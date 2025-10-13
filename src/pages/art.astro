@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
 import BentoGridDemo from '../components/ui/bento-grid-demo';
+import CategoryFilter from '../components/ui/category-filter';
+import ArtHeroText from '../components/ui/art-hero-text';
 ---
 
 <Layout title="Art | carlosgarcia.works" description="Digital artwork and 3D exploration by Carlos Garcia">
@@ -9,19 +11,17 @@ import BentoGridDemo from '../components/ui/bento-grid-demo';
 		<DotBackgroundDemo client:load />
 		
 		<!-- Hero Section -->
-		<div class="relative w-full pt-24 pb-12">
-			<div class="flex flex-col gap-4">
-				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white">
-					Art
-				</h1>
-				<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl">
-					Digital artwork & exploration. A collection of 3D renders, experiments, and creative work spanning various styles and techniques.
-				</p>
-			</div>
+		<div class="relative z-10 w-full pt-24 pb-12">
+			<ArtHeroText client:load />
+		</div>
+
+		<!-- Category Filter -->
+		<div class="relative z-10 w-full py-8 border-b border-gray-200 dark:border-gray-800">
+			<CategoryFilter client:load />
 		</div>
 
 		<!-- Bento Grid Gallery -->
-		<div class="relative w-full py-12">
+		<div class="relative z-10 w-full py-12">
 			<BentoGridDemo client:load />
 		</div>
 	</main>

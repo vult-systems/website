@@ -1,11 +1,32 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import DotBackgroundDemo from '../components/ui/dot-background-demo';
 ---
 
-<Layout title="about | carlosgarcia.works">
-	<main class="min-h-screen w-full bg-zinc-950 text-gray-200">
-		<div class="relative w-full max-w-[90rem] mx-auto px-8 py-20">
-			<h1 class="text-4xl font-normal text-white">Coming Soon</h1>
+<Layout title="About | carlosgarcia.works" description="Learn about Carlos Garcia - 3D Artist & Educator">
+	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
+		<DotBackgroundDemo client:load />
+		
+		<!-- Hero Section -->
+		<div class="relative z-10 w-full pt-24 pb-12">
+			<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
+				About Me
+			</h1>
+			<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mb-12">
+				3D Artist & Educator based in San Antonio, Texas. I create digital art, develop creative tools, 
+				and teach others to build with intention.
+			</p>
+		</div>
+
+		<!-- Resume PDF Embed -->
+		<div class="relative z-10 w-full pb-12">
+			<div class="w-full max-w-5xl bg-white dark:bg-zinc-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-800">
+				<iframe 
+					src="/resume.pdf" 
+					class="w-full h-[calc(100vh-200px)] min-h-[800px]"
+					title="Carlos Garcia Resume"
+				></iframe>
+			</div>
 		</div>
 	</main>
 </Layout>

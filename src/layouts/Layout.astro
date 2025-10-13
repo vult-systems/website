@@ -1,5 +1,6 @@
 ---
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 import "../styles/globals.css";
 import "../styles/fonts.css";
 
@@ -30,10 +31,11 @@ const { title, description = "My portfolio website", image = "/astro.svg"} = Ast
 			}
 		</script>
 	</head>
-	<body class="min-h-screen bg-background text-foreground font-['Clarendon_LT_STD'] font-light">
+	<body class="min-h-screen bg-background text-foreground font-['Clarendon_LT_STD'] font-light flex flex-col">
 		<Header />
-		<main class="px-6 md:px-8 lg:px-12 max-w-[90rem] mx-auto w-full">
+		<main class="px-12 md:px-18 lg:px-24 max-w-[90rem] mx-auto w-full flex-grow">
 			<slot />
 		</main>
+		<Footer />
 	</body>
 </html>

@@ -1,9 +1,12 @@
 ---
 import { ThemeToggle } from './ui/theme-toggle';
+
+const currentPath = Astro.url.pathname;
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
-    <div class="w-full max-w-[90rem] mx-auto flex h-20 items-center justify-between px-6 md:px-8 lg:px-12 border-b border-gray-200 dark:border-gray-800">
+    <div class="w-full max-w-[90rem] mx-auto px-12 md:px-18 lg:px-24">
+        <div class="flex h-20 items-center justify-between border-b border-gray-200 dark:border-gray-800">
         <a href="/" class="flex items-end gap-x-3">
             <img
                 src="/images/logo.svg"
@@ -12,7 +15,7 @@ import { ThemeToggle } from './ui/theme-toggle';
                 alt="Carlos Garcia Logo"
                 class="dark:brightness-[.85] mb-[2px]"
             />
-            <span class="text-xl font-bold text-gray-800 dark:text-gray-200 hover:text-amber-400 transition-colors leading-none">
+            <span class="text-xl font-bold text-gray-800 dark:text-gray-200 hover:text-amber-500 transition-colors leading-none">
                 carlosgarcia.works
             </span>
         </a>
@@ -21,32 +24,32 @@ import { ThemeToggle } from './ui/theme-toggle';
             <nav class="hidden md:block">
                 <ul class="flex gap-x-6 lg:gap-x-8">
                     <li>
-                        <a href="/art" class="text-gray-600 dark:text-gray-400 hover:text-amber-400 transition-colors text-sm">
+                        <a href="/art" class={`text-base hover:text-amber-500 transition-colors ${currentPath.startsWith('/art') ? 'text-amber-500' : 'text-gray-600 dark:text-gray-400'}`}>
                             Art
                         </a>
                     </li>
                     <li>
-                        <a href="/code" class="text-gray-600 dark:text-gray-400 hover:text-amber-400 transition-colors text-sm">
+                        <a href="/code" class={`text-base hover:text-amber-500 transition-colors ${currentPath.startsWith('/code') ? 'text-amber-500' : 'text-gray-600 dark:text-gray-400'}`}>
                             Code
                         </a>
                     </li>
                     <li>
-                        <a href="/learn" class="text-gray-600 dark:text-gray-400 hover:text-amber-400 transition-colors text-sm">
+                        <a href="/learn" class={`text-base hover:text-amber-500 transition-colors ${currentPath.startsWith('/learn') ? 'text-amber-500' : 'text-gray-600 dark:text-gray-400'}`}>
                             Learn
                         </a>
                     </li>
                     <li>
-                        <a href="/log" class="text-gray-600 dark:text-gray-400 hover:text-amber-400 transition-colors text-sm">
+                        <a href="/log" class={`text-base hover:text-amber-500 transition-colors ${currentPath.startsWith('/log') ? 'text-amber-500' : 'text-gray-600 dark:text-gray-400'}`}>
                             Log
                         </a>
                     </li>
                     <li>
-                        <a href="/vult" class="text-gray-600 dark:text-gray-400 hover:text-amber-400 transition-colors text-sm">
-                            Vult<span class="text-[0.6em] align-super">©</span>
+                        <a href="/vult" class={`text-base hover:text-amber-500 transition-colors ${currentPath.startsWith('/vult') ? 'text-amber-500' : 'text-gray-600 dark:text-gray-400'}`}>
+                            Vult
                         </a>
                     </li>
                     <li>
-                        <a href="/about" class="text-gray-600 dark:text-gray-400 hover:text-amber-400 transition-colors text-sm">
+                        <a href="/about" class={`text-base hover:text-amber-500 transition-colors ${currentPath.startsWith('/about') ? 'text-amber-500' : 'text-gray-600 dark:text-gray-400'}`}>
                             About
                         </a>
                     </li>
@@ -54,6 +57,7 @@ import { ThemeToggle } from './ui/theme-toggle';
             </nav>
             
             <ThemeToggle client:load />
+        </div>
         </div>
     </div>
 </header>

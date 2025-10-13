@@ -3,7 +3,7 @@ import React from "react";
 
 export default function DotBackgroundDemo() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center">
+    <div className="pointer-events-none fixed inset-0 z-0 bg-white dark:bg-zinc-950">
       <div
         className={cn(
           "absolute inset-0",
@@ -12,8 +12,6 @@ export default function DotBackgroundDemo() {
           "dark:[background-image:radial-gradient(#404040_1px,transparent_1px)]",
         )}
       />
-      {/* Radial gradient for the container to give a faded look */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white dark:bg-zinc-950 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
     </div>
   );
 }

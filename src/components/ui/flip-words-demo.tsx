@@ -20,19 +20,14 @@ export default function FlipWordsDemo() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-3 w-full px-4 sm:px-0">
-      <div className="flex flex-col">
-        <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-normal text-gray-600 dark:text-gray-400 leading-tight break-words">
-          Welcome to my workspace for all things
-        </div>
-        <div key={currentIndex} className="h-[2rem] sm:h-[2.5rem] md:h-[3rem] lg:h-[3.5rem] xl:h-[4rem] flex items-start max-w-full mt-2">
-          <TextGenerateEffect
-            words={items[currentIndex].phrase}
-            duration={0.6}
-            filter={true}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-gray-800 dark:text-gray-200"
-          />
-        </div>
+    <div className="flex flex-col gap-3 w-full">
+      <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-normal leading-tight">
+        <span className="text-gray-600 dark:text-gray-400">
+          Welcome to my workspace for all things{" "}
+        </span>
+        <span key={currentIndex} className="text-gray-800 dark:text-gray-200">
+          {items[currentIndex].phrase}
+        </span>
       </div>
       <div className="flex flex-col gap-4 mt-6 sm:mt-8">
         <img
@@ -42,7 +37,7 @@ export default function FlipWordsDemo() {
         />
         <a
           href={items[currentIndex].href}
-          className="text-gray-600 dark:text-gray-400 hover:text-amber-400 transition-colors text-sm tracking-wide"
+          className="text-amber-500 hover:text-amber-600 transition-colors text-sm tracking-wide"
         >
           {items[currentIndex].link} ›
         </a>

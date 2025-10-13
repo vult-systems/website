@@ -21,7 +21,7 @@ export default function BentoGridDemo() {
 }
 
 const ImageHeader = ({ src, alt }: { src: string; alt: string }) => (
-  <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl overflow-hidden">
+  <div className="flex flex-1 w-full h-full min-h-[16rem] rounded-xl overflow-hidden">
     <img
       src={src}
       alt={alt}
