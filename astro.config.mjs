@@ -4,6 +4,8 @@ import react from '@astrojs/react';
 
 export default defineConfig({
   site: 'https://carlosgarcia.works',
+  base: '/',
+  output: 'static',
   integrations: [
     tailwind({
       applyBaseStyles: false,
