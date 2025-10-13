@@ -4,10 +4,10 @@ import DirectionAwareHoverDemo from "./direction-aware-hover-demo";
 
 export function HeroSection() {
   return (
-    <div className="grid lg:grid-cols-2 gap-4 lg:gap-6 items-center h-screen py-4 sm:py-8">
+    <div className="grid lg:grid-cols-2 gap-8 lg:gap-6 items-center min-h-screen py-8 sm:py-12 lg:py-4">
       {/* Left Panel */}
-      <div className="flex flex-col justify-center w-full px-4 sm:px-6 lg:px-0">
-        <div className="w-full max-w-xl">
+      <div className="flex flex-col justify-center w-full lg:px-0">
+        <div className="w-full max-w-xl mx-auto lg:mx-0">
           <FlipWordsDemo />
         </div>
       </div>
