@@ -1,0 +1,62 @@
+---
+import { ThemeToggle } from './ui/theme-toggle';
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-md">
+    <div class="w-full max-w-[90rem] mx-auto flex h-20 items-center justify-between px-8 border-b border-gray-800">
+        <a href="/" class="flex items-end gap-x-3 h-8">
+            <img
+                src="/images/logo.svg"
+                width={32}
+                height={32}
+                alt="Carlos Garcia Logo"
+                class="dark:brightness-[.85]"
+            />
+            <span class="text-xl font-bold text-gray-200 hover:text-amber-400 transition-colors leading-none pb-1">
+                carlosgarcia.works
+            </span>
+        </a>
+        
+        <div class="flex items-center gap-x-8">
+            <nav class="hidden md:block">
+                <ul class="flex gap-x-8">
+                    <li>
+                        <a href="/art" class="text-gray-400 hover:text-amber-400 transition-colors">
+                            Art
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/code" class="text-gray-400 hover:text-amber-400 transition-colors">
+                            Code
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/learn" class="text-gray-400 hover:text-amber-400 transition-colors">
+                            Learn
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/log" class="text-gray-400 hover:text-amber-400 transition-colors">
+                            Log
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vult" class="text-gray-400 hover:text-amber-400 transition-colors">
+                            Vult<span class="text-sm align-super">©</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/about" class="text-gray-400 hover:text-amber-400 transition-colors">
+                            About
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <ThemeToggle client:load />
+        </div>
+    </div>
+</header>
+
+<!-- Spacer to prevent content from going under fixed header -->
+<div class="h-16"></div>

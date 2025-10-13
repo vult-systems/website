@@ -1,11 +1,14 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import { HeroSection } from '../components/ui/hero-section';
+import DotBackgroundDemo from '../components/ui/dot-background-demo';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="carlosgarcia.works">
+	<main class="min-h-screen w-full bg-zinc-950 text-gray-200">
+		<DotBackgroundDemo client:load />
+		<div class="relative w-full max-w-[90rem] mx-auto px-8">
+			<HeroSection client:load />
+		</div>
+	</main>
 </Layout>

@@ -1,0 +1,91 @@
+---
+import { cn } from "../lib/utils.ts";
+
+interface Props {
+  className?: string;
+  containerClassName?: string;
+}
+
+const { className, containerClassName } = Astro.props;
+---
+
+<script>
+  class Card3D extends HTMLElement {
+    container: HTMLDivElement | null = null;
+    isMouseEntered = false;
+
+    constructor() {
+      super();
+      this.container = this.querySelector("[data-card-container]");
+      this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+      if (!this.container) return;
+
+      this.container.addEventListener("mouseenter", this.handleMouseEnter.bind(this));
+      this.container.addEventListener("mousemove", this.handleMouseMove.bind(this));
+      this.container.addEventListener("mouseleave", this.handleMouseLeave.bind(this));
+    }
+
+    handleMouseMove(e: MouseEvent) {
+      if (!this.container) return;
+      const { left, top, width, height } = this.container.getBoundingClientRect();
+      const x = (e.clientX - left - width / 2) / 25;
+      const y = (e.clientY - top - height / 2) / 25;
+      this.container.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+    }
+
+    handleMouseEnter() {
+      this.isMouseEntered = true;
+      this.updateChildTransforms();
+    }
+
+    handleMouseLeave() {
+      if (!this.container) return;
+      this.isMouseEntered = false;
+      this.container.style.transform = `rotateY(0deg) rotateX(0deg)`;
+      this.updateChildTransforms();
+    }
+
+    updateChildTransforms() {
+      const cardItems = this.querySelectorAll("[data-card-item]");
+      cardItems.forEach((item: Element) => {
+        if (!(item instanceof HTMLElement)) return;
+        
+        const translateX = item.dataset.translateX || "0";
+        const translateY = item.dataset.translateY || "0";
+        const translateZ = item.dataset.translateZ || "0";
+        const rotateX = item.dataset.rotateX || "0";
+        const rotateY = item.dataset.rotateY || "0";
+        const rotateZ = item.dataset.rotateZ || "0";
+
+        if (this.isMouseEntered) {
+          item.style.transform = `translateX(${translateX}px) translateY(${translateY}px) translateZ(${translateZ}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
+        } else {
+          item.style.transform = `translateX(0px) translateY(0px) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;
+        }
+      });
+    }
+  }
+
+  customElements.define("card-3d", Card3D);
+</script>
+
+<card-3d>
+  <div
+    class={cn("py-20 flex items-center justify-center", containerClassName)}
+    style="perspective: 1000px;"
+  >
+    <div
+      data-card-container
+      class={cn(
+        "flex items-center justify-center relative transition-all duration-200 ease-linear",
+        className
+      )}
+      style="transform-style: preserve-3d;"
+    >
+      <slot />
+    </div>
+  </div>
+</card-3d>

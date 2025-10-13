@@ -1,0 +1,38 @@
+---
+interface Props {
+  as?: string;
+  className?: string;
+  translateX?: number;
+  translateY?: number;
+  translateZ?: number;
+  rotateX?: number;
+  rotateY?: number;
+  rotateZ?: number;
+}
+
+const {
+  as: Element = "div",
+  className,
+  translateX = 0,
+  translateY = 0,
+  translateZ = 0,
+  rotateX = 0,
+  rotateY = 0,
+  rotateZ = 0,
+  ...rest
+} = Astro.props;
+---
+
+<Element
+  data-card-item
+  data-translate-x={translateX}
+  data-translate-y={translateY}
+  data-translate-z={translateZ}
+  data-rotate-x={rotateX}
+  data-rotate-y={rotateY}
+  data-rotate-z={rotateZ}
+  class:list={["w-fit transition duration-200 ease-linear", className]}
+  {...rest}
+>
+  <slot />
+</Element>
