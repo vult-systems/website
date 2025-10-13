@@ -8,7 +8,7 @@ export default function DirectionAwareHoverDemo() {
       <div className="h-full w-full relative flex items-center justify-center">
         <DirectionAwareHover 
           imageUrl={imageUrl}
-          className="h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] md:h-[500px] md:w-[500px]"
+          className="h-[300px] w-[400px] sm:h-[350px] sm:w-[450px] md:h-[400px] md:w-[500px]"
           imageClassName="grayscale hover:grayscale-0 transition-all duration-300"
         >
           <div className="flex flex-col gap-2">
@@ -17,7 +17,7 @@ export default function DirectionAwareHoverDemo() {
           </div>
         </DirectionAwareHover>
       </div>
-      <div className="flex flex-col gap-3 w-[300px] sm:w-[400px] md:w-[500px]">
+      <div className="flex flex-col gap-3 w-[400px] sm:w-[450px] md:w-[500px]">
         <div className="text-lg sm:text-xl font-normal text-white">
           Creating at the intersection of art and technology
         </div>

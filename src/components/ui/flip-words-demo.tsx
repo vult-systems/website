@@ -22,22 +22,27 @@ export default function FlipWordsDemo() {
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className="flex flex-col">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-gray-400 leading-tight break-words md:break-normal">
+        <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-normal text-gray-400 leading-tight break-words md:break-normal">
           Welcome to my workspace for all things
-        </h1>
-        <div key={currentIndex} className="min-h-[4rem] sm:min-h-[5rem] md:min-h-[6rem] flex items-start w-full mt-2">
+        </div>
+        <div key={currentIndex} className="h-[2.5rem] sm:h-[3rem] md:h-[3.5rem] lg:h-[4rem] flex items-start max-w-full mt-2">
           <TextGenerateEffect
             words={items[currentIndex].phrase}
             duration={0.6}
             filter={true}
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-200"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-gray-200"
           />
         </div>
       </div>
-      <div className="flex items-center gap-4 text-sm tracking-wide pt-2">
+      <div className="flex flex-col gap-4 mt-8">
+        <img
+          src="/images/logo.svg"
+          alt="Carlos Garcia Logo"
+          className="w-8 h-8 dark:brightness-[.85]"
+        />
         <a
           href={items[currentIndex].href}
-          className="text-gray-400 hover:text-amber-400 transition-colors"
+          className="text-gray-400 hover:text-amber-400 transition-colors text-sm tracking-wide"
         >
           {items[currentIndex].link} ›
         </a>
