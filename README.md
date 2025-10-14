@@ -1,4 +1,4 @@
-## 🎨 Tech Stack
+## Tech Stack
 
 - **Framework**: Astro v5
 - **UI Library**: React v19
