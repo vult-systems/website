@@ -1,20 +1,46 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
 ---
 
-<Layout title="Vult | carlosgarcia.works" description="Vult Studio projects and work">
+<BaseLayout 
+	title="Vult Studio | Carlos Garcia | Client Work & Collaborations" 
+	description="Professional studio work, client projects, and collaborative endeavors by Carlos Garcia. Pushing creative boundaries through commercial and artistic partnerships."
+	keywords="Studio Work, Client Projects, Commercial 3D, Collaborations, Professional Work, 3D Production, Creative Partnerships"
+>
+<Header />
 	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
 		<DotBackgroundDemo client:load />
 		
 		<!-- Hero Section -->
-		<div class="relative z-10 w-full pt-24 pb-12">
-			<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
-				Vult
-			</h1>
-			<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl">
-				Coming Soon
-			</p>
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
+					Vult
+				</h1>
+				<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed">
+					Studio work, client projects, and collaborative endeavors pushing creative boundaries. From concept to completion, each project represents a commitment to craft and creative problem-solving.
+				</p>
+			</div>
+		</div>
+
+		{/* Divider */}
+		<div class="relative z-10 w-full">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<div class="border-t border-gray-200 dark:border-gray-800"></div>
+			</div>
+		</div>
+
+		<!-- Coming Soon -->
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<p class="text-center text-gray-500 dark:text-gray-500">
+					Studio projects coming soon. Check back for updates.
+				</p>
+			</div>
 		</div>
 	</main>
-</Layout>
+<Footer />
+</BaseLayout>

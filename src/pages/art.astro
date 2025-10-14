@@ -1,28 +1,50 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
 import BentoGridDemo from '../components/ui/bento-grid-demo';
 import CategoryFilter from '../components/ui/category-filter';
 import ArtHeroText from '../components/ui/art-hero-text';
 ---
 
-<Layout title="Art | carlosgarcia.works" description="Digital artwork and 3D exploration by Carlos Garcia">
+<BaseLayout 
+	title="3D Art Gallery | Carlos Garcia | Digital Sculptures & Environments" 
+	description="Explore the 3D art portfolio of Carlos Garcia featuring digital sculptures, procedural environments, character work, and creative experiments in Houdini, Blender, and other 3D tools."
+	keywords="3D Art, Digital Sculpture, 3D Environments, Houdini Art, Blender Art, Character Design, Procedural Art, Technical Art Portfolio"
+>
+<Header />
 	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
 		<DotBackgroundDemo client:load />
 		
 		<!-- Hero Section -->
-		<div class="relative z-10 w-full pt-24 pb-12">
-			<ArtHeroText client:load />
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
+					Art
+				</h1>
+				<ArtHeroText client:load />
+				
+				<!-- Category Filter -->
+				<div class="mt-8">
+					<CategoryFilter client:load />
+				</div>
+			</div>
 		</div>
 
-		<!-- Category Filter -->
-		<div class="relative z-10 w-full py-8 border-b border-gray-200 dark:border-gray-800">
-			<CategoryFilter client:load />
+		{/* Divider */}
+		<div class="relative z-10 w-full">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<div class="border-t border-gray-200 dark:border-gray-800"></div>
+			</div>
 		</div>
 
 		<!-- Bento Grid Gallery -->
-		<div class="relative z-10 w-full py-12">
-			<BentoGridDemo client:load />
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<BentoGridDemo client:load />
+			</div>
 		</div>
 	</main>
-</Layout>
+<Footer />
+</BaseLayout>

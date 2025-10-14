@@ -1,20 +1,210 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
 ---
 
-<Layout title="Log | carlosgarcia.works" description="Project log and updates by Carlos Garcia">
+<BaseLayout 
+	title="Blog | Carlos Garcia | Insights on 3D Art, Tech & Creative Workflows" 
+	description="Blog posts, insights, and thoughts on 3D art, technical direction, pipeline development, and creative workflows. Regular updates from Carlos Garcia."
+	keywords="3D Art Blog, Technical Art Blog, Pipeline Development, Houdini Tips, Creative Workflows, Artist Insights, Technical Direction"
+>
+<Header />
 	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
 		<DotBackgroundDemo client:load />
 		
 		<!-- Hero Section -->
-		<div class="relative z-10 w-full pt-24 pb-12">
-			<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
-				Log
-			</h1>
-			<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl">
-				Coming Soon
-			</p>
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
+					Log
+				</h1>
+				<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed">
+					A written and visual journal documenting my process, experiments, and reflections. Thoughts on craft, technical notes, work-in-progress updates, and the occasional deep dive into what makes things tick.
+				</p>
+				
+				<!-- Category Filter -->
+				<div class="mt-8">
+					<div class="flex flex-wrap gap-6 items-center">
+						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-amber-500">
+							All
+						</button>
+						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
+							Process
+						</button>
+						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
+							Thoughts
+						</button>
+						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
+							Technical
+						</button>
+						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
+							Experiment
+						</button>
+						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
+							3D
+						</button>
+						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
+							Tutorial
+						</button>
+						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
+							WIP
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		{/* Divider */}
+		<div class="relative z-10 w-full">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<div class="border-t border-gray-200 dark:border-gray-800"></div>
+			</div>
+		</div>
+
+		<!-- Journal Entries Section - Vertical Scroll -->
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<div class="max-w-4xl mx-auto">
+				
+				<!-- Entry Feed -->
+				<div class="space-y-16">
+					
+					<!-- Sample Entry 1 -->
+					<article class="group pb-16 border-b border-gray-200 dark:border-gray-800">
+						<div class="space-y-6">
+							<!-- Meta -->
+							<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+								<time>January 15, 2025</time>
+								<span>•</span>
+								<div class="flex gap-2">
+									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">Process</span>
+									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">3D</span>
+								</div>
+							</div>
+							
+							<!-- Title -->
+							<h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white">
+								Sample Entry Title
+							</h2>
+							
+							<!-- Featured Image -->
+							<div class="aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-zinc-900">
+								<div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
+									<span class="text-6xl">📝</span>
+								</div>
+							</div>
+							
+							<!-- Content -->
+							<div class="prose prose-lg dark:prose-invert max-w-none">
+								<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+									This is where the journal entry content would go. You can write about your process, share experiments, document technical challenges, or reflect on your creative practice. The content flows naturally down the page, making it easy to read and digest.
+								</p>
+								<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+									Multiple paragraphs, images, code snippets, and other media can be included. Each entry tells its own story in your visual and written journal.
+								</p>
+							</div>
+							
+							<!-- Read More Link -->
+							<a href="#" class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors duration-200">
+								<span>Read full entry</span>
+								<span class="ml-2">→</span>
+							</a>
+						</div>
+					</article>
+
+					<!-- Sample Entry 2 -->
+					<article class="group pb-16 border-b border-gray-200 dark:border-gray-800">
+						<div class="space-y-6">
+							<!-- Meta -->
+							<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+								<time>January 10, 2025</time>
+								<span>•</span>
+								<div class="flex gap-2">
+									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">Thoughts</span>
+								</div>
+							</div>
+							
+							<!-- Title -->
+							<h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white">
+								Reflections on Craft
+							</h2>
+							
+							<!-- Featured Image -->
+							<div class="aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-zinc-900">
+								<div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
+									<span class="text-6xl">💭</span>
+								</div>
+							</div>
+							
+							<!-- Content -->
+							<div class="prose prose-lg dark:prose-invert max-w-none">
+								<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+									Another entry exploring different aspects of the creative process. Each post captures a moment in time, documenting progress, setbacks, breakthroughs, and everything in between.
+								</p>
+							</div>
+							
+							<!-- Read More Link -->
+							<a href="#" class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors duration-200">
+								<span>Read full entry</span>
+								<span class="ml-2">→</span>
+							</a>
+						</div>
+					</article>
+
+					<!-- Sample Entry 3 -->
+					<article class="group pb-16 border-b border-gray-200 dark:border-gray-800">
+						<div class="space-y-6">
+							<!-- Meta -->
+							<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+								<time>January 5, 2025</time>
+								<span>•</span>
+								<div class="flex gap-2">
+									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">Experiment</span>
+									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">Technical</span>
+								</div>
+							</div>
+							
+							<!-- Title -->
+							<h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white">
+								Technical Experiments
+							</h2>
+							
+							<!-- Featured Image -->
+							<div class="aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-zinc-900">
+								<div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
+									<span class="text-6xl">🔬</span>
+								</div>
+							</div>
+							
+							<!-- Content -->
+							<div class="prose prose-lg dark:prose-invert max-w-none">
+								<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+									Documentation of experiments, technical explorations, and the occasional deep dive into problem-solving. Failures, discoveries, and learnings all find a place here.
+								</p>
+							</div>
+							
+							<!-- Read More Link -->
+							<a href="#" class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors duration-200">
+								<span>Read full entry</span>
+								<span class="ml-2">→</span>
+							</a>
+						</div>
+					</article>
+
+				</div>
+
+				<!-- Coming Soon Message -->
+				<div class="mt-16 text-center">
+					<p class="text-gray-500 dark:text-gray-500">
+						More entries coming soon. Check back regularly for updates.
+					</p>
+				</div>
+
+				</div>
+			</div>
 		</div>
 	</main>
-</Layout>
+<Footer />
+</BaseLayout>

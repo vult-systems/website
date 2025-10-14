@@ -1,32 +1,76 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
 ---
 
-<Layout title="About | carlosgarcia.works" description="Learn about Carlos Garcia - 3D Artist & Educator">
+<BaseLayout 
+	title="About Carlos Garcia | 3D Artist & Educator | San Antonio, TX" 
+	description="Learn about Carlos Garcia - 3D Artist, Technical Director, and Educator based in San Antonio, Texas. Bridging theory and practice through art, code, and education. View resume and contact information."
+	keywords="Carlos Garcia, About, 3D Artist Bio, Technical Artist Resume, San Antonio Artist, Educator Bio, Portfolio, Contact"
+>
+<Header />
 	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
 		<DotBackgroundDemo client:load />
 		
 		<!-- Hero Section -->
-		<div class="relative z-10 w-full pt-24 pb-12">
-			<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
-				About Me
-			</h1>
-			<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mb-12">
-				3D Artist & Educator based in San Antonio, Texas. I create digital art, develop creative tools, 
-				and teach others to build with intention.
-			</p>
-		</div>
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
+					About Me
+				</h1>
+				<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed mb-12">
+					3D Artist & Educator based in San Antonio, Texas. I create digital art, develop creative tools, 
+					and teach others to build with intention. Bridging theory and practice through art, code, and education.
+				</p>
 
-		<!-- Resume PDF Embed -->
-		<div class="relative z-10 w-full pb-12">
-			<div class="w-full max-w-5xl bg-white dark:bg-zinc-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-800">
-				<iframe 
-					src="/resume.pdf" 
-					class="w-full h-[calc(100vh-200px)] min-h-[800px]"
-					title="Carlos Garcia Resume"
-				></iframe>
+				<div class="max-w-5xl">
+					<!-- Resume Preview Card -->
+					<a 
+						href="/resume.pdf" 
+						target="_blank"
+						rel="noopener noreferrer"
+						class="block group relative"
+					>
+						<div class="shadow-input flex flex-col justify-between space-y-2 rounded-lg border border-neutral-200 dark:border-white/[0.2] bg-white dark:bg-zinc-950/50 p-4 transition duration-200 hover:shadow-xl dark:shadow-none group-hover:scale-[1.02]">
+							<!-- Resume Thumbnail -->
+							<div class="aspect-[16/9] relative rounded-lg overflow-hidden group-hover:blur-sm transition-all duration-300 bg-white dark:bg-zinc-900 flex items-center justify-center p-8">
+								<!-- Overlay on hover -->
+								<div class="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 z-10 flex items-center justify-center pointer-events-none">
+									<div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
+										<p class="text-white text-lg font-normal mb-2">View Full Resume</p>
+										<p class="text-gray-300 text-sm">Opens in new tab</p>
+									</div>
+								</div>
+								
+								<!-- Paper with text lines -->
+								<div class="w-full space-y-3">
+									<div class="h-2 bg-gray-800 dark:bg-gray-300 rounded w-3/4"></div>
+									<div class="h-2 bg-gray-600 dark:bg-gray-400 rounded w-full"></div>
+									<div class="h-2 bg-gray-600 dark:bg-gray-400 rounded w-5/6"></div>
+									<div class="h-2 bg-gray-600 dark:bg-gray-400 rounded w-full"></div>
+									<div class="h-2 bg-gray-600 dark:bg-gray-400 rounded w-4/5"></div>
+									<div class="mt-4 h-2 bg-gray-800 dark:bg-gray-300 rounded w-2/3"></div>
+									<div class="h-2 bg-gray-600 dark:bg-gray-400 rounded w-full"></div>
+									<div class="h-2 bg-gray-600 dark:bg-gray-400 rounded w-3/4"></div>
+								</div>
+							</div>
+							
+							<!-- Card Content -->
+							<div class="transition duration-200 group-hover:translate-x-2">
+								<div class="mt-2 mb-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
+									Full Resume & CV
+								</div>
+								<div class="font-sans text-sm font-normal text-neutral-600 dark:text-neutral-300">
+									Experience spanning 3D art, technical direction, education, and software development. Click to view or download PDF.
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
 			</div>
 		</div>
 	</main>
-</Layout>
+<Footer />
+</BaseLayout>

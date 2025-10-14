@@ -1,0 +1,16 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /.well-known/
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://carlosgarcia.works/sitemap-index.xml
+
+# Security
+User-agent: *
+Disallow: /admin/
+Disallow: /private/

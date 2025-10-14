@@ -1,0 +1,122 @@
+---
+import { Image } from 'astro:assets';
+import logoSvg from '../../assets/images/logo.svg';
+import profileImg from '../../assets/images/profile.jpg';
+
+const workspaceLinks = [
+  { phrase: "digital artwork & exploration", link: "ART", href: "/art" },
+  { phrase: "technical solutions & tools", link: "CODE", href: "/code" },
+  { phrase: "educational resources", link: "LEARN", href: "/learn" },
+  { phrase: "thoughts & documentation", link: "LOG", href: "/log" },
+  { phrase: "studio practice & projects", link: "VULT", href: "/vult" }
+];
+---
+
+<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+  <div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center">
+  {/* Left Panel - Workspace Introduction */}
+  <div class="flex flex-col justify-center w-full">
+    <div class="flex flex-col gap-6 w-full">
+      <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal leading-tight">
+        <span class="text-gray-600 dark:text-gray-400">Welcome to my workspace for all things </span>
+        <span id="workspace-text" class="text-gray-800 dark:text-gray-200 inline-block transition-all duration-600 ease-in-out">{workspaceLinks[0].phrase}</span>
+      </div>
+      <div class="flex flex-col gap-6 mt-8 sm:mt-10 lg:mt-12">
+        <Image
+          src={logoSvg}
+          alt="Carlos Garcia Logo"
+          width={48}
+          height={48}
+          class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 dark:brightness-[.85] transition-opacity duration-300"
+        />
+        <a
+          id="workspace-link"
+          href={workspaceLinks[0].href}
+          class="inline-block text-amber-500 hover:text-amber-600 hover:scale-110 transition-all duration-300 text-sm tracking-wide"
+        >
+          {workspaceLinks[0].link} ›
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  {/* Right Panel - Profile Card & About */}
+  <div class="w-full flex items-center justify-center lg:justify-end">
+    <div class="w-full space-y-8 sm:space-y-10 lg:space-y-12">
+      {/* Profile Card */}
+      <div class="w-full group overflow-hidden rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-zinc-900 shadow-xl hover:shadow-2xl transition-all duration-300">
+        <div class="relative w-full aspect-[16/9] overflow-hidden">
+          <Image
+            src={profileImg}
+            alt="Carlos Garcia"
+            widths={[400, 800, 1200]}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105"
+            loading="eager"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent group-hover:from-black/60 transition-all duration-300" />
+          <div class="absolute bottom-6 left-6 right-6 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+            <p class="font-clarendon text-2xl sm:text-3xl md:text-4xl tracking-wide text-amber-500">
+              Carlos Garcia
+            </p>
+            <p class="font-normal text-base sm:text-lg md:text-xl text-gray-200">
+              3D Artist & Educator
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Text Content */}
+      <div class="w-full space-y-3">
+        <p class="text-white dark:text-white text-base sm:text-lg md:text-xl leading-relaxed">
+          Creating at the intersection of art and technology.
+        </p>
+        <p class="text-gray-600 dark:text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed">
+          I'm a 3D artist and educator based in San Antonio, working across digital art, pipeline development, and creative instruction. I believe in bridging theory and practice - helping artists build with intention.
+        </p>
+        <a 
+          href="/about" 
+          class="inline-block text-sm tracking-wide text-amber-500 hover:text-amber-600 hover:scale-110 transition-all duration-200 mt-3"
+        >
+          ABOUT ME ›
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ workspaceLinks }}>
+  let currentIndex = 0;
+  let isTransitioning = false;
+  
+  const textElement = document.getElementById('workspace-text');
+  const linkElement = document.getElementById('workspace-link');
+  
+  function updateContent() {
+    if (!textElement || !linkElement) return;
+    
+    isTransitioning = true;
+    textElement.style.opacity = '0';
+    textElement.style.transform = 'translateY(0.5rem)';
+    linkElement.style.opacity = '0';
+    
+    setTimeout(() => {
+      currentIndex = (currentIndex + 1) % workspaceLinks.length;
+      const current = workspaceLinks[currentIndex];
+      
+      textElement.textContent = current.phrase;
+      linkElement.textContent = current.link + ' ›';
+      linkElement.href = current.href;
+      
+      setTimeout(() => {
+        textElement.style.opacity = '1';
+        textElement.style.transform = 'translateY(0)';
+        linkElement.style.opacity = '1';
+        isTransitioning = false;
+      }, 50);
+    }, 300);
+  }
+  
+  setInterval(updateContent, 3500);
+</script>

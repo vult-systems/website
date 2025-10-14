@@ -1,20 +1,46 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
 ---
 
-<Layout title="Code | carlosgarcia.works" description="Code projects and development by Carlos Garcia">
+<BaseLayout 
+	title="Code & Tools | Carlos Garcia | Pipeline Development & Technical Solutions" 
+	description="Pipeline tools, technical art solutions, and software projects by Carlos Garcia. Bridging creativity and efficiency through Python, Houdini tools, and custom development."
+	keywords="Pipeline Tools, Technical Art Tools, Houdini Development, Python Tools, 3D Pipeline, Artist Tools, Automation, Technical Solutions"
+>
+<Header />
 	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
 		<DotBackgroundDemo client:load />
 		
 		<!-- Hero Section -->
-		<div class="relative z-10 w-full pt-24 pb-12">
-			<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
-				Code
-			</h1>
-			<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl">
-				Coming Soon
-			</p>
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
+					Code
+				</h1>
+				<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed">
+					Pipeline tools, technical art solutions, and software built to bridge creativity and efficiency. From automation scripts to custom tools, each project solves real problems in the creative workflow.
+				</p>
+			</div>
+		</div>
+
+		{/* Divider */}
+		<div class="relative z-10 w-full">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<div class="border-t border-gray-200 dark:border-gray-800"></div>
+			</div>
+		</div>
+
+		<!-- Coming Soon -->
+		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<p class="text-center text-gray-500 dark:text-gray-500">
+					Projects coming soon. Check back for updates.
+				</p>
+			</div>
 		</div>
 	</main>
-</Layout>
+<Footer />
+</BaseLayout>

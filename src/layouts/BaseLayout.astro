@@ -1,0 +1,121 @@
+---
+import "../styles/globals.css";
+import "../styles/fonts.css";
+import { getImage } from 'astro:assets';
+import logoSvg from '../assets/images/logo.svg';
+
+interface Props {
+	title: string;
+	description?: string;
+	image?: string;
+	type?: 'website' | 'article';
+	keywords?: string;
+	author?: string;
+}
+
+const { 
+	title, 
+	description = "Portfolio of Carlos Garcia - 3D Artist & Educator specializing in technical art, pipeline development, and creative education", 
+	image,
+	type = 'website',
+	keywords = "3D Artist, Technical Artist, Educator, Pipeline Development, Houdini, Blender, 3D Art, Creative Tools, San Antonio",
+	author = "Carlos Garcia"
+} = Astro.props;
+
+// Use optimized logo as default OG image and favicon
+const optimizedLogo = await getImage({ src: logoSvg, format: 'svg' });
+const ogImage = image || optimizedLogo.src;
+const faviconSvg = optimizedLogo.src;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const siteUrl = Astro.site?.toString() || 'https://carlosgarcia.works';
+---
+
+<!doctype html>
+<html lang="en" class="antialiased dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		
+		<!-- Primary Meta Tags -->
+		<title>{title}</title>
+		<meta name="title" content={title} />
+		<meta name="description" content={description} />
+		<meta name="keywords" content={keywords} />
+		<meta name="author" content={author} />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+		<link rel="canonical" href={canonicalURL} />
+		
+		<!-- Favicon -->
+		<link rel="icon" type="image/svg+xml" href={faviconSvg} />
+		<link rel="apple-touch-icon" href={faviconSvg} />
+		
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content={type} />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={new URL(ogImage, Astro.site)} />
+		<meta property="og:image:alt" content={title} />
+		<meta property="og:site_name" content="carlosgarcia.works" />
+		<meta property="og:locale" content="en_US" />
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:url" content={canonicalURL} />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
+		<meta name="twitter:creator" content="@carlosgarcia" />
+		
+		<!-- Additional SEO -->
+		<meta name="generator" content={Astro.generator} />
+		<meta name="theme-color" content="#09090b" />
+		
+		<!-- Security Headers -->
+		<meta http-equiv="X-Content-Type-Options" content="nosniff" />
+		<meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+		<meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+		<meta name="referrer" content="strict-origin-when-cross-origin" />
+		<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data: blob:; connect-src 'self'; frame-src 'self'; base-uri 'self'; form-action 'self';" />
+		
+		<!-- Performance -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+		<link rel="dns-prefetch" href="https://images.unsplash.com" />
+		
+		<!-- Structured Data -->
+		<script type="application/ld+json" set:html={JSON.stringify({
+			"@context": "https://schema.org",
+			"@type": "Person",
+			"name": "Carlos Garcia",
+			"url": siteUrl,
+			"image": new URL(ogImage, Astro.site),
+			"jobTitle": "3D Artist & Educator",
+			"description": description,
+			"sameAs": [
+				"https://github.com/ProfessorGarcia",
+				"https://linkedin.com/in/carlosgarcia"
+			],
+			"address": {
+				"@type": "PostalAddress",
+				"addressLocality": "San Antonio",
+				"addressRegion": "TX",
+				"addressCountry": "US"
+			}
+		})} />
+		
+		<script is:inline>
+			// On page load or when changing themes, best to add inline in `head` to avoid FOUC
+			if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+				document.documentElement.classList.add('dark')
+			} else {
+				document.documentElement.classList.remove('dark')
+			}
+		</script>
+	</head>
+	<body class="min-h-screen bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200 font-['Clarendon_LT_STD'] font-light flex flex-col">
+		<slot />
+	</body>
+</html>

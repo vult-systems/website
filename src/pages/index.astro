@@ -1,12 +1,40 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { HeroSection } from '../components/ui/hero-section';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import HeroSection from '../components/ui/hero-section.astro';
+import { FeaturesSection } from '../components/ui/features-section';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
 ---
 
-<Layout title="carlosgarcia.works">
+<BaseLayout 
+	title="Carlos Garcia | 3D Artist & Educator | Technical Art & Pipeline Development" 
+	description="Portfolio of Carlos Garcia - 3D Artist, Technical Director, and Creative Educator based in San Antonio, TX. Specializing in technical art, pipeline development, Houdini, Blender, and creative education."
+	keywords="Carlos Garcia, 3D Artist, Technical Artist, Pipeline Developer, Houdini Artist, Blender, Educator, San Antonio, Technical Direction, Creative Tools"
+>
+<Header />
 	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
 		<DotBackgroundDemo client:load />
-		<HeroSection client:load />
+		
+		{/* Hero Section */}
+		<HeroSection />
+		
+		{/* Divider */}
+		<div class="relative z-10 w-full">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<div class="border-t-2 border-gray-300 dark:border-gray-700"></div>
+			</div>
+		</div>
+		
+		{/* Features Section */}
+		<FeaturesSection client:load />
+		
+		{/* Divider */}
+		<div class="relative z-10 w-full">
+			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+				<div class="border-t-2 border-gray-300 dark:border-gray-700"></div>
+			</div>
+		</div>
 	</main>
-</Layout>
+<Footer />
+</BaseLayout>
