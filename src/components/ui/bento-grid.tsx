@@ -10,7 +10,7 @@ export const BentoGrid = ({
   return (
     <div
       className={cn(
-        "mx-auto grid max-w-6xl grid-cols-1 gap-9 md:auto-rows-[26rem] md:grid-cols-3",
+        "mx-auto grid max-w-7xl grid-cols-1 gap-4 md:grid-cols-3 md:auto-rows-[20rem]",
         className,
       )}
     >
@@ -25,20 +25,17 @@ export const BentoGridItem = ({
   description,
   header,
   icon,
+  href,
 }: {
   className?: string;
   title?: string | React.ReactNode;
   description?: string | React.ReactNode;
   header?: React.ReactNode;
   icon?: React.ReactNode;
+  href?: string;
 }) => {
-  return (
-    <div
-      className={cn(
-        "group/bento shadow-input row-span-1 flex flex-col justify-between space-y-2 rounded-lg border border-neutral-200 bg-white p-4 transition duration-200 hover:shadow-xl dark:border-white/[0.2] dark:bg-zinc-950/50 dark:shadow-none",
-        className,
-      )}
-    >
+  const content = (
+    <>
       {header}
       <div className="transition duration-200 group-hover/bento:translate-x-2">
         {icon}
@@ -49,6 +46,25 @@ export const BentoGridItem = ({
           {description}
         </div>
       </div>
+    </>
+  );
+
+  const baseClasses = cn(
+    "group/bento shadow-input row-span-1 flex flex-col justify-between space-y-4 rounded-xl border border-transparent dark:border-white/[0.2] bg-white dark:bg-black p-4 transition duration-200 hover:shadow-xl dark:shadow-none",
+    className,
+  );
+
+  if (href) {
+    return (
+      <a href={href} className={baseClasses}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <div className={baseClasses}>
+      {content}
     </div>
   );
 };

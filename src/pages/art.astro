@@ -1,11 +1,21 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
-import BentoGridDemo from '../components/ui/bento-grid-demo';
-import CategoryFilter from '../components/ui/category-filter';
+import ArtGallery from '../components/ui/art-gallery';
 import ArtHeroText from '../components/ui/art-hero-text';
+
+const artPieces = await getCollection('art');
+const artData = artPieces.map(piece => ({
+	slug: piece.slug,
+	title: piece.data.title,
+	description: piece.data.description,
+	heroImage: typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src,
+	category: piece.data.category,
+	featured: piece.data.featured
+}));
 ---
 
 <BaseLayout 
@@ -25,24 +35,8 @@ import ArtHeroText from '../components/ui/art-hero-text';
 				</h1>
 				<ArtHeroText client:load />
 				
-				<!-- Category Filter -->
-				<div class="mt-8">
-					<CategoryFilter client:load />
-				</div>
-			</div>
-		</div>
-
-		{/* Divider */}
-		<div class="relative z-10 w-full">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<div class="border-t border-gray-200 dark:border-gray-800"></div>
-			</div>
-		</div>
-
-		<!-- Bento Grid Gallery -->
-		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<BentoGridDemo client:load />
+				<!-- Gallery with Filter -->
+				<ArtGallery artPieces={artData} client:load />
 			</div>
 		</div>
 	</main>

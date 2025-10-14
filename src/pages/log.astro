@@ -1,8 +1,16 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
+
+const blogPosts = await getCollection('blog', ({ data }) => {
+	return data.draft !== true;
+});
+
+// Sort posts by date, newest first
+const sortedPosts = blogPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <BaseLayout 
@@ -68,139 +76,81 @@ import DotBackgroundDemo from '../components/ui/dot-background-demo';
 			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
 				<div class="max-w-4xl mx-auto">
 				
-				<!-- Entry Feed -->
-				<div class="space-y-16">
-					
-					<!-- Sample Entry 1 -->
-					<article class="group pb-16 border-b border-gray-200 dark:border-gray-800">
-						<div class="space-y-6">
-							<!-- Meta -->
-							<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
-								<time>January 15, 2025</time>
-								<span>•</span>
-								<div class="flex gap-2">
-									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">Process</span>
-									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">3D</span>
-								</div>
-							</div>
-							
-							<!-- Title -->
-							<h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white">
-								Sample Entry Title
-							</h2>
-							
-							<!-- Featured Image -->
-							<div class="aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-zinc-900">
-								<div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
-									<span class="text-6xl">📝</span>
-								</div>
-							</div>
-							
-							<!-- Content -->
-							<div class="prose prose-lg dark:prose-invert max-w-none">
-								<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-									This is where the journal entry content would go. You can write about your process, share experiments, document technical challenges, or reflect on your creative practice. The content flows naturally down the page, making it easy to read and digest.
-								</p>
-								<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-									Multiple paragraphs, images, code snippets, and other media can be included. Each entry tells its own story in your visual and written journal.
-								</p>
-							</div>
-							
-							<!-- Read More Link -->
-							<a href="#" class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors duration-200">
-								<span>Read full entry</span>
-								<span class="ml-2">→</span>
-							</a>
+				{sortedPosts.length === 0 ? (
+					<div class="text-center py-16">
+						<p class="text-gray-500 dark:text-gray-500 text-lg">
+							No entries yet. Check back soon for updates on process, experiments, and reflections.
+						</p>
+					</div>
+				) : (
+					<>
+						<!-- Entry Feed -->
+						<div class="space-y-16">
+							{sortedPosts.map((post) => (
+								<article class="group pb-16 border-b border-gray-200 dark:border-gray-800">
+									<div class="space-y-6">
+										<!-- Meta -->
+										<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+											<time datetime={post.data.pubDate.toISOString()}>
+												{post.data.pubDate.toLocaleDateString('en-US', { 
+													year: 'numeric', 
+													month: 'long', 
+													day: 'numeric' 
+												})}
+											</time>
+											{post.data.tags.length > 0 && (
+												<>
+													<span>•</span>
+													<div class="flex gap-2 flex-wrap">
+														{post.data.tags.map((tag: string) => (
+															<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+																{tag}
+															</span>
+														))}
+													</div>
+												</>
+											)}
+										</div>
+										
+										<!-- Title -->
+										<h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white">
+											<a href={`/blog/${post.slug}`} class="hover:text-amber-500 transition-colors duration-200">
+												{post.data.title}
+											</a>
+										</h2>
+										
+										<!-- Featured Image -->
+										{post.data.heroImage && (
+											<div class="aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+												<img 
+													src={post.data.heroImage.src} 
+													alt={post.data.title}
+													class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+												/>
+											</div>
+										)}
+										
+										<!-- Description/Excerpt -->
+										<div class="prose prose-lg dark:prose-invert max-w-none">
+											<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+												{post.data.description}
+											</p>
+										</div>
+										
+										<!-- Read More Link -->
+										<a 
+											href={`/blog/${post.slug}`}
+											class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors duration-200"
+										>
+											<span>Read full entry</span>
+											<span class="ml-2">→</span>
+										</a>
+									</div>
+								</article>
+							))}
 						</div>
-					</article>
-
-					<!-- Sample Entry 2 -->
-					<article class="group pb-16 border-b border-gray-200 dark:border-gray-800">
-						<div class="space-y-6">
-							<!-- Meta -->
-							<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
-								<time>January 10, 2025</time>
-								<span>•</span>
-								<div class="flex gap-2">
-									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">Thoughts</span>
-								</div>
-							</div>
-							
-							<!-- Title -->
-							<h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white">
-								Reflections on Craft
-							</h2>
-							
-							<!-- Featured Image -->
-							<div class="aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-zinc-900">
-								<div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
-									<span class="text-6xl">💭</span>
-								</div>
-							</div>
-							
-							<!-- Content -->
-							<div class="prose prose-lg dark:prose-invert max-w-none">
-								<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-									Another entry exploring different aspects of the creative process. Each post captures a moment in time, documenting progress, setbacks, breakthroughs, and everything in between.
-								</p>
-							</div>
-							
-							<!-- Read More Link -->
-							<a href="#" class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors duration-200">
-								<span>Read full entry</span>
-								<span class="ml-2">→</span>
-							</a>
-						</div>
-					</article>
-
-					<!-- Sample Entry 3 -->
-					<article class="group pb-16 border-b border-gray-200 dark:border-gray-800">
-						<div class="space-y-6">
-							<!-- Meta -->
-							<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
-								<time>January 5, 2025</time>
-								<span>•</span>
-								<div class="flex gap-2">
-									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">Experiment</span>
-									<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">Technical</span>
-								</div>
-							</div>
-							
-							<!-- Title -->
-							<h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white">
-								Technical Experiments
-							</h2>
-							
-							<!-- Featured Image -->
-							<div class="aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-zinc-900">
-								<div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600">
-									<span class="text-6xl">🔬</span>
-								</div>
-							</div>
-							
-							<!-- Content -->
-							<div class="prose prose-lg dark:prose-invert max-w-none">
-								<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-									Documentation of experiments, technical explorations, and the occasional deep dive into problem-solving. Failures, discoveries, and learnings all find a place here.
-								</p>
-							</div>
-							
-							<!-- Read More Link -->
-							<a href="#" class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors duration-200">
-								<span>Read full entry</span>
-								<span class="ml-2">→</span>
-							</a>
-						</div>
-					</article>
-
-				</div>
-
-				<!-- Coming Soon Message -->
-				<div class="mt-16 text-center">
-					<p class="text-gray-500 dark:text-gray-500">
-						More entries coming soon. Check back regularly for updates.
-					</p>
-				</div>
+					</>
+				)}
 
 				</div>
 			</div>

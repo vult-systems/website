@@ -1,10 +1,23 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import HeroSection from '../components/ui/hero-section.astro';
 import { FeaturesSection } from '../components/ui/features-section';
 import DotBackgroundDemo from '../components/ui/dot-background-demo';
+
+// Get featured art pieces
+const artPieces = await getCollection('art');
+const featuredArt = artPieces
+  .filter(piece => piece.data.featured)
+  .map(piece => ({
+    slug: piece.slug,
+    title: piece.data.title,
+    description: piece.data.description,
+    heroImage: typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src,
+    category: piece.data.category,
+  }));
 ---
 
 <BaseLayout 
@@ -27,7 +40,7 @@ import DotBackgroundDemo from '../components/ui/dot-background-demo';
 		</div>
 		
 		{/* Features Section */}
-		<FeaturesSection client:load />
+		<FeaturesSection featuredArt={featuredArt} client:load />
 		
 		{/* Divider */}
 		<div class="relative z-10 w-full">

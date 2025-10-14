@@ -22,8 +22,8 @@ const artCollection = defineCollection({
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
-    heroImage: image().optional(),
-    category: z.enum(['3d', 'digital', 'concept', 'abstract']).default('3d'),
+    heroImage: z.union([image(), z.string()]).optional(),
+    category: z.enum(['3d', 'character', 'environment', 'digital', 'concept', 'abstract']).default('3d'),
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     tools: z.array(z.string()).optional(),
@@ -40,6 +40,7 @@ const blogCollection = defineCollection({
     heroImage: image().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
+    category: z.enum(['process', 'thoughts', 'technical', 'experiment', '3d', 'tutorial', 'wip']).optional(),
   }),
 });
 

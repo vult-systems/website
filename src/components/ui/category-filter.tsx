@@ -3,17 +3,20 @@ import React, { useState } from "react";
 
 interface CategoryFilterProps {
   onFilterChange?: (category: string) => void;
+  initialCategory?: string;
 }
 
-export default function CategoryFilter({ onFilterChange }: CategoryFilterProps) {
-  const [activeCategory, setActiveCategory] = useState("All");
+export default function CategoryFilter({ onFilterChange, initialCategory = "All" }: CategoryFilterProps) {
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
 
   const categories = [
     "All",
     "Characters",
     "Environments",
-    "Props",
-    "3D Printing"
+    "3D",
+    "Digital",
+    "Concept",
+    "Abstract"
   ];
 
   const handleCategoryClick = (category: string) => {

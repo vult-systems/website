@@ -1,0 +1,16 @@
+---
+// Legacy Layout - Use BaseLayout.astro for new pages
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+	title: string;
+	description?: string;
+	image?: string;
+}
+
+const props = Astro.props;
+---
+
+<BaseLayout {...props}>
+	<slot />
+</BaseLayout>

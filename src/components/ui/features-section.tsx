@@ -10,6 +10,14 @@ interface Feature {
   header: React.ReactNode;
 }
 
+interface FeaturedArt {
+  slug: string;
+  title: string;
+  description: string;
+  heroImage: string;
+  category: string;
+}
+
 const ImageHeader = ({ src, alt }: { src: string; alt: string }) => (
   <div className="flex flex-1 w-full h-full min-h-[16rem] rounded-lg overflow-hidden">
     <img
@@ -20,47 +28,60 @@ const ImageHeader = ({ src, alt }: { src: string; alt: string }) => (
   </div>
 );
 
-export function FeaturesSection() {
-  const features: Feature[] = [
-    {
-      title: "Art",
-      description: "3D renders, character work, and experimental compositions exploring form, light, and storytelling.",
-      icon: <div className="text-xl">🎨</div>,
-      href: "/art",
-      header: <ImageHeader src="https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=800&h=600&fit=crop" alt="Art Work" />,
-    },
-    {
-      title: "Code",
-      description: "Pipeline tools, technical art solutions, and software built to bridge creativity and efficiency.",
-      icon: <div className="text-xl">💻</div>,
-      href: "/code",
-      header: <ImageHeader src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=600&fit=crop" alt="Code Work" />,
-    },
-    {
-      title: "Learn",
-      description: "Tutorials, courses, and resources for artists navigating 3D workflows and creative development.",
-      icon: <div className="text-xl">📚</div>,
-      href: "/learn",
-      header: <ImageHeader src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop" alt="Learn Work" />,
-    },
-    {
-      title: "Log",
-      description: "Reflections on process, technique, and the evolving practice of making meaningful work.",
-      icon: <div className="text-xl">📝</div>,
-      href: "/log",
-      header: <ImageHeader src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1600&h=600&fit=crop" alt="Log Work" />,
-    },
-    {
-      title: "Vult",
-      description: "Studio work, client projects, and collaborative endeavors pushing creative boundaries.",
-      icon: <div className="text-xl">⚡</div>,
-      href: "/vult",
-      header: <ImageHeader src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=1600&h=600&fit=crop" alt="Vult Studio Work" />,
+const getCategoryIcon = (category: string) => {
+  const icons: Record<string, string> = {
+    character: "🎭",
+    environment: "🌄",
+    "3d": "🎨",
+    technical: "⚙️",
+    experiment: "🧪",
+  };
+  return icons[category] || "🎨";
+};
+
+export function FeaturesSection({ featuredArt = [] }: { featuredArt?: FeaturedArt[] }) {
+  const [isPaused, setIsPaused] = React.useState(false);
+
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+
+  // Convert featured art to features
+  const features: Feature[] = featuredArt.map((art) => ({
+    title: art.title,
+    description: art.description,
+    icon: <div className="text-xl">{getCategoryIcon(art.category)}</div>,
+    href: `/art/${art.slug}`,
+    header: <ImageHeader src={art.heroImage} alt={art.title} />,
+  }));
+
+  // If there are no featured items, render nothing (no example/static fallbacks)
+  if (features.length === 0) return null;
+
+  const scrollToIndex = (index: number) => {
+    if (scrollRef.current) {
+      const scrollWidth = scrollRef.current.scrollWidth / 3; // Divide by 3 since content is tripled
+      scrollRef.current.scrollTo({
+        left: index * window.innerWidth,
+        behavior: 'smooth'
+      });
+      setCurrentIndex(index);
+      setIsPaused(true);
+      setTimeout(() => setIsPaused(false), 3000); // Resume after 3s
     }
-  ];
+  };
+
+  const scrollPrev = () => {
+    const newIndex = currentIndex === 0 ? features.length - 1 : currentIndex - 1;
+    scrollToIndex(newIndex);
+  };
+
+  const scrollNext = () => {
+    const newIndex = currentIndex === features.length - 1 ? 0 : currentIndex + 1;
+    scrollToIndex(newIndex);
+  };
 
   return (
-    <section className="relative z-10 w-full py-12 sm:py-16 lg:py-20 overflow-hidden">
+    <section className="relative z-10 w-full py-12 sm:py-16 lg:py-20">
       <div className="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
         {/* Section Header */}
         <div className="mb-10 sm:mb-12 lg:mb-16">
@@ -71,52 +92,73 @@ export function FeaturesSection() {
             Latest posts and projects from across my practice — new renders, tools in development, tutorials, reflections, and studio work. Check back regularly to see what I'm currently exploring and building.
           </p>
         </div>
+      </div>
 
-        {/* Horizontal Scrolling Features */}
-        <div className="relative">
-          <div className="flex gap-6 animate-scroll">
-            {[...features, ...features, ...features].map((feature, i) => (
-              <a 
-                key={i} 
-                href={feature.href} 
-                className="flex-shrink-0 w-[350px] sm:w-[400px] group/bento"
-              >
-                <div className="shadow-input flex flex-col justify-between space-y-2 rounded-lg border border-neutral-200 bg-white p-4 transition duration-200 hover:shadow-xl dark:border-white/[0.2] dark:bg-zinc-950/50 dark:shadow-none h-full">
-                  {feature.header}
-                  <div className="transition duration-200 group-hover/bento:translate-x-2">
-                    {feature.icon}
-                    <div className="mt-2 mb-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
-                      {feature.title}
-                    </div>
-                    <div className="font-sans text-sm font-normal text-neutral-600 dark:text-neutral-300">
-                      {feature.description}
-                    </div>
+      {/* Horizontal Scrolling Features */}
+      <div className="relative overflow-hidden">
+        {/* Navigation Buttons */}
+        {features.length > 0 && (
+          <>
+            <button
+              onClick={scrollPrev}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm shadow-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 hover:bg-amber-500 hover:text-white"
+              aria-label="Previous slide"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            <button
+              onClick={scrollNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm shadow-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 hover:bg-amber-500 hover:text-white"
+              aria-label="Next slide"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
+
+        <div 
+          ref={scrollRef}
+          className={`flex gap-6 ${!isPaused ? 'animate-scroll' : ''}`}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {(() => {
+            // triple the features array for a seamless loop effect
+            const tripled = [...features, ...features, ...features];
+            return tripled.map((feature, i) => (
+            <a 
+              key={i} 
+              href={feature.href} 
+              className="flex-shrink-0 w-[350px] sm:w-[400px] group/bento shadow-input rounded-xl border border-transparent dark:border-white/[0.2] bg-white dark:bg-black p-4 transition duration-200 hover:shadow-xl dark:shadow-none"
+            >
+              <div className="flex flex-col justify-between space-y-4 h-full">
+                {feature.header}
+                <div className="transition duration-200 group-hover/bento:translate-x-2">
+                  {feature.icon}
+                  <div className="mt-2 mb-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
+                    {feature.title}
+                  </div>
+                  <div className="font-sans text-sm font-normal text-neutral-600 dark:text-neutral-300">
+                    {feature.description}
                   </div>
                 </div>
-              </a>
-            ))}
-          </div>
+              </div>
+            </a>
+            ));
+          })()}
         </div>
       </div>
 
-      <style>{`
-        @keyframes scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-33.333%);
-          }
-        }
-        
-        .animate-scroll {
-          animation: scroll 30s linear infinite;
-        }
-        
-        .animate-scroll:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
+      {/* Build CSS in JS to avoid template literal interpolation inside JSX which can break some parsers */}
+      <style>{(() => {
+        const translatePct = (100 / 3).toFixed(6) + "%"; // -33.333333%
+        return `@keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-${translatePct}); } } .animate-scroll { animation: scroll 45s linear infinite; will-change: transform; }`;
+      })()}</style>
     </section>
   );
 }

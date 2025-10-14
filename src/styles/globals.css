@@ -83,3 +83,54 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* View Transitions Animations */
+@layer utilities {
+  /* Smooth fade transitions */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Fade in new content */
+  ::view-transition-new(root) {
+    animation-name: fade-in;
+  }
+
+  /* Fade out old content */
+  ::view-transition-old(root) {
+    animation-name: fade-out;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  /* Prevent layout shift during transitions */
+  html {
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+  }
+
+  /* Add smooth scrolling for in-page navigation */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}

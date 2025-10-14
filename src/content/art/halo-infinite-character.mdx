@@ -1,0 +1,71 @@
+---
+title: "Halo Infinite Character"
+description: "3D character model and texturing work for Halo Infinite inspired design"
+pubDate: 2024-10-13
+category: "character"
+tags: ["houdini", "character", "game-ready", "3d"]
+featured: true
+tools: ["Houdini", "Substance Painter", "Maya"]
+heroImage: ../../assets/images/halo-infinite/343i-chimera-armor-01.png
+---
+
+import { Image } from 'astro:assets';
+import logo343 from '../../assets/images/halo-infinite/343-logo.png';
+import armor01 from '../../assets/images/halo-infinite/343i-chimera-armor-01.png';
+import armor02 from '../../assets/images/halo-infinite/343i-chimera-armor-02.png';
+import armor03 from '../../assets/images/halo-infinite/343i-chimera-armor-03.png';
+import armor04 from '../../assets/images/halo-infinite/343i-chimera-armor-04.avif';
+
+## Project Overview
+
+Worked closely with the Character Art Lead and Character artists to create believable sci-fi armor. Created armor sets for the customization content for Season 5 & 6 "Cyber Showdown" operation launch specifically for the Chimera Spartan Core. 
+Demonstrated expertise in utilizing Maya and ZBrush creating hard-surface armor utilizing 343I's internal Crease Set workflow.
+
+<Image src={logo343} alt="343 Industries Logo" class="rounded-lg border border-gray-200 dark:border-gray-800 my-8" />
+
+## Technical Details
+
+<Image src={armor04} alt="Chimera Armor - Side View" class="rounded-lg border border-gray-200 dark:border-gray-800 my-8" />
+
+### Modeling
+- **Polycount**: Optimized for real-time rendering
+- **Topology**: Clean quad-based geometry for deformation
+- **Software**: Primary modeling in Houdini with refinement in Maya
+
+### Texturing
+- **Pipeline**: PBR workflow in Substance Painter
+- **Maps**: Albedo, Normal, Roughness, Metallic, AO
+- **Resolution**: 4K texture sets for hero assets
+
+<Image src={armor02} alt="Chimera Armor - Detail View" class="rounded-lg border border-gray-200 dark:border-gray-800 my-8" />
+
+### Rigging
+- **Skeleton**: Custom rig optimized for animation
+- **Skinning**: Weight painted for natural deformation
+- **Controls**: FK/IK blending for maximum flexibility
+
+<Image src={armor03} alt="Chimera Armor - Alternate Angle" class="rounded-lg border border-gray-200 dark:border-gray-800 my-8" />
+
+## Process
+
+1. **Concept & Blocking**: Initial proportions and forms established
+2. **High-Poly Sculpting**: Detail pass for baking
+3. **Retopology**: Game-ready mesh creation
+4. **UV Layout**: Efficient texture space utilization
+5. **Texturing**: PBR material creation in Substance
+6. **Rigging & Skinning**: Animation-ready setup
+
+## Challenges & Solutions
+
+One of the main challenges was maintaining the recognizable Halo aesthetic while optimizing for performance. Solved this by strategic use of normal maps to preserve detail while keeping polygon count manageable.
+
+## Results
+
+The character achieves a balance between visual fidelity and performance, suitable for real-time game engines. Successfully captures the iconic armor design while maintaining clean topology for animation.
+
+## Future Improvements
+
+- Additional armor variations
+- Modular attachment system
+- LOD (Level of Detail) generations
+- Animation set development
