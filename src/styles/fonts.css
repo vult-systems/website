@@ -1,8 +1,7 @@
 @font-face {
     font-family: 'Clarendon LT STD';
     src: url('/fonts/ClarendonLTStd-Light.woff2') format('woff2'),
-         url('/fonts/ClarendonLTStd-Light.woff') format('woff'),
-         url('/fonts/ClarendonLTStd-Light.otf') format('opentype');
+         url('/fonts/ClarendonLTStd-Light.woff') format('woff');
     font-weight: 300;
     font-style: normal;
     font-display: swap;
