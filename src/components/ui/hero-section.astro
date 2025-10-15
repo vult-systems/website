@@ -1,7 +1,9 @@
 ---
 import { Image } from 'astro:assets';
-import logoSvg from '../../assets/images/logo.svg';
-import profileImg from '../../assets/images/profile.jpg';
+import logoSvg from '../../assets/brand/logo.svg';
+import profileImg from '../../assets/profile/profile.jpg';
+import ContentSection from '../containers/ContentSection.astro';
+import SplitPanel from '../containers/SplitPanel.astro';
 
 const workspaceLinks = [
   { phrase: "digital artwork & exploration", link: "ART", href: "/art" },
@@ -12,11 +14,9 @@ const workspaceLinks = [
 ];
 ---
 
-<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-  <div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-    <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center">
-  {/* Left Panel - Workspace Introduction */}
-  <div class="flex flex-col justify-center w-full">
+<ContentSection spacing="md" maxWidth="full">
+  <SplitPanel gap="xl" verticalAlign="center">
+    <div slot="left" class="flex flex-col justify-center w-full">
     <div class="flex flex-col gap-6 w-full">
       <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal leading-tight">
         <span class="text-gray-600 dark:text-gray-400">Welcome to my workspace for all things </span>
@@ -40,10 +40,9 @@ const workspaceLinks = [
         </a>
       </div>
     </div>
-  </div>
-  
-  {/* Right Panel - Profile Card & About */}
-  <div class="w-full flex items-center justify-center lg:justify-end">
+    </div>
+    
+    <div slot="right" class="w-full flex items-center justify-center lg:justify-end">
     <div class="w-full space-y-8 sm:space-y-10 lg:space-y-12">
       {/* Profile Card */}
       <div class="w-full group overflow-hidden rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-zinc-900 shadow-xl hover:shadow-2xl transition-all duration-300">
@@ -84,8 +83,9 @@ const workspaceLinks = [
         </a>
       </div>
     </div>
-  </div>
-</div>
+    </div>
+  </SplitPanel>
+</ContentSection>
 
 <script define:vars={{ workspaceLinks }}>
   let currentIndex = 0;

@@ -1,0 +1,51 @@
+---
+/**
+ * Divider - Visual section separator
+ * 
+ * Usage:
+ * <Divider variant="line" spacing="md" />
+ * 
+ * Props:
+ * - variant: 'line' | 'gradient' | 'dots' - Visual style
+ * - spacing: 'sm' | 'md' | 'lg' - Vertical spacing around divider
+ * - maxWidth: Same as ContentSection
+ */
+
+interface Props {
+  variant?: 'line' | 'gradient' | 'dots';
+  spacing?: 'sm' | 'md' | 'lg';
+  maxWidth?: '4xl' | '5xl' | '6xl' | '7xl' | 'full';
+}
+
+const { 
+  variant = 'line', 
+  spacing = 'md',
+  maxWidth = '7xl' 
+} = Astro.props;
+
+const spacingClasses = {
+  sm: 'py-4 md:py-6',
+  md: 'py-8 md:py-12',
+  lg: 'py-12 md:py-16',
+};
+
+const maxWidthClasses = {
+  '4xl': 'max-w-4xl',
+  '5xl': 'max-w-5xl',
+  '6xl': 'max-w-6xl',
+  '7xl': 'max-w-7xl',
+  'full': 'max-w-full',
+};
+
+const variantClasses = {
+  line: 'border-t-2 border-gray-300 dark:border-gray-700',
+  gradient: 'h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-700 to-transparent',
+  dots: 'border-t-2 border-dotted border-gray-300 dark:border-gray-700',
+};
+---
+
+<div class={`relative z-10 w-full ${spacingClasses[spacing]}`}>
+  <div class={`${maxWidthClasses[maxWidth]} mx-auto px-6 sm:px-8 md:px-12 lg:px-16`}>
+    <div class={variantClasses[variant]}></div>
+  </div>
+</div>

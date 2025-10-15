@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 
-export default function DotBackgroundDemo() {
+export default function DotBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 z-0 bg-white dark:bg-zinc-950">
       <div

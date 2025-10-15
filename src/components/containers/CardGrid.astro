@@ -1,0 +1,50 @@
+---
+/**
+ * CardGrid - Flexible responsive grid for any card content
+ * 
+ * Usage:
+ * <CardGrid items={artPieces} columns={{ sm: 1, md: 2, lg: 3 }} gap="md">
+ *   {items.map(item => <Card {...item} />)}
+ * </CardGrid>
+ * 
+ * Props:
+ * - columns: object - Responsive column counts
+ * - gap: 'sm' | 'md' | 'lg' - Space between cards
+ */
+
+interface Props {
+  columns?: {
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+  };
+  gap?: 'sm' | 'md' | 'lg';
+}
+
+const { 
+  columns = { sm: 1, md: 2, lg: 3 },
+  gap = 'md' 
+} = Astro.props;
+
+const gapClasses = {
+  sm: 'gap-4',
+  md: 'gap-6',
+  lg: 'gap-8',
+};
+
+const buildGridClass = () => {
+  const parts = ['grid'];
+  
+  if (columns.sm) parts.push(`grid-cols-${columns.sm}`);
+  if (columns.md) parts.push(`md:grid-cols-${columns.md}`);
+  if (columns.lg) parts.push(`lg:grid-cols-${columns.lg}`);
+  if (columns.xl) parts.push(`xl:grid-cols-${columns.xl}`);
+  
+  return parts.join(' ');
+};
+---
+
+<div class={`${buildGridClass()} ${gapClasses[gap]}`}>
+  <slot />
+</div>

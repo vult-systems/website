@@ -30,7 +30,7 @@ const artCollection = defineCollection({
   }),
 });
 
-const blogCollection = defineCollection({
+const logCollection = defineCollection({
   type: 'content',
   schema: ({ image }) => z.object({
     title: z.string(),
@@ -47,5 +47,5 @@ const blogCollection = defineCollection({
 export const collections = {
   'projects': projectsCollection,
   'art': artCollection,
-  'blog': blogCollection,
+  'log': logCollection,
 };

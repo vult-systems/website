@@ -1,11 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import DotBackgroundDemo from '../components/ui/dot-background-demo';
-import ArtGallery from '../components/ui/art-gallery';
-import ArtHeroText from '../components/ui/art-hero-text';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import DotBackground from '../components/ui/dot-background';
+import ArtGallery from '../components/art/art-gallery';
+import ArtHeroText from '../components/art/art-hero-text';
 
 const artPieces = await getCollection('art');
 const artData = artPieces.map(piece => ({
@@ -25,7 +25,7 @@ const artData = artPieces.map(piece => ({
 >
 <Header />
 	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
-		<DotBackgroundDemo client:load />
+		<DotBackground client:idle />
 		
 		<!-- Hero Section -->
 		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
@@ -33,7 +33,7 @@ const artData = artPieces.map(piece => ({
 				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
 					Art
 				</h1>
-				<ArtHeroText client:load />
+				<ArtHeroText client:visible />
 				
 				<!-- Gallery with Filter -->
 				<ArtGallery artPieces={artData} client:load />

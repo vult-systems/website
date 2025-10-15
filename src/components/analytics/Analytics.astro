@@ -1,0 +1,101 @@
+---
+interface Props {
+  provider?: 'ga4' | 'plausible' | 'fathom' | 'umami' | 'none';
+  trackingId?: string;
+  domain?: string;
+  respectDNT?: boolean;
+}
+
+const {
+  provider = import.meta.env.PUBLIC_ANALYTICS_PROVIDER || 'none',
+  trackingId = import.meta.env.PUBLIC_ANALYTICS_ID,
+  domain = import.meta.env.PUBLIC_ANALYTICS_DOMAIN || 'carlosgarcia.works',
+  respectDNT = true
+} = Astro.props;
+
+const isProduction = import.meta.env.PROD;
+const shouldLoad = isProduction && provider !== 'none' && trackingId;
+---
+
+{shouldLoad && provider === 'ga4' && (
+  <>
+    <script type="text/partytown" async src={`https://www.googletagmanager.com/gtag/js?id=${trackingId}`}></script>
+    <script type="text/partytown" define:vars={{ trackingId, respectDNT }}>
+      if (respectDNT && navigator.doNotTrack === '1') {
+        console.log('[Analytics] Do Not Track enabled');
+      } else {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', trackingId, {
+          anonymize_ip: true,
+          cookie_flags: 'SameSite=None;Secure'
+        });
+      }
+    </script>
+  </>
+)}
+
+{shouldLoad && provider === 'plausible' && (
+  <script defer data-domain={domain} src="https://plausible.io/js/script.js"></script>
+)}
+
+{shouldLoad && provider === 'fathom' && (
+  <script src="https://cdn.usefathom.com/script.js" data-site={trackingId} defer></script>
+)}
+
+{shouldLoad && provider === 'umami' && (
+  <script 
+    async 
+    defer 
+    data-website-id={trackingId}
+    src={import.meta.env.PUBLIC_UMAMI_SCRIPT_URL || 'https://analytics.umami.is/script.js'}
+  ></script>
+)}
+
+<script>
+  window.trackEvent = function(eventName, eventData = {}) {
+    const provider = import.meta.env.PUBLIC_ANALYTICS_PROVIDER;
+    if (!import.meta.env.PROD) return;
+
+    try {
+      switch(provider) {
+        case 'ga4':
+          if (window.gtag) window.gtag('event', eventName, eventData);
+          break;
+        case 'plausible':
+          if (window.plausible) window.plausible(eventName, { props: eventData });
+          break;
+        case 'fathom':
+          if (window.fathom) window.fathom.trackGoal(eventName, eventData.value || 0);
+          break;
+        case 'umami':
+          if (window.umami) window.umami.track(eventName, eventData);
+          break;
+      }
+    } catch (error) {
+      console.error('[Analytics] Error:', error);
+    }
+  };
+
+  // Auto-track outbound links
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const link = target?.closest?.('a');
+    if (link && link.href && link.host !== window.location.host) {
+      window.trackEvent?.('outbound_link', { url: link.href });
+    }
+  });
+
+  // Auto-track downloads
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const link = target?.closest?.('a');
+    if (link && link.href) {
+      const downloadExts = ['.pdf', '.zip', '.doc', '.docx'];
+      if (downloadExts.some(ext => link.href.toLowerCase().endsWith(ext))) {
+        window.trackEvent?.('file_download', { file: link.href.split('/').pop() });
+      }
+    }
+  });
+</script>

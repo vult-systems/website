@@ -1,16 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import DotBackgroundDemo from '../components/ui/dot-background-demo';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import DotBackground from '../components/ui/dot-background';
 
-const blogPosts = await getCollection('blog', ({ data }) => {
+const logPosts = await getCollection('log', ({ data }) => {
 	return data.draft !== true;
 });
 
 // Sort posts by date, newest first
-const sortedPosts = blogPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sortedPosts = logPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
 <BaseLayout 
@@ -20,7 +20,7 @@ const sortedPosts = blogPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.p
 >
 <Header />
 	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
-		<DotBackgroundDemo client:load />
+		<DotBackground client:idle />
 		
 		<!-- Hero Section -->
 		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">

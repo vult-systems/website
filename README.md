@@ -1,10 +1,12 @@
-## Tech Stack
+# carlosgarcia.works
 
-- **Framework**: Astro v5
-- **UI Library**: React v19
-- **Styling**: Tailwind CSS v3
-- **Content**: Astro Content Collections
-- **Animations**: Framer Motion
-- **Typography**: @tailwindcss/typography
-- **Sitemap**: @astrojs/sitemap
-- **MDX**: @astrojs/mdx
+My portfolio site. Built with Astro.
+
+## Stack
+
+- Astro 5
+- TypeScript
+- Tailwind CSS
+- MDX
+
+## Project Structure

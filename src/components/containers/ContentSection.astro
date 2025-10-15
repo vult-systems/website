@@ -1,0 +1,70 @@
+---
+/**
+ * ContentSection - Standard content section wrapper
+ * 
+ * Usage:
+ * <ContentSection title="Featured Work" description="Recent projects">
+ *   <CardGrid items={items} />
+ * </ContentSection>
+ * 
+ * Props:
+ * - title: string (optional) - Section heading
+ * - description: string (optional) - Section description
+ * - maxWidth: '4xl' | '5xl' | '6xl' | '7xl' | 'full' - Container max width
+ * - spacing: 'sm' | 'md' | 'lg' | 'xl' - Vertical spacing
+ * - centered: boolean - Center text alignment
+ */
+
+interface Props {
+  title?: string;
+  description?: string;
+  maxWidth?: '4xl' | '5xl' | '6xl' | '7xl' | 'full';
+  spacing?: 'sm' | 'md' | 'lg' | 'xl';
+  centered?: boolean;
+}
+
+const { 
+  title, 
+  description, 
+  maxWidth = '7xl', 
+  spacing = 'lg',
+  centered = false 
+} = Astro.props;
+
+const spacingClasses = {
+  sm: 'py-8 md:py-12',
+  md: 'py-12 md:py-16',
+  lg: 'py-16 md:py-24',
+  xl: 'py-24 md:py-32',
+};
+
+const maxWidthClasses = {
+  '4xl': 'max-w-4xl',
+  '5xl': 'max-w-5xl',
+  '6xl': 'max-w-6xl',
+  '7xl': 'max-w-7xl',
+  'full': 'max-w-full',
+};
+
+const textAlign = centered ? 'text-center' : 'text-left';
+---
+
+<section class={`relative z-10 w-full ${spacingClasses[spacing]}`}>
+  <div class={`${maxWidthClasses[maxWidth]} mx-auto px-6 sm:px-8 md:px-12 lg:px-16`}>
+    {(title || description) && (
+      <div class={`mb-8 md:mb-12 ${textAlign}`}>
+        {title && (
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white mb-4">
+            {title}
+          </h2>
+        )}
+        {description && (
+          <p class="text-base sm:text-lg text-gray-600 dark:text-gray-500 max-w-3xl">
+            {description}
+          </p>
+        )}
+      </div>
+    )}
+    <slot />
+  </div>
+</section>
