@@ -4,11 +4,11 @@ Portfolio site for my 3D art, studio work, teaching, technical writing, and crea
 
 ## Stack
 
-[![Astro](https://img.shields.io/badge/Astro-BC52EE?logo=astro&logoColor=fff)](#) **Astro 5** - Static site generation  
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)](#) **TypeScript** - Type-safe components  
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?logo=tailwindcss&logoColor=fff)](#) **Tailwind CSS** - Utility-first styling  
-[![MDX](https://img.shields.io/badge/MDX-1B1F24?logo=mdx&logoColor=fff)](#) **MDX** - Content authoring  
-[![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000)](#) **React** - Minimal usage (4 components)
+[![Astro](https://img.shields.io/badge/Astro-BC52EE?logo=astro&logoColor=fff)](#) 
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)](#)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?logo=tailwindcss&logoColor=fff)](#)
+[![MDX](https://img.shields.io/badge/MDX-1B1F24?logo=mdx&logoColor=fff)](#)
+[![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000)](#)
 
 ## Development Approach
 
