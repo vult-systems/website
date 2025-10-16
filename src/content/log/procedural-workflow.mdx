@@ -1,0 +1,172 @@
+---
+title: "How I Built This Website: From Concept to Launch"
+description: "A behind-the-scenes look at building my portfolio with Astro, including the tools, decisions, and workflow that made it happen."
+pubDate: 2025-10-10
+author: "Carlos Garcia"
+tags: ["Web Dev", "Process", "Tutorial"]
+draft: false
+heroImage: "../../assets/blog-placeholders/procedural-workflow.jpg"
+---
+
+## The Goal
+
+I needed a portfolio site that felt like *me* - minimal, fast, and focused on the work. No unnecessary complexity, just clean presentation of art, code, and writing.
+
+## Tech Stack
+
+After researching options, I landed on:
+
+- **[Astro](https://astro.build)** - Perfect for content-focused sites
+- **[Tailwind CSS](https://tailwindcss.com)** - Utility-first styling
+- **[shadcn/ui](https://ui.shadcn.com)** - Component patterns
+- **[MDX](https://mdxjs.com)** - Enhanced markdown for blog posts
+
+Why Astro? It ships zero JavaScript by default, but lets you add interactivity where needed. Perfect for a portfolio.
+
+![Astro Logo](https://astro.build/assets/press/astro-icon-light-gradient.svg)
+
+## The Build Process
+
+### 1. Setting Up the Foundation
+
+Started with Astro's basic template and added Tailwind:
+
+```bash
+npm create astro@latest
+npx astro add tailwind
+```
+
+Simple. Clean. Fast.
+
+### 2. Content Collections
+
+Astro's content collections are brilliant. I organized everything into three types:
+
+```
+src/content/
+├── art/      # Portfolio pieces
+├── log/      # Blog posts
+└── projects/ # Case studies
+```
+
+Each collection has type-safe frontmatter. TypeScript catches mistakes before they reach production.
+
+### 3. Design System
+
+I used [shadcn/ui blocks](https://shadcnblocks.com) as inspiration for the layout. Key pages:
+
+**Homepage (Hero1 pattern)**
+- Side-by-side layout
+- Clear CTAs
+- Professional but approachable
+
+**Art Gallery (Grid pattern)**
+- 3-column responsive grid
+- Hover effects on cards
+- Category badges
+
+**Blog (Blog grid pattern)**
+- 2-column cards
+- Featured images
+- Clean typography
+
+### 4. Performance Optimization
+
+Getting 100/100 on Lighthouse was important:
+
+- Optimized images with Astro's `<Image />` component
+- Added proper meta tags and Schema.org data
+- Implemented view transitions for smooth navigation
+- Used lazy loading for below-the-fold content
+
+Here's a comparison of load times:
+
+| Metric | Before | After |
+|--------|--------|-------|
+| First Contentful Paint | 2.1s | 0.8s |
+| Largest Contentful Paint | 3.4s | 1.2s |
+| Cumulative Layout Shift | 0.15 | 0 |
+
+### 5. Adding Interactivity
+
+Most of the site is static, but I added React for:
+
+- Dark mode toggle
+- Art gallery filters
+- Animated dot background
+- Analytics tracking
+
+React components are only loaded where needed, keeping the main bundle tiny.
+
+## Deployment
+
+Deployed to [Vercel](https://vercel.com) because it's dead simple:
+
+1. Push to GitHub
+2. Connect repo to Vercel
+3. Done
+
+Automatic deployments on every push. Preview URLs for branches. Perfect workflow.
+
+## The Workflow GIF
+
+Here's what the dev process looks like in real-time:
+
+![Development Workflow](https://media.giphy.com/media/l3vR85PnGsBwu1PFK/giphy.gif)
+
+*Edit, save, hot reload. Instant feedback.*
+
+## Key Learnings
+
+**1. Start Simple**
+Don't over-engineer. I started with basic pages and added features as needed.
+
+**2. Content First**
+Built the content structure before worrying about fancy animations. Got the fundamentals right.
+
+**3. Use Existing Patterns**
+shadcn/ui blocks saved hours of design work. No need to reinvent common patterns.
+
+**4. Optimize Early**
+Performance from day one is easier than retrofitting later.
+
+**5. Document as You Go**
+I wrote these blog posts while building. Fresh insights while it's all in working memory.
+
+## Resources
+
+Here's what helped me along the way:
+
+- [Astro Docs](https://docs.astro.build) - Excellent documentation
+- [Tailwind CSS Docs](https://tailwindcss.com/docs) - Comprehensive reference
+- [shadcn/ui Blocks](https://shadcnblocks.com) - Pre-built component patterns
+- [Vercel Docs](https://vercel.com/docs) - Deployment guides
+
+## The Result
+
+A site that:
+- ✅ Loads in under 1 second
+- ✅ Scores 100/100 on Lighthouse SEO
+- ✅ Works perfectly in dark mode
+- ✅ Feels fast and responsive
+- ✅ Is easy to maintain and update
+
+## What's Next?
+
+Planning to add:
+- Case studies with more detail
+- Tutorial series on Houdini workflows
+- Analytics integration (Plausible or Umami)
+- Newsletter signup
+
+## Try It Yourself
+
+The codebase is on [GitHub](https://github.com/ProfessorGarcia/carlosgarcia.works). Feel free to fork it, learn from it, or use it as a starting point for your own site.
+
+Got questions? Hit me up on [Twitter](https://twitter.com/carlosgarcia) or email: hello@carlosgarcia.works
+
+---
+
+*Last updated: October 10, 2025*
+
+> **Note:** This site is continuously evolving. Check the [changelog](https://github.com/ProfessorGarcia/carlosgarcia.works/commits/main) for recent updates.

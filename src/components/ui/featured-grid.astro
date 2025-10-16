@@ -1,0 +1,91 @@
+---
+import Heading from './heading.astro';
+import Text from './text.astro';
+import Link from './link.astro';
+import Badge from './badge.astro';
+
+interface ArtPiece {
+  slug: string;
+  title: string;
+  description: string;
+  heroImage: string;
+  category: string;
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  artPieces: ArtPiece[];
+}
+
+const { 
+  title = "Featured Work",
+  description = "Recent projects and explorations",
+  artPieces 
+} = Astro.props;
+---
+
+<section class="relative z-10 py-24 sm:py-32">
+  <div class="container max-w-7xl mx-auto px-4">
+    
+    <!-- Section Header -->
+    {(title || description) && (
+      <div class="mb-16 text-center">
+        {title && (
+          <Heading level={2} size="3xl" align="center" class="mb-4">{title}</Heading>
+        )}
+        {description && (
+          <Text size="lg" variant="secondary" align="center" class="max-w-2xl mx-auto">{description}</Text>
+        )}
+      </div>
+    )}
+
+    <!-- Art Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {artPieces.map((piece) => (
+        <a 
+          href={`/art/${piece.slug}`}
+          class="group flex flex-col gap-4 hover:scale-[1.02] transition-transform duration-300"
+        >
+          <!-- Image -->
+          <div class="relative aspect-[4/3] rounded-lg overflow-hidden bg-card">
+            <img
+              src={piece.heroImage}
+              alt={piece.title}
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <!-- Category Badge -->
+            <div class="absolute top-4 left-4">
+              <Badge size="sm" class="bg-background/90 backdrop-blur-sm">
+                {piece.category}
+              </Badge>
+            </div>
+          </div>
+          
+          <!-- Content -->
+          <div class="space-y-2">
+            <Heading level={3} size="xl" class="group-hover:text-foreground-secondary transition-colors">
+              {piece.title}
+            </Heading>
+            {piece.description && (
+              <Text size="sm" variant="secondary" class="line-clamp-2">
+                {piece.description}
+              </Text>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- View All Link -->
+    <div class="mt-16 text-center">
+      <Link href="/art" class="inline-flex items-center gap-2">
+        View all work
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </Link>
+    </div>
+  </div>
+</section>

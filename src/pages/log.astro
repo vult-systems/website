@@ -1,9 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/layout/Header.astro';
-import Footer from '../components/layout/Footer.astro';
-import DotBackground from '../components/ui/dot-background';
+import BaseLayout from '../layouts/base-layout.astro';
+import Header from '../components/layout/header.astro';
+import Footer from '../components/layout/footer.astro';
+import PageMain from '../components/layout/page-main.astro';
+import PageContainer from '../components/layout/page-container.astro';
+import PageHeader from '../components/layout/page-header.astro';
+import DotBackground from '../components/ui/dot-background.astro';
+import BlogGrid from '../components/blog/blog-grid-wrapper';
 
 const logPosts = await getCollection('log', ({ data }) => {
 	return data.draft !== true;
@@ -11,6 +15,18 @@ const logPosts = await getCollection('log', ({ data }) => {
 
 // Sort posts by date, newest first
 const sortedPosts = logPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Format data for BlogGrid component
+const blogData = sortedPosts.map(post => ({
+	slug: post.slug,
+	title: post.data.title,
+	description: post.data.description,
+	heroImage: typeof post.data.heroImage === 'string' ? post.data.heroImage : post.data.heroImage?.src,
+	pubDate: post.data.pubDate,
+	tags: post.data.tags
+}));
+
+const isEmpty = blogData.length === 0;
 ---
 
 <BaseLayout 
@@ -18,143 +34,28 @@ const sortedPosts = logPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pu
 	description="Blog posts, insights, and thoughts on 3D art, technical direction, pipeline development, and creative workflows. Regular updates from Carlos Garcia."
 	keywords="3D Art Blog, Technical Art Blog, Pipeline Development, Houdini Tips, Creative Workflows, Artist Insights, Technical Direction"
 >
-<Header />
-	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
-		<DotBackground client:idle />
+	<Header />
+	<PageMain class="text-foreground">
+		<DotBackground />
 		
-		<!-- Hero Section -->
-		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
-					Log
-				</h1>
-				<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed">
-					A written and visual journal documenting my process, experiments, and reflections. Thoughts on craft, technical notes, work-in-progress updates, and the occasional deep dive into what makes things tick.
-				</p>
+		<div class="relative z-10 w-full py-24 sm:py-32">
+			<PageContainer>
+				<PageHeader
+					title="Log"
+					description="Thoughts on craft, technical notes, and experiments"
+				/>
 				
-				<!-- Category Filter -->
-				<div class="mt-8">
-					<div class="flex flex-wrap gap-6 items-center">
-						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-amber-500">
-							All
-						</button>
-						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
-							Process
-						</button>
-						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
-							Thoughts
-						</button>
-						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
-							Technical
-						</button>
-						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
-							Experiment
-						</button>
-						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
-							3D
-						</button>
-						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
-							Tutorial
-						</button>
-						<button class="text-sm font-medium transition-all hover:text-amber-500 hover:scale-105 text-gray-600 dark:text-gray-400">
-							WIP
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		
-		{/* Divider */}
-		<div class="relative z-10 w-full">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<div class="border-t border-gray-200 dark:border-gray-800"></div>
-			</div>
-		</div>
-
-		<!-- Journal Entries Section - Vertical Scroll -->
-		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<div class="max-w-4xl mx-auto">
-				
-				{sortedPosts.length === 0 ? (
+				{isEmpty ? (
 					<div class="text-center py-16">
-						<p class="text-gray-500 dark:text-gray-500 text-lg">
-							No entries yet. Check back soon for updates on process, experiments, and reflections.
+						<p class="text-foreground-muted text-lg">
+							No entries yet. Check back soon.
 						</p>
 					</div>
 				) : (
-					<>
-						<!-- Entry Feed -->
-						<div class="space-y-16">
-							{sortedPosts.map((post) => (
-								<article class="group pb-16 border-b border-gray-200 dark:border-gray-800">
-									<div class="space-y-6">
-										<!-- Meta -->
-										<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
-											<time datetime={post.data.pubDate.toISOString()}>
-												{post.data.pubDate.toLocaleDateString('en-US', { 
-													year: 'numeric', 
-													month: 'long', 
-													day: 'numeric' 
-												})}
-											</time>
-											{post.data.tags.length > 0 && (
-												<>
-													<span>•</span>
-													<div class="flex gap-2 flex-wrap">
-														{post.data.tags.map((tag: string) => (
-															<span class="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-																{tag}
-															</span>
-														))}
-													</div>
-												</>
-											)}
-										</div>
-										
-										<!-- Title -->
-										<h2 class="text-3xl sm:text-4xl md:text-5xl font-normal text-gray-800 dark:text-white">
-											<a href={`/blog/${post.slug}`} class="hover:text-amber-500 transition-colors duration-200">
-												{post.data.title}
-											</a>
-										</h2>
-										
-										<!-- Featured Image -->
-										{post.data.heroImage && (
-											<div class="aspect-[16/9] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
-												<img 
-													src={post.data.heroImage.src} 
-													alt={post.data.title}
-													class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-												/>
-											</div>
-										)}
-										
-										<!-- Description/Excerpt -->
-										<div class="prose prose-lg dark:prose-invert max-w-none">
-											<p class="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-												{post.data.description}
-											</p>
-										</div>
-										
-										<!-- Read More Link -->
-										<a 
-											href={`/blog/${post.slug}`}
-											class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors duration-200"
-										>
-											<span>Read full entry</span>
-											<span class="ml-2">→</span>
-										</a>
-									</div>
-								</article>
-							))}
-						</div>
-					</>
+					<BlogGrid posts={blogData} client:load />
 				)}
-
-				</div>
-			</div>
+			</PageContainer>
 		</div>
-	</main>
-<Footer />
+	</PageMain>
+	<Footer />
 </BaseLayout>

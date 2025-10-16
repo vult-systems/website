@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import profileImg from '../../assets/profile/profile.jpg';
+import Heading from './heading.astro';
+import Text from './text.astro';
+import Button from './button.astro';
+import Badge from './badge.astro';
+---
+
+<section class="relative z-10 py-32">
+  <div class="container max-w-7xl mx-auto px-4">
+    <div class="grid items-center gap-8 lg:grid-cols-2">
+      
+      <!-- Left Column - Text -->
+      <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
+        <Badge class="mb-6">
+          San Antonio, TX
+        </Badge>
+        
+        <Heading level={1} size="4xl" class="mb-6">
+          3D Artist & Technical Educator
+        </Heading>
+        
+        <Text variant="secondary" size="lg" class="mb-8 max-w-xl">
+          Creating digital art, building creative tools, and teaching technical workflows. 
+          Specializing in Houdini, Blender, and procedural techniques.
+        </Text>
+        
+        <div class="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
+          <Button variant="primary" size="lg" href="/art">
+            View Art
+          </Button>
+          <Button variant="outline" size="lg" href="/about">
+            About Me
+            <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </Button>
+        </div>
+      </div>
+      
+      <!-- Right Column - Image -->
+      <div class="flex justify-center lg:justify-end">
+        <Image
+          src={profileImg}
+          alt="Carlos Garcia"
+          width={600}
+          height={600}
+          loading="eager"
+          class="max-h-96 w-full rounded-md object-cover"
+        />
+      </div>
+    </div>
+  </div>
+</section>

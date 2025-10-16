@@ -1,8 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Header from '../../components/layout/Header.astro';
-import Footer from '../../components/layout/Footer.astro';
+import BaseLayout from '../../layouts/base-layout.astro';
+import Header from '../../components/layout/header.astro';
+import Footer from '../../components/layout/footer.astro';
+import PageMain from '../../components/layout/page-main.astro';
+import ContentHero from '../../components/content/content-hero.astro';
+import ProseContent from '../../components/content/prose-content.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('log', ({ data }) => {
@@ -16,6 +19,16 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await post.render();
+
+// Format metadata
+const formattedDate = post.data.pubDate 
+  ? new Date(post.data.pubDate).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })
+  : '';
+const meta = formattedDate ? `on ${formattedDate}` : '';
 ---
 
 <BaseLayout
@@ -24,25 +37,17 @@ const { Content } = await post.render();
   image={post.data.heroImage?.src}
   type="article"
 >
-<Header />
-  <main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
-    <article class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-      <div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-        <div class="max-w-4xl mx-auto">
-          <h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
-            {post.data.title}
-          </h1>
-          {post.data.pubDate && (
-            <time class="text-gray-600 dark:text-gray-400 text-sm mb-8 block">
-              {new Date(post.data.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </time>
-          )}
-          <div class="prose prose-lg dark:prose-invert max-w-none">
-            <Content />
-          </div>
-        </div>
-      </div>
-    </article>
-  </main>
-<Footer />
+  <Header />
+  <PageMain>
+    <ContentHero
+      title={post.data.title}
+      description={post.data.description}
+      meta={meta}
+      heroImage={post.data.heroImage}
+    />
+    <ProseContent>
+      <Content />
+    </ProseContent>
+  </PageMain>
+  <Footer />
 </BaseLayout>

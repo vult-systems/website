@@ -1,0 +1,76 @@
+---
+/**
+ * Heading Component
+ * 
+ * Semantic heading element with size variants and semantic levels.
+ * Automatically handles responsive sizing and consistent styling.
+ * 
+ * @example
+ * <Heading level={1} size="4xl">Page Title</Heading>
+ * <Heading level={2} size="2xl">Section Title</Heading>
+ * <Heading level={3}>Card Title</Heading>
+ */
+
+interface Props {
+  /** Semantic heading level (h1-h6) for accessibility */
+  level: 1 | 2 | 3 | 4 | 5 | 6;
+  /** Visual size variant (independent of semantic level) */
+  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl';
+  /** Text alignment */
+  align?: 'left' | 'center' | 'right';
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  level,
+  size,
+  align = 'left',
+  class: className = ''
+} = Astro.props;
+
+// Default sizes based on semantic level
+const defaultSizes = {
+  1: '4xl',
+  2: '3xl',
+  3: 'xl',
+  4: 'lg',
+  5: 'base',
+  6: 'sm'
+};
+
+const visualSize = size || defaultSizes[level];
+
+// Size classes with responsive scaling
+const sizeClasses = {
+  'xs': 'text-xs',
+  'sm': 'text-sm',
+  'base': 'text-base',
+  'lg': 'text-lg md:text-xl',
+  'xl': 'text-xl md:text-2xl',
+  '2xl': 'text-2xl md:text-3xl',
+  '3xl': 'text-3xl md:text-4xl',
+  '4xl': 'text-4xl sm:text-5xl lg:text-6xl',
+  '5xl': 'text-4xl sm:text-5xl md:text-6xl lg:text-7xl',
+  '6xl': 'text-5xl sm:text-6xl md:text-7xl lg:text-8xl'
+};
+
+const alignClasses = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right'
+};
+
+const Tag = `h${level}` as any;
+
+const classes = [
+  sizeClasses[visualSize as keyof typeof sizeClasses],
+  alignClasses[align as keyof typeof alignClasses],
+  'font-semibold text-foreground',
+  className
+].filter(Boolean).join(' ');
+---
+
+<Tag class={classes}>
+  <slot />
+</Tag>

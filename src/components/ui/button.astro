@@ -1,0 +1,95 @@
+---
+/**
+ * Button Component
+ * 
+ * Interactive button with multiple variants and states.
+ * Handles both links and button elements with consistent styling.
+ * 
+ * @example
+ * <Button variant="primary">Primary Action</Button>
+ * <Button variant="secondary" href="/about">Link Button</Button>
+ * <Button variant="ghost" size="sm">Small Button</Button>
+ */
+
+interface Props {
+  /** Visual style variant */
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  /** Button size */
+  size?: 'sm' | 'base' | 'lg';
+  /** If provided, renders as a link */
+  href?: string;
+  /** HTML button type (only used if href not provided) */
+  type?: 'button' | 'submit' | 'reset';
+  /** Disable the button */
+  disabled?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'base',
+  href,
+  type = 'button',
+  disabled = false,
+  class: className = ''
+} = Astro.props;
+
+const variantClasses = {
+  primary: [
+    'bg-foreground text-background',
+    'hover:bg-accent',
+    'border border-transparent',
+    'font-medium',
+    'transition-colors duration-200'
+  ].join(' '),
+  
+  secondary: [
+    'bg-card text-foreground',
+    'hover:bg-card-hover',
+    'border border-border',
+    'font-medium',
+    'transition-colors duration-200'
+  ].join(' '),
+  
+  outline: [
+    'bg-transparent text-foreground',
+    'hover:bg-card',
+    'border border-border hover:border-border-hover',
+    'font-medium',
+    'transition-colors duration-200'
+  ].join(' '),
+  
+  ghost: [
+    'bg-transparent text-foreground-secondary',
+    'hover:bg-card hover:text-foreground',
+    'border border-transparent',
+    'transition-colors duration-200'
+  ].join(' ')
+};
+
+const sizeClasses = {
+  sm: 'px-3 py-1.5 text-sm rounded',
+  base: 'px-4 py-2 text-base rounded-md',
+  lg: 'px-6 py-3 text-lg rounded-lg'
+};
+
+const Tag = href ? 'a' : 'button';
+
+const classes = [
+  'inline-flex items-center justify-center gap-2',
+  'cursor-pointer select-none',
+  variantClasses[variant],
+  sizeClasses[size],
+  disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
+  className
+].filter(Boolean).join(' ');
+
+const attrs = href 
+  ? { href, class: classes }
+  : { type, disabled, class: classes };
+---
+
+<Tag {...attrs}>
+  <slot />
+</Tag>

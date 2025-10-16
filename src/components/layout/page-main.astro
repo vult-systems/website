@@ -1,0 +1,12 @@
+---
+// Consistent page wrapper for content pages
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<main class:list={["relative z-10 min-h-screen w-full bg-background", className]}>
+  <slot />
+</main>

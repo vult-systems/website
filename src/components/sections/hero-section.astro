@@ -1,0 +1,50 @@
+---
+import Heading from '../ui/heading.astro';
+import Text from '../ui/text.astro';
+import PageContainer from '../layout/page-container.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  align?: 'left' | 'center';
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  align = 'center',
+  class: className = ''
+} = Astro.props;
+
+const containerClasses = [
+  'py-16 sm:py-20 lg:py-24',
+  className
+].filter(Boolean).join(' ');
+---
+
+<section class={containerClasses}>
+  <PageContainer>
+    <div class={`max-w-3xl ${align === 'center' ? 'mx-auto' : ''}`}>
+      <Heading level={1} align={align}>
+        {title}
+      </Heading>
+      
+      {description && (
+        <div class="mt-4 sm:mt-6">
+          <Text size="lg" variant="secondary" align={align}>
+            {description}
+          </Text>
+        </div>
+      )}
+      
+      <slot name="actions">
+        <!-- Optional action buttons -->
+      </slot>
+      
+      <slot>
+        <!-- Additional hero content -->
+      </slot>
+    </div>
+  </PageContainer>
+</section>

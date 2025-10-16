@@ -1,8 +1,9 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/layout/Header.astro';
-import Footer from '../components/layout/Footer.astro';
-import DotBackground from '../components/ui/dot-background';
+import BaseLayout from '../layouts/base-layout.astro';
+import Header from '../components/layout/header.astro';
+import Footer from '../components/layout/footer.astro';
+import DotBackground from '../components/ui/dot-background.astro';
+import ComingSoonSection from '../components/sections/coming-soon-section.astro';
 ---
 
 <BaseLayout 
@@ -11,35 +12,14 @@ import DotBackground from '../components/ui/dot-background';
 	keywords="Studio Work, Client Projects, Commercial 3D, Collaborations, Professional Work, 3D Production, Creative Partnerships"
 >
 <Header />
-	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
-		<DotBackground client:idle />
+	<main class="min-h-screen w-full bg-background text-foreground">
+		<DotBackground />
 		
-		<!-- Hero Section -->
-		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
-					Vult
-				</h1>
-				<p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl leading-relaxed">
-					Studio work, client projects, and collaborative endeavors pushing creative boundaries. From concept to completion, each project represents a commitment to craft and creative problem-solving.
-				</p>
-			</div>
-		</div>
-
-		{/* Divider */}
-		<div class="relative z-10 w-full">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<div class="border-t border-gray-200 dark:border-gray-800"></div>
-			</div>
-		</div>
-
-		<!-- Coming Soon -->
-		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<p class="text-center text-gray-500 dark:text-gray-500">
-					Studio projects coming soon. Check back for updates.
-				</p>
-			</div>
+		<div class="relative z-10">
+			<ComingSoonSection 
+				title="Vult" 
+				description="Studio work, client projects, and collaborative endeavors pushing creative boundaries. From concept to completion, each project represents a commitment to craft and creative problem-solving."
+			/>
 		</div>
 	</main>
 <Footer />

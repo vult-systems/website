@@ -1,12 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/layout/Header.astro';
-import Footer from '../components/layout/Footer.astro';
-import HeroSection from '../components/ui/hero-section.astro';
-import { FeaturesSection } from '../components/ui/features-section';
-import DotBackground from '../components/ui/dot-background';
-import Divider from '../components/containers/Divider.astro';
+import BaseLayout from '../layouts/base-layout.astro';
+import Header from '../components/layout/header.astro';
+import Footer from '../components/layout/footer.astro';
+import MinimalHero from '../components/ui/minimal-hero.astro';
+import FeaturedGrid from '../components/ui/featured-grid.astro';
+import DotBackground from '../components/ui/dot-background.astro';
 
 // Get featured art pieces
 const artPieces = await getCollection('art');
@@ -27,20 +26,14 @@ const featuredArt = artPieces
 	keywords="Carlos Garcia, 3D Artist, Technical Artist, Educator, Pipeline Development, Houdini Artist, Blender, Creative Tools, San Antonio 3D Art, Procedural Art"
 >
 <Header />
-	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
-		<DotBackground client:idle />
+	<main class="min-h-screen w-full bg-background text-foreground">
+		<DotBackground />
 		
 		<!-- Hero Section -->
-		<HeroSection />
+		<MinimalHero />
 
-		<!-- Divider -->
-		<Divider />
-
-		<!-- Features Section -->
-		<FeaturesSection featuredArt={featuredArt} client:load />
-		
-		<!-- Divider -->
-		<Divider />
+		<!-- Featured Work -->
+		<FeaturedGrid artPieces={featuredArt} />
 	</main>
 <Footer />
 </BaseLayout>

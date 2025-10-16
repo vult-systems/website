@@ -1,0 +1,67 @@
+---
+import Heading from '../ui/heading.astro';
+import Text from '../ui/text.astro';
+import Card from '../ui/card.astro';
+import PageContainer from '../layout/page-container.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  class: className = ''
+} = Astro.props;
+
+const containerClasses = [
+  'py-16 sm:py-20 lg:py-24',
+  className
+].filter(Boolean).join(' ');
+---
+
+<section class={containerClasses}>
+  <PageContainer>
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-12">
+        <Heading level={1} align="center">
+          {title}
+        </Heading>
+        
+        {description && (
+          <div class="mt-4 sm:mt-6">
+            <Text size="lg" variant="secondary" align="center">
+              {description}
+            </Text>
+          </div>
+        )}
+      </div>
+      
+      <Card variant="bordered" padding="lg">
+        <div class="text-center">
+          <div class="mb-4">
+            <Text size="xl" variant="muted">
+              🚧
+            </Text>
+          </div>
+          
+          <Heading level={2} size="xl">
+            Coming Soon
+          </Heading>
+          
+          <div class="mt-3">
+            <Text variant="secondary">
+              This section is currently under construction. Check back soon for updates.
+            </Text>
+          </div>
+          
+          <slot>
+            <!-- Optional additional content -->
+          </slot>
+        </div>
+      </Card>
+    </div>
+  </PageContainer>
+</section>

@@ -1,0 +1,68 @@
+---
+/**
+ * Text Component
+ * 
+ * Body text with semantic color variants and size options.
+ * Use for paragraphs, descriptions, and general text content.
+ * 
+ * @example
+ * <Text>Default body text</Text>
+ * <Text variant="secondary">Less prominent text</Text>
+ * <Text variant="muted" size="sm">Helper text</Text>
+ */
+
+interface Props {
+  /** Color variant for different text hierarchies */
+  variant?: 'default' | 'secondary' | 'muted';
+  /** Text size */
+  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl';
+  /** Text alignment */
+  align?: 'left' | 'center' | 'right';
+  /** HTML element to render */
+  as?: 'p' | 'span' | 'div';
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  variant = 'default',
+  size = 'base',
+  align = 'left',
+  as = 'p',
+  class: className = ''
+} = Astro.props;
+
+const variantClasses = {
+  default: 'text-foreground',
+  secondary: 'text-foreground-secondary',
+  muted: 'text-foreground-muted'
+};
+
+const sizeClasses = {
+  xs: 'text-xs',
+  sm: 'text-sm',
+  base: 'text-base',
+  lg: 'text-lg',
+  xl: 'text-xl'
+};
+
+const alignClasses = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right'
+};
+
+const Tag = as;
+
+const classes = [
+  variantClasses[variant as keyof typeof variantClasses],
+  sizeClasses[size as keyof typeof sizeClasses],
+  alignClasses[align as keyof typeof alignClasses],
+  'leading-relaxed',
+  className
+].filter(Boolean).join(' ');
+---
+
+<Tag class={classes}>
+  <slot />
+</Tag>

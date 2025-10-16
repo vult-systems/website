@@ -1,0 +1,52 @@
+---
+/**
+ * Link Component
+ * 
+ * Semantic link element with visual variants.
+ * Handles both internal and external links with proper attributes.
+ * 
+ * @example
+ * <Link href="/about">Internal Link</Link>
+ * <Link href="/projects" variant="accent">Accent Link</Link>
+ * <Link href="https://github.com" external>External Link</Link>
+ */
+
+interface Props {
+  /** Link destination */
+  href: string;
+  /** Visual style variant */
+  variant?: 'default' | 'accent' | 'muted' | 'button';
+  /** External link (adds target="_blank" and rel) */
+  external?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  href,
+  variant = 'default',
+  external = false,
+  class: className = ''
+} = Astro.props;
+
+const variantClasses = {
+  default: 'text-foreground-secondary hover:text-foreground underline-offset-2 hover:underline transition-colors duration-200',
+  accent: 'text-accent hover:text-accent-hover underline-offset-2 hover:underline transition-colors duration-200',
+  muted: 'text-foreground-muted hover:text-foreground-secondary underline-offset-2 hover:underline transition-colors duration-200',
+  button: 'text-foreground hover:text-accent no-underline transition-colors duration-200'
+};
+
+const classes = [
+  variantClasses[variant],
+  'cursor-pointer',
+  className
+].filter(Boolean).join(' ');
+
+const externalAttrs = external 
+  ? { target: '_blank', rel: 'noopener noreferrer' }
+  : {};
+---
+
+<a href={href} class={classes} {...externalAttrs}>
+  <slot />
+</a>

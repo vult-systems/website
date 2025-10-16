@@ -1,0 +1,20 @@
+---
+import Heading from '../ui/heading.astro';
+import Text from '../ui/text.astro';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<div class="mb-8">
+  <Heading level={1} size="4xl" class="mb-4">
+    {title}
+  </Heading>
+  <Text size="lg" variant="secondary">
+    {description}
+  </Text>
+</div>

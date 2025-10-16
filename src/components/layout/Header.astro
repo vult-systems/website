@@ -6,9 +6,9 @@ import { ThemeToggle } from '../ui/theme-toggle';
 const currentPath = Astro.url.pathname;
 ---
 
-<div class="w-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-sm sticky top-0 left-0 right-0 z-50" transition:persist>
+<div class="w-full bg-background/90 backdrop-blur-sm sticky top-0 left-0 right-0 z-50" transition:persist>
     <div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-        <div class="flex h-16 items-center justify-between border-b border-gray-200/50 dark:border-gray-800/50">
+        <div class="flex h-16 items-center justify-between border-b border-border/50">
         <a href="/" class="flex items-end gap-x-3 hover:scale-105 transition-transform duration-200">
             <Image
                 src={logoSvg}
@@ -20,7 +20,7 @@ const currentPath = Astro.url.pathname;
                 transition:name="site-logo"
                 transition:animate="initial"
             />
-            <span class="text-xl font-bold text-gray-800 dark:text-gray-200 hover:text-amber-500 transition-colors leading-none" transition:name="site-title">
+            <span class="text-xl font-bold text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title">
                 carlosgarcia.works
             </span>
         </a>
@@ -29,32 +29,32 @@ const currentPath = Astro.url.pathname;
             <nav class="hidden md:block">
                 <ul class="flex gap-x-6 lg:gap-x-8">
                     <li>
-                        <a href="/art" class={`text-base inline-block hover:text-amber-500 hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/art') ? 'text-amber-500 scale-105' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <a href="/art" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/art') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
                             Art
                         </a>
                     </li>
                     <li>
-                        <a href="/code" class={`text-base inline-block hover:text-amber-500 hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/code') ? 'text-amber-500 scale-105' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <a href="/code" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/code') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
                             Code
                         </a>
                     </li>
                     <li>
-                        <a href="/learn" class={`text-base inline-block hover:text-amber-500 hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/learn') ? 'text-amber-500 scale-105' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <a href="/learn" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/learn') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
                             Learn
                         </a>
                     </li>
                     <li>
-                        <a href="/log" class={`text-base inline-block hover:text-amber-500 hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/log') ? 'text-amber-500 scale-105' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <a href="/log" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/log') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
                             Log
                         </a>
                     </li>
                     <li>
-                        <a href="/vult" class={`text-base inline-block hover:text-amber-500 hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/vult') ? 'text-amber-500 scale-105' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <a href="/vult" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/vult') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
                             Vult
                         </a>
                     </li>
                     <li>
-                        <a href="/about" class={`text-base inline-block hover:text-amber-500 hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/about') ? 'text-amber-500 scale-105' : 'text-gray-600 dark:text-gray-400'}`}>
+                        <a href="/about" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/about') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
                             About
                         </a>
                     </li>

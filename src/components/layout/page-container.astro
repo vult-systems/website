@@ -1,0 +1,14 @@
+---
+// Consistent page container
+interface Props {
+  maxWidth?: 'default' | 'wide';
+  class?: string;
+}
+
+const { maxWidth = 'wide', class: className } = Astro.props;
+const maxWidthClass = maxWidth === 'wide' ? 'max-w-7xl' : 'max-w-6xl';
+---
+
+<div class:list={["container", maxWidthClass, "mx-auto px-4", className]}>
+  <slot />
+</div>

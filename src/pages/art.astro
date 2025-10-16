@@ -1,11 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Header from '../components/layout/Header.astro';
-import Footer from '../components/layout/Footer.astro';
-import DotBackground from '../components/ui/dot-background';
-import ArtGallery from '../components/art/art-gallery';
-import ArtHeroText from '../components/art/art-hero-text';
+import BaseLayout from '../layouts/base-layout.astro';
+import Header from '../components/layout/header.astro';
+import Footer from '../components/layout/footer.astro';
+import PageMain from '../components/layout/page-main.astro';
+import PageContainer from '../components/layout/page-container.astro';
+import PageHeader from '../components/layout/page-header.astro';
+import DotBackground from '../components/ui/dot-background.astro';
+import ArtGrid from '../components/art/art-grid-wrapper';
 
 const artPieces = await getCollection('art');
 const artData = artPieces.map(piece => ({
@@ -13,9 +15,10 @@ const artData = artPieces.map(piece => ({
 	title: piece.data.title,
 	description: piece.data.description,
 	heroImage: typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src,
-	category: piece.data.category,
-	featured: piece.data.featured
+	category: piece.data.category
 }));
+
+const isEmpty = artData.length === 0;
 ---
 
 <BaseLayout 
@@ -23,22 +26,28 @@ const artData = artPieces.map(piece => ({
 	description="Explore the 3D art portfolio of Carlos Garcia featuring digital sculptures, procedural environments, character work, and creative experiments in Houdini, Blender, and other 3D tools."
 	keywords="3D Art, Digital Sculpture, 3D Environments, Houdini Art, Blender Art, Character Design, Procedural Art, Technical Art Portfolio"
 >
-<Header />
-	<main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
-		<DotBackground client:idle />
+	<Header />
+	<PageMain class="text-foreground">
+		<DotBackground />
 		
-		<!-- Hero Section -->
-		<div class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-			<div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-				<h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-6">
-					Art
-				</h1>
-				<ArtHeroText client:visible />
+		<div class="relative z-10 w-full py-24 sm:py-32">
+			<PageContainer>
+				<PageHeader
+					title="Art"
+					description="Digital art, procedural experiments, and 3D explorations"
+				/>
 				
-				<!-- Gallery with Filter -->
-				<ArtGallery artPieces={artData} client:load />
-			</div>
+				{isEmpty ? (
+					<div class="text-center py-16">
+						<p class="text-foreground-muted text-lg">
+							No artwork yet. Check back soon.
+						</p>
+					</div>
+				) : (
+					<ArtGrid artPieces={artData} client:load />
+				)}
+			</PageContainer>
 		</div>
-	</main>
-<Footer />
+	</PageMain>
+	<Footer />
 </BaseLayout>

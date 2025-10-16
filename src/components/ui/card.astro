@@ -1,0 +1,69 @@
+---
+/**
+ * Card Component
+ * 
+ * Container component for grouped content with hover states.
+ * Can be interactive (clickable) or static display container.
+ * 
+ * @example
+ * <Card>Static content card</Card>
+ * <Card interactive href="/post/1">Clickable card</Card>
+ * <Card variant="bordered" padding="lg">Large padded card</Card>
+ */
+
+interface Props {
+  /** Visual style variant */
+  variant?: 'default' | 'bordered' | 'elevated';
+  /** Padding size */
+  padding?: 'none' | 'sm' | 'base' | 'lg';
+  /** If provided, makes card clickable */
+  href?: string;
+  /** Enable hover effect */
+  interactive?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  variant = 'default',
+  padding = 'base',
+  href,
+  interactive = !!href,
+  class: className = ''
+} = Astro.props;
+
+const variantClasses = {
+  default: 'bg-card border border-border',
+  bordered: 'bg-card border-2 border-border',
+  elevated: 'bg-card border border-border shadow-lg'
+};
+
+const paddingClasses = {
+  none: '',
+  sm: 'p-4',
+  base: 'p-6',
+  lg: 'p-8'
+};
+
+const interactiveClasses = interactive
+  ? 'hover:bg-card-hover hover:border-border-hover transition-all duration-200 cursor-pointer'
+  : '';
+
+const Tag = href ? 'a' : 'div';
+
+const classes = [
+  'rounded-lg',
+  variantClasses[variant],
+  paddingClasses[padding],
+  interactiveClasses,
+  className
+].filter(Boolean).join(' ');
+
+const attrs = href 
+  ? { href, class: classes }
+  : { class: classes };
+---
+
+<Tag {...attrs}>
+  <slot />
+</Tag>

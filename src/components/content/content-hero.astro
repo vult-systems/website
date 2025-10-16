@@ -1,0 +1,67 @@
+---
+import Heading from '../ui/heading.astro';
+import Text from '../ui/text.astro';
+import Badge from '../ui/badge.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  author?: {
+    name: string;
+    initials: string;
+  };
+  meta?: string;
+  heroImage?: string | { src: string };
+}
+
+const {
+  title,
+  description,
+  author = { name: 'Carlos Garcia', initials: 'CG' },
+  meta,
+  heroImage
+} = Astro.props;
+
+const heroImageSrc = typeof heroImage === 'string' ? heroImage : heroImage?.src;
+---
+
+<section class="py-20 md:py-32">
+  <div class="container mx-auto px-4">
+    <div class="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center">
+      <!-- Title -->
+      <Heading level={1} size="5xl" align="center" class="max-w-3xl text-pretty">
+        {title}
+      </Heading>
+      
+      <!-- Description -->
+      {description && (
+        <Text size="xl" variant="secondary" align="center" class="max-w-3xl">
+          {description}
+        </Text>
+      )}
+      
+      <!-- Author & Meta -->
+      <div class="flex items-center gap-3 text-sm md:text-base">
+        <!-- Author Avatar Badge (custom - doesn't fit Badge component pattern) -->
+        <div class="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card">
+          <span class="text-sm font-semibold text-foreground">
+            {author.initials}
+          </span>
+        </div>
+        <Text variant="secondary" as="span">
+          <span class="font-semibold text-foreground">{author.name}</span>
+          {meta && <span class="ml-1">{meta}</span>}
+        </Text>
+      </div>
+      
+      <!-- Featured Image (custom - specific to content) -->
+      {heroImageSrc && (
+        <img
+          src={heroImageSrc}
+          alt={title}
+          class="mb-8 mt-4 aspect-video w-full rounded-lg border border-border object-cover"
+        />
+      )}
+    </div>
+  </div>
+</section>

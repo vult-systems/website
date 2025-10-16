@@ -1,0 +1,43 @@
+---
+title: "Procedural Terrain Generator"
+description: "Real-time procedural terrain system with erosion simulation"
+heroImage: "../../assets/art-placeholders/procedural-gen.jpg"
+pubDate: 2024-07-20
+category: "3d"
+tags: ["Procedural", "Technical", "Houdini", "Real-time"]
+tools: ["Houdini", "Unreal Engine", "Gaea"]
+featured: false
+---
+
+## Project Goals
+
+Create a fully procedural terrain generation system that can produce varied, realistic landscapes while remaining artist-directable.
+
+## System Architecture
+
+The generator consists of several modules:
+- Height field generation with noise
+- Hydraulic erosion simulation
+- Sediment deposition
+- Vegetation scatter system
+- Material blending based on slope
+
+## Technical Challenges
+
+Key problems solved:
+- Performance optimization for real-time use
+- Artist control vs procedural variation balance
+- Realistic erosion patterns
+- Seamless tiling for large worlds
+
+## Implementation
+
+Built using Houdini's Height Field toolkit:
+- Custom HDAs for tool ecosystem
+- Parameter-driven for art direction
+- Export pipeline to game engines
+- LOD generation for distance
+
+## Results
+
+The system successfully generates varied terrain while allowing artists to guide the overall aesthetic through intuitive controls.

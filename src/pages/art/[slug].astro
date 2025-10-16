@@ -1,9 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Header from '../../components/layout/Header.astro';
-import Footer from '../../components/layout/Footer.astro';
+import BaseLayout from '../../layouts/base-layout.astro';
+import Header from '../../components/layout/header.astro';
+import Footer from '../../components/layout/footer.astro';
+import PageMain from '../../components/layout/page-main.astro';
+import ContentHero from '../../components/content/content-hero.astro';
+import ProseContent from '../../components/content/prose-content.astro';
 
 export async function getStaticPaths() {
   const artPieces = await getCollection('art');
@@ -15,6 +17,9 @@ export async function getStaticPaths() {
 
 const { art } = Astro.props;
 const { Content } = await art.render();
+
+// Format metadata
+const meta = art.data.category ? `• ${art.data.category}` : '';
 const heroImageSrc = typeof art.data.heroImage === 'string' ? art.data.heroImage : art.data.heroImage?.src;
 ---
 
@@ -25,115 +30,17 @@ const heroImageSrc = typeof art.data.heroImage === 'string' ? art.data.heroImage
   type="article"
   keywords={art.data.tags?.join(', ')}
 >
-<Header />
-  <main class="min-h-screen w-full bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-200">
-    <article class="relative z-10 w-full py-8 md:py-12 lg:py-16">
-      <div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-        <div class="max-w-5xl mx-auto">
-          
-          {/* Back Navigation */}
-          <a 
-            href="/art" 
-            class="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-8 group"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Gallery
-          </a>
-
-          {/* Hero Image */}
-          {art.data.heroImage && (
-            <div class="mb-10 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xl">
-              {typeof art.data.heroImage === 'string' ? (
-                <img 
-                  src={art.data.heroImage} 
-                  alt={art.data.title}
-                  loading="eager"
-                  class="w-full h-auto object-cover"
-                />
-              ) : (
-                <Image 
-                  src={art.data.heroImage} 
-                  alt={art.data.title}
-                  loading="eager"
-                  class="w-full h-auto object-cover"
-                />
-              )}
-            </div>
-          )}
-
-          {/* Title & Meta */}
-          <header class="mb-8">
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-normal text-gray-800 dark:text-white mb-4">
-              {art.data.title}
-            </h1>
-            
-            {/* Meta Info */}
-            <div class="flex flex-wrap gap-4 items-center text-sm text-gray-600 dark:text-gray-400 mb-6">
-              {art.data.pubDate && (
-                <time class="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  {new Date(art.data.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </time>
-              )}
-              {art.data.category && (
-                <span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full capitalize">
-                  {art.data.category}
-                </span>
-              )}
-            </div>
-
-            {/* Tags */}
-            {art.data.tags && art.data.tags.length > 0 && (
-              <div class="flex flex-wrap gap-2 mb-6">
-                {art.data.tags.map((tag: string) => (
-                  <span class="px-3 py-1 text-xs bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full border border-amber-500/20">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Tools */}
-            {art.data.tools && art.data.tools.length > 0 && (
-              <div class="flex flex-wrap gap-2 items-center">
-                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Tools:</span>
-                {art.data.tools.map((tool: string) => (
-                  <span class="px-3 py-1 text-xs bg-zinc-950/50 text-gray-700 dark:text-gray-300 rounded border border-gray-200 dark:border-gray-800">
-                    {tool}
-                  </span>
-                ))}
-              </div>
-            )}
-          </header>
-
-          {/* Divider */}
-          <div class="border-t border-gray-200 dark:border-gray-800 mb-10"></div>
-
-          {/* Content */}
-          <div class="prose prose-lg dark:prose-invert max-w-none prose-headings:font-normal prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-gray-600 dark:prose-p:text-gray-400 prose-p:leading-relaxed prose-strong:text-gray-900 dark:prose-strong:text-white prose-ul:my-6 prose-li:text-gray-600 dark:prose-li:text-gray-400">
-            <Content />
-          </div>
-
-          {/* Back to Gallery */}
-          <div class="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
-            <a 
-              href="/art" 
-              class="inline-flex items-center text-amber-500 hover:text-amber-600 transition-colors font-normal group"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Gallery
-            </a>
-          </div>
-
-        </div>
-      </div>
-    </article>
-  </main>
-<Footer />
+  <Header />
+  <PageMain>
+    <ContentHero
+      title={art.data.title}
+      description={art.data.description}
+      meta={meta}
+      heroImage={art.data.heroImage}
+    />
+    <ProseContent>
+      <Content />
+    </ProseContent>
+  </PageMain>
+  <Footer />
 </BaseLayout>
