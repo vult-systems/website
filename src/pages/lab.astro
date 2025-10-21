@@ -22,7 +22,6 @@ import Badge from '../components/ui/badge.astro';
 import Link from '../components/ui/link.astro';
 import MinimalHero from '../components/ui/minimal-hero.astro';
 import FeaturedGrid from '../components/ui/featured-grid.astro';
-import DotBackground from '../components/ui/dot-background.astro';
 
 // Layout Components
 import Header from '../components/layout/header.astro';
@@ -65,8 +64,6 @@ if (!isDev) {
   
   <Header />
   <PageMain class="text-foreground">
-    <DotBackground />
-    
     <div class="relative z-10 w-full py-24 sm:py-16">
       <PageContainer>
         <div class="mb-10">
@@ -119,23 +116,23 @@ if (!isDev) {
           <Heading level={3} size="lg" class="mb-4">Color System</Heading>
           <div class="flex flex-wrap gap-4">
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 border border-border rounded" style="background-color: hsl(var(--background))"></div>
+              <div class="w-6 h-6 border border-border rounded-md" style="background-color: hsl(var(--background))"></div>
               <Text size="sm">Background</Text>
             </div>
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 bg-foreground rounded"></div>
+              <div class="w-6 h-6 bg-foreground rounded-md"></div>
               <Text size="sm">Foreground</Text>
             </div>
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 bg-accent rounded"></div>
+              <div class="w-6 h-6 bg-accent rounded-md"></div>
               <Text size="sm">Accent</Text>
             </div>
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 bg-card border border-border rounded"></div>
+              <div class="w-6 h-6 bg-card border border-border rounded-md"></div>
               <Text size="sm">Card</Text>
             </div>
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 bg-border border border-border-hover rounded"></div>
+              <div class="w-6 h-6 bg-border border border-border-hover rounded-md"></div>
               <Text size="sm">Border</Text>
             </div>
           </div>
@@ -203,8 +200,8 @@ if (!isDev) {
             <div>
               <Text size="sm" class="text-foreground-secondary mb-2">Links:</Text>
               <div class="space-x-4">
-                <Link href="#test" variant="accent">Accent Link</Link>
-                <Link href="#test" variant="ghost">Subtle Link</Link>
+                <Link href="#test" variant="accent">Accent Link ></Link>
+                <Link href="#test" variant="ghost">Subtle Link ></Link>
               </div>
             </div>
           </div>
@@ -251,7 +248,7 @@ if (!isDev) {
       <!-- Coming Soon Section -->
       <div class="mb-12">
         <Heading level={2} size="2xl" class="mb-6">Coming Soon Section</Heading>
-        <div class="border border-border rounded-lg overflow-hidden">
+        <div class="border border-border rounded-md overflow-hidden">
           <ComingSoonSection 
             title="Example Coming Soon Page" 
             description="This shows how the coming soon section component appears with your styling"
@@ -307,7 +304,7 @@ if (!isDev) {
             </div>
             <div class="flex gap-3">
               <Button variant="primary" size="sm">View Details</Button>
-              <Link href="#example" variant="button">Learn More →</Link>
+              <Link href="#example" variant="ghost">Learn More</Link>
             </div>
           </div>
         </Card>
@@ -341,18 +338,7 @@ if (!isDev) {
   /* Apply Neue Haas Grotesk to body and most elements on the lab page */
   body {
     font-family: var(--font-neue-haas) !important;
-    /* Add dot background that covers full page height - override any solid background */
-    background-image: radial-gradient(rgb(230 230 230) 1px, transparent 1px) !important;
-    background-size: 20px 20px !important;
-    background-attachment: fixed !important;
-    background-color: hsl(var(--background)) !important;
     min-height: 100vh;
-  }
-  
-  /* Dark mode dot background */
-  :global(.dark) body {
-    background-image: radial-gradient(rgb(40 40 40) 1px, transparent 1px) !important;
-    background-color: hsl(var(--background)) !important;
   }
   
   /* Apply Neue Haas Grotesk to all text elements (headings will override this) */
@@ -362,7 +348,7 @@ if (!isDev) {
   
   /* Additional lab-specific styles */
   .lab-color-swatch {
-    @apply w-12 h-12 rounded-lg border border-border flex-shrink-0;
+    @apply w-12 h-12 rounded-md border border-border flex-shrink-0;
   }
   
   .lab-section {

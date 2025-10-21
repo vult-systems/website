@@ -74,11 +74,12 @@ export default function ContentGrid({
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className={`text-sm font-medium transition-all hover:text-accent hover:scale-105 ${
+                  className={`text-sm font-medium transition-all duration-200 hover:text-accent hover:scale-105 ${
                     activeFilter === filter
                       ? "text-accent"
                       : "text-foreground-secondary"
                   }`}
+                  style={{fontFamily: '"Besley", serif'}}
                 >
                   {filter}
                 </button>
@@ -96,7 +97,7 @@ export default function ContentGrid({
       {/* Grid of Content Items - 4 Column */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-6">
         {filteredItems.map((item) => (
-          <div key={item.slug} className="group flex flex-col overflow-clip rounded-lg border border-border hover:border-border-hover transition-all">
+          <div key={item.slug} className="group flex flex-col overflow-clip rounded-md border border-border hover:border-border-hover hover:scale-[1.02] transition-all duration-300">
             {/* Image */}
             <a href={`${baseUrl}/${item.slug}`} className="overflow-hidden">
               {item.heroImage && (
@@ -111,13 +112,13 @@ export default function ContentGrid({
             
             {/* Content */}
             <div className="flex flex-col flex-grow p-4">
-              <h3 className="mb-2 text-base font-semibold text-foreground line-clamp-2 md:text-lg">
-                <a href={`${baseUrl}/${item.slug}`} className="hover:text-foreground-secondary transition-colors">
+              <h3 className="mb-2 text-base font-semibold text-foreground line-clamp-2 md:text-lg" style={{fontFamily: '"Besley", serif'}}>
+                <a href={`${baseUrl}/${item.slug}`} className="hover:text-foreground-secondary transition-all duration-200 hover:scale-105 inline-block">
                   {item.title}
                 </a>
               </h3>
               {item.description && (
-                <p className="text-foreground-secondary text-sm mb-3 line-clamp-2">
+                <p className="text-foreground-secondary text-sm mb-3 line-clamp-2" style={{fontFamily: 'var(--font-neue-haas)'}}>
                   {item.description}
                 </p>
               )}

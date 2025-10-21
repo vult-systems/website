@@ -1,0 +1,78 @@
+---
+import Card from '../ui/card.astro';
+import Heading from '../ui/heading.astro';
+import Text from '../ui/text.astro';
+import Badge from '../ui/badge.astro';
+import Link from '../ui/link.astro';
+
+interface ArtPiece {
+  slug: string;
+  title: string;
+  description?: string;
+  heroImage?: string;
+  category: string;
+}
+
+interface Props {
+  artPieces: ArtPiece[];
+}
+
+const { artPieces } = Astro.props;
+
+// Get unique categories for filtering
+const categories = [...new Set(artPieces.map(piece => piece.category))];
+---
+
+<div class="space-y-8">
+  <!-- Filter Buttons (if we have categories) -->
+  {categories.length > 1 && (
+    <>
+      <div class="flex flex-wrap gap-6 items-center justify-start">
+        <Link href="#" variant="accent">All ></Link>
+        {categories.map((category) => (
+          <Link href="#" variant="ghost">{category} ></Link>
+        ))}
+      </div>
+      
+      <!-- Divider -->
+      <div class="border-t border-border"></div>
+    </>
+  )}
+
+  <!-- Art Grid - Match Lab Layout -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {artPieces.map((piece) => (
+      <Card padding="none" interactive href={`/art/${piece.slug}`}>
+        <!-- Image -->
+        <div class="relative aspect-[4/3] overflow-hidden">
+          {piece.heroImage && (
+            <img
+              src={piece.heroImage}
+              alt={piece.title}
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          )}
+          <!-- Category Badge -->
+          <div class="absolute top-4 left-4">
+            <Badge size="sm" class="bg-background/90 backdrop-blur-sm">
+              {piece.category}
+            </Badge>
+          </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-6 space-y-3">
+          <Heading level={3} size="lg" class="line-clamp-2">
+            {piece.title}
+          </Heading>
+          {piece.description && (
+            <Text size="sm" variant="secondary" class="line-clamp-2">
+              {piece.description}
+            </Text>
+          )}
+        </div>
+      </Card>
+    ))}
+  </div>
+</div>

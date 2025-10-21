@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/base-layout.astro';
 import Header from '../components/layout/header.astro';
 import Footer from '../components/layout/footer.astro';
-import DotBackground from '../components/ui/dot-background.astro';
 import ComingSoonSection from '../components/sections/coming-soon-section.astro';
 ---
 
@@ -12,9 +11,7 @@ import ComingSoonSection from '../components/sections/coming-soon-section.astro'
 	keywords="Studio Work, Client Projects, Commercial 3D, Collaborations, Professional Work, 3D Production, Creative Partnerships"
 >
 <Header />
-	<main class="min-h-screen w-full bg-background text-foreground">
-		<DotBackground />
-		
+	<main class="min-h-screen w-full text-foreground">
 		<div class="relative z-10">
 			<ComingSoonSection 
 				title="Vult" 

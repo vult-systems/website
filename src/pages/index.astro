@@ -5,7 +5,6 @@ import Header from '../components/layout/header.astro';
 import Footer from '../components/layout/footer.astro';
 import MinimalHero from '../components/ui/minimal-hero.astro';
 import FeaturedGrid from '../components/ui/featured-grid.astro';
-import DotBackground from '../components/ui/dot-background.astro';
 
 // Get featured art pieces
 const artPieces = await getCollection('art');
@@ -26,9 +25,7 @@ const featuredArt = artPieces
 	keywords="Carlos Garcia, 3D Artist, Technical Artist, Educator, Pipeline Development, Houdini Artist, Blender, Creative Tools, San Antonio 3D Art, Procedural Art"
 >
 <Header />
-	<main class="min-h-screen w-full bg-background text-foreground">
-		<DotBackground />
-		
+	<main class="min-h-screen w-full text-foreground">
 		<!-- Hero Section -->
 		<MinimalHero />
 

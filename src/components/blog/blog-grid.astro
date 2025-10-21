@@ -1,0 +1,88 @@
+---
+import Card from '../ui/card.astro';
+import Heading from '../ui/heading.astro';
+import Text from '../ui/text.astro';
+import Badge from '../ui/badge.astro';
+import Link from '../ui/link.astro';
+
+interface BlogPost {
+  slug: string;
+  title: string;
+  description?: string;
+  heroImage?: string;
+  pubDate: Date;
+  tags?: string[];
+}
+
+interface Props {
+  posts: BlogPost[];
+}
+
+const { posts } = Astro.props;
+
+// Get unique tags for filtering
+const allTags = posts.flatMap(post => post.tags || []);
+const uniqueTags = [...new Set(allTags)];
+
+// Format dates consistently
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+};
+---
+
+<div class="space-y-8">
+  <!-- Filter Buttons (if we have tags) -->
+  {uniqueTags.length > 0 && (
+    <>
+      <div class="flex flex-wrap gap-6 items-center justify-start">
+        <Link href="#" variant="accent">All ></Link>
+        {uniqueTags.slice(0, 6).map((tag) => (
+          <Link href="#" variant="ghost">{tag} ></Link>
+        ))}
+      </div>
+      
+      <!-- Divider -->
+      <div class="border-t border-border"></div>
+    </>
+  )}
+
+  <!-- Blog Grid - Match Lab Layout -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {posts.map((post) => (
+      <Card padding="lg" interactive href={`/log/${post.slug}`}>
+        <!-- Content -->
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <Heading level={3} size="lg" class="line-clamp-2">
+              {post.title}
+            </Heading>
+            {post.description && (
+              <Text size="sm" variant="secondary" class="line-clamp-3">
+                {post.description}
+              </Text>
+            )}
+          </div>
+          
+          <!-- Metadata -->
+          <div class="flex items-center justify-between pt-4 border-t border-border">
+            <Text size="xs" variant="secondary">
+              {formatDate(post.pubDate)}
+            </Text>
+            
+            {post.tags && post.tags.length > 0 && (
+              <div class="flex gap-2">
+                {post.tags.slice(0, 2).map((tag) => (
+                  <Badge size="sm" variant="outline">{tag}</Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
+    ))}
+  </div>
+</div>

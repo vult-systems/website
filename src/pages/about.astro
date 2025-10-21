@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/base-layout.astro';
 import Header from '../components/layout/header.astro';
 import Footer from '../components/layout/footer.astro';
-import DotBackground from '../components/ui/dot-background.astro';
 import Heading from '../components/ui/heading.astro';
 import Text from '../components/ui/text.astro';
 import Link from '../components/ui/link.astro';
@@ -14,9 +13,7 @@ import Link from '../components/ui/link.astro';
 	keywords="Carlos Garcia, About, 3D Artist Bio, Technical Artist Resume, San Antonio Artist, Educator Bio, Portfolio, Contact"
 >
 <Header />
-	<main class="min-h-screen w-full bg-background text-foreground">
-		<DotBackground />
-		
+	<main class="min-h-screen w-full text-foreground">
 		<div class="relative z-10 w-full py-24 sm:py-32">
 			<div class="container max-w-4xl mx-auto px-4">
 				
@@ -33,25 +30,24 @@ import Link from '../components/ui/link.astro';
 				<div class="max-w-none mb-16">
 					<Heading level={2} size="2xl" class="mb-4">What I Do</Heading>
 					<Text variant="secondary" class="leading-relaxed mb-6">
-						I specialize in procedural 3D art, technical workflows, and educational content. 
-						My work bridges theory and practice through Houdini, Blender, and custom pipeline tools.
+						I specialize in 3D art and educational content.
 					</Text>
 					
 					<Heading level={2} size="2xl" class="mb-4 mt-12">Background</Heading>
 					<Text variant="secondary" class="leading-relaxed mb-6">
-						Currently teaching and creating in San Antonio, Texas. Focused on making technical art 
-						more accessible through clear documentation and practical examples.
+						Currently teaching and creating in San Antonio, Texas. Focused on making 3d art 
+						more accessible.
 					</Text>
 				</div>
 
 				<!-- Resume Card -->
 				<div class="mb-16">
 					<Heading level={2} size="2xl" class="mb-6">Resume</Heading>
-					<Link href="/resume.pdf" external class="block group">
-						<div class="rounded-lg border border-border bg-card p-8 hover:border-border-hover transition-colors">
+					<Link href="/resume.pdf" external variant="accent" class="block group">
+						<div class="rounded-md border border-border bg-card p-8 hover:border-border-hover transition-colors">
 							<div class="flex items-center justify-between">
 								<div>
-									<Text size="lg" class="font-medium mb-2">View Full Resume</Text>
+									<Text size="lg" class="font-medium mb-2">View Full Resume ></Text>
 									<Text size="sm" variant="secondary">PDF • Opens in new tab</Text>
 								</div>
 								<svg class="w-6 h-6 text-foreground-secondary group-hover:text-foreground transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,24 +56,6 @@ import Link from '../components/ui/link.astro';
 							</div>
 						</div>
 					</Link>
-				</div>
-
-				<!-- Contact Section -->
-				<div>
-					<Heading level={2} size="2xl" class="mb-6">Get in Touch</Heading>
-					<div class="space-y-4">
-						<Link href="mailto:hello@carlosgarcia.works" class="block">
-							hello@carlosgarcia.works
-						</Link>
-						<div class="flex gap-6">
-							<Link href="https://twitter.com/carlosgarcia" external>
-								Twitter
-							</Link>
-							<Link href="https://github.com/ProfessorGarcia" external>
-								GitHub
-							</Link>
-						</div>
-					</div>
 				</div>
 				</div>
 			</div>

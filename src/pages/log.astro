@@ -6,8 +6,7 @@ import Footer from '../components/layout/footer.astro';
 import PageMain from '../components/layout/page-main.astro';
 import PageContainer from '../components/layout/page-container.astro';
 import PageHeader from '../components/layout/page-header.astro';
-import DotBackground from '../components/ui/dot-background.astro';
-import BlogGrid from '../components/blog/blog-grid-wrapper';
+import BlogGrid from '../components/blog/blog-grid.astro';
 
 const logPosts = await getCollection('log', ({ data }) => {
 	return data.draft !== true;
@@ -36,8 +35,6 @@ const isEmpty = blogData.length === 0;
 >
 	<Header />
 	<PageMain class="text-foreground">
-		<DotBackground />
-		
 		<div class="relative z-10 w-full py-24 sm:py-32">
 			<PageContainer>
 				<PageHeader
@@ -52,7 +49,7 @@ const isEmpty = blogData.length === 0;
 						</p>
 					</div>
 				) : (
-					<BlogGrid posts={blogData} client:load />
+					<BlogGrid posts={blogData} />
 				)}
 			</PageContainer>
 		</div>
