@@ -13,12 +13,6 @@ module.exports = {
   		}
   	},
   	extend: {
-  		fontFamily: {
-  			clarendon: [
-  				'Clarendon LT STD',
-  				'serif'
-  			]
-  		},
   		colors: {
   			// Semantic color system
   			background: 'hsl(var(--background))',
