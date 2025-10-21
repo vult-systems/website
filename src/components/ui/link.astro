@@ -15,7 +15,7 @@ interface Props {
   /** Link destination */
   href: string;
   /** Visual style variant */
-  variant?: 'default' | 'accent' | 'muted' | 'button';
+  variant?: 'default' | 'accent' | 'muted' | 'ghost' | 'button';
   /** External link (adds target="_blank" and rel) */
   external?: boolean;
   /** Additional CSS classes */
@@ -30,10 +30,11 @@ const {
 } = Astro.props;
 
 const variantClasses = {
-  default: 'text-foreground-secondary hover:text-foreground underline-offset-2 hover:underline transition-colors duration-200',
-  accent: 'text-accent hover:text-accent-hover underline-offset-2 hover:underline transition-colors duration-200',
-  muted: 'text-foreground-muted hover:text-foreground-secondary underline-offset-2 hover:underline transition-colors duration-200',
-  button: 'text-foreground hover:text-accent no-underline transition-colors duration-200'
+  default: 'text-foreground-secondary hover:text-foreground underline-offset-2 hover:underline hover:scale-105 inline-block transition-all duration-200',
+  accent: 'text-accent hover:text-accent-hover no-underline hover:scale-105 inline-block transition-all duration-200',
+  muted: 'text-foreground-muted hover:text-foreground-secondary underline-offset-2 hover:underline hover:scale-105 inline-block transition-all duration-200',
+  ghost: 'text-foreground-muted hover:text-accent no-underline hover:scale-105 inline-block transition-all duration-200',
+  button: 'text-foreground hover:text-accent no-underline hover:scale-105 inline-block transition-all duration-200'
 };
 
 const classes = [

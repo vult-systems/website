@@ -7,6 +7,6 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<main class:list={["relative z-10 min-h-screen w-full bg-background", className]}>
+<main class:list={["relative z-10 min-h-screen w-full", className]}>
   <slot />
 </main>

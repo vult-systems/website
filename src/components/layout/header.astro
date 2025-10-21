@@ -20,7 +20,7 @@ const currentPath = Astro.url.pathname;
                 transition:name="site-logo"
                 transition:animate="initial"
             />
-            <span class="text-xl font-bold text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title">
+            <span class="text-xl font-medium text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title" style="font-family: 'Besley', serif !important;">
                 carlosgarcia.works
             </span>
         </a>
@@ -29,32 +29,32 @@ const currentPath = Astro.url.pathname;
             <nav class="hidden md:block">
                 <ul class="flex gap-x-6 lg:gap-x-8">
                     <li>
-                        <a href="/art" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/art') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
+                        <a href="/art" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/art') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Art
                         </a>
                     </li>
                     <li>
-                        <a href="/code" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/code') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
+                        <a href="/code" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/code') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Code
                         </a>
                     </li>
                     <li>
-                        <a href="/learn" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/learn') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
+                        <a href="/learn" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/learn') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Learn
                         </a>
                     </li>
                     <li>
-                        <a href="/log" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/log') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
+                        <a href="/log" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/log') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Log
                         </a>
                     </li>
                     <li>
-                        <a href="/vult" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/vult') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
+                        <a href="/vult" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/vult') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Vult
                         </a>
                     </li>
                     <li>
-                        <a href="/about" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/about') ? 'text-accent scale-105' : 'text-foreground-secondary'}`}>
+                        <a href="/about" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/about') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             About
                         </a>
                     </li>
@@ -67,3 +67,18 @@ const currentPath = Astro.url.pathname;
         </div>
     </div>
 </div>
+
+<style>
+/* Force Besley font for all header text */
+header, nav, .header-text, 
+span[transition\\:name="site-title"], 
+nav a, nav ul, nav li {
+    font-family: 'Besley', serif !important;
+}
+
+/* Ensure the site title and nav links use Besley */
+.text-xl.font-bold,
+nav a.text-base {
+    font-family: 'Besley', serif !important;
+}
+</style>

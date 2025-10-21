@@ -13,7 +13,7 @@
 
 interface Props {
   /** Visual style variant */
-  variant?: 'default' | 'accent' | 'outline' | 'muted';
+  variant?: 'default' | 'accent' | 'outline' | 'muted' | 'ghost';
   /** Badge size */
   size?: 'sm' | 'base';
   /** Additional CSS classes */
@@ -30,7 +30,8 @@ const variantClasses = {
   default: 'bg-card text-foreground border border-border',
   accent: 'bg-accent text-background border border-transparent',
   outline: 'bg-transparent text-foreground-secondary border border-border',
-  muted: 'bg-card text-foreground-muted border border-border'
+  muted: 'bg-card text-foreground-muted border border-border',
+  ghost: 'bg-transparent text-foreground-secondary border border-transparent hover:bg-card transition-colors duration-200'
 };
 
 const sizeClasses = {

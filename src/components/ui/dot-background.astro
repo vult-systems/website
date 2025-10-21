@@ -1,9 +1,52 @@
 ---
-// Pure Astro component - no React needed
+interface Props {
+  class?: string;
+  intensity?: 'low' | 'medium' | 'high';
+  size?: 'sm' | 'base' | 'lg';
+}
+
+const {
+  class: className = '',
+  intensity = 'medium',
+  size = 'base'
+} = Astro.props;
+
+// Intensity settings
+const intensityClasses = {
+  low: 'opacity-20',
+  medium: 'opacity-40',
+  high: 'opacity-60'
+};
+
+// Size settings  
+const sizeSettings = {
+  sm: '15px 15px',
+  base: '20px 20px',
+  lg: '30px 30px'
+};
+
+const backgroundSize = sizeSettings[size];
+const opacityClass = intensityClasses[intensity];
+
+const containerClasses = [
+  'absolute inset-0 pointer-events-none',
+  className
+].filter(Boolean).join(' ');
 ---
 
-<div class="pointer-events-none fixed inset-0 z-0 bg-background">
+<div class={containerClasses}>
 	<div 
-		class="absolute inset-0 opacity-40 [background-size:20px_20px] [background-image:radial-gradient(#d4d4d4_1px,transparent_1px)] dark:[background-image:radial-gradient(#404040_1px,transparent_1px)]"
+		class={`absolute inset-0 ${opacityClass} dot-pattern`}
+		style={`background-size: ${backgroundSize};`}
 	/>
 </div>
+
+<style>
+.dot-pattern {
+  background-image: radial-gradient(rgb(212 212 212) 1px, transparent 1px);
+}
+
+:global(.dark) .dot-pattern {
+  background-image: radial-gradient(rgb(43, 43, 43) 1px, transparent 1px);
+}
+</style>
