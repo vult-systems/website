@@ -4,6 +4,7 @@
  * 
  * Semantic link element with visual variants.
  * Handles both internal and external links with proper attributes.
+ * All styling comes from centralized design tokens in src/config/design.ts
  * 
  * @example
  * <Link href="/about">Internal Link</Link>
@@ -11,11 +12,15 @@
  * <Link href="https://github.com" external>External Link</Link>
  */
 
+import { components, cn } from '@/config/design';
+
 interface Props {
   /** Link destination */
   href: string;
   /** Visual style variant */
-  variant?: 'default' | 'accent' | 'muted' | 'ghost' | 'button';
+  variant?: 'default' | 'accent' | 'muted' | 'ghost';
+  /** Underline style */
+  underline?: 'always' | 'hover' | 'none';
   /** External link (adds target="_blank" and rel) */
   external?: boolean;
   /** Additional CSS classes */
@@ -25,23 +30,17 @@ interface Props {
 const {
   href,
   variant = 'default',
+  underline = 'hover',
   external = false,
   class: className = ''
 } = Astro.props;
 
-const variantClasses = {
-  default: 'text-foreground-secondary hover:text-foreground underline-offset-2 hover:underline hover:scale-105 inline-block transition-all duration-200',
-  accent: 'text-accent hover:text-accent-hover no-underline hover:scale-105 inline-block transition-all duration-200',
-  muted: 'text-foreground-muted hover:text-foreground-secondary underline-offset-2 hover:underline hover:scale-105 inline-block transition-all duration-200',
-  ghost: 'text-foreground-muted hover:text-accent no-underline hover:scale-105 inline-block transition-all duration-200',
-  button: 'text-foreground hover:text-accent no-underline hover:scale-105 inline-block transition-all duration-200'
-};
-
-const classes = [
-  variantClasses[variant],
-  'cursor-pointer',
+const classes = cn(
+  components.link.base,
+  components.link.variants[variant],
+  components.link.underline[underline],
   className
-].filter(Boolean).join(' ');
+);
 
 const externalAttrs = external 
   ? { target: '_blank', rel: 'noopener noreferrer' }

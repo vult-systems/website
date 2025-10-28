@@ -1,46 +1,47 @@
 ---
-title: "Experiment: Blending Houdini and Blender"
-description: "Testing a hybrid pipeline using Houdini for generation and Blender for final artistic touches."
+title: "Experiment: Character Modeling Pipeline"
+description: "Testing workflow approaches for character modeling and refinement."
 pubDate: 2025-09-28
 author: "Carlos Garcia"
 tags: ["Experiment", "3D", "WIP"]
 draft: false
-heroImage: "../../assets/blog-placeholders/experiment.jpg"
+heroImage: "@/assets/blog-placeholders/experiment.jpg"
 ---
 
-## The Idea
+## Hypothesis
 
-What if we use each tool for what it does best?
+Exploring efficient character modeling workflows.
 
-**Houdini**: Procedural generation, simulation, technical heavy lifting  
-**Blender**: Artistic refinement, shading, final renders
+**Maya**: Primary modeling, rigging, and technical setup  
+**Refinement**: Iteration on topology, UV layout, and final polish
 
-## The Test
+## Test Case
 
-Building a procedural city generator:
-- Houdini handles building placement, road networks, utility distribution
-- Export to Blender for material work, lighting, final composition
+Character creation pipeline:
+- Maya handles base mesh, topology, UV unwrapping
+- Iteration for optimized mesh flow and clean geometry
+- Final character setup and export
 
-## Initial Results
+## Results
 
-**Pros:**
-- Faster iteration in Houdini
-- Better artistic control in Blender
-- Leverages strengths of both tools
+**Advantages:**
+- Faster iteration cycles
+- Better control over topology
+- Streamlined workflow
 
-**Cons:**
-- Transfer overhead
-- Need to maintain two files
-- Version sync challenges
+**Limitations:**
+- Refinement overhead
+- Multiple revision cycles
+- Version management complexity
 
-## Current Status
+## Status
 
-Still experimenting. The workflow shows promise but needs refinement. Considering building custom exporters to smooth the transition.
+Experimental. Shows promise but requires workflow optimization.
 
-## Next Steps
+## Next
 
-- Test with larger scenes
-- Automate the export/import process
-- Document best practices
+- Scale testing with full character sets
+- Pipeline automation
+- Documentation of best practices
 
-*This is a work in progress. Updates coming soon.*
+*Work in progress. Updates to follow.*

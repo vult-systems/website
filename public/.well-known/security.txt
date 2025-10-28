@@ -1,3 +1,5 @@
+# Security contact information
+# Managed via src/config/site.ts - update SITE.author.securityEmail if needed
 Contact: mailto:security@carlosgarcia.works
 Expires: 2026-12-31T23:59:59.000Z
 Preferred-Languages: en

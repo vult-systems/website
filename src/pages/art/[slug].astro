@@ -1,11 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/base-layout.astro';
-import Header from '../../components/layout/header.astro';
-import Footer from '../../components/layout/footer.astro';
-import PageMain from '../../components/layout/page-main.astro';
-import ContentHero from '../../components/content/content-hero.astro';
-import ProseContent from '../../components/content/prose-content.astro';
+import BaseLayout from '@/layouts/base-layout.astro';
+import Header from '@/components/layout/header.astro';
+import Footer from '@/components/layout/footer.astro';
+import PageMain from '@/components/layout/page-main.astro';
+import ContentHero from '@/components/content/content-hero.astro';
+import ProseContent from '@/components/content/prose-content.astro';
+import { getArtPageSEO } from '@/config/seo';
 
 export async function getStaticPaths() {
   const artPieces = await getCollection('art');
@@ -21,10 +22,11 @@ const { Content } = await art.render();
 // Format metadata
 const meta = art.data.category ? `• ${art.data.category}` : '';
 const heroImageSrc = typeof art.data.heroImage === 'string' ? art.data.heroImage : art.data.heroImage?.src;
+const seo = getArtPageSEO(art.data.title);
 ---
 
 <BaseLayout
-  title={`${art.data.title} | Art | Carlos Garcia`}
+  title={seo.title}
   description={art.data.description}
   image={heroImageSrc}
   type="article"

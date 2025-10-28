@@ -1,7 +1,8 @@
 ---
 import { Image } from 'astro:assets';
-import logoSvg from '../../assets/brand/logo.svg';
-import { ThemeToggle } from '../ui/theme-toggle';
+import logoSvg from '@/assets/brand/logo.svg';
+import ThemeToggle from '@/components/ui/theme-toggle.astro';
+import { SITE } from '@/config/site';
 
 const currentPath = Astro.url.pathname;
 ---
@@ -14,14 +15,14 @@ const currentPath = Astro.url.pathname;
                 src={logoSvg}
                 width={24}
                 height={24}
-                alt="Carlos Garcia Logo"
+                alt={`${SITE.author.name} Logo`}
                 loading="eager"
                 class="dark:brightness-[.85] mb-[2px]"
                 transition:name="site-logo"
                 transition:animate="initial"
             />
             <span class="text-xl font-medium text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title" style="font-family: 'Besley', serif !important;">
-                carlosgarcia.works
+                {SITE.name}
             </span>
         </a>
         
@@ -62,7 +63,7 @@ const currentPath = Astro.url.pathname;
             </nav>
             
             <div transition:persist="theme-toggle">
-                <ThemeToggle client:visible />
+                <ThemeToggle />
             </div>
         </div>
     </div>
@@ -70,9 +71,7 @@ const currentPath = Astro.url.pathname;
 
 <style>
 /* Force Besley font for all header text */
-header, nav, .header-text, 
-span[transition\\:name="site-title"], 
-nav a, nav ul, nav li {
+header, nav, .header-text, nav a, nav ul, nav li {
     font-family: 'Besley', serif !important;
 }
 

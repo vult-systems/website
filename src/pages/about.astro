@@ -1,16 +1,20 @@
 ---
-import BaseLayout from '../layouts/base-layout.astro';
-import Header from '../components/layout/header.astro';
-import Footer from '../components/layout/footer.astro';
-import Heading from '../components/ui/heading.astro';
-import Text from '../components/ui/text.astro';
-import Link from '../components/ui/link.astro';
+import BaseLayout from '@/layouts/base-layout.astro';
+import Header from '@/components/layout/header.astro';
+import Footer from '@/components/layout/footer.astro';
+import Heading from '@/components/ui/heading.astro';
+import Text from '@/components/ui/text.astro';
+import Link from '@/components/ui/link.astro';
+import { getAboutPageSEO } from '@/config/seo';
+import { SITE } from '@/config/site';
+
+const seo = getAboutPageSEO();
 ---
 
 <BaseLayout 
-	title="About Carlos Garcia | 3D Artist & Educator | San Antonio, TX" 
-	description="Learn about Carlos Garcia - 3D Artist, Technical Director, and Educator based in San Antonio, Texas. Bridging theory and practice through art, code, and education. View resume and contact information."
-	keywords="Carlos Garcia, About, 3D Artist Bio, Technical Artist Resume, San Antonio Artist, Educator Bio, Portfolio, Contact"
+	title={seo.title} 
+	description={seo.description}
+	keywords={seo.keywords}
 >
 <Header />
 	<main class="min-h-screen w-full text-foreground">
@@ -21,43 +25,24 @@ import Link from '../components/ui/link.astro';
 				<div class="mb-16">
 					<Heading level={1} size="4xl" class="mb-6">About</Heading>
 					<Text size="lg" variant="secondary" class="leading-relaxed">
-						3D Artist & Educator based in San Antonio, Texas. I create digital art, develop creative tools, 
-						and teach others to build with intention.
+						{SITE.author.role} based in {SITE.author.location.full}. 3D character art, digital modeling, 
+						and education.
 					</Text>
 				</div>
 
 				<!-- Bio Content -->
 				<div class="max-w-none mb-16">
-					<Heading level={2} size="2xl" class="mb-4">What I Do</Heading>
+					<Heading level={2} size="2xl" class="mb-4">Focus</Heading>
 					<Text variant="secondary" class="leading-relaxed mb-6">
-						I specialize in 3D art and educational content.
+						3D character art and educational content.
 					</Text>
 					
 					<Heading level={2} size="2xl" class="mb-4 mt-12">Background</Heading>
 					<Text variant="secondary" class="leading-relaxed mb-6">
-						Currently teaching and creating in San Antonio, Texas. Focused on making 3d art 
-						more accessible.
+						Based in {SITE.author.location.full}. Teaching and creating 3D character art.
 					</Text>
 				</div>
-
-				<!-- Resume Card -->
-				<div class="mb-16">
-					<Heading level={2} size="2xl" class="mb-6">Resume</Heading>
-					<Link href="/resume.pdf" external variant="accent" class="block group">
-						<div class="rounded-md border border-border bg-card p-8 hover:border-border-hover transition-colors">
-							<div class="flex items-center justify-between">
-								<div>
-									<Text size="lg" class="font-medium mb-2">View Full Resume ></Text>
-									<Text size="sm" variant="secondary">PDF • Opens in new tab</Text>
-								</div>
-								<svg class="w-6 h-6 text-foreground-secondary group-hover:text-foreground transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-								</svg>
-							</div>
-						</div>
-					</Link>
-				</div>
-				</div>
+			</div>
 			</div>
 		</div>
 	</main>

@@ -1,21 +1,24 @@
 ---
-import BaseLayout from '../layouts/base-layout.astro';
-import Header from '../components/layout/header.astro';
-import Footer from '../components/layout/footer.astro';
-import ComingSoonSection from '../components/sections/coming-soon-section.astro';
+import BaseLayout from '@/layouts/base-layout.astro';
+import Header from '@/components/layout/header.astro';
+import Footer from '@/components/layout/footer.astro';
+import ComingSoonSection from '@/components/sections/coming-soon-section.astro';
+import { getCodePageSEO } from '@/config/seo';
+
+const seo = getCodePageSEO();
 ---
 
 <BaseLayout 
-	title="Code & Tools | Carlos Garcia | Pipeline Development & Technical Solutions" 
-	description="Pipeline tools, technical art solutions, and software projects by Carlos Garcia. Bridging creativity and efficiency through Python, Houdini tools, and custom development."
-	keywords="Pipeline Tools, Technical Art Tools, Houdini Development, Python Tools, 3D Pipeline, Artist Tools, Automation, Technical Solutions"
+	title={seo.title} 
+	description={seo.description}
+	keywords={seo.keywords}
 >
 <Header />
 	<main class="min-h-screen w-full text-foreground">
 		<div class="relative z-10">
 			<ComingSoonSection 
 				title="Code" 
-				description="Pipeline tools, technical art solutions, and software built to bridge creativity and efficiency. From automation scripts to custom tools, each project solves real problems in the creative workflow."
+				description="Tools and scripts for Maya workflows and character pipelines."
 			/>
 		</div>
 	</main>

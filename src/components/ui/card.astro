@@ -4,12 +4,15 @@
  * 
  * Container component for grouped content with hover states.
  * Can be interactive (clickable) or static display container.
+ * All styling comes from centralized design tokens in src/config/design.ts
  * 
  * @example
  * <Card>Static content card</Card>
  * <Card interactive href="/post/1">Clickable card</Card>
  * <Card variant="bordered" padding="lg">Large padded card</Card>
  */
+
+import { components, cn } from '@/config/design';
 
 interface Props {
   /** Visual style variant */
@@ -32,32 +35,15 @@ const {
   class: className = ''
 } = Astro.props;
 
-const variantClasses = {
-  default: 'bg-card border border-border',
-  bordered: 'bg-card border-2 border-border',
-  elevated: 'bg-card border border-border shadow-lg'
-};
-
-const paddingClasses = {
-  none: '',
-  sm: 'p-4',
-  base: 'p-6',
-  lg: 'p-8'
-};
-
-const interactiveClasses = interactive
-  ? 'hover:bg-card-hover hover:border-border-hover hover:scale-[1.02] transition-all duration-300 cursor-pointer'
-  : '';
-
 const Tag = href ? 'a' : 'div';
 
-const classes = [
-  'rounded-md',
-  variantClasses[variant],
-  paddingClasses[padding],
-  interactiveClasses,
+const classes = cn(
+  components.card.base,
+  components.card.variants[variant],
+  components.card.padding[padding],
+  interactive && components.card.interactive,
   className
-].filter(Boolean).join(' ');
+);
 
 const attrs = href 
   ? { href, class: classes }

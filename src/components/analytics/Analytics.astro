@@ -1,4 +1,6 @@
 ---
+import { SITE } from '@/config/site';
+
 interface Props {
   provider?: 'ga4' | 'plausible' | 'fathom' | 'umami' | 'none';
   trackingId?: string;
@@ -9,7 +11,7 @@ interface Props {
 const {
   provider = import.meta.env.PUBLIC_ANALYTICS_PROVIDER || 'none',
   trackingId = import.meta.env.PUBLIC_ANALYTICS_ID,
-  domain = import.meta.env.PUBLIC_ANALYTICS_DOMAIN || 'carlosgarcia.works',
+  domain = import.meta.env.PUBLIC_ANALYTICS_DOMAIN || SITE.name,
   respectDNT = true
 } = Astro.props;
 

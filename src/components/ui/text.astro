@@ -4,6 +4,7 @@
  * 
  * Body text with semantic color variants and size options.
  * Use for paragraphs, descriptions, and general text content.
+ * All styling comes from centralized design tokens in src/config/design.ts
  * 
  * @example
  * <Text>Default body text</Text>
@@ -11,9 +12,11 @@
  * <Text variant="muted" size="sm">Helper text</Text>
  */
 
+import { components, cn } from '@/config/design';
+
 interface Props {
   /** Color variant for different text hierarchies */
-  variant?: 'default' | 'secondary' | 'muted';
+  variant?: 'default' | 'secondary' | 'muted' | 'accent';
   /** Text size */
   size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl';
   /** Text alignment */
@@ -32,35 +35,22 @@ const {
   class: className = ''
 } = Astro.props;
 
-const variantClasses = {
-  default: 'text-foreground',
-  secondary: 'text-foreground-secondary',
-  muted: 'text-foreground-muted'
-};
-
-const sizeClasses = {
-  xs: 'text-xs',
-  sm: 'text-sm',
-  base: 'text-base',
-  lg: 'text-lg',
-  xl: 'text-xl'
-};
-
 const alignClasses = {
   left: 'text-left',
   center: 'text-center',
   right: 'text-right'
-};
+} as const;
 
 const Tag = as;
 
-const classes = [
-  variantClasses[variant as keyof typeof variantClasses],
-  sizeClasses[size as keyof typeof sizeClasses],
+const classes = cn(
+  components.text.base,
+  components.text.variants[variant as keyof typeof components.text.variants],
+  components.text.sizes[size as keyof typeof components.text.sizes],
   alignClasses[align as keyof typeof alignClasses],
   'leading-relaxed',
   className
-].filter(Boolean).join(' ');
+);
 ---
 
 <Tag class={classes}>

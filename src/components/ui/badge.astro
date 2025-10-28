@@ -4,12 +4,15 @@
  * 
  * Small label for tags, categories, and status indicators.
  * Uses semantic colors with variants for different contexts.
+ * All styling comes from centralized design tokens in src/config/design.ts
  * 
  * @example
  * <Badge>Default</Badge>
  * <Badge variant="accent">Featured</Badge>
  * <Badge variant="outline" size="sm">Tag</Badge>
  */
+
+import { components, cn } from '@/config/design';
 
 interface Props {
   /** Visual style variant */
@@ -26,26 +29,12 @@ const {
   class: className = ''
 } = Astro.props;
 
-const variantClasses = {
-  default: 'bg-card text-foreground border border-border',
-  accent: 'bg-accent text-background border border-transparent',
-  outline: 'bg-transparent text-foreground-secondary border border-border',
-  muted: 'bg-card text-foreground-muted border border-border',
-  ghost: 'bg-transparent text-foreground-secondary border border-transparent hover:bg-card transition-colors duration-200'
-};
-
-const sizeClasses = {
-  sm: 'px-2 py-0.5 text-xs rounded-md',
-  base: 'px-2.5 py-1 text-sm rounded-md'
-};
-
-const classes = [
-  'inline-flex items-center justify-center',
-  'font-medium whitespace-nowrap',
-  variantClasses[variant],
-  sizeClasses[size],
+const classes = cn(
+  components.badge.base,
+  components.badge.variants[variant],
+  components.badge.sizes[size],
   className
-].filter(Boolean).join(' ');
+);
 ---
 
 <span class={classes}>

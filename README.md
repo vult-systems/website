@@ -1,17 +1,49 @@
 # carlosgarcia.works
 
-Portfolio site for my 3D art, studio work, teaching, technical writing, and creative exploration.
+Personal portfolio site for 3D art, studio work, teaching, and technical writing.
 
 ## Stack
 
-[![Astro](https://img.shields.io/badge/Astro-BC52EE?logo=astro&logoColor=fff)](#) 
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff)](#)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?logo=tailwindcss&logoColor=fff)](#)
-[![MDX](https://img.shields.io/badge/MDX-1B1F24?logo=mdx&logoColor=fff)](#)
-[![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000)](#)
+- [Astro](https://astro.build) - Static site generator
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [Tailwind CSS](https://tailwindcss.com) - Styling
+- [MDX](https://mdxjs.com) - Enhanced markdown
+
+## Architecture
+
+**DRY & Maintainable**
+
+Three config files are the single source of truth:
+- `src/config/site.ts` - All site/author metadata
+- `src/config/seo.ts` - SEO helper functions
+- `src/config/design.ts` - Component styling tokens
+
+Change your email once in `site.ts`, it updates everywhere. Change a button color in `design.ts`, all buttons update.
+
+**Design System**
+
+Centralized styling tokens instead of scattered Tailwind classes:
+- Components: button, badge, card, link, heading, text
+- Layout utilities: container, section, grid patterns
+- Typography & spacing scales
+
+**Pure Astro Stack**
+
+No React, no Vue, no Svelte. Just Astro components with vanilla JS where needed.
+- Minimal JavaScript footprint
+- ~2 second builds for 21 pages
+- 12 packages (down from 65+)
+
+## Development
+
+```bash
+npm install
+npm run dev     # Start dev server
+npm run build   # Build for production
+```
+
+Visit `/lab` in dev mode to see the design system.
 
 ## Development Approach
 
-This site is being built through **vibe-coding** with AI assistance. As a 3D artist exploring modern web development, I'm testing the capabilities of AI-powered development tools to bridge knowledge gaps and accelerate learning.
-
-I understand the trade-offs: less manual control, potential over-reliance on generated code, and the importance of understanding what's being built. But for creative experimentation and rapid prototyping, this approach lets me focus on design and content while exploring new technologies.
+Built with AI assistance for rapid prototyping and learning.

@@ -1,52 +1,52 @@
 ---
 title: "Quick Tip: Custom Attributes for Better Control"
-description: "A simple technique for adding artist-friendly controls to procedural systems using custom attributes."
+description: "Adding artist-friendly controls to procedural systems using custom attributes."
 pubDate: 2025-09-20
 author: "Carlos Garcia"
-tags: ["Tutorial", "Technical", "Houdini"]
+tags: ["Tutorial", "Technical", "Maya"]
 draft: false
-heroImage: "../../assets/blog-placeholders/tutorial.jpg"
+heroImage: "@/assets/blog-placeholders/tutorial.jpg"
 ---
 
-## The Problem
+## Problem
 
-Procedural systems are powerful, but they can be intimidating for artists who just want to adjust one thing.
+Procedural systems expose technical parameters that are difficult for artists to interpret.
 
-## The Solution
+## Solution
 
-Custom attributes with sensible names and ranges.
+Custom attributes with clear names and appropriate ranges.
 
 ## Example
 
-Instead of exposing raw noise parameters:
+Raw noise parameters:
 
 ```python
-# Bad: Technical and unclear
+# Technical parameters
 frequency = 0.347
 octaves = 4.2
 lacunarity = 2.1
 ```
 
-Create artist-friendly controls:
+Artist-friendly controls:
 
 ```python
-# Good: Clear intent
-terrain_roughness = 0.5  # 0 = smooth, 1 = very rough
+# Descriptive parameters
+surface_roughness = 0.5  # 0 = smooth, 1 = very rough
 detail_level = 0.7       # 0 = simple, 1 = complex
 variation = 0.3          # 0 = uniform, 1 = varied
 ```
 
-## Implementation in Houdini
+## Implementation in Maya
 
-1. Create a parameter interface
+1. Create parameter interface
 2. Remap values to technical parameters
-3. Add clear labels and tooltips
-4. Set sensible min/max ranges
+3. Add tooltips and labels
+4. Set appropriate min/max ranges
 
-## The Result
+## Result
 
-Artists can iterate quickly without needing to understand the underlying math. Win-win.
+Artists iterate quickly without understanding underlying mathematics.
 
-## Bonus Tip
+## Addition
 
-Include presets! "Smooth Plains," "Rocky Hills," "Mountain Range" - instant starting points for exploration.
+Include presets for common use cases: "Smooth Surface," "Rough Texture," "High Detail."

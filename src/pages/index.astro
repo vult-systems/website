@@ -1,10 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/base-layout.astro';
-import Header from '../components/layout/header.astro';
-import Footer from '../components/layout/footer.astro';
-import MinimalHero from '../components/ui/minimal-hero.astro';
-import FeaturedGrid from '../components/ui/featured-grid.astro';
+import BaseLayout from '@/layouts/base-layout.astro';
+import Header from '@/components/layout/header.astro';
+import Footer from '@/components/layout/footer.astro';
+import MinimalHero from '@/components/ui/minimal-hero.astro';
+import FeaturedGrid from '@/components/ui/featured-grid.astro';
+import { getHomePageSEO } from '@/config/seo';
 
 // Get featured art pieces
 const artPieces = await getCollection('art');
@@ -14,15 +15,17 @@ const featuredArt = artPieces
     slug: piece.slug,
     title: piece.data.title,
     description: piece.data.description,
-    heroImage: (typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src) || '',
-    category: piece.data.category,
+    heroImage: piece.data.heroImage,
+    category: piece.data.category
   }));
+
+const seo = getHomePageSEO();
 ---
 
 <BaseLayout 
-	title="Carlos Garcia | 3D Artist & Educator | Technical Art & Creative Tools" 
-	description="Portfolio of Carlos Garcia - Creative technologist specializing in 3D art, pipeline development, and technical education. Explore projects in Houdini, Blender, and innovative creative tools."
-	keywords="Carlos Garcia, 3D Artist, Technical Artist, Educator, Pipeline Development, Houdini Artist, Blender, Creative Tools, San Antonio 3D Art, Procedural Art"
+	title={seo.title} 
+	description={seo.description}
+	keywords={seo.keywords}
 >
 <Header />
 	<main class="min-h-screen w-full text-foreground">

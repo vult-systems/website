@@ -4,12 +4,15 @@
  * 
  * Interactive button with multiple variants and states.
  * Handles both links and button elements with consistent styling.
+ * All styling comes from centralized design tokens in src/config/design.ts
  * 
  * @example
  * <Button variant="primary">Primary Action</Button>
  * <Button variant="secondary" href="/about">Link Button</Button>
  * <Button variant="ghost" size="sm">Small Button</Button>
  */
+
+import { components, cn } from '@/config/design';
 
 interface Props {
   /** Visual style variant */
@@ -35,56 +38,15 @@ const {
   class: className = ''
 } = Astro.props;
 
-const variantClasses = {
-  primary: [
-    'bg-foreground text-background',
-    'hover:bg-accent',
-    'border border-transparent',
-    'font-medium',
-    'transition-all duration-200'
-  ].join(' '),
-  
-  secondary: [
-    'bg-card text-foreground',
-    'hover:bg-card-hover',
-    'border border-border',
-    'font-medium',
-    'transition-all duration-200'
-  ].join(' '),
-  
-  outline: [
-    'bg-transparent text-foreground',
-    'hover:bg-card',
-    'border border-border hover:border-border-hover',
-    'font-medium',
-    'transition-all duration-200'
-  ].join(' '),
-  
-  ghost: [
-    'bg-transparent text-foreground-secondary',
-    'hover:bg-card hover:text-foreground',
-    'border border-transparent',
-    'transition-all duration-200'
-  ].join(' ')
-};
-
-const sizeClasses = {
-  sm: 'px-3 py-1.5 text-sm rounded-md',
-  base: 'px-4 py-2 text-base rounded-md',
-  lg: 'px-6 py-3 text-lg rounded-md'
-};
-
 const Tag = href ? 'a' : 'button';
 
-const classes = [
-  'inline-flex items-center justify-center gap-2',
-  'cursor-pointer select-none',
-  'hover:scale-105',
-  variantClasses[variant],
-  sizeClasses[size],
-  disabled && 'opacity-50 cursor-not-allowed pointer-events-none',
+const classes = cn(
+  components.button.base,
+  components.button.variants[variant],
+  components.button.sizes[size],
+  disabled && components.button.states.disabled,
   className
-].filter(Boolean).join(' ');
+);
 
 const style = 'font-family: "Besley", serif !important;';
 

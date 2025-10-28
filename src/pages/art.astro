@@ -1,12 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/base-layout.astro';
-import Header from '../components/layout/header.astro';
-import Footer from '../components/layout/footer.astro';
-import PageMain from '../components/layout/page-main.astro';
-import PageContainer from '../components/layout/page-container.astro';
-import PageHeader from '../components/layout/page-header.astro';
-import ArtGrid from '../components/art/art-grid.astro';
+import BaseLayout from '@/layouts/base-layout.astro';
+import Header from '@/components/layout/header.astro';
+import Footer from '@/components/layout/footer.astro';
+import PageMain from '@/components/layout/page-main.astro';
+import PageContainer from '@/components/layout/page-container.astro';
+import PageHeader from '@/components/layout/page-header.astro';
+import ArtGrid from '@/components/art/art-grid.astro';
+import { getArtPageSEO } from '@/config/seo';
 
 const artPieces = await getCollection('art');
 const artData = artPieces.map(piece => ({
@@ -18,12 +19,13 @@ const artData = artPieces.map(piece => ({
 }));
 
 const isEmpty = artData.length === 0;
+const seo = getArtPageSEO();
 ---
 
 <BaseLayout 
-	title="3D Art Gallery | Carlos Garcia | Digital Sculptures & Environments" 
-	description="Explore the 3D art portfolio of Carlos Garcia featuring digital sculptures, procedural environments, character work, and creative experiments in Houdini, Blender, and other 3D tools."
-	keywords="3D Art, Digital Sculpture, 3D Environments, Houdini Art, Blender Art, Character Design, Procedural Art, Technical Art Portfolio"
+	title={seo.title} 
+	description={seo.description}
+	keywords={seo.keywords}
 >
 	<Header />
 	<PageMain class="text-foreground">
