@@ -71,7 +71,7 @@ export const components = {
     base: 'inline-flex items-center justify-center gap-2 cursor-pointer select-none transition-all duration-200 font-medium',
     
     variants: {
-      primary: 'bg-foreground text-background hover:bg-accent border border-transparent hover:scale-105',
+      primary: 'bg-card text-forecground hover:bg-accent border border-border hover:scale-105',
       secondary: 'bg-card text-foreground hover:bg-card-hover border border-border hover:scale-105',
       outline: 'bg-transparent text-foreground hover:bg-card border border-border hover:border-border-hover hover:scale-105',
       ghost: 'bg-transparent text-foreground-secondary hover:bg-card hover:text-foreground border border-transparent',
@@ -125,19 +125,19 @@ export const components = {
   },
 
   link: {
-    base: 'transition-colors duration-200 cursor-pointer',
+    base: 'inline-block transition-all duration-200 cursor-pointer no-underline',
     
     variants: {
-      default: 'text-foreground hover:text-accent underline-offset-4 hover:underline',
-      muted: 'text-foreground-secondary hover:text-foreground underline-offset-4 hover:underline',
-      accent: 'text-accent hover:text-accent-hover underline-offset-4 hover:underline',
-      ghost: 'text-foreground-secondary hover:text-foreground no-underline',
+      default: 'text-foreground hover:text-accent hover:scale-105',
+      muted: 'text-foreground-secondary hover:text-foreground hover:scale-105',
+      accent: 'text-accent hover:text-accent-hover hover:scale-105',
+      ghost: 'text-foreground-secondary hover:text-foreground hover:scale-105',
     },
     
     underline: {
-      always: 'underline',
-      hover: 'hover:underline',
-      none: 'no-underline',
+      always: 'underline underline-offset-4',
+      hover: 'hover:underline underline-offset-4',
+      none: '',
     },
   },
 

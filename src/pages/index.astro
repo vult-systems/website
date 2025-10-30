@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/base-layout.astro';
 import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
-import MinimalHero from '@/components/ui/minimal-hero.astro';
+import AnimatedHero from '@/components/ui/animated-hero.astro';
 import FeaturedGrid from '@/components/ui/featured-grid.astro';
 import { getHomePageSEO } from '@/config/seo';
 
@@ -30,7 +30,7 @@ const seo = getHomePageSEO();
 <Header />
 	<main class="min-h-screen w-full text-foreground">
 		<!-- Hero Section -->
-		<MinimalHero />
+		<AnimatedHero />
 
 		<!-- Featured Work -->
 		<FeaturedGrid artPieces={featuredArt} />

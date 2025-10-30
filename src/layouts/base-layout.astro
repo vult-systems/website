@@ -241,4 +241,54 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 			animation: none !important;
 		}
 	}
+
+	/* Parallax elements */
+	[data-parallax] {
+		will-change: transform;
+	}
 </style>
+
+<script>
+	// Global parallax scroll effect
+	function initParallax() {
+		const parallaxElements = document.querySelectorAll('[data-parallax]');
+		let ticking = false;
+
+		function updateParallax() {
+			parallaxElements.forEach((element) => {
+				const speed = parseFloat(element.getAttribute('data-parallax') || '0');
+				const rect = element.getBoundingClientRect();
+				const elementCenter = rect.top + rect.height / 2;
+				const viewportCenter = window.innerHeight / 2;
+				
+				// Calculate offset based on distance from viewport center
+				// This creates a natural parallax that's centered when element is in view
+				const distanceFromCenter = viewportCenter - elementCenter;
+				const offset = distanceFromCenter * speed;
+				
+				(element as HTMLElement).style.transform = `translateY(${offset}px)`;
+			});
+			
+			ticking = false;
+		}
+
+		function onScroll() {
+			if (!ticking) {
+				window.requestAnimationFrame(updateParallax);
+				ticking = true;
+			}
+		}
+
+		if (parallaxElements.length > 0) {
+			window.addEventListener('scroll', onScroll, { passive: true });
+			window.addEventListener('resize', updateParallax, { passive: true });
+			updateParallax(); // Initial update
+		}
+	}
+
+	// Initialize on page load
+	initParallax();
+
+	// Re-initialize after view transitions
+	document.addEventListener('astro:after-swap', initParallax);
+</script>

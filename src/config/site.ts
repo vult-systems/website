@@ -30,7 +30,7 @@ export const SITE = {
   // SEO defaults
   seo: {
     defaultTitle: 'Carlos Garcia | 3D Character Artist & Educator',
-    defaultDescription: 'Portfolio of Carlos Garcia - 3D Character Artist & Educator specializing in character modeling and digital art education',
+    defaultDescription: 'Portfolio of Carlos Garcia - 3D Character Artist & Educator specializing in character art and education',
     keywords: [
       '3D Artist',
       '3D Character Artist',
@@ -50,7 +50,7 @@ export const SITE = {
   social: {
     github: 'https://github.com/ProfessorGarcia',
     linkedin: 'https://linkedin.com/in/carlosgarcia',
-    twitter: 'https://twitter.com/carlosgarcia',
+    twitter: 'https://twitter.com/',
   },
   
   // Theme
@@ -62,12 +62,12 @@ export const SITE = {
   // Skills/expertise for structured data
   expertise: [
     '3D Art',
-    'Technical Art',
+    'Character Art',
     'Pipeline Development',
-    'Houdini',
-    'Blender',
+    'UE5',
+    'Maya',
     'Creative Education',
-    'Procedural Modeling'
+    'Real-time'
   ],
 } as const;
 

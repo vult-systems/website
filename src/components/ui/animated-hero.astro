@@ -1,0 +1,170 @@
+---
+import { Image } from 'astro:assets';
+import profileImg from '@/assets/profile/profile.jpg';
+import Heading from '@/components/ui/heading.astro';
+import Text from '@/components/ui/text.astro';
+import Link from '@/components/ui/link.astro';
+import { SITE } from '@/config/site';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+
+// Define the rotating content for different pages
+const rotatingContent = [
+  {
+    text: "creative expression",
+    icon: "🎨",
+    link: "/art",
+    linkText: "View Art"
+  },
+  {
+    text: "technical exploration",
+    icon: "⚡",
+    link: "/lab",
+    linkText: "Visit Lab"
+  },
+  {
+    text: "sharing knowledge",
+    icon: "📚",
+    link: "/learn",
+    linkText: "Explore Tutorials"
+  },
+  {
+    text: "documenting process",
+    icon: "📝",
+    link: "/log",
+    linkText: "Read Log"
+  }
+];
+
+const sectionClasses = [
+  "relative z-10 py-20",
+  className
+].filter(Boolean).join(' ');
+---
+
+<section class={sectionClasses} id="animated-hero-section">
+  <div class="container max-w-7xl mx-auto px-4">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+      
+      <!-- Left Column - Animated Text -->
+      <div id="parallax-left" class="flex flex-col items-center text-center lg:items-start lg:text-left order-2 lg:order-1">
+        <div data-parallax="0.05">
+          <Heading level={1} size="3xl" class="mb-3 text-accent">
+            This is my workspace for
+          </Heading>
+        </div>
+        <div class="relative mb-6 w-full" style="min-height: 6rem;" data-parallax="0.08">
+          <div id="rotating-text" class="absolute inset-0">
+            {rotatingContent.map((item, index) => (
+              <div 
+                class={`rotating-item ${index === 0 ? 'active' : ''}`}
+                data-index={index}
+              >
+                <Heading level={2} size="3xl" class="text-foreground-muted mb-4">
+                  {item.text}
+                </Heading>
+                <div class="flex items-center gap-3 mb-3">
+                  <span class="text-3xl" role="img" aria-label="icon">
+                    {item.icon}
+                  </span>
+                </div>
+                <Link
+                  variant="accent"
+                  href={item.link}
+                >
+                  {item.linkText} >
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column - Profile Photo + Info -->
+      <div id="parallax-right" class="flex flex-col order-1 lg:order-2">
+        <div data-parallax="-0.06">
+          <Image
+            src={profileImg}
+            alt={SITE.author.name}
+            width={1600}
+            height={900}
+            loading="eager"
+            class="w-full rounded-lg object-cover mb-6"
+            style="aspect-ratio: 16/9;"
+          />
+        </div>
+        
+        <div class="text-left" data-parallax="-0.04">
+            <Heading level={1} size="2xl" class="mb-4">
+              Hello! I'm Carlos Garcia.
+            </Heading>
+
+            <Text variant="secondary" size="base" class="mb-4">
+            A {SITE.author.bio}
+          </Text>
+          
+          <Link variant="accent" href="/about">
+            About Me >
+          </Link>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .rotating-item {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+  }
+
+  .rotating-item.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .rotating-item.exiting {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  #parallax-left,
+  #parallax-right,
+  [data-parallax] {
+    will-change: transform;
+  }
+</style>
+
+<script>
+  // Text rotation logic
+  const rotatingTextContainer = document.getElementById('rotating-text');
+  
+  if (rotatingTextContainer) {
+    const items = rotatingTextContainer.querySelectorAll('.rotating-item');
+    let currentIndex = 0;
+    const displayDuration = 4000;
+    const transitionDuration = 400;
+
+    function rotateContent() {
+      const currentItem = items[currentIndex];
+      currentItem.classList.add('exiting');
+      
+      setTimeout(() => {
+        currentItem.classList.remove('active', 'exiting');
+        currentIndex = (currentIndex + 1) % items.length;
+        items[currentIndex].classList.add('active');
+      }, transitionDuration);
+    }
+
+    setInterval(rotateContent, displayDuration);
+  }
+</script>

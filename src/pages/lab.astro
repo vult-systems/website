@@ -53,233 +53,346 @@ if (!isDev) {
 
 <BaseLayout 
   title="Design System Lab - carlosgarcia.works"
-  description="Interactive showcase of the centralized design system and components"
+  description="Component reference and design system documentation"
 >
   <Header />
   
-  <main class="min-h-screen w-full bg-background text-foreground">
+  <main class="min-h-screen w-full text-foreground">
     <PageContainer>
-      <!-- Page Header -->
+      
+      <!-- Intro -->
       <section class="py-16 sm:py-24">
-        <div class="mb-12">
-          <Badge variant="accent" class="mb-4">Development Only</Badge>
-          <Heading level={1} size="4xl" class="mb-4">Design System Lab</Heading>
-          <Text size="lg" variant="secondary" class="max-w-2xl">
-            Interactive showcase of all components and design tokens from <code class="text-accent">src/config/design.ts</code>
+        <Badge variant="accent" class="mb-4">Dev Only</Badge>
+        <Heading level={1} size="4xl" class="mb-6">Design System Reference</Heading>
+        
+        <div class="prose-custom max-w-3xl space-y-6 mb-12">
+          <Text size="lg" variant="secondary">
+            I built this site with a centralized design system. Every component pulls from the same config files, 
+            so changing a button style or color palette happens in one place and cascades everywhere.
+          </Text>
+          
+          <Text>
+            This page is my reference when I forget what props are available or need to see all the variants 
+            side-by-side. It's also useful when I want to test changes to the design tokens before pushing them live.
+          </Text>
+
+          <Text variant="secondary">
+            Everything here is live code—not static examples. The components you see are the actual ones used 
+            across the site.
           </Text>
         </div>
       </section>
 
-      <!-- Design Tokens Section -->
+      <!-- Colors -->
       <section class="py-12 border-t border-border">
-        <Heading level={2} size="3xl" class="mb-8">Design Tokens</Heading>
+        <Heading level={2} size="3xl" class="mb-6">Color System</Heading>
         
-        <!-- Color System -->
-        <div class="mb-12">
-          <Heading level={3} size="xl" class="mb-6">Semantic Colors</Heading>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <Card padding="base">
-              <div class="w-full h-16 bg-background border border-border rounded-md mb-3"></div>
-              <Text size="sm" class="font-medium">background</Text>
-              <Text size="xs" variant="muted">Base canvas</Text>
-            </Card>
-            <Card padding="base">
-              <div class="w-full h-16 bg-foreground rounded-md mb-3"></div>
-              <Text size="sm" class="font-medium">foreground</Text>
-              <Text size="xs" variant="muted">Primary text</Text>
-            </Card>
-            <Card padding="base">
-              <div class="w-full h-16 bg-accent rounded-md mb-3"></div>
-              <Text size="sm" class="font-medium">accent</Text>
-              <Text size="xs" variant="muted">Brand color</Text>
-            </Card>
-            <Card padding="base">
-              <div class="w-full h-16 bg-card border border-border rounded-md mb-3"></div>
-              <Text size="sm" class="font-medium">card</Text>
-              <Text size="xs" variant="muted">Surface</Text>
-            </Card>
-            <Card padding="base">
-              <div class="w-full h-16 bg-border rounded-md mb-3"></div>
-              <Text size="sm" class="font-medium">border</Text>
-              <Text size="xs" variant="muted">Dividers</Text>
-            </Card>
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            Colors are semantic—they adapt to light and dark themes automatically. The actual values live in 
+            <code class="text-accent">tailwind.config.mjs</code> using HSL format so I can tweak hue, saturation, 
+            and lightness independently.
+          </Text>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          <Card padding="base">
+            <div class="w-full h-20 bg-background border border-border rounded-md mb-3"></div>
+            <Text size="sm" class="font-medium mb-1">background</Text>
+            <Text size="xs" variant="muted" class="font-mono">bg-background</Text>
+          </Card>
+          <Card padding="base">
+            <div class="w-full h-20 bg-foreground rounded-md mb-3"></div>
+            <Text size="sm" class="font-medium mb-1">foreground</Text>
+            <Text size="xs" variant="muted" class="font-mono">text-foreground</Text>
+          </Card>
+          <Card padding="base">
+            <div class="w-full h-20 bg-accent rounded-md mb-3"></div>
+            <Text size="sm" class="font-medium mb-1">accent</Text>
+            <Text size="xs" variant="muted" class="font-mono">bg-accent</Text>
+          </Card>
+          <Card padding="base">
+            <div class="w-full h-20 bg-card border border-border rounded-md mb-3"></div>
+            <Text size="sm" class="font-medium mb-1">card</Text>
+            <Text size="xs" variant="muted" class="font-mono">bg-card</Text>
+          </Card>
+          <Card padding="base">
+            <div class="w-full h-20 bg-border rounded-md mb-3"></div>
+            <Text size="sm" class="font-medium mb-1">border</Text>
+            <Text size="xs" variant="muted" class="font-mono">border-border</Text>
+          </Card>
+        </div>
+
+        <Card padding="lg" variant="bordered" class="max-w-2xl">
+          <div class="bg-card/50 border border-border rounded-md p-4 font-mono text-sm">
+            <div class="text-muted">// tailwind.config.mjs</div>
+            <div>colors: {'{'}</div>
+            <div class="pl-4">accent: 'hsl(142 71% 45%)',</div>
+            <div class="pl-4">foreground: 'hsl(var(--foreground))',</div>
+            <div>{'}'}</div>
+          </div>
+        </Card>
+      </section>
+
+      <!-- Typography -->
+      <section class="py-12 border-t border-border">
+        <Heading level={2} size="3xl" class="mb-6">Typography</Heading>
+        
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            The type scale is in <code class="text-accent">src/config/design.ts</code>. I map semantic size names 
+            (like '4xl', '3xl') to Tailwind classes. Makes it easier to maintain consistency without remembering 
+            which heading uses which class.
+          </Text>
+        </div>
+
+        <div class="space-y-8 mb-8">
+          <div>
+            <Heading level={1} size="4xl" class="mb-2">Heading 4xl</Heading>
+            <Text size="sm" variant="muted" class="font-mono">{'<'}Heading level={'{'}1{'}'} size="4xl"{'>'}</Text>
+          </div>
+          <div>
+            <Heading level={2} size="3xl" class="mb-2">Heading 3xl</Heading>
+            <Text size="sm" variant="muted" class="font-mono">{'<'}Heading level={'{'}2{'}'} size="3xl"{'>'}</Text>
+          </div>
+          <div>
+            <Heading level={3} size="2xl" class="mb-2">Heading 2xl</Heading>
+            <Text size="sm" variant="muted" class="font-mono">{'<'}Heading level={'{'}3{'}'} size="2xl"{'>'}</Text>
+          </div>
+          <div>
+            <Heading level={4} size="xl" class="mb-2">Heading xl</Heading>
+            <Text size="sm" variant="muted" class="font-mono">{'<'}Heading level={'{'}4{'}'} size="xl"{'>'}</Text>
           </div>
         </div>
 
-        <!-- Typography Scale -->
-        <div class="mb-12">
-          <Heading level={3} size="xl" class="mb-6">Typography Scale</Heading>
-          <Card padding="lg">
-            <div class="space-y-4">
-              <div>
-                <Heading level={1} size="4xl">Heading 4xl</Heading>
-                <Text size="xs" variant="muted" class="mt-1">components.heading.sizes['4xl'] → text-6xl</Text>
-              </div>
-              <div>
-                <Heading level={2} size="3xl">Heading 3xl</Heading>
-                <Text size="xs" variant="muted" class="mt-1">components.heading.sizes['3xl'] → text-5xl</Text>
-              </div>
-              <div>
-                <Heading level={3} size="2xl">Heading 2xl</Heading>
-                <Text size="xs" variant="muted" class="mt-1">components.heading.sizes['2xl'] → text-4xl</Text>
-              </div>
-              <div>
-                <Heading level={4} size="xl">Heading xl</Heading>
-                <Text size="xs" variant="muted" class="mt-1">components.heading.sizes.xl → text-3xl</Text>
-              </div>
-              <div class="pt-4 border-t border-border">
-                <Text size="lg">Body text large (lg)</Text>
-                <Text>Body text base (default)</Text>
-                <Text size="sm" variant="secondary">Body text small (sm)</Text>
-                <Text size="xs" variant="muted">Body text extra small (xs)</Text>
-              </div>
-            </div>
-          </Card>
+        <div class="space-y-4">
+          <div>
+            <Text size="lg" class="mb-1">Body large - for lead text or emphasis</Text>
+            <Text size="sm" variant="muted" class="font-mono">{'<'}Text size="lg"{'>'}</Text>
+          </div>
+          <div>
+            <Text class="mb-1">Body base - default text size</Text>
+            <Text size="sm" variant="muted" class="font-mono">{'<'}Text{'>'}</Text>
+          </div>
+          <div>
+            <Text size="sm" variant="secondary" class="mb-1">Body small with secondary color</Text>
+            <Text size="sm" variant="muted" class="font-mono">{'<'}Text size="sm" variant="secondary"{'>'}</Text>
+          </div>
         </div>
       </section>
 
-      <!-- Components Section -->
+      <!-- Buttons -->
       <section class="py-12 border-t border-border">
-        <Heading level={2} size="3xl" class="mb-8">Components</Heading>
+        <Heading level={2} size="3xl" class="mb-6">Buttons</Heading>
         
-        <!-- Buttons -->
-        <div class="mb-12">
-          <Heading level={3} size="xl" class="mb-6">Buttons</Heading>
-          <Card padding="lg">
-            <div class="space-y-6">
-              <div>
-                <Text size="sm" variant="secondary" class="mb-3">Variants</Text>
-                <div class="flex flex-wrap gap-3">
-                  <Button variant="primary">Primary</Button>
-                  <Button variant="secondary">Secondary</Button>
-                  <Button variant="outline">Outline</Button>
-                  <Button variant="ghost">Ghost</Button>
-                </div>
-              </div>
-              <div>
-                <Text size="sm" variant="secondary" class="mb-3">Sizes</Text>
-                <div class="flex flex-wrap items-center gap-3">
-                  <Button variant="primary" size="sm">Small</Button>
-                  <Button variant="primary" size="base">Base</Button>
-                  <Button variant="primary" size="lg">Large</Button>
-                </div>
-              </div>
-              <div>
-                <Text size="sm" variant="secondary" class="mb-3">States</Text>
-                <div class="flex flex-wrap gap-3">
-                  <Button variant="primary" disabled>Disabled</Button>
-                  <Button variant="secondary" href="#link">As Link</Button>
-                </div>
-              </div>
-            </div>
-          </Card>
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            Four variants, three sizes. The <code class="text-accent">href</code> prop turns them into links 
+            automatically. Styles are in <code class="text-accent">src/config/design.ts</code> so I can tweak 
+            padding, radius, or hover states globally.
+          </Text>
         </div>
 
-        <!-- Badges -->
-        <div class="mb-12">
-          <Heading level={3} size="xl" class="mb-6">Badges</Heading>
-          <Card padding="lg">
-            <div class="space-y-6">
-              <div>
-                <Text size="sm" variant="secondary" class="mb-3">Variants</Text>
-                <div class="flex flex-wrap gap-2">
-                  <Badge variant="default">Default</Badge>
-                  <Badge variant="accent">Accent</Badge>
-                  <Badge variant="outline">Outline</Badge>
-                  <Badge variant="muted">Muted</Badge>
-                  <Badge variant="ghost">Ghost</Badge>
-                </div>
-              </div>
-              <div>
-                <Text size="sm" variant="secondary" class="mb-3">Sizes</Text>
-                <div class="flex flex-wrap items-center gap-2">
-                  <Badge size="sm">Small</Badge>
-                  <Badge size="base">Base</Badge>
-                </div>
-              </div>
+        <div class="space-y-8">
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Variants</Text>
+            <div class="flex flex-wrap gap-3 mb-4">
+              <Button variant="primary">Primary</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="outline">Outline</Button>
+              <Button variant="ghost">Ghost</Button>
             </div>
-          </Card>
-        </div>
-
-        <!-- Cards -->
-        <div class="mb-12">
-          <Heading level={3} size="xl" class="mb-6">Cards</Heading>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card padding="lg" variant="default">
-              <Badge variant="default" class="mb-3">Default</Badge>
-              <Heading level={4} size="base" class="mb-2">Default Card</Heading>
-              <Text size="sm" variant="secondary">Standard card with border</Text>
-            </Card>
-            <Card padding="lg" variant="bordered">
-              <Badge variant="accent" class="mb-3">Bordered</Badge>
-              <Heading level={4} size="base" class="mb-2">Bordered Card</Heading>
-              <Text size="sm" variant="secondary">Thicker border variant</Text>
-            </Card>
-            <Card padding="lg" variant="elevated">
-              <Badge variant="outline" class="mb-3">Elevated</Badge>
-              <Heading level={4} size="base" class="mb-2">Elevated Card</Heading>
-              <Text size="sm" variant="secondary">With shadow elevation</Text>
+            <Card padding="base" variant="bordered" class="max-w-2xl">
+              <Text size="xs" class="font-mono">{'<'}Button variant="primary"{'>'}Text{'<'}/Button{'>'}</Text>
             </Card>
           </div>
-          
-          <div class="mt-6">
-            <Text size="sm" variant="secondary" class="mb-3">Interactive Card (hover me)</Text>
-            <Card padding="lg" interactive href="#interactive">
-              <div class="flex items-start justify-between mb-3">
-                <Heading level={4} size="base">Interactive Card</Heading>
-                <Badge variant="accent">New</Badge>
-              </div>
-              <Text size="sm" variant="secondary">Cards can be clickable with hover effects</Text>
+
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Sizes</Text>
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+              <Button variant="primary" size="sm">Small</Button>
+              <Button variant="primary" size="base">Base</Button>
+              <Button variant="primary" size="lg">Large</Button>
+            </div>
+            <Card padding="base" variant="bordered" class="max-w-2xl">
+              <Text size="xs" class="font-mono">{'<'}Button size="lg"{'>'}Text{'<'}/Button{'>'}</Text>
             </Card>
           </div>
-        </div>
 
-        <!-- Links -->
-        <div class="mb-12">
-          <Heading level={3} size="xl" class="mb-6">Links</Heading>
-          <Card padding="lg">
-            <div class="space-y-6">
-              <div>
-                <Text size="sm" variant="secondary" class="mb-3">Variants</Text>
-                <div class="flex flex-wrap gap-4">
-                  <Link href="#default" variant="default">Default Link</Link>
-                  <Link href="#accent" variant="accent">Accent Link</Link>
-                  <Link href="#muted" variant="muted">Muted Link</Link>
-                  <Link href="#ghost" variant="ghost">Ghost Link</Link>
-                </div>
-              </div>
-              <div>
-                <Text size="sm" variant="secondary" class="mb-3">Underline Styles</Text>
-                <div class="flex flex-wrap gap-4">
-                  <Link href="#always" underline="always">Always</Link>
-                  <Link href="#hover" underline="hover">Hover</Link>
-                  <Link href="#none" underline="none">None</Link>
-                </div>
-              </div>
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">States</Text>
+            <div class="flex flex-wrap gap-3 mb-4">
+              <Button variant="primary" href="/art">As Link</Button>
+              <Button variant="secondary" disabled>Disabled</Button>
             </div>
-          </Card>
+            <Card padding="base" variant="bordered" class="max-w-2xl">
+              <Text size="xs" class="font-mono">{'<'}Button href="/path"{'>'}Link Button{'<'}/Button{'>'}</Text>
+            </Card>
+          </div>
         </div>
       </section>
 
-      <!-- Real Content Section -->
+      <!-- Badges -->
       <section class="py-12 border-t border-border">
-        <Heading level={2} size="3xl" class="mb-8">Real Content Examples</Heading>
+        <Heading level={2} size="3xl" class="mb-6">Badges</Heading>
         
-        <!-- Featured Art Grid -->
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            Small labels for tags, categories, status indicators. I use these everywhere—art pieces, blog posts, 
+            project categories.
+          </Text>
+        </div>
+
+        <div class="space-y-8">
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Variants</Text>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <Badge variant="default">Default</Badge>
+              <Badge variant="accent">Accent</Badge>
+              <Badge variant="outline">Outline</Badge>
+              <Badge variant="muted">Muted</Badge>
+              <Badge variant="ghost">Ghost</Badge>
+            </div>
+          </div>
+
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Sizes</Text>
+            <div class="flex flex-wrap items-center gap-2 mb-4">
+              <Badge size="sm">Small</Badge>
+              <Badge size="base">Base</Badge>
+            </div>
+            <Card padding="base" variant="bordered" class="max-w-2xl">
+              <Text size="xs" class="font-mono">{'<'}Badge variant="accent" size="sm"{'>'}Label{'<'}/Badge{'>'}</Text>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards -->
+      <section class="py-12 border-t border-border">
+        <Heading level={2} size="3xl" class="mb-6">Cards</Heading>
+        
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            Container components. The <code class="text-accent">interactive</code> prop with <code class="text-accent">href</code> 
+            makes the whole card clickable with hover effects—useful for blog post previews or portfolio pieces.
+          </Text>
+        </div>
+
+        <div class="space-y-8">
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Variants</Text>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+              <Card padding="lg" variant="default">
+                <Badge variant="default" class="mb-2">Default</Badge>
+                <Text size="sm">Subtle border</Text>
+              </Card>
+              <Card padding="lg" variant="bordered">
+                <Badge variant="accent" class="mb-2">Bordered</Badge>
+                <Text size="sm">Thicker border</Text>
+              </Card>
+              <Card padding="lg" variant="elevated">
+                <Badge variant="outline" class="mb-2">Elevated</Badge>
+                <Text size="sm">Shadow depth</Text>
+              </Card>
+            </div>
+          </div>
+
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Interactive</Text>
+            <Card padding="lg" interactive href="#" class="mb-4">
+              <div class="flex items-start justify-between">
+                <Text>Hover over this card</Text>
+                <Badge variant="accent" size="sm">Clickable</Badge>
+              </div>
+            </Card>
+            <Card padding="base" variant="bordered" class="max-w-2xl">
+              <Text size="xs" class="font-mono">{'<'}Card interactive href="/path"{'>'}...{'<'}/Card{'>'}</Text>
+            </Card>
+          </div>
+
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Padding</Text>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <Card padding="sm" variant="bordered"><Text size="sm">Small</Text></Card>
+              <Card padding="base" variant="bordered"><Text size="sm">Base</Text></Card>
+              <Card padding="lg" variant="bordered"><Text size="sm">Large</Text></Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Links -->
+      <section class="py-12 border-t border-border">
+        <Heading level={2} size="3xl" class="mb-6">Links</Heading>
+        
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            Styled anchor tags. Use the <code class="text-accent">external</code> prop for external URLs—it adds 
+            the right attributes automatically.
+          </Text>
+        </div>
+
+        <div class="space-y-8">
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Variants</Text>
+            <div class="flex flex-wrap gap-4 mb-4">
+              <Link href="#" variant="default">Default</Link>
+              <Link href="#" variant="accent">Accent</Link>
+              <Link href="#" variant="muted">Muted</Link>
+              <Link href="#" variant="ghost">Ghost</Link>
+            </div>
+          </div>
+
+          <div>
+            <Text size="sm" variant="secondary" class="mb-3">Underline styles</Text>
+            <div class="flex flex-wrap gap-4 mb-4">
+              <Link href="#" underline="always">Always</Link>
+              <Link href="#" underline="hover">Hover</Link>
+              <Link href="#" underline="none">None</Link>
+            </div>
+            <Card padding="base" variant="bordered" class="max-w-2xl">
+              <Text size="xs" class="font-mono">{'<'}Link underline="hover"{'>'}Text{'<'}/Link{'>'}</Text>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <!-- Content Collections -->
+      <section class="py-12 border-t border-border">
+        <Heading level={2} size="3xl" class="mb-6">Content Collections</Heading>
+        
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            All content lives in MDX files. Astro's content collections give me type-safe queries and automatic 
+            validation. Art pieces go in <code class="text-accent">src/content/art/</code>, blog posts in 
+            <code class="text-accent">src/content/log/</code>.
+          </Text>
+          <Text variant="secondary">
+            The examples below are pulling live data from those collections—not static mockups.
+          </Text>
+        </div>
+
         {featuredArt.length > 0 && (
           <div class="mb-12">
+            <Heading level={3} size="xl" class="mb-4">Featured Artwork</Heading>
+            <Text variant="secondary" class="mb-6">
+              Set <code class="text-accent">featured: true</code> in the MDX frontmatter to include a piece here.
+            </Text>
             <FeaturedGrid 
-              title="Featured Artwork"
-              description="Live data from your art content collection"
+              title="Featured Work"
+              description="From the art collection"
               artPieces={featuredArt}
             />
           </div>
         )}
 
-        <!-- Blog Posts Preview -->
         {recentPosts.length > 0 && (
           <div class="mb-12">
-            <Heading level={3} size="xl" class="mb-6">Recent Log Posts</Heading>
+            <Heading level={3} size="xl" class="mb-4">Recent Posts</Heading>
+            <Text variant="secondary" class="mb-6">
+              Blog posts automatically sorted by date. These cards are interactive—hover to see the effect.
+            </Text>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               {recentPosts.map(post => (
                 <Card padding="lg" interactive href={`/log/${post.slug}`}>
@@ -300,93 +413,122 @@ if (!isDev) {
         )}
       </section>
 
-      <!-- Complex Layout Example -->
+      <!-- Configuration -->
       <section class="py-12 border-t border-border">
-        <Heading level={2} size="3xl" class="mb-8">Complex Layout</Heading>
+        <Heading level={2} size="3xl" class="mb-6">Configuration Files</Heading>
         
-        <Card padding="lg" variant="elevated" class="max-w-4xl">
-          <div class="flex items-start justify-between mb-6">
-            <div>
-              <div class="flex items-center gap-3 mb-2">
-                <Heading level={3} size="xl">Multi-Component Card</Heading>
-                <Badge variant="accent">Example</Badge>
-              </div>
-              <Text variant="secondary">Combining typography, badges, buttons, and layout utilities</Text>
-            </div>
-          </div>
-          
-          <Text class="mb-6">
-            This demonstrates how all the design system components work together in realistic layouts. 
-            Everything is sourced from <code class="text-accent">src/config/design.ts</code> for consistency.
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            Three config files control the entire site. This is the core of the DRY approach—everything pulls 
+            from these centralized sources.
           </Text>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <Heading level={4} size="base" class="mb-3">Design Tokens</Heading>
-              <ul class="space-y-2">
-                <li class="flex items-start gap-2">
-                  <Text size="sm" variant="accent">→</Text>
-                  <Text size="sm" variant="secondary">Centralized in one file</Text>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Text size="sm" variant="accent">→</Text>
-                  <Text size="sm" variant="secondary">Type-safe with TypeScript</Text>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Text size="sm" variant="accent">→</Text>
-                  <Text size="sm" variant="secondary">Easy to update globally</Text>
-                </li>
-              </ul>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card padding="lg" variant="elevated">
+            <Badge variant="accent" class="mb-3">Design</Badge>
+            <Heading level={4} size="base" class="mb-2">design.ts</Heading>
+            <Text size="sm" class="font-mono text-accent mb-4">src/config/design.ts</Text>
+            <Text size="sm" variant="secondary" class="mb-4">
+              Component styles, spacing scales, border radii, animations. Change button padding or card shadows 
+              here and it updates everywhere.
+            </Text>
+            <div class="space-y-1">
+              <Text size="xs" variant="muted">• Button variants</Text>
+              <Text size="xs" variant="muted">• Badge styles</Text>
+              <Text size="xs" variant="muted">• Card variants</Text>
+              <Text size="xs" variant="muted">• Typography scale</Text>
             </div>
-            <div>
-              <Heading level={4} size="base" class="mb-3">Benefits</Heading>
-              <ul class="space-y-2">
-                <li class="flex items-start gap-2">
-                  <Text size="sm" variant="accent">✓</Text>
-                  <Text size="sm" variant="secondary">Single source of truth</Text>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Text size="sm" variant="accent">✓</Text>
-                  <Text size="sm" variant="secondary">Consistent UI everywhere</Text>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Text size="sm" variant="accent">✓</Text>
-                  <Text size="sm" variant="secondary">Maintainable codebase</Text>
-                </li>
-              </ul>
+          </Card>
+
+          <Card padding="lg" variant="elevated">
+            <Badge variant="accent" class="mb-3">Content</Badge>
+            <Heading level={4} size="base" class="mb-2">site.ts</Heading>
+            <Text size="sm" class="font-mono text-accent mb-4">src/config/site.ts</Text>
+            <Text size="sm" variant="secondary" class="mb-4">
+              Site metadata, bio, social links, navigation. Single source of truth for all content that appears 
+              across multiple pages.
+            </Text>
+            <div class="space-y-1">
+              <Text size="xs" variant="muted">• Name & role</Text>
+              <Text size="xs" variant="muted">• Bio text</Text>
+              <Text size="xs" variant="muted">• Social media</Text>
+              <Text size="xs" variant="muted">• Navigation</Text>
             </div>
-          </div>
-          
-          <div class="flex items-center justify-between pt-4 border-t border-border">
-            <div class="flex gap-2">
-              <Badge variant="outline">Design System</Badge>
-              <Badge variant="outline">DRY Principle</Badge>
+          </Card>
+
+          <Card padding="lg" variant="elevated">
+            <Badge variant="accent" class="mb-3">SEO</Badge>
+            <Heading level={4} size="base" class="mb-2">seo.ts</Heading>
+            <Text size="sm" class="font-mono text-accent mb-4">src/config/seo.ts</Text>
+            <Text size="sm" variant="secondary" class="mb-4">
+              Helper functions for meta tags, OpenGraph data, structured content. Each page type has its own 
+              SEO function.
+            </Text>
+            <div class="space-y-1">
+              <Text size="xs" variant="muted">• Page metadata</Text>
+              <Text size="xs" variant="muted">• OpenGraph tags</Text>
+              <Text size="xs" variant="muted">• Twitter cards</Text>
+              <Text size="xs" variant="muted">• Structured data</Text>
             </div>
-            <div class="flex gap-3">
-              <Button variant="primary" size="sm" href="/art">View Art</Button>
-              <Button variant="ghost" size="sm" href="/log">Read Log</Button>
+          </Card>
+        </div>
+
+        <Card padding="lg" variant="bordered" class="max-w-3xl">
+          <Heading level={4} size="base" class="mb-4">Quick Reference</Heading>
+          <div class="space-y-3">
+            <div class="flex gap-4">
+              <Text size="sm" class="font-medium text-accent min-w-[120px]">Colors</Text>
+              <Text size="sm" variant="secondary" class="font-mono">tailwind.config.mjs</Text>
+            </div>
+            <div class="flex gap-4">
+              <Text size="sm" class="font-medium text-accent min-w-[120px]">Components</Text>
+              <Text size="sm" variant="secondary" class="font-mono">src/config/design.ts</Text>
+            </div>
+            <div class="flex gap-4">
+              <Text size="sm" class="font-medium text-accent min-w-[120px]">Bio/Role</Text>
+              <Text size="sm" variant="secondary" class="font-mono">src/config/site.ts</Text>
+            </div>
+            <div class="flex gap-4">
+              <Text size="sm" class="font-medium text-accent min-w-[120px]">Add artwork</Text>
+              <Text size="sm" variant="secondary" class="font-mono">src/content/art/*.mdx</Text>
+            </div>
+            <div class="flex gap-4">
+              <Text size="sm" class="font-medium text-accent min-w-[120px]">Write post</Text>
+              <Text size="sm" variant="secondary" class="font-mono">src/content/log/*.mdx</Text>
             </div>
           </div>
         </Card>
       </section>
 
-      <!-- Design System Info -->
+      <!-- Closing -->
       <section class="py-12 border-t border-border mb-24">
-        <Card padding="lg" variant="bordered" class="max-w-3xl">
-          <Heading level={3} size="xl" class="mb-4">About This Lab</Heading>
-          <Text class="mb-4">
-            This page showcases the centralized design system built with DRY principles. 
-            All components import their styles from <code class="text-accent">src/config/design.ts</code>.
+        <div class="prose-custom max-w-3xl space-y-6">
+          <Heading level={2} size="3xl" class="mb-4">Why This Approach</Heading>
+          
+          <Text>
+            I wanted a system where changing a design decision doesn't mean hunting through dozens of files. 
+            Colors, typography, spacing, component styles—everything lives in centralized config files.
           </Text>
-          <Text variant="secondary" size="sm" class="mb-4">
-            To modify styles globally, edit the design tokens in that file. Changes will cascade 
-            to all components automatically—no need to hunt through multiple files.
+
+          <Text variant="secondary">
+            The tradeoff is upfront setup time. But once it's in place, maintenance is fast. Need to adjust 
+            button padding? One line in <code class="text-accent">design.ts</code>. Want to tweak the accent 
+            color? Change one HSL value in <code class="text-accent">tailwind.config.mjs</code>.
           </Text>
-          <div class="flex gap-3">
-            <Button variant="secondary" size="sm" href="/about">About Me</Button>
+
+          <Text>
+            This lab page is as much for me as it is documentation. When I'm building something new and can't 
+            remember which badge variant to use, I pull this up. When I want to test a design token change, 
+            I can see every component affected at once.
+          </Text>
+
+          <div class="flex gap-3 pt-6">
+            <Button variant="primary" href="/">Home</Button>
+            <Button variant="secondary" href="/log">Read Log</Button>
             <Link href="https://github.com/vult-systems/website" variant="accent" external>View Source →</Link>
           </div>
-        </Card>
+        </div>
       </section>
 
     </PageContainer>

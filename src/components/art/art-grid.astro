@@ -28,9 +28,13 @@ const categories = [...new Set(artPieces.map(piece => piece.category))];
   {categories.length > 1 && (
     <>
       <div class="flex flex-wrap gap-6 items-center justify-start">
-        <Link href="#" variant="accent">All ></Link>
+        <button data-filter="all" class="filter-btn active inline-block text-accent hover:scale-105 transition-all duration-200 cursor-pointer">
+          All
+        </button>
         {categories.map((category) => (
-          <Link href="#" variant="ghost">{category} ></Link>
+          <button data-filter={category} class="filter-btn inline-block text-foreground-secondary hover:text-accent hover:scale-105 transition-all duration-200 cursor-pointer">
+            {category}
+          </button>
         ))}
       </div>
       
@@ -40,39 +44,98 @@ const categories = [...new Set(artPieces.map(piece => piece.category))];
   )}
 
   <!-- Art Grid - Match Lab Layout -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="art-grid">
     {artPieces.map((piece) => (
-      <Card padding="none" interactive href={`/art/${piece.slug}`}>
-        <!-- Image -->
-        <div class="relative aspect-[4/3] overflow-hidden">
-          {piece.heroImage && (
-            <img
-              src={piece.heroImage}
-              alt={piece.title}
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-            />
-          )}
-          <!-- Category Badge -->
-          <div class="absolute top-4 left-4">
-            <Badge size="sm" class="bg-background/90 backdrop-blur-sm">
-              {piece.category}
-            </Badge>
+      <div class="art-item" data-category={piece.category}>
+        <Card padding="none" interactive href={`/art/${piece.slug}`}>
+          <!-- Image -->
+          <div class="relative aspect-[4/3] overflow-hidden">
+            {piece.heroImage && (
+              <img
+                src={piece.heroImage}
+                alt={piece.title}
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+            )}
+            <!-- Category Badge -->
+            <div class="absolute top-4 left-4">
+              <Badge size="sm" class="bg-background/90 backdrop-blur-sm">
+                {piece.category}
+              </Badge>
+            </div>
           </div>
-        </div>
-        
-        <!-- Content -->
-        <div class="p-6 space-y-3">
-          <Heading level={3} size="lg" class="line-clamp-2">
-            {piece.title}
-          </Heading>
-          {piece.description && (
-            <Text size="sm" variant="secondary" class="line-clamp-2">
-              {piece.description}
-            </Text>
-          )}
-        </div>
-      </Card>
+          
+          <!-- Content -->
+          <div class="p-6 space-y-3">
+            <Heading level={3} size="lg" class="line-clamp-2">
+              {piece.title}
+            </Heading>
+            {piece.description && (
+              <Text size="sm" variant="secondary" class="line-clamp-2">
+                {piece.description}
+              </Text>
+            )}
+          </div>
+        </Card>
+      </div>
     ))}
   </div>
 </div>
+
+<style>
+  .filter-btn.active {
+    color: hsl(var(--accent));
+    transform: scale(1.05);
+  }
+
+  .art-item {
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .art-item.filtering-out {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  .art-item.hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  // Filter functionality
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const artItems = document.querySelectorAll('.art-item');
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const filter = button.getAttribute('data-filter');
+      
+      // Update active button
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      
+      // Step 1: Fade out ALL items first
+      artItems.forEach(item => {
+        item.classList.add('filtering-out');
+      });
+      
+      // Step 2: After fade out completes, hide filtered items and remove fade class from visible ones
+      setTimeout(() => {
+        artItems.forEach(item => {
+          const category = item.getAttribute('data-category');
+          
+          if (filter === 'all' || category === filter) {
+            item.classList.remove('hidden', 'filtering-out');
+          } else {
+            item.classList.add('hidden');
+            item.classList.remove('filtering-out');
+          }
+        });
+      }, 300); // Match transition duration
+    });
+  });
+</script>
