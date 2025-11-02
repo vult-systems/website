@@ -11,6 +11,8 @@ const artCollection = defineCollection({
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     tools: z.array(z.string()).optional(),
+    order: z.number().default(999),
+    size: z.enum(['small', 'medium', 'large', 'tall']).default('medium'),
   }),
 });
 

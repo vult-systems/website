@@ -1,9 +1,9 @@
 ---
-import Card from '../ui/card.astro';
+import BentoGrid from '../ui/bento-grid.astro';
+import BentoGridItem from '../ui/bento-grid-item.astro';
 import Heading from '../ui/heading.astro';
 import Text from '../ui/text.astro';
 import Badge from '../ui/badge.astro';
-import Link from '../ui/link.astro';
 
 interface ArtPiece {
   slug: string;
@@ -11,6 +11,7 @@ interface ArtPiece {
   description?: string;
   heroImage?: string;
   category: string;
+  size?: 'small' | 'medium' | 'large' | 'tall';
 }
 
 interface Props {
@@ -21,6 +22,21 @@ const { artPieces } = Astro.props;
 
 // Get unique categories for filtering
 const categories = [...new Set(artPieces.map(piece => piece.category))];
+
+// Map size to column span classes
+const getSizeClass = (size?: string) => {
+  switch(size) {
+    case 'small':
+      return 'md:col-span-1';
+    case 'tall':
+      return 'md:col-span-1 md:row-span-2';
+    case 'large':
+      return 'md:col-span-2 md:row-span-2';
+    case 'medium':
+    default:
+      return 'md:col-span-1';
+  }
+};
 ---
 
 <div class="space-y-8">
@@ -43,13 +59,16 @@ const categories = [...new Set(artPieces.map(piece => piece.category))];
     </>
   )}
 
-  <!-- Art Grid - Match Lab Layout -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="art-grid">
+  <!-- Bento Grid -->
+  <BentoGrid>
     {artPieces.map((piece) => (
-      <div class="art-item" data-category={piece.category}>
-        <Card padding="none" interactive href={`/art/${piece.slug}`}>
+      <BentoGridItem 
+        class={`art-item ${getSizeClass(piece.size)}`}
+        href={`/art/${piece.slug}`}
+      >
+        <div class="flex flex-col h-full">
           <!-- Image -->
-          <div class="relative aspect-[4/3] overflow-hidden">
+          <div class={`relative overflow-hidden ${piece.size === 'large' || piece.size === 'tall' ? 'flex-1 min-h-[10rem]' : 'aspect-[4/3]'}`}>
             {piece.heroImage && (
               <img
                 src={piece.heroImage}
@@ -77,10 +96,10 @@ const categories = [...new Set(artPieces.map(piece => piece.category))];
               </Badge>
             </div>
           </div>
-        </Card>
-      </div>
+        </div>
+      </BentoGridItem>
     ))}
-  </div>
+  </BentoGrid>
 </div>
 
 <style>
@@ -126,7 +145,7 @@ const categories = [...new Set(artPieces.map(piece => piece.category))];
       // Step 2: After fade out completes, hide filtered items and remove fade class from visible ones
       setTimeout(() => {
         artItems.forEach(item => {
-          const category = item.getAttribute('data-category');
+          const category = item.closest('[data-category]')?.getAttribute('data-category');
           
           if (filter === 'all' || category === filter) {
             item.classList.remove('hidden', 'filtering-out');
@@ -135,7 +154,7 @@ const categories = [...new Set(artPieces.map(piece => piece.category))];
             item.classList.remove('filtering-out');
           }
         });
-      }, 300); // Match transition duration
+      }, 300);
     });
   });
 </script>

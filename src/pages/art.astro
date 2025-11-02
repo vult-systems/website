@@ -9,7 +9,7 @@ import PageHeader from '@/components/layout/page-header.astro';
 import ArtGrid from '@/components/art/art-grid.astro';
 import { getArtPageSEO } from '@/config/seo';
 
-const artPieces = await getCollection('art');
+const artPieces = (await getCollection('art')).sort((a, b) => a.data.order - b.data.order);
 const artData = artPieces.map(piece => ({
 	slug: piece.slug,
 	title: piece.data.title,

@@ -22,6 +22,15 @@ import Link from '@/components/ui/link.astro';
 import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import FeaturedGrid from '@/components/ui/featured-grid.astro';
+import BentoGrid from '@/components/ui/bento-grid.astro';
+import BentoGridItem from '@/components/ui/bento-grid-item.astro';
+
+// Import images
+import heroImage from '@/assets/foundation-explorer/carlos-garcia-foundation-explorer-01.jpg';
+import artImage1 from '@/assets/art-placeholders/digital-sculpture.jpg';
+import artImage2 from '@/assets/art-placeholders/character-2.jpg';
+import artImage3 from '@/assets/art-placeholders/3d-modeling.jpg';
+import artImage4 from '@/assets/art-placeholders/environment-1.jpg';
 
 // Import design tokens for display
 import { components, layout, typography, spacing, radius, animation } from '@/config/design';
@@ -411,6 +420,168 @@ if (!isDev) {
             </div>
           </div>
         )}
+      </section>
+
+      <!-- Bento Grid Showcase -->
+      <section class="py-12 border-t border-border">
+        <Heading level={2} size="3xl" class="mb-6">Bento Grid Layout</Heading>
+        
+        <div class="prose-custom max-w-3xl space-y-4 mb-8">
+          <Text>
+            A flexible masonry-style grid system for showcasing content with varying sizes. Items can span 
+            multiple columns and rows to create visual hierarchy and interest.
+          </Text>
+          
+          <Text size="sm" variant="secondary">
+            Used for art portfolios and featured content. Small (1 col), Medium (1 col), and Large (2×2) sizes 
+            create a dynamic Pinterest-style layout.
+          </Text>
+        </div>
+
+        <BentoGrid class="mb-8">
+          <BentoGridItem class="md:col-span-2 md:row-span-2" href="#">
+            <div class="flex flex-col h-full">
+              <!-- Image -->
+              <div class="relative flex-1 overflow-hidden min-h-[10rem]">
+                <img
+                  src={heroImage.src}
+                  alt="Large hero example"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              
+              <!-- Content -->
+              <div class="p-6 space-y-3">
+                <Heading level={3} size="lg" class="line-clamp-2">Large Hero Item</Heading>
+                <Text size="sm" variant="secondary" class="line-clamp-2">
+                  Large items span 2 columns and 2 rows, perfect for featuring your best work.
+                </Text>
+                <div>
+                  <Badge size="sm">2×2</Badge>
+                </div>
+              </div>
+            </div>
+          </BentoGridItem>
+
+          <BentoGridItem class="md:col-span-1" href="#">
+            <div class="flex flex-col h-full">
+              <!-- Image -->
+              <div class="relative aspect-[4/3] overflow-hidden">
+                <img
+                  src={artImage1.src}
+                  alt="Medium example"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              
+              <!-- Content -->
+              <div class="p-6 space-y-3">
+                <Heading level={3} size="lg" class="line-clamp-2">Medium Item</Heading>
+                <Text size="sm" variant="secondary" class="line-clamp-2">
+                  Standard size for most content pieces.
+                </Text>
+                <div>
+                  <Badge size="sm" variant="outline">1×1</Badge>
+                </div>
+              </div>
+            </div>
+          </BentoGridItem>
+
+          <BentoGridItem class="md:col-span-1" href="#">
+            <div class="flex flex-col h-full">
+              <!-- Image -->
+              <div class="relative aspect-[4/3] overflow-hidden">
+                <img
+                  src={artImage2.src}
+                  alt="Small example"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              
+              <!-- Content -->
+              <div class="p-6 space-y-3">
+                <Heading level={3} size="lg" class="line-clamp-2">Small Item</Heading>
+                <Text size="sm" variant="secondary" class="line-clamp-2">
+                  Compact items fill gaps efficiently.
+                </Text>
+                <div>
+                  <Badge size="sm" variant="outline">1×1</Badge>
+                </div>
+              </div>
+            </div>
+          </BentoGridItem>
+
+          <BentoGridItem class="md:col-span-1" href="#">
+            <div class="flex flex-col h-full">
+              <!-- Image -->
+              <div class="relative aspect-[4/3] overflow-hidden">
+                <img
+                  src={artImage3.src}
+                  alt="Another example"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              
+              <!-- Content -->
+              <div class="p-6 space-y-3">
+                <Heading level={3} size="lg" class="line-clamp-2">Another Piece</Heading>
+                <Text size="sm" variant="secondary" class="line-clamp-2">
+                  Grid flows items automatically with dense packing.
+                </Text>
+                <div>
+                  <Badge size="sm" variant="outline">1×1</Badge>
+                </div>
+              </div>
+            </div>
+          </BentoGridItem>
+
+          <BentoGridItem class="md:col-span-2" href="#">
+            <div class="flex flex-col h-full">
+              <!-- Image -->
+              <div class="relative aspect-[4/3] overflow-hidden">
+                <img
+                  src={artImage4.src}
+                  alt="Wide example"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              
+              <!-- Content -->
+              <div class="p-6 space-y-3">
+                <Heading level={3} size="lg" class="line-clamp-2">Wide Format</Heading>
+                <Text size="sm" variant="secondary" class="line-clamp-2">
+                  Wide items span 2 columns, ideal for panoramic or landscape-oriented work.
+                </Text>
+                <div>
+                  <Badge size="sm" variant="outline">2×1</Badge>
+                </div>
+              </div>
+            </div>
+          </BentoGridItem>
+        </BentoGrid>
+
+        <Card padding="lg" variant="bordered" class="max-w-3xl">
+          <Heading level={4} size="base" class="mb-4">Implementation</Heading>
+          <div class="space-y-3 font-mono text-sm">
+            <div class="flex gap-4">
+              <Text size="sm" class="text-accent min-w-[120px]">Base Grid</Text>
+              <Text size="sm" variant="secondary">src/components/ui/bento-grid.astro</Text>
+            </div>
+            <div class="flex gap-4">
+              <Text size="sm" class="text-accent min-w-[120px]">Grid Item</Text>
+              <Text size="sm" variant="secondary">src/components/ui/bento-grid-item.astro</Text>
+            </div>
+            <div class="flex gap-4">
+              <Text size="sm" class="text-accent min-w-[120px]">Art Usage</Text>
+              <Text size="sm" variant="secondary">src/components/art/art-bento-grid.astro</Text>
+            </div>
+          </div>
+        </Card>
       </section>
 
       <!-- Configuration -->
