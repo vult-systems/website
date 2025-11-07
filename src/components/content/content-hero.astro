@@ -53,14 +53,168 @@ const heroImageSrc = typeof heroImage === 'string' ? heroImage : heroImage?.src;
         </Text>
       </div>
       
-      <!-- Featured Image (custom - specific to content) -->
+            <!-- Featured Image (custom - specific to content) -->
       {heroImageSrc && (
         <img
+          id="hero-image"
           src={heroImageSrc}
           alt={title}
-          class="mb-8 mt-4 aspect-video w-full rounded-md border border-border object-cover"
+          class="mb-8 mt-4 aspect-[4/3] w-full rounded-md object-cover"
         />
       )}
     </div>
   </div>
 </section>
+
+<script>
+  const heroImage = document.getElementById('hero-image');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
+  const imageWrapper = document.getElementById('image-wrapper');
+  const closeBtn = document.getElementById('close-btn');
+  const zoomIn = document.getElementById('zoom-in');
+  const zoomOut = document.getElementById('zoom-out');
+  const zoomReset = document.getElementById('zoom-reset');
+
+  let scale = 1;
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let translateX = 0, translateY = 0;
+  let currentX = 0, currentY = 0;
+
+  if (heroImage && lightbox && lightboxImage && imageWrapper) {
+    // Open lightbox
+    heroImage.addEventListener('click', () => {
+      lightboxImage.src = (heroImage as HTMLImageElement).src;
+      lightboxImage.alt = (heroImage as HTMLImageElement).alt;
+      
+      // Show lightbox
+      lightbox.classList.remove('invisible', 'opacity-0');
+      lightbox.classList.add('visible', 'opacity-100');
+      
+      // Animate image wrapper after a brief delay
+      requestAnimationFrame(() => {
+        imageWrapper?.classList.remove('opacity-0', 'scale-90');
+        imageWrapper?.classList.add('opacity-100', 'scale-100');
+      });
+      
+      document.body.style.overflow = 'hidden';
+      resetZoom();
+    });
+
+    // Close lightbox
+    const closeLightbox = () => {
+      // Animate image wrapper out
+      imageWrapper?.classList.remove('opacity-100', 'scale-100');
+      imageWrapper?.classList.add('opacity-0', 'scale-90');
+      
+      // Hide lightbox after animation
+      setTimeout(() => {
+        lightbox.classList.remove('visible', 'opacity-100');
+        lightbox.classList.add('invisible', 'opacity-0');
+      }, 200);
+      
+      document.body.style.overflow = '';
+      resetZoom();
+    };
+
+    closeBtn?.addEventListener('click', closeLightbox);
+    
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    // Zoom functions
+    const updateTransform = () => {
+      if (lightboxImage) {
+        lightboxImage.style.transform = `scale(${scale}) translate(${currentX / scale}px, ${currentY / scale}px)`;
+        lightboxImage.style.cursor = scale > 1 ? 'grab' : 'default';
+      }
+    };
+
+    const resetZoom = () => {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      currentX = 0;
+      currentY = 0;
+      updateTransform();
+    };
+
+    zoomIn?.addEventListener('click', () => {
+      scale = Math.min(scale + 0.5, 4);
+      updateTransform();
+    });
+
+    zoomOut?.addEventListener('click', () => {
+      scale = Math.max(scale - 0.5, 1);
+      if (scale === 1) {
+        translateX = 0;
+        translateY = 0;
+        currentX = 0;
+        currentY = 0;
+      }
+      updateTransform();
+    });
+
+    zoomReset?.addEventListener('click', resetZoom);
+
+    // Improved drag to pan
+    lightboxImage.addEventListener('mousedown', (e) => {
+      if (scale > 1) {
+        e.preventDefault();
+        isDragging = true;
+        startX = e.clientX - currentX;
+        startY = e.clientY - currentY;
+        lightboxImage.style.cursor = 'grabbing';
+        lightboxImage.style.transition = 'none';
+      }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging && scale > 1) {
+        e.preventDefault();
+        currentX = e.clientX - startX;
+        currentY = e.clientY - startY;
+        lightboxImage.style.transform = `scale(${scale}) translate(${currentX / scale}px, ${currentY / scale}px)`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        if (lightboxImage) {
+          lightboxImage.style.cursor = scale > 1 ? 'grab' : 'default';
+          lightboxImage.style.transition = '';
+        }
+      }
+    });
+
+    // Prevent accidental selection
+    lightboxImage.addEventListener('dragstart', (e) => e.preventDefault());
+
+    // Mouse wheel zoom
+    imageWrapper?.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      const oldScale = scale;
+      scale = Math.max(1, Math.min(4, scale + delta));
+      
+      if (scale === 1) {
+        currentX = 0;
+        currentY = 0;
+      }
+      
+      updateTransform();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !lightbox.classList.contains('pointer-events-none')) {
+        closeLightbox();
+      }
+    });
+  }
+</script>

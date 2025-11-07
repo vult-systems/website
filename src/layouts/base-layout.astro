@@ -5,6 +5,7 @@ import "@/styles/fonts.css";
 import { getImage } from 'astro:assets';
 import logoSvg from '@/assets/brand/logo.svg';
 import Analytics from '@/components/analytics/Analytics.astro';
+import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { SITE, getKeywordsString } from '@/config/site';
 
 interface Props {
@@ -159,6 +160,7 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 	</head>
 	<body class="min-h-screen bg-background text-foreground font-light flex flex-col">
 		<slot />
+		<ImageLightbox />
 	</body>
 </html>
 

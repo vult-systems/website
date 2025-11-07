@@ -37,8 +37,8 @@
     --accent-hover: 38 92% 50%;           /* amber-400 */
     
     /* Component backgrounds */
-    --card-bg: 0 0% 10%;                  /* zinc-900 */
-    --card-bg-hover: 0 0% 8%;             /* zinc-950 + gray-900 mix */
+    --card-bg: 0 0% 5%;                  /* zinc-900 */
+    --card-bg-hover: 0 0% 2%;             /* zinc-950 + gray-900 mix */
   }
 }
  

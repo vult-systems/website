@@ -1,10 +1,13 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/base-layout.astro';
 import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
 import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
+import Badge from '@/components/ui/badge.astro';
+import profileImg from '@/assets/profile/profile.jpg';
 import { getAboutPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
 
@@ -19,30 +22,128 @@ const seo = getAboutPageSEO();
 <Header />
 	<main class="min-h-screen w-full text-foreground">
 		<div class="relative z-10 w-full py-24 sm:py-32">
-			<div class="max-w-4xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+			<div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
 				
-				<!-- Header -->
-				<div class="mb-16">
-					<Heading level={1} size="4xl" class="mb-6">About</Heading>
-					<Text size="lg" variant="secondary" class="leading-relaxed">
-						{SITE.author.role} based in {SITE.author.location.full}. 3D character art, digital modeling, 
-						and education.
-					</Text>
-				</div>
-
-				<!-- Bio Content -->
-				<div class="max-w-none mb-16">
-					<Heading level={2} size="2xl" class="mb-4">Focus</Heading>
-					<Text variant="secondary" class="leading-relaxed mb-6">
-						3D character art and educational content.
-					</Text>
+				<!-- Two Column Layout -->
+				<div class="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16">
 					
-					<Heading level={2} size="2xl" class="mb-4 mt-12">Background</Heading>
-					<Text variant="secondary" class="leading-relaxed mb-6">
-						Based in {SITE.author.location.full}. Teaching and creating 3D character art.
-					</Text>
+					<!-- Left Column - Image & Quick Info -->
+					<div class="space-y-8">
+						<div>
+							<Image
+								src={profileImg}
+								alt={SITE.author.name}
+								width={800}
+								height={600}
+								id="about-profile-image"
+								class="w-full object-cover rounded-md"
+								style="aspect-ratio: 4/5;"
+							/>
+						</div>
+						
+						<div class="space-y-4">
+							<div>
+								<Text variant="secondary" size="sm" class="mb-1">Location</Text>
+								<Text variant="primary" size="base">{SITE.author.location.full}</Text>
+							</div>
+							
+							<div>
+								<Text variant="secondary" size="sm" class="mb-1">Focus</Text>
+								<div class="flex flex-wrap gap-2 mt-2">
+									<Badge>3D Character Art</Badge>
+									<Badge>Digital Sculpture</Badge>
+									<Badge>Technical Art</Badge>
+									<Badge>Education</Badge>
+								</div>
+							</div>
+							
+							<div>
+								<Text variant="secondary" size="sm" class="mb-2">Connect</Text>
+								<div class="space-y-2">
+									<div>
+										<Link href={SITE.social.github} variant="accent">
+											GitHub >
+										</Link>
+									</div>
+									<div>
+										<Link href={SITE.social.linkedin} variant="accent">
+											LinkedIn >
+										</Link>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Right Column - Content -->
+					<div class="space-y-12">
+						<!-- Header -->
+						<div>
+							<Heading level={1} size="4xl" class="mb-6">About</Heading>
+							<Text size="xl" variant="primary" class="leading-relaxed">
+								{SITE.author.role} based in {SITE.author.location.full}, specializing in 3D character art, 
+								digital modeling, and creative education.
+							</Text>
+						</div>
+
+						<!-- What I Do -->
+						<div>
+							<Heading level={2} size="2xl" class="mb-4">What I Do</Heading>
+							<Text variant="secondary" class="leading-relaxed mb-4">
+								I create 3D character art and digital sculptures, focusing on the intersection of artistic vision 
+								and technical execution. My work spans from concept to final render, with an emphasis on understanding 
+								the tools and workflows that enable creative expression.
+							</Text>
+							<Text variant="secondary" class="leading-relaxed">
+								Through VULT, I develop pipeline tools and systems that help artists work more efficiently, 
+								bridging the gap between creative intent and technical implementation.
+							</Text>
+						</div>
+						
+						<!-- Teaching & Education -->
+						<div>
+							<Heading level={2} size="2xl" class="mb-4">Teaching & Education</Heading>
+							<Text variant="secondary" class="leading-relaxed mb-4">
+								I'm passionate about creative education and helping artists develop both their craft and their 
+								understanding of the underlying systems. My teaching focuses on building strong fundamentals while 
+								exploring the why behind techniques and workflows.
+							</Text>
+							<Text variant="secondary" class="leading-relaxed">
+								I believe in teaching that connects making, method, and mindset—helping artists build with intention 
+								and understand the full context of their creative decisions.
+							</Text>
+						</div>
+						
+						<!-- Background -->
+						<div>
+							<Heading level={2} size="2xl" class="mb-4">Background</Heading>
+							<Text variant="secondary" class="leading-relaxed mb-4">
+								Based in {SITE.author.location.full}, I work across digital sculpture, character modeling, and 
+								technical art direction. My practice combines hands-on creation with systems thinking, always 
+								looking for ways to make complex workflows more accessible.
+							</Text>
+							<Text variant="secondary" class="leading-relaxed">
+								This workspace documents my projects, process, and ongoing exploration of 3D art, technical pipelines, 
+								and creative education.
+							</Text>
+						</div>
+
+						<!-- CTA -->
+						<div class="pt-8 border-t-2 border-foreground-secondary/10">
+							<Text variant="secondary" class="mb-4">
+								Interested in collaborating or learning more about my work?
+							</Text>
+							<div class="flex gap-4">
+								<Link href="/art" variant="accent">
+									View Work >
+								</Link>
+								<Link href="/log" variant="accent">
+									Read Log >
+								</Link>
+							</div>
+						</div>
+					</div>
 				</div>
-			</div>
 			</div>
 		</div>
 	</main>
