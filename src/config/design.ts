@@ -142,7 +142,7 @@ export const components = {
   },
 
   heading: {
-    base: 'font-semibold tracking-tight',
+    base: 'font-normal',
     
     sizes: {
       sm: 'text-lg',
@@ -152,6 +152,8 @@ export const components = {
       '2xl': 'text-4xl',
       '3xl': 'text-5xl',
       '4xl': 'text-6xl',
+      '4.5xl': 'text-[4rem]',
+      '5xl': 'text-7xl',
     },
   },
 
@@ -194,7 +196,7 @@ export const components = {
  * Layout utilities
  */
 export const layout = {
-  container: 'container max-w-7xl mx-auto px-4',
+  container: 'max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16',
   section: {
     base: 'py-16 sm:py-24',
     sm: 'py-8 sm:py-12',

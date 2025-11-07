@@ -6,9 +6,10 @@ interface Props {
 }
 
 const { maxWidth = 'wide', class: className } = Astro.props;
-const maxWidthClass = maxWidth === 'wide' ? 'max-w-7xl' : 'max-w-6xl';
+const maxWidthClass = maxWidth === 'wide' ? 'max-w-[102rem]' : 'max-w-6xl';
+const paddingClass = 'px-6 sm:px-8 md:px-12 lg:px-16';
 ---
 
-<div class:list={["container", maxWidthClass, "mx-auto px-4", className]}>
+<div class:list={[maxWidthClass, "mx-auto", paddingClass, className]}>
   <slot />
 </div>

@@ -163,26 +163,27 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 </html>
 
 <style is:global>
-	/* Font System - Match Lab Page */
+	/* Font System - IBM Plex Mono for body text */
 	:root {
-		--font-neue-haas: 'Neue Haas Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+		--font-ibm-plex: 'IBM Plex Mono', 'Courier New', monospace;
 	}
 	
-	/* Apply Neue Haas Grotesk to all text elements (components will override with Besley where needed) */
+	/* Apply IBM Plex Mono to all text elements (components will override with Besley where needed) */
 	* {
-		font-family: var(--font-neue-haas) !important;
+		font-family: var(--font-ibm-plex) !important;
+		letter-spacing: 0.02em !important;
 	}
 
 	/* Dot background everywhere - base layout */
 	body {
-		background-image: radial-gradient(rgb(230 230 230) 1px, transparent 1px) !important;
+		background-image: radial-gradient(rgba(216, 216, 216, 0.6) 1px, transparent 1px) !important;
 		background-size: 20px 20px !important;
 		background-attachment: fixed !important;
 	}
 	
 	/* Dark mode dot background */
 	.dark body {
-		background-image: radial-gradient(rgb(40 40 40) 1px, transparent 1px) !important;
+		background-image: radial-gradient(rgba(40, 40, 40, 0.6) 1px, transparent 1px) !important;
 	}
 
 	/* Custom view transition animations */
@@ -241,54 +242,6 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 			animation: none !important;
 		}
 	}
-
-	/* Parallax elements */
-	[data-parallax] {
-		will-change: transform;
-	}
 </style>
 
 <script>
-	// Global parallax scroll effect
-	function initParallax() {
-		const parallaxElements = document.querySelectorAll('[data-parallax]');
-		let ticking = false;
-
-		function updateParallax() {
-			parallaxElements.forEach((element) => {
-				const speed = parseFloat(element.getAttribute('data-parallax') || '0');
-				const rect = element.getBoundingClientRect();
-				const elementCenter = rect.top + rect.height / 2;
-				const viewportCenter = window.innerHeight / 2;
-				
-				// Calculate offset based on distance from viewport center
-				// This creates a natural parallax that's centered when element is in view
-				const distanceFromCenter = viewportCenter - elementCenter;
-				const offset = distanceFromCenter * speed;
-				
-				(element as HTMLElement).style.transform = `translateY(${offset}px)`;
-			});
-			
-			ticking = false;
-		}
-
-		function onScroll() {
-			if (!ticking) {
-				window.requestAnimationFrame(updateParallax);
-				ticking = true;
-			}
-		}
-
-		if (parallaxElements.length > 0) {
-			window.addEventListener('scroll', onScroll, { passive: true });
-			window.addEventListener('resize', updateParallax, { passive: true });
-			updateParallax(); // Initial update
-		}
-	}
-
-	// Initialize on page load
-	initParallax();
-
-	// Re-initialize after view transitions
-	document.addEventListener('astro:after-swap', initParallax);
-</script>

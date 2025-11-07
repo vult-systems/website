@@ -15,28 +15,28 @@ const { class: className = "" } = Astro.props;
 // Define the rotating content for different pages
 const rotatingContent = [
   {
-    text: "creative expression",
+    text: "digital craftmanship",
     icon: "🎨",
     link: "/art",
-    linkText: "View Art"
+    linkText: "ART"
   },
   {
-    text: "technical exploration",
+    text: "studio practice",
     icon: "⚡",
-    link: "/lab",
-    linkText: "Visit Lab"
+    link: "/vult",
+    linkText: "VULT"
   },
   {
-    text: "sharing knowledge",
+    text: "creative education",
     icon: "📚",
     link: "/learn",
-    linkText: "Explore Tutorials"
+    linkText: "LEARN"
   },
   {
     text: "documenting process",
     icon: "📝",
     link: "/log",
-    linkText: "Read Log"
+    linkText: "LOG"
   }
 ];
 
@@ -47,28 +47,28 @@ const sectionClasses = [
 ---
 
 <section class={sectionClasses} id="animated-hero-section">
-  <div class="container max-w-7xl mx-auto px-4">
-    <div class="grid items-center gap-12 lg:grid-cols-2">
+  <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+    <div class="grid items-center gap-12 lg:grid-cols-[1.5fr_1.1fr]">
       
       <!-- Left Column - Animated Text -->
-      <div id="parallax-left" class="flex flex-col items-center text-center lg:items-start lg:text-left order-2 lg:order-1">
-        <div data-parallax="0.05">
-          <Heading level={1} size="3xl" class="mb-3 text-accent">
-            This is my workspace for
+      <div class="flex flex-col items-center text-center lg:items-start lg:text-left order-2 lg:order-1 -mt-12">
+        <div class="mb-0">
+          <Heading level={1} size="4.5xl" class="mb-0 text-foreground-muted !font-extralight leading-none">
+            This is my<br />workspace for
           </Heading>
         </div>
-        <div class="relative mb-6 w-full" style="min-height: 6rem;" data-parallax="0.08">
+        <div class="relative mb-16 w-full" style="min-height: 6rem;">
           <div id="rotating-text" class="absolute inset-0">
             {rotatingContent.map((item, index) => (
               <div 
                 class={`rotating-item ${index === 0 ? 'active' : ''}`}
                 data-index={index}
               >
-                <Heading level={2} size="3xl" class="text-foreground-muted mb-4">
+                <Heading level={2} size="4.5xl" class="text-foreground !font-extralight mb-6">
                   {item.text}
                 </Heading>
-                <div class="flex items-center gap-3 mb-3">
-                  <span class="text-3xl" role="img" aria-label="icon">
+                <div class="flex items-center gap-3 mb-6">
+                  <span class="text-4xl" role="img" aria-label="icon">
                     {item.icon}
                   </span>
                 </div>
@@ -85,30 +85,31 @@ const sectionClasses = [
       </div>
       
       <!-- Right Column - Profile Photo + Info -->
-      <div id="parallax-right" class="flex flex-col order-1 lg:order-2">
-        <div data-parallax="-0.06">
+      <div class="flex flex-col order-1 lg:order-2">
+        <div>
           <Image
             src={profileImg}
             alt={SITE.author.name}
             width={1600}
             height={900}
             loading="eager"
-            class="w-full rounded-lg object-cover mb-6"
-            style="aspect-ratio: 16/9;"
+            class="w-full object-cover mb-6"
+            style="aspect-ratio: 4/3;"
           />
         </div>
         
-        <div class="text-left" data-parallax="-0.04">
-            <Heading level={1} size="2xl" class="mb-4">
-              Hello! I'm Carlos Garcia.
-            </Heading>
+        <div class="text-left">
+            <Text variant="primary" size="md" class="mb-0 !font-normal text-justify leading-tight">
+              Creating art, tools, and learning systems.
+            </Text>
 
-            <Text variant="secondary" size="base" class="mb-4">
-            A {SITE.author.bio}
-          </Text>
-          
+            <Text variant="secondary" size="md" class="mb-2 text-justify leading-tight !text-foreground-muted">
+              I'm a 3D artist and educator based in San Antonio, working across digital sculpture, pipeline development, and creative instruction. 
+              I focus on connecting the making, the method, and the mindset - helping artists build with intention.
+            </Text>
+
           <Link variant="accent" href="/about">
-            About Me >
+            ABOUT ME >
           </Link>
         </div>
       </div>
@@ -135,12 +136,6 @@ const sectionClasses = [
   .rotating-item.exiting {
     opacity: 0;
     transform: translateY(20px);
-  }
-
-  #parallax-left,
-  #parallax-right,
-  [data-parallax] {
-    will-change: transform;
   }
 </style>
 

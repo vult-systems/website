@@ -9,7 +9,7 @@
     --foreground-secondary: 0 0% 38%;     /* gray-600 */
     --foreground-muted: 0 0% 62%;         /* gray-500 */
     
-    --border: 0 0% 75%;                   /* gray-400 - darker */
+    --border: 0 0% 85%;                   /* gray-400 - darker */
     --border-hover: 0 0% 65%;             /* gray-500 - darker */
     
     --accent: 38 92% 50%;                 /* amber-500 */
@@ -25,9 +25,9 @@
  
   .dark {
     /* Semantic color system - Dark mode */
-    --background: 0 0% 2%;                /* zinc-950 */
-    --foreground: 0 0% 85%;              /* white */
-    --foreground-secondary: 0 0% 64%;     /* gray-400 */
+    --background: 0 0% 5%;                /* zinc-950 */
+    --foreground: 0 0% 95%;              /* white */
+    --foreground-secondary: 0 0% 85%;     /* gray-400 */
     --foreground-muted: 0 0% 55%;         /* gray-500 */
     
     --border: 0 0% 7%;                   /* gray-800 */
@@ -37,8 +37,8 @@
     --accent-hover: 38 92% 50%;           /* amber-400 */
     
     /* Component backgrounds */
-    --card-bg: 0 0% 4%;                  /* zinc-900 */
-    --card-bg-hover: 0 0% 5%;             /* zinc-950 + gray-900 mix */
+    --card-bg: 0 0% 10%;                  /* zinc-900 */
+    --card-bg-hover: 0 0% 8%;             /* zinc-950 + gray-900 mix */
   }
 }
  

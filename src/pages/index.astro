@@ -9,6 +9,15 @@ import { getHomePageSEO } from '@/config/seo';
 
 // Get featured art pieces
 const artPieces = await getCollection('art');
+
+// Define the desired order
+const desiredOrder = [
+  'halo-infinite-character',
+  'foundation-explorer',
+  'digital-sculpture-series',
+  'cyber-city'
+];
+
 const featuredArt = artPieces
   .filter(piece => piece.data.featured)
   .map(piece => ({
@@ -17,7 +26,12 @@ const featuredArt = artPieces
     description: piece.data.description,
     heroImage: piece.data.heroImage,
     category: piece.data.category
-  }));
+  }))
+  .sort((a, b) => {
+    const indexA = desiredOrder.indexOf(a.slug);
+    const indexB = desiredOrder.indexOf(b.slug);
+    return indexA - indexB;
+  });
 
 const seo = getHomePageSEO();
 ---
@@ -31,6 +45,11 @@ const seo = getHomePageSEO();
 	<main class="min-h-screen w-full text-foreground">
 		<!-- Hero Section -->
 		<AnimatedHero />
+
+		<!-- Divider -->
+		<div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+			<div class="border-b-2 border-foreground-secondary/10"></div>
+		</div>
 
 		<!-- Featured Work -->
 		<FeaturedGrid artPieces={featuredArt} />

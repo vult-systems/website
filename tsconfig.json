@@ -2,12 +2,12 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "jsx": "preserve",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["**/*"],
-  "exclude": ["dist"]
+  "include": ["src/**/*", "*.config.mjs"],
+  "exclude": ["dist", "node_modules"]
 }

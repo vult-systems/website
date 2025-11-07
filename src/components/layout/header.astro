@@ -7,26 +7,26 @@ import { SITE } from '@/config/site';
 const currentPath = Astro.url.pathname;
 ---
 
-<div class="w-full bg-background/90 backdrop-blur-sm sticky top-0 left-0 right-0 z-50" transition:persist>
-    <div class="max-w-[90rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-        <div class="flex h-16 items-center justify-between border-b border-border/50">
+<div class="w-full bg-background/90 backdrop-blur-lg sticky top-0 left-0 right-0 z-50" transition:persist>
+    <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+        <div class="flex h-24 items-end justify-between pb-6 border-b-2 border-foreground-secondary/10">
         <a href="/" class="flex items-end gap-x-3 hover:scale-105 transition-transform duration-200">
             <Image
                 src={logoSvg}
-                width={24}
-                height={24}
+                width={22}
+                height={22}
                 alt={`${SITE.author.name} Logo`}
                 loading="eager"
-                class="dark:brightness-[.85] mb-[2px]"
+                class="dark:brightness-[.95] mb-[2px]"
                 transition:name="site-logo"
                 transition:animate="initial"
             />
-            <span class="text-xl font-medium text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title" style="font-family: 'Besley', serif !important;">
+            <span class="text-base font-normal text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title" style="font-family: 'Besley', serif !important;">
                 {SITE.name}
             </span>
         </a>
         
-        <div class="flex items-center gap-x-8">
+        <div class="flex items-end gap-x-8">
             <nav class="hidden md:block">
                 <ul class="flex gap-x-6 lg:gap-x-8">
                     <li>

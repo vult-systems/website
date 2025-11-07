@@ -25,6 +25,8 @@ interface Props {
   as?: 'p' | 'span' | 'div';
   /** Additional CSS classes */
   class?: string;
+  /** Inline styles */
+  style?: string;
 }
 
 const {
@@ -32,7 +34,8 @@ const {
   size = 'base',
   align = 'left',
   as = 'p',
-  class: className = ''
+  class: className = '',
+  style = ''
 } = Astro.props;
 
 const alignClasses = {
@@ -53,6 +56,6 @@ const classes = cn(
 );
 ---
 
-<Tag class={classes}>
+<Tag class={classes} style={style}>
   <slot />
 </Tag>
