@@ -1,0 +1,83 @@
+---
+import Heading from '@/components/ui/heading.astro';
+import Text from '@/components/ui/text.astro';
+import Link from '@/components/ui/link.astro';
+
+interface Logo {
+  name: string;
+  src?: string;
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  logos?: Logo[];
+  class?: string;
+}
+
+const {
+  title = "Studios & Creative Teams I've Worked With",
+  description = "Over the years, I've collaborated with leading game studios, tech companies, and creative teams to ship characters, assets, and tools across AAA titles and consumer products.",
+  logos = [
+    // Row 1
+    { name: '343 Industries' },
+    { name: 'Microsoft' },
+    { name: 'Motorola' },
+    { name: 'Unity' },
+    { name: 'Epic Games' },
+    // Row 2
+    { name: 'Ubisoft' },
+    { name: 'EA' },
+    { name: 'Riot Games' },
+    { name: 'Sony' },
+    { name: 'Activision' },
+  ],
+  class: className = ''
+} = Astro.props;
+---
+
+<section class:list={["relative z-10 py-16 sm:py-20", className]}>
+  <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+    
+    <!-- Section Header -->
+    <div class="mb-10 sm:mb-12 text-left">
+      {title && (
+        <Text variant="primary" size="md" class="mb-0 !font-normal leading-tight">
+          {title}
+        </Text>
+      )}
+      {description && (
+        <Text variant="secondary" size="md" class="mb-2 leading-tight !text-foreground-muted max-w-[50%]">
+          {description}
+        </Text>
+      )}
+      <Link variant="accent" href="/about">
+        ABOUT ME >
+      </Link>
+    </div>
+
+    <!-- Logo Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-10">
+      {logos.map((logo) => (
+        <div 
+          class="flex items-center justify-center p-4 sm:p-6 rounded-lg bg-foreground/[0.02] border border-foreground/[0.05] hover:bg-foreground/[0.04] hover:border-foreground/[0.1] transition-all duration-300"
+        >
+          {logo.src ? (
+            <img 
+              src={logo.src} 
+              alt={logo.name}
+              class="h-8 sm:h-10 md:h-12 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-300 filter grayscale hover:grayscale-0"
+              loading="lazy"
+            />
+          ) : (
+            <!-- Placeholder for logo - replace with actual logo images -->
+            <span class="text-xs sm:text-sm font-medium text-foreground/40 text-center">
+              {logo.name}
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
