@@ -2,10 +2,23 @@
 import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
+import { Image } from 'astro:assets';
+
+// Import logo images
+import vultLogo from '@/assets/logos/vult-logo-wht.png';
+import uiw3dLogo from '@/assets/logos/uiw3d-horiz-logo-wht.png';
+import logo343i from '@/assets/logos/343i-logo-wht.png';
+import biowareLogo from '@/assets/logos/bioware-logo-wht.png';
+import disneyLogo from '@/assets/logos/walt-disney-logo-wht.png';
+import qualcommLogo from '@/assets/logos/qualcomm-logo-clr.png';
+import mergeVrLogo from '@/assets/logos/merge-vr-logo-clr.png';
+import usafaLogo from '@/assets/logos/usafa-logo-clr.png';
+import newtekLogo from '@/assets/logos/newtek-logo-wht.png';
+import losAlamosLogo from '@/assets/logos/losalamos-logo-clr.png';
 
 interface Logo {
   name: string;
-  src?: string;
+  image: ImageMetadata;
 }
 
 interface Props {
@@ -15,23 +28,25 @@ interface Props {
   class?: string;
 }
 
+const defaultLogos: Logo[] = [
+  // Row 1
+  { name: 'UIW 3D', image: uiw3dLogo },
+  { name: 'Vult Systems', image: vultLogo },
+  { name: '343 Industries', image: logo343i },
+  { name: 'BioWare', image: biowareLogo },
+  { name: 'Qualcomm', image: qualcommLogo },
+  // Row 2
+  { name: 'Walt Disney', image: disneyLogo },
+  { name: 'Merge VR', image: mergeVrLogo },
+  { name: 'US Air Force Academy', image: usafaLogo },
+  { name: 'NewTek', image: newtekLogo },
+  { name: 'Los Alamos', image: losAlamosLogo },
+];
+
 const {
   title = "Studios & Creative Teams I've Worked With",
-  description = "Over the years, I've collaborated with leading game studios, tech companies, and creative teams to ship characters, assets, and tools across AAA titles and consumer products.",
-  logos = [
-    // Row 1
-    { name: '343 Industries' },
-    { name: 'Microsoft' },
-    { name: 'Motorola' },
-    { name: 'Unity' },
-    { name: 'Epic Games' },
-    // Row 2
-    { name: 'Ubisoft' },
-    { name: 'EA' },
-    { name: 'Riot Games' },
-    { name: 'Sony' },
-    { name: 'Activision' },
-  ],
+  description = "I've worked across a lot of different corners of the industry: game studios, defense, national labs, startups, academia. Building characters, assets, and pipelines for AAA games, consumer tech, scientific visualization, and a bit of everything in between. If it involves 3D, chances are I've developed something for it.",
+  logos = defaultLogos,
   class: className = ''
 } = Astro.props;
 ---
@@ -57,26 +72,49 @@ const {
     </div>
 
     <!-- Logo Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-10">
-      {logos.map((logo) => (
-        <div 
-          class="flex items-center justify-center p-4 sm:p-6 rounded-lg bg-foreground/[0.02] border border-foreground/[0.05] hover:bg-foreground/[0.04] hover:border-foreground/[0.1] transition-all duration-300"
-        >
-          {logo.src ? (
-            <img 
-              src={logo.src} 
+    <div class="space-y-6">
+      <!-- Top Row - 5 logos -->
+      <div class="grid grid-cols-5 items-center">
+        {logos.slice(0, 5).map((logo, index) => (
+          <div class:list={[
+            "flex items-center",
+            index === 0 ? "justify-start" : index === 4 ? "justify-end" : "justify-center"
+          ]}>
+            <Image 
+              src={logo.image} 
               alt={logo.name}
-              class="h-8 sm:h-10 md:h-12 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-300 filter grayscale hover:grayscale-0"
+              class:list={[
+                "object-contain pointer-events-none select-none",
+                index === 0 ? "h-16 sm:h-20 md:h-24" :
+                index === 1 || index === 3 ? "h-6 sm:h-8 md:h-10" :
+                index === 4 ? "h-10 sm:h-12 md:h-14" : "h-8 sm:h-10 md:h-12"
+              ]}
               loading="lazy"
             />
-          ) : (
-            <!-- Placeholder for logo - replace with actual logo images -->
-            <span class="text-xs sm:text-sm font-medium text-foreground/40 text-center">
-              {logo.name}
-            </span>
-          )}
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
+      <!-- Bottom Row - 5 columns (4 logos + empty) -->
+      <div class="grid grid-cols-5 items-center">
+        {logos.slice(5).map((logo, index) => (
+          <div class:list={[
+            "flex items-center",
+            index === 0 ? "justify-start" : "justify-center"
+          ]}>
+            <Image 
+              src={logo.image} 
+              alt={logo.name}
+              class:list={[
+                "object-contain pointer-events-none select-none",
+                index === 0 ? "h-12 sm:h-14 md:h-16" : "h-8 sm:h-10 md:h-12"
+              ]}
+              loading="lazy"
+            />
+          </div>
+        ))}
+        <!-- Empty 5th column -->
+        <div></div>
+      </div>
     </div>
 
   </div>
