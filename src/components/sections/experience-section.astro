@@ -30,8 +30,8 @@ interface Props {
 
 const defaultLogos: Logo[] = [
   // Row 1
-  { name: 'UIW 3D', image: uiw3dLogo },
   { name: 'Vult Systems', image: vultLogo },
+  { name: 'UIW 3D', image: uiw3dLogo },
   { name: '343 Industries', image: logo343i },
   { name: 'BioWare', image: biowareLogo },
   { name: 'Qualcomm', image: qualcommLogo },
@@ -85,8 +85,8 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none",
-                index === 0 ? "h-16 sm:h-20 md:h-24" :
-                index === 1 || index === 3 ? "h-6 sm:h-8 md:h-10" :
+                index === 0 || index === 3 ? "h-6 sm:h-8 md:h-10" :
+                index === 1 ? "h-16 sm:h-20 md:h-24" :
                 index === 4 ? "h-10 sm:h-12 md:h-14" : "h-8 sm:h-10 md:h-12"
               ]}
               loading="lazy"
