@@ -8,6 +8,7 @@ import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
 import Badge from '@/components/ui/badge.astro';
 import profileImg from '@/assets/profile/profile.jpg';
+import resumeThumb from '@/assets/profile/resume-thumbnail.png';
 import { getAboutPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
 
@@ -92,29 +93,46 @@ const seo = getAboutPageSEO();
 						<!-- Resume -->
 						<div>
 							<Heading level={2} size="2xl" class="mb-4">Resume</Heading>
-							<a href="/CarlosGarcia_Resume_2026.pdf" target="_blank" class="group block rounded-md border-2 border-border hover:border-accent/40 transition-all overflow-hidden">
-								<div class="flex items-center justify-between bg-foreground/5 group-hover:bg-foreground/10 px-4 py-3 transition-colors">
-									<div class="flex items-center gap-3">
-										<svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+							<div class="inline-block">
+								<button id="resume-trigger" class="group block rounded-md border-2 border-border hover:border-accent/40 transition-all overflow-hidden cursor-pointer bg-transparent p-0 text-left">
+									<Image
+										src={resumeThumb}
+										alt="Carlos Garcia Resume"
+										width={400}
+										height={504}
+										class="w-full max-w-[280px] object-contain rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
+									/>
+								</button>
+								<div class="mt-2">
+									<a href="/CarlosGarcia_Resume_2026.pdf" download class="inline-flex items-center gap-1.5 text-sm text-foreground-secondary hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
 										</svg>
-										<div>
-											<Text variant="primary" size="sm" class="font-medium">CarlosGarcia_Resume_2026.pdf</Text>
-											<Text variant="muted" size="sm">Click to view full resume</Text>
-										</div>
-									</div>
-									<svg class="w-4 h-4 text-foreground-secondary group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-									</svg>
+										Download PDF
+									</a>
 								</div>
-							</a>
-							<div class="mt-2">
-								<a href="/CarlosGarcia_Resume_2026.pdf" download class="inline-flex items-center gap-1.5 text-sm text-foreground-secondary hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">
-									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-									</svg>
-									Download PDF
-								</a>
+							</div>
+						</div>
+
+						<!-- Resume Drawer/Lightbox -->
+						<div id="resume-drawer" class="fixed inset-0 bg-background/95 backdrop-blur-md z-[9999] opacity-0 invisible transition-all duration-200 ease-out flex items-center justify-center p-4 sm:p-8">
+							<div class="relative w-full max-w-4xl h-full flex flex-col">
+								<!-- Drawer Header -->
+								<div class="flex items-center justify-between mb-4 shrink-0">
+									<a href="/CarlosGarcia_Resume_2026.pdf" download class="inline-flex items-center gap-1.5 text-sm text-foreground-secondary hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+										</svg>
+										Download
+									</a>
+									<button id="resume-close" class="w-10 h-10 rounded-full bg-card border border-border hover:bg-card-hover transition-colors flex items-center justify-center cursor-pointer">
+										<span class="text-xl">×</span>
+									</button>
+								</div>
+								<!-- PDF Embed -->
+								<div class="flex-1 rounded-lg border-2 border-foreground-secondary/10 bg-card shadow-2xl overflow-hidden opacity-0 scale-90 transition-all duration-200 ease-out" id="resume-content">
+									<iframe src="/CarlosGarcia_Resume_2026.pdf" class="w-full h-full" title="Carlos Garcia Resume"></iframe>
+								</div>
 							</div>
 						</div>
 
@@ -139,3 +157,41 @@ const seo = getAboutPageSEO();
 	</main>
 <Footer />
 </BaseLayout>
+
+<script>
+	const trigger = document.getElementById('resume-trigger');
+	const drawer = document.getElementById('resume-drawer');
+	const content = document.getElementById('resume-content');
+	const closeBtn = document.getElementById('resume-close');
+
+	const openDrawer = () => {
+		if (!drawer || !content) return;
+		drawer.classList.remove('invisible', 'opacity-0');
+		drawer.classList.add('visible', 'opacity-100');
+		requestAnimationFrame(() => {
+			content.classList.remove('opacity-0', 'scale-90');
+			content.classList.add('opacity-100', 'scale-100');
+		});
+		document.body.style.overflow = 'hidden';
+	};
+
+	const closeDrawer = () => {
+		if (!drawer || !content) return;
+		content.classList.remove('opacity-100', 'scale-100');
+		content.classList.add('opacity-0', 'scale-90');
+		setTimeout(() => {
+			drawer.classList.remove('visible', 'opacity-100');
+			drawer.classList.add('invisible', 'opacity-0');
+			document.body.style.overflow = '';
+		}, 200);
+	};
+
+	trigger?.addEventListener('click', openDrawer);
+	closeBtn?.addEventListener('click', closeDrawer);
+	drawer?.addEventListener('click', (e) => {
+		if (e.target === drawer) closeDrawer();
+	});
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') closeDrawer();
+	});
+</script>
