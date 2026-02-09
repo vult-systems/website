@@ -157,25 +157,30 @@ const seo = getArtPageSEO();
 	const initArtTabs = () => {
 		const tabs = document.querySelectorAll('.art-tab');
 		const artItems = document.querySelectorAll('.art-item');
+		if (!tabs.length) return;
 
+		// Clone & replace to remove stale listeners
 		tabs.forEach((tab) => {
+			const fresh = tab.cloneNode(true);
+			tab.parentNode?.replaceChild(fresh, tab);
+		});
+
+		const freshTabs = document.querySelectorAll('.art-tab');
+		freshTabs.forEach((tab) => {
 			tab.addEventListener('click', () => {
 				const filter = (tab as HTMLElement).dataset.filter;
 
-				// Update tab styles
-				tabs.forEach((t) => {
+				freshTabs.forEach((t) => {
 					t.classList.remove('text-accent', 'border-accent');
 					t.classList.add('text-foreground-secondary', 'border-transparent');
 				});
 				tab.classList.remove('text-foreground-secondary', 'border-transparent');
 				tab.classList.add('text-accent', 'border-accent');
 
-				// Fade out all items
 				artItems.forEach((item) => {
 					item.classList.add('filtering-out');
 				});
 
-				// After fade, show/hide by category
 				setTimeout(() => {
 					artItems.forEach((item) => {
 						const category = item.getAttribute('data-category');
@@ -192,4 +197,5 @@ const seo = getArtPageSEO();
 	};
 
 	initArtTabs();
+	document.addEventListener('astro:after-swap', initArtTabs);
 </script>

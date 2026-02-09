@@ -306,18 +306,25 @@ const resources = [
 	const initTabs = () => {
 		const tabs = document.querySelectorAll('.learn-tab');
 		const panels = document.querySelectorAll('.learn-tab-content');
+		if (!tabs.length) return;
 
 		tabs.forEach((tab) => {
+			// Clone & replace to remove any stale listeners
+			const fresh = tab.cloneNode(true);
+			tab.parentNode?.replaceChild(fresh, tab);
+		});
+
+		// Re-query after clone
+		const freshTabs = document.querySelectorAll('.learn-tab');
+		freshTabs.forEach((tab) => {
 			tab.addEventListener('click', () => {
 				const target = (tab as HTMLElement).dataset.tab;
-				// Update tab styles
-				tabs.forEach((t) => {
+				freshTabs.forEach((t) => {
 					t.classList.remove('text-accent', 'border-accent');
 					t.classList.add('text-foreground-secondary', 'border-transparent');
 				});
 				tab.classList.remove('text-foreground-secondary', 'border-transparent');
 				tab.classList.add('text-accent', 'border-accent');
-				// Show/hide panels
 				panels.forEach((panel) => {
 					if (panel.id === `tab-${target}`) {
 						panel.classList.remove('hidden');
@@ -328,7 +335,6 @@ const resources = [
 			});
 		});
 	};
-	initTabs();
 
 	// Make placeholder thumbnails clickable with a lightbox-style overlay
 	const initLearnLightbox = () => {
@@ -336,30 +342,30 @@ const resources = [
 		const lightbox = document.getElementById('lightbox');
 		const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
 		const imageWrapper = document.getElementById('image-wrapper');
+		if (!triggers.length) return;
 
 		triggers.forEach((trigger) => {
+			const fresh = trigger.cloneNode(true);
+			trigger.parentNode?.replaceChild(fresh, trigger);
+		});
+
+		document.querySelectorAll('.learn-lightbox-trigger').forEach((trigger) => {
 			trigger.addEventListener('click', () => {
 				if (!lightbox || !lightboxImage || !imageWrapper) return;
 
 				const label = (trigger as HTMLElement).dataset.label || 'Preview';
 
-				// Create a placeholder canvas for the lightbox
 				const canvas = document.createElement('canvas');
 				canvas.width = 800;
 				canvas.height = 1000;
 				const ctx = canvas.getContext('2d');
 				if (ctx) {
-					// Draw placeholder background
 					const isDark = document.documentElement.classList.contains('dark');
 					ctx.fillStyle = isDark ? '#1a1a1a' : '#f0f0f0';
 					ctx.fillRect(0, 0, 800, 1000);
-
-					// Draw border
 					ctx.strokeStyle = isDark ? '#333' : '#ccc';
 					ctx.lineWidth = 2;
 					ctx.strokeRect(20, 20, 760, 960);
-
-					// Draw label
 					ctx.fillStyle = isDark ? '#888' : '#666';
 					ctx.font = '24px system-ui, sans-serif';
 					ctx.textAlign = 'center';
@@ -384,6 +390,11 @@ const resources = [
 		});
 	};
 
-	initLearnLightbox();
-	document.addEventListener('astro:after-swap', initLearnLightbox);
+	const initAll = () => {
+		initTabs();
+		initLearnLightbox();
+	};
+
+	initAll();
+	document.addEventListener('astro:after-swap', initAll);
 </script>
