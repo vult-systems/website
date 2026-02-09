@@ -46,6 +46,7 @@ interface CourseAssignment {
 interface Course {
 	code: string;
 	title: string;
+	description: string;
 	syllabus?: ImageMetadata;
 	assignments?: CourseAssignment[];
 }
@@ -60,43 +61,43 @@ const curriculum: CurriculumYear[] = [
 	{
 		year: 'Freshman',
 		courses: [
-			{ code: 'ANGD 1101', title: 'Orientation to ANGD' },
-			{ code: 'ANGD 1312', title: 'Hard Surface Modeling' },
-			{ code: 'ANGD 1314', title: 'Organic Modeling' },
-			{ code: 'FYES 1211', title: 'First Year Experience Seminar' },
+			{ code: 'ANGD 1101', title: 'Orientation to ANGD', description: 'Introduction to the Animation and Game Design program, its culture, expectations, and the industry landscape students are preparing for.' },
+			{ code: 'ANGD 1312', title: 'Hard Surface Modeling', description: 'Fundamentals of polygonal modeling for mechanical and manufactured objects. Emphasis on clean topology, edge flow, and production-ready geometry.' },
+			{ code: 'ANGD 1314', title: 'Organic Modeling', description: 'Introduction to sculpting and modeling organic forms. Covers body proportions, natural shapes, and transitioning between high and low poly workflows.' },
+			{ code: 'FYES 1211', title: 'First Year Experience Seminar', description: 'University transition course focused on academic skills, professional development, and building habits for creative careers.' },
 		],
 	},
 	{
 		year: 'Sophomore',
 		courses: [
-			{ code: 'ANGD 2333', title: 'Environment Production I' },
-			{ code: 'ANGD 2334', title: 'Environment Production II' },
-			{ code: 'ANGD 2361', title: 'Character Modeling I' },
-			{ code: 'ANGD 1380', title: 'Anatomy for Animators' },
+			{ code: 'ANGD 2333', title: 'Environment Production I', description: 'Fundamentals of environment art production. Students build modular assets and learn scene composition for real-time engines.' },
+			{ code: 'ANGD 2334', title: 'Environment Production II', description: 'Continued environment work with focus on texturing, lighting, and presentation. Students develop a polished environment portfolio piece.' },
+			{ code: 'ANGD 2361', title: 'Character Modeling I', description: 'Introduction to character creation. Covers base mesh construction, anatomical landmarks, and the fundamentals of building believable characters.' },
+			{ code: 'ANGD 1380', title: 'Anatomy for Animators', description: 'Study of human anatomy as it applies to 3D art and animation. Skeletal structure, musculature, and how the body moves and deforms.' },
 		],
 	},
 	{
 		year: 'Junior',
 		courses: [
-			{ code: 'ANGD 3331', title: 'Environment Production III' },
-			{ code: 'ANGD 3361', title: 'Character Modeling II' },
-			{ code: 'ANGD 3330', title: 'History of Games' },
-			{ code: 'ANGD 3332', title: 'Environment Production IV' },
-			{ code: 'ANGD 4140', title: 'Senior Thesis Workshop' },
-			{ code: 'ANGD 3362', title: 'Character Modeling III' },
+			{ code: 'ANGD 3331', title: 'Environment Production III', description: 'Advanced environment techniques including procedural workflows, trim sheets, and large-scale scene construction.' },
+			{ code: 'ANGD 3361', title: 'Character Modeling II', description: 'Intermediate character art. Students tackle facial modeling, clothing, accessories, and begin developing personal style within production constraints.' },
+			{ code: 'ANGD 3330', title: 'History of Games', description: 'Survey of the game industry from its origins to today. People, companies, technology, and the cultural forces that shaped interactive entertainment.' },
+			{ code: 'ANGD 3332', title: 'Environment Production IV', description: 'Capstone environment course. Students produce a fully realized environment ready for portfolio presentation and industry review.' },
+			{ code: 'ANGD 4140', title: 'Senior Thesis Workshop', description: 'Pre-production planning for the senior thesis. Concept development, scope definition, pipeline planning, and milestone scheduling.' },
+			{ code: 'ANGD 3362', title: 'Character Modeling III', description: 'Advanced character creation covering hair, cloth, armor systems, and final presentation. Portfolio-ready character pieces are the deliverable.' },
 		],
 	},
 	{
 		year: 'Senior',
 		courses: [
-			{ code: 'ANGD 4350', title: 'Senior Thesis Production I' },
-			{ code: 'ANGD 4360', title: 'Senior Thesis Production II' },
+			{ code: 'ANGD 4350', title: 'Senior Thesis Production I', description: 'First semester of thesis execution. Students produce work against their approved plan with regular critiques, reviews, and milestone check-ins.' },
+			{ code: 'ANGD 4360', title: 'Senior Thesis Production II', description: 'Final semester of thesis work. Polish, presentation, and defense of the completed thesis project before faculty and industry reviewers.' },
 		],
 	},
 	{
 		year: 'Graduate',
 		courses: [
-			{ code: 'ANGD 6332', title: 'Graduate Environment Arts IV' },
+			{ code: 'ANGD 6332', title: 'Graduate Environment Arts IV', description: 'Graduate-level environment art production with emphasis on research-driven process, advanced techniques, and publishable quality work.' },
 		],
 	},
 ];
@@ -179,28 +180,32 @@ const resources = [
 								<div class="grid sm:grid-cols-2 gap-3">
 									{level.courses.map((course) => (
 										<Card variant="bordered" padding="sm">
-											<div class="flex items-center gap-3 mb-3">
+											<div class="flex items-center gap-3 mb-2">
 												<Badge variant="accent" size="sm">{course.code}</Badge>
 												<Text variant="primary" size="sm">{course.title}</Text>
 											</div>
+											<Text variant="muted" size="sm" class="mb-4">
+												{course.description}
+											</Text>
 											{/* Syllabus & Assignment Thumbnails */}
-											<div class="flex gap-2 flex-wrap">
+											<div class="flex gap-3 flex-wrap">
 												{/* Syllabus placeholder */}
-												<div class="flex-shrink-0 group relative">
-													<div class="w-16 h-20 rounded border border-border bg-foreground/5 flex items-center justify-center cursor-pointer hover:bg-foreground/10 transition-colors">
-														<svg class="w-5 h-5 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<div class="flex-shrink-0">
+													<div class="learn-lightbox-trigger w-24 h-32 rounded border border-border bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 hover:border-accent/40 transition-all" data-label={`${course.code} Syllabus & Outline`}>
+														<svg class="w-7 h-7 text-foreground-muted mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 														</svg>
+														<span class="text-[10px] text-foreground-muted">Syllabus</span>
 													</div>
-													<Text variant="muted" size="sm" class="text-[10px] text-center mt-1">Syllabus</Text>
 												</div>
 												{/* Assignment placeholders */}
 												{[1, 2, 3].map((n) => (
 													<div class="flex-shrink-0">
-														<div class="w-16 h-16 rounded border border-border bg-foreground/5 flex items-center justify-center cursor-pointer hover:bg-foreground/10 transition-colors">
-															<svg class="w-5 h-5 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<div class="learn-lightbox-trigger w-24 h-24 rounded border border-border bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 hover:border-accent/40 transition-all" data-label={`${course.code} Assignment ${n}`}>
+															<svg class="w-7 h-7 text-foreground-muted mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 															</svg>
+															<span class="text-[10px] text-foreground-muted">Assignment {n}</span>
 														</div>
 													</div>
 												))}
@@ -289,3 +294,62 @@ const resources = [
 	<Footer />
 	<ImageLightbox />
 </BaseLayout>
+
+<script>
+	// Make placeholder thumbnails clickable with a lightbox-style overlay
+	const initLearnLightbox = () => {
+		const triggers = document.querySelectorAll('.learn-lightbox-trigger');
+		const lightbox = document.getElementById('lightbox');
+		const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
+		const imageWrapper = document.getElementById('image-wrapper');
+
+		triggers.forEach((trigger) => {
+			trigger.addEventListener('click', () => {
+				if (!lightbox || !lightboxImage || !imageWrapper) return;
+
+				const label = (trigger as HTMLElement).dataset.label || 'Preview';
+
+				// Create a placeholder canvas for the lightbox
+				const canvas = document.createElement('canvas');
+				canvas.width = 800;
+				canvas.height = 1000;
+				const ctx = canvas.getContext('2d');
+				if (ctx) {
+					// Draw placeholder background
+					const isDark = document.documentElement.classList.contains('dark');
+					ctx.fillStyle = isDark ? '#1a1a1a' : '#f0f0f0';
+					ctx.fillRect(0, 0, 800, 1000);
+
+					// Draw border
+					ctx.strokeStyle = isDark ? '#333' : '#ccc';
+					ctx.lineWidth = 2;
+					ctx.strokeRect(20, 20, 760, 960);
+
+					// Draw label
+					ctx.fillStyle = isDark ? '#888' : '#666';
+					ctx.font = '24px system-ui, sans-serif';
+					ctx.textAlign = 'center';
+					ctx.fillText(label, 400, 480);
+					ctx.font = '16px system-ui, sans-serif';
+					ctx.fillText('Content coming soon', 400, 520);
+				}
+
+				lightboxImage.src = canvas.toDataURL();
+				lightboxImage.alt = label;
+
+				lightbox.classList.remove('invisible', 'opacity-0');
+				lightbox.classList.add('visible', 'opacity-100');
+
+				requestAnimationFrame(() => {
+					imageWrapper?.classList.remove('opacity-0', 'scale-90');
+					imageWrapper?.classList.add('opacity-100', 'scale-100');
+				});
+
+				document.body.style.overflow = 'hidden';
+			});
+		});
+	};
+
+	initLearnLightbox();
+	document.addEventListener('astro:after-swap', initLearnLightbox);
+</script>
