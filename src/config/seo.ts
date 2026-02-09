@@ -88,8 +88,8 @@ export function getCodePageSEO(): PageSEO {
 export function getLearnPageSEO(): PageSEO {
   return {
     title: `Learn | ${SITE.author.name}`,
-    description: `Tutorials and resources for 3D character workflows. Maya and character modeling instruction by ${SITE.author.name}.`,
-    keywords: 'Tutorials, Education, Learn, Maya, Character Modeling, 3D Workflows'
+    description: `Academia and creative education by ${SITE.author.name}. Curriculum development, student showcase, and teaching resources for 3D character art and pipeline development.`,
+    keywords: 'Education, Academia, Curriculum, Teaching, Maya, Character Modeling, 3D Workflows, Pipeline Development, Student Showcase, Tutorials'
   };
 }
 

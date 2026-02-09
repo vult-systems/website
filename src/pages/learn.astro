@@ -2,10 +2,94 @@
 import BaseLayout from '@/layouts/base-layout.astro';
 import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
-import ComingSoonSection from '@/components/sections/coming-soon-section.astro';
+import PageMain from '@/components/layout/page-main.astro';
+import PageContainer from '@/components/layout/page-container.astro';
+import Heading from '@/components/ui/heading.astro';
+import Text from '@/components/ui/text.astro';
+import Link from '@/components/ui/link.astro';
+import Badge from '@/components/ui/badge.astro';
+import Card from '@/components/ui/card.astro';
 import { getLearnPageSEO } from '@/config/seo';
+import { SITE } from '@/config/site';
 
 const seo = getLearnPageSEO();
+
+// Course data
+const courses = [
+	{
+		code: 'ARTD 3340',
+		title: '3D Modeling & Sculpting',
+		description: 'Fundamentals of polygonal modeling and digital sculpting. Students build a strong foundation in topology, form language, and production-ready meshes using Maya and ZBrush.',
+		tags: ['Maya', 'ZBrush', 'Modeling'],
+	},
+	{
+		code: 'ARTD 3341',
+		title: '3D Character Creation',
+		description: 'Character modeling from concept to final render. Covers anatomy, facial modeling, hair/cloth systems, and presentation techniques for portfolio-ready character work.',
+		tags: ['Character Art', 'Maya', 'Substance'],
+	},
+	{
+		code: 'ARTD 4340',
+		title: 'Advanced 3D & Pipeline Development',
+		description: 'Senior-level course exploring real-time workflows, scripting for artists, and pipeline thinking. Students build tools, optimize assets, and develop professional production strategies.',
+		tags: ['Pipeline', 'Python', 'UE5'],
+	},
+];
+
+// Resources
+const resources = [
+	{
+		category: 'Modeling & Sculpting',
+		items: [
+			{ name: 'Maya', description: 'Primary DCC for modeling, rigging, and animation' },
+			{ name: 'ZBrush', description: 'High-resolution digital sculpting and detailing' },
+			{ name: 'Blender', description: 'Open-source 3D creation suite' },
+		],
+	},
+	{
+		category: 'Texturing & Materials',
+		items: [
+			{ name: 'Substance 3D Painter', description: 'PBR texturing and material authoring' },
+			{ name: 'Substance 3D Designer', description: 'Procedural material creation' },
+			{ name: 'Marmoset Toolbag', description: 'Real-time rendering and baking' },
+		],
+	},
+	{
+		category: 'Engine & Real-Time',
+		items: [
+			{ name: 'Unreal Engine 5', description: 'Real-time rendering, Nanite, Lumen, and MetaHumans' },
+			{ name: 'Unity', description: 'Cross-platform real-time engine' },
+		],
+	},
+	{
+		category: 'Pipeline & Scripting',
+		items: [
+			{ name: 'Python', description: 'Scripting for Maya, pipeline tools, and automation' },
+			{ name: 'MEL', description: 'Maya Embedded Language for quick automation' },
+			{ name: 'Git', description: 'Version control for collaborative projects' },
+		],
+	},
+];
+
+// Teaching philosophy pillars
+const philosophyPillars = [
+	{
+		title: 'Fundamentals First',
+		description: 'Strong foundations in form, anatomy, and topology inform every creative decision. Master the basics before chasing trends.',
+	},
+	{
+		title: 'Pipeline Thinking',
+		description: 'Understanding the full production pipeline—from concept to engine—makes artists more versatile and employable.',
+	},
+	{
+		title: 'Learn by Making',
+		description: 'Every class is project-driven. Students build real portfolio pieces, not just exercises. The work should speak for itself.',
+	},
+	{
+		title: 'Industry-Aligned',
+		description: 'Curriculum is designed around current industry standards and workflows. What you learn here transfers directly to the studio floor.',
+	},
+];
 ---
 
 <BaseLayout 
@@ -13,14 +97,154 @@ const seo = getLearnPageSEO();
 	description={seo.description}
 	keywords={seo.keywords}
 >
-<Header />
-	<main class="min-h-screen w-full text-foreground">
-		<div class="relative z-10">
-			<ComingSoonSection 
-				title="Learn" 
-				description="Tutorials for Maya, character modeling, and 3D workflows."
-			/>
+	<Header />
+	<PageMain class="text-foreground">
+		<div class="relative z-10 w-full py-24 sm:py-32">
+			<PageContainer>
+				
+				<!-- Page Header -->
+				<div class="mb-16">
+					<Heading level={1} size="4xl" class="mb-4">
+						Learn
+					</Heading>
+					<Text size="lg" variant="secondary" class="max-w-3xl">
+						I teach 3D character art and pipeline development at the university level—building curriculum 
+						that connects studio craft with the systems thinking needed for modern production.
+					</Text>
+				</div>
+
+				<!-- Teaching Philosophy -->
+				<section class="mb-20">
+					<Heading level={2} size="2xl" class="mb-2">
+						Teaching Philosophy
+					</Heading>
+					<Text variant="secondary" class="mb-8 max-w-3xl">
+						My approach to creative education is rooted in building artists who can think, not just execute. 
+						Making, method, and mindset—all three matter.
+					</Text>
+					
+					<div class="grid sm:grid-cols-2 gap-6">
+						{philosophyPillars.map((pillar) => (
+							<Card variant="bordered" padding="lg">
+								<Heading level={3} size="lg" class="mb-3">
+									{pillar.title}
+								</Heading>
+								<Text variant="secondary" size="sm">
+									{pillar.description}
+								</Text>
+							</Card>
+						))}
+					</div>
+				</section>
+
+				<!-- Courses / Curriculum -->
+				<section class="mb-20">
+					<Heading level={2} size="2xl" class="mb-2">
+						Curriculum
+					</Heading>
+					<Text variant="secondary" class="mb-8 max-w-3xl">
+						Courses I've developed and taught, covering the full arc from introductory modeling through 
+						advanced production pipelines.
+					</Text>
+
+					<div class="space-y-6">
+						{courses.map((course) => (
+							<Card variant="bordered" padding="lg">
+								<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+									<div class="flex-1">
+										<div class="flex items-center gap-3 mb-2">
+											<Badge variant="accent" size="sm">{course.code}</Badge>
+											<Heading level={3} size="lg">
+												{course.title}
+											</Heading>
+										</div>
+										<Text variant="secondary" size="sm" class="mb-3">
+											{course.description}
+										</Text>
+										<div class="flex flex-wrap gap-2">
+											{course.tags.map((tag) => (
+												<Badge variant="outline" size="sm">{tag}</Badge>
+											))}
+										</div>
+									</div>
+								</div>
+							</Card>
+						))}
+					</div>
+				</section>
+
+				<!-- Student Showcase -->
+				<section class="mb-20">
+					<Heading level={2} size="2xl" class="mb-2">
+						Student Showcase
+					</Heading>
+					<Text variant="secondary" class="mb-8 max-w-3xl">
+						Highlights from student work across my courses. These artists came in with curiosity and left 
+						with portfolio-ready pieces and a real understanding of production workflows.
+					</Text>
+					
+					<Card variant="bordered" padding="lg">
+						<div class="text-center py-8">
+							<Text variant="muted" size="lg" class="mb-2">
+								Coming Soon
+							</Text>
+							<Text variant="secondary" size="sm">
+								Student showcase gallery is currently being curated.
+							</Text>
+						</div>
+					</Card>
+				</section>
+
+				<!-- Tools & Resources -->
+				<section class="mb-20">
+					<Heading level={2} size="2xl" class="mb-2">
+						Tools & Resources
+					</Heading>
+					<Text variant="secondary" class="mb-8 max-w-3xl">
+						Software, tools, and technologies used across my courses. This is the stack students work with to 
+						build industry-relevant skills.
+					</Text>
+
+					<div class="grid sm:grid-cols-2 gap-6">
+						{resources.map((group) => (
+							<Card variant="bordered" padding="lg">
+								<Heading level={3} size="lg" class="mb-4">
+									{group.category}
+								</Heading>
+								<div class="space-y-3">
+									{group.items.map((item) => (
+										<div>
+											<Text variant="primary" size="sm" class="font-medium">
+												{item.name}
+											</Text>
+											<Text variant="muted" size="sm">
+												{item.description}
+											</Text>
+										</div>
+									))}
+								</div>
+							</Card>
+						))}
+					</div>
+				</section>
+
+				<!-- CTA -->
+				<section class="pt-8 border-t-2 border-foreground-secondary/10">
+					<Text variant="secondary" class="mb-4">
+						Interested in collaborating on curriculum, workshops, or guest lectures?
+					</Text>
+					<div class="flex gap-4">
+						<Link href="/about" variant="accent">
+							Get in Touch >
+						</Link>
+						<Link href="/art" variant="accent">
+							View My Work >
+						</Link>
+					</div>
+				</section>
+
+			</PageContainer>
 		</div>
-	</main>
-<Footer />
+	</PageMain>
+	<Footer />
 </BaseLayout>
