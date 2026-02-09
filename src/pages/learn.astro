@@ -9,13 +9,54 @@ import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
 import Badge from '@/components/ui/badge.astro';
 import Card from '@/components/ui/card.astro';
+import ImageLightbox from '@/components/ui/image-lightbox.astro';
+import { Image } from 'astro:assets';
 import { getLearnPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
 
 const seo = getLearnPageSEO();
 
+// -------------------------------------------------------------------
+// Syllabus & Assignment Images
+// -------------------------------------------------------------------
+// To add a syllabus thumbnail for a course:
+//   1. Drop a screenshot/image into src/assets/learn/syllabi/
+//      e.g. angd-1312-syllabus.png
+//   2. Import it here:
+//      import syllabus1312 from '@/assets/learn/syllabi/angd-1312-syllabus.png';
+//   3. Add it to the matching course below:
+//      { code: 'ANGD 1312', title: '...', syllabus: syllabus1312 }
+//
+// To add assignment thumbnails for a course:
+//   1. Drop images into src/assets/learn/assignments/
+//      e.g. angd-1312-assign-01.png
+//   2. Import them here:
+//      import assign1312_01 from '@/assets/learn/assignments/angd-1312-assign-01.png';
+//   3. Add them to the matching course:
+//      { code: 'ANGD 1312', title: '...', assignments: [
+//          { image: assign1312_01, title: 'Assignment 1' },
+//      ]}
+// -------------------------------------------------------------------
+
+interface CourseAssignment {
+	image: ImageMetadata;
+	title: string;
+}
+
+interface Course {
+	code: string;
+	title: string;
+	syllabus?: ImageMetadata;
+	assignments?: CourseAssignment[];
+}
+
+interface CurriculumYear {
+	year: string;
+	courses: Course[];
+}
+
 // Curriculum organized by year
-const curriculum = [
+const curriculum: CurriculumYear[] = [
 	{
 		year: 'Freshman',
 		courses: [
@@ -135,12 +176,44 @@ const resources = [
 								<Heading level={3} size="lg" class="mb-4">
 									{level.year}
 								</Heading>
-								<div class="grid sm:grid-cols-2 gap-3">
+								<div class="space-y-3">
 									{level.courses.map((course) => (
 										<Card variant="bordered" padding="sm">
-											<div class="flex items-center gap-3">
-												<Badge variant="accent" size="sm">{course.code}</Badge>
-												<Text variant="primary" size="sm">{course.title}</Text>
+											<div class="flex items-start gap-4">
+												{/* Syllabus Thumbnail */}
+												{course.syllabus && (
+													<div class="flex-shrink-0">
+														<Image
+															src={course.syllabus}
+															alt={`${course.code} Syllabus`}
+															width={80}
+															height={104}
+															class="rounded border border-border object-cover cursor-pointer hover:opacity-80 transition-opacity"
+															style="aspect-ratio: 3/4;"
+														/>
+													</div>
+												)}
+												<div class="flex-1 min-w-0">
+													<div class="flex items-center gap-3 mb-1">
+														<Badge variant="accent" size="sm">{course.code}</Badge>
+														<Text variant="primary" size="sm">{course.title}</Text>
+													</div>
+													{/* Assignment Thumbnails */}
+													{course.assignments && course.assignments.length > 0 && (
+														<div class="flex gap-2 mt-3 flex-wrap">
+															{course.assignments.map((assignment) => (
+																<Image
+																	src={assignment.image}
+																	alt={`${course.code} - ${assignment.title}`}
+																	width={72}
+																	height={72}
+																	class="rounded border border-border object-cover cursor-pointer hover:opacity-80 transition-opacity"
+																	style="aspect-ratio: 1;"
+																/>
+															))}
+														</div>
+													)}
+												</div>
 											</div>
 										</Card>
 									))}
@@ -224,4 +297,5 @@ const resources = [
 		</div>
 	</PageMain>
 	<Footer />
+	<ImageLightbox />
 </BaseLayout>
