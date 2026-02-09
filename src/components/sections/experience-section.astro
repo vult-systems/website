@@ -10,11 +10,7 @@ import uiw3dLogoWht from '@/assets/logos/uiw3d-horiz-logo-wht.png';
 import logo343iWht from '@/assets/logos/343i-logo-wht.png';
 import biowareLogoWht from '@/assets/logos/bioware-logo-wht.png';
 import disneyLogoWht from '@/assets/logos/walt-disney-logo-wht.png';
-import qualcommLogoWht from '@/assets/logos/qualcomm-logo-wht.png';
-import mergeVrLogoWht from '@/assets/logos/merge-vr-logo-wht.png';
-import usafaLogoWht from '@/assets/logos/usafa-logo-wht.png';
 import newtekLogoWht from '@/assets/logos/newtek-logo-wht.png';
-import losAlamosLogoWht from '@/assets/logos/losalamos-logo-wht.png';
 
 // Import logo images - black versions (for light mode)
 import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
@@ -22,11 +18,13 @@ import uiw3dLogoBlk from '@/assets/logos/uiw3d-horiz-logo-blk.png';
 import logo343iBlk from '@/assets/logos/343i-logo-blk.png';
 import biowareLogoBlk from '@/assets/logos/bioware-logo-blk.png';
 import disneyLogoBlk from '@/assets/logos/walt-disney-logo-blk.png';
-import qualcommLogoBlk from '@/assets/logos/qualcomm-logo-blk.png';
-import mergeVrLogoBlk from '@/assets/logos/merge-vr-logo-blk.png';
-import usafaLogoBlk from '@/assets/logos/usafa-logo-blk.png';
 import newtekLogoBlk from '@/assets/logos/newtek-logo-blk.png';
-import losAlamosLogoBlk from '@/assets/logos/losalamos-logo-blk.png';
+
+// Import colored logos (used in both light and dark modes)
+import qualcommLogoClr from '@/assets/logos/qualcomm-logo-clr.png';
+import mergeVrLogoClr from '@/assets/logos/merge-vr-logo-clr.png';
+import usafaLogoClr from '@/assets/logos/usafa-logo-clr.png';
+import losAlamosLogoClr from '@/assets/logos/losalamos-logo-clr.png';
 
 interface Logo {
   name: string;
@@ -47,13 +45,13 @@ const defaultLogos: Logo[] = [
   { name: 'UIW 3D', imageLight: uiw3dLogoBlk, imageDark: uiw3dLogoWht },
   { name: '343 Industries', imageLight: logo343iBlk, imageDark: logo343iWht },
   { name: 'BioWare', imageLight: biowareLogoBlk, imageDark: biowareLogoWht },
-  { name: 'Qualcomm', imageLight: qualcommLogoBlk, imageDark: qualcommLogoWht },
+  { name: 'Qualcomm', imageLight: qualcommLogoClr, imageDark: qualcommLogoClr },
   // Row 2
   { name: 'Walt Disney', imageLight: disneyLogoBlk, imageDark: disneyLogoWht },
-  { name: 'Merge VR', imageLight: mergeVrLogoBlk, imageDark: mergeVrLogoWht },
-  { name: 'US Air Force Academy', imageLight: usafaLogoBlk, imageDark: usafaLogoWht },
+  { name: 'Merge VR', imageLight: mergeVrLogoClr, imageDark: mergeVrLogoClr },
+  { name: 'US Air Force Academy', imageLight: usafaLogoClr, imageDark: usafaLogoClr },
   { name: 'NewTek', imageLight: newtekLogoBlk, imageDark: newtekLogoWht },
-  { name: 'Los Alamos', imageLight: losAlamosLogoBlk, imageDark: losAlamosLogoWht },
+  { name: 'Los Alamos', imageLight: losAlamosLogoClr, imageDark: losAlamosLogoClr },
 ];
 
 const {
