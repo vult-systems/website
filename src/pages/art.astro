@@ -5,8 +5,12 @@ import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
 import PageMain from '@/components/layout/page-main.astro';
 import PageContainer from '@/components/layout/page-container.astro';
-import PageHeader from '@/components/layout/page-header.astro';
-import ArtGrid from '@/components/art/art-grid.astro';
+import Heading from '@/components/ui/heading.astro';
+import Text from '@/components/ui/text.astro';
+import Link from '@/components/ui/link.astro';
+import Badge from '@/components/ui/badge.astro';
+import Card from '@/components/ui/card.astro';
+import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { getArtPageSEO } from '@/config/seo';
 
 const artPieces = (await getCollection('art')).sort((a, b) => a.data.order - b.data.order);
@@ -15,10 +19,23 @@ const artData = artPieces.map(piece => ({
 	title: piece.data.title,
 	description: piece.data.description,
 	heroImage: typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src,
-	category: piece.data.category
+	category: piece.data.category,
+	tags: piece.data.tags,
+	tools: piece.data.tools,
+	featured: piece.data.featured,
 }));
 
-const isEmpty = artData.length === 0;
+// Build category list
+const categoryLabels: Record<string, string> = {
+	'character': 'Character',
+	'3d': '3D / Hard Surface',
+	'environment': 'Environment',
+	'digital': 'Digital',
+	'concept': 'Concept',
+	'abstract': 'Abstract',
+};
+const usedCategories = [...new Set(artData.map(p => p.category))];
+
 const seo = getArtPageSEO();
 ---
 
@@ -31,22 +48,148 @@ const seo = getArtPageSEO();
 	<PageMain class="text-foreground">
 		<div class="relative z-10 w-full py-24 sm:py-32">
 			<PageContainer>
-				<PageHeader
-					title="Art"
-					description="Professional, personal, and 3D explorations"
-				/>
 				
-				{isEmpty ? (
-					<div class="text-center py-16">
-						<p class="text-foreground-muted text-lg">
-							No artwork yet. Check back soon.
-						</p>
+				<!-- Page Header -->
+				<div class="mb-16">
+					<Heading level={1} size="4xl" class="mb-4">
+						Art
+					</Heading>
+					<Text size="lg" variant="secondary" class="mb-4">
+						A collection of professional, personal, and exploratory 3D work. These pieces span client projects, 
+						studio collaborations, and self-directed studies across character art, hard surface modeling, and real-time rendering.
+					</Text>
+					<Text size="lg" variant="secondary">
+						Each project links to a full breakdown with renders, wireframes, and process notes where available.
+					</Text>
+				</div>
+
+				<!-- Tab Navigation -->
+				<div class="mb-10">
+					<div class="flex gap-6 border-b-2 border-foreground-secondary/10">
+						<button class="art-tab pb-3 text-base text-accent border-b-2 border-accent -mb-[2px] transition-colors" data-filter="all" style="font-family: 'Besley', serif !important;">
+							All
+						</button>
+						{usedCategories.map((cat) => (
+							<button class="art-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-filter={cat} style="font-family: 'Besley', serif !important;">
+								{categoryLabels[cat] || cat}
+							</button>
+						))}
 					</div>
-				) : (
-					<ArtGrid artPieces={artData} />
-				)}
+				</div>
+
+				<!-- Art Grid -->
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="art-grid">
+					{artData.map((piece) => (
+						<div class="art-item" data-category={piece.category}>
+							<Card padding="none" interactive href={`/art/${piece.slug}`}>
+								<div class="relative aspect-[4/3] overflow-hidden">
+									{piece.heroImage && (
+										<img
+											src={piece.heroImage}
+											alt={piece.title}
+											class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+											loading="lazy"
+											data-no-lightbox
+										/>
+									)}
+								</div>
+								<div class="p-6 space-y-3">
+									<Heading level={3} size="lg" class="line-clamp-2">
+										{piece.title}
+									</Heading>
+									{piece.description && (
+										<Text size="sm" variant="secondary" class="line-clamp-2">
+											{piece.description}
+										</Text>
+									)}
+									<div class="flex flex-wrap gap-2">
+										<Badge size="sm">{categoryLabels[piece.category] || piece.category}</Badge>
+										{piece.tools?.slice(0, 3).map((tool) => (
+											<Badge size="sm" variant="accent">{tool}</Badge>
+										))}
+									</div>
+								</div>
+							</Card>
+						</div>
+					))}
+				</div>
+
+				<!-- CTA -->
+				<section class="mt-16 pt-8 border-t-2 border-foreground-secondary/10">
+					<Text variant="secondary" class="mb-4">
+						Interested in working together or seeing more of my process?
+					</Text>
+					<div class="flex gap-4">
+						<Link href="/about" variant="accent">
+							Get in Touch >
+						</Link>
+						<Link href="/learn" variant="accent">
+							Teaching >
+						</Link>
+					</div>
+				</section>
+
 			</PageContainer>
 		</div>
 	</PageMain>
 	<Footer />
+	<ImageLightbox />
 </BaseLayout>
+
+<style>
+	.art-item {
+		transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	.art-item.filtering-out {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+
+	.art-item.hidden {
+		display: none;
+	}
+</style>
+
+<script>
+	const initArtTabs = () => {
+		const tabs = document.querySelectorAll('.art-tab');
+		const artItems = document.querySelectorAll('.art-item');
+
+		tabs.forEach((tab) => {
+			tab.addEventListener('click', () => {
+				const filter = (tab as HTMLElement).dataset.filter;
+
+				// Update tab styles
+				tabs.forEach((t) => {
+					t.classList.remove('text-accent', 'border-accent');
+					t.classList.add('text-foreground-secondary', 'border-transparent');
+				});
+				tab.classList.remove('text-foreground-secondary', 'border-transparent');
+				tab.classList.add('text-accent', 'border-accent');
+
+				// Fade out all items
+				artItems.forEach((item) => {
+					item.classList.add('filtering-out');
+				});
+
+				// After fade, show/hide by category
+				setTimeout(() => {
+					artItems.forEach((item) => {
+						const category = item.getAttribute('data-category');
+						if (filter === 'all' || category === filter) {
+							item.classList.remove('hidden', 'filtering-out');
+						} else {
+							item.classList.add('hidden');
+							item.classList.remove('filtering-out');
+						}
+					});
+				}, 300);
+			});
+		});
+	};
+
+	initArtTabs();
+</script>
