@@ -4,21 +4,34 @@ import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
 import { Image } from 'astro:assets';
 
-// Import logo images
-import vultLogo from '@/assets/logos/vult-logo-wht.png';
-import uiw3dLogo from '@/assets/logos/uiw3d-horiz-logo-wht.png';
-import logo343i from '@/assets/logos/343i-logo-wht.png';
-import biowareLogo from '@/assets/logos/bioware-logo-wht.png';
-import disneyLogo from '@/assets/logos/walt-disney-logo-wht.png';
-import qualcommLogo from '@/assets/logos/qualcomm-logo-clr.png';
-import mergeVrLogo from '@/assets/logos/merge-vr-logo-clr.png';
-import usafaLogo from '@/assets/logos/usafa-logo-clr.png';
-import newtekLogo from '@/assets/logos/newtek-logo-wht.png';
-import losAlamosLogo from '@/assets/logos/losalamos-logo-clr.png';
+// Import logo images - white versions (for dark mode)
+import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
+import uiw3dLogoWht from '@/assets/logos/uiw3d-horiz-logo-wht.png';
+import logo343iWht from '@/assets/logos/343i-logo-wht.png';
+import biowareLogoWht from '@/assets/logos/bioware-logo-wht.png';
+import disneyLogoWht from '@/assets/logos/walt-disney-logo-wht.png';
+import qualcommLogoWht from '@/assets/logos/qualcomm-logo-wht.png';
+import mergeVrLogoWht from '@/assets/logos/merge-vr-logo-wht.png';
+import usafaLogoWht from '@/assets/logos/usafa-logo-wht.png';
+import newtekLogoWht from '@/assets/logos/newtek-logo-wht.png';
+import losAlamosLogoWht from '@/assets/logos/losalamos-logo-wht.png';
+
+// Import logo images - black versions (for light mode)
+import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
+import uiw3dLogoBlk from '@/assets/logos/uiw3d-horiz-logo-blk.png';
+import logo343iBlk from '@/assets/logos/343i-logo-blk.png';
+import biowareLogoBlk from '@/assets/logos/bioware-logo-blk.png';
+import disneyLogoBlk from '@/assets/logos/walt-disney-logo-blk.png';
+import qualcommLogoBlk from '@/assets/logos/qualcomm-logo-blk.png';
+import mergeVrLogoBlk from '@/assets/logos/merge-vr-logo-blk.png';
+import usafaLogoBlk from '@/assets/logos/usafa-logo-blk.png';
+import newtekLogoBlk from '@/assets/logos/newtek-logo-blk.png';
+import losAlamosLogoBlk from '@/assets/logos/losalamos-logo-blk.png';
 
 interface Logo {
   name: string;
-  image: ImageMetadata;
+  imageLight: ImageMetadata; // Black logo for light mode
+  imageDark: ImageMetadata;  // White logo for dark mode
 }
 
 interface Props {
@@ -30,17 +43,17 @@ interface Props {
 
 const defaultLogos: Logo[] = [
   // Row 1
-  { name: 'Vult Systems', image: vultLogo },
-  { name: 'UIW 3D', image: uiw3dLogo },
-  { name: '343 Industries', image: logo343i },
-  { name: 'BioWare', image: biowareLogo },
-  { name: 'Qualcomm', image: qualcommLogo },
+  { name: 'Vult Systems', imageLight: vultLogoBlk, imageDark: vultLogoWht },
+  { name: 'UIW 3D', imageLight: uiw3dLogoBlk, imageDark: uiw3dLogoWht },
+  { name: '343 Industries', imageLight: logo343iBlk, imageDark: logo343iWht },
+  { name: 'BioWare', imageLight: biowareLogoBlk, imageDark: biowareLogoWht },
+  { name: 'Qualcomm', imageLight: qualcommLogoBlk, imageDark: qualcommLogoWht },
   // Row 2
-  { name: 'Walt Disney', image: disneyLogo },
-  { name: 'Merge VR', image: mergeVrLogo },
-  { name: 'US Air Force Academy', image: usafaLogo },
-  { name: 'NewTek', image: newtekLogo },
-  { name: 'Los Alamos', image: losAlamosLogo },
+  { name: 'Walt Disney', imageLight: disneyLogoBlk, imageDark: disneyLogoWht },
+  { name: 'Merge VR', imageLight: mergeVrLogoBlk, imageDark: mergeVrLogoWht },
+  { name: 'US Air Force Academy', imageLight: usafaLogoBlk, imageDark: usafaLogoWht },
+  { name: 'NewTek', imageLight: newtekLogoBlk, imageDark: newtekLogoWht },
+  { name: 'Los Alamos', imageLight: losAlamosLogoBlk, imageDark: losAlamosLogoWht },
 ];
 
 const {
@@ -80,11 +93,24 @@ const {
             "flex items-center",
             index === 0 ? "justify-start" : index === 4 ? "justify-end" : "justify-center"
           ]}>
+            {/* Light mode logo (black) */}
             <Image 
-              src={logo.image} 
+              src={logo.imageLight} 
               alt={logo.name}
               class:list={[
-                "object-contain pointer-events-none select-none",
+                "object-contain pointer-events-none select-none dark:hidden",
+                index === 0 || index === 3 ? "h-6 sm:h-8 md:h-10" :
+                index === 1 ? "h-16 sm:h-20 md:h-24" :
+                index === 4 ? "h-10 sm:h-12 md:h-14" : "h-8 sm:h-10 md:h-12"
+              ]}
+              loading="lazy"
+            />
+            {/* Dark mode logo (white) */}
+            <Image 
+              src={logo.imageDark} 
+              alt={logo.name}
+              class:list={[
+                "object-contain pointer-events-none select-none hidden dark:block",
                 index === 0 || index === 3 ? "h-6 sm:h-8 md:h-10" :
                 index === 1 ? "h-16 sm:h-20 md:h-24" :
                 index === 4 ? "h-10 sm:h-12 md:h-14" : "h-8 sm:h-10 md:h-12"
@@ -101,11 +127,22 @@ const {
             "flex items-center",
             index === 0 ? "justify-start" : "justify-center"
           ]}>
+            {/* Light mode logo (black) */}
             <Image 
-              src={logo.image} 
+              src={logo.imageLight} 
               alt={logo.name}
               class:list={[
-                "object-contain pointer-events-none select-none",
+                "object-contain pointer-events-none select-none dark:hidden",
+                index === 0 ? "h-12 sm:h-14 md:h-16" : "h-8 sm:h-10 md:h-12"
+              ]}
+              loading="lazy"
+            />
+            {/* Dark mode logo (white) */}
+            <Image 
+              src={logo.imageDark} 
+              alt={logo.name}
+              class:list={[
+                "object-contain pointer-events-none select-none hidden dark:block",
                 index === 0 ? "h-12 sm:h-14 md:h-16" : "h-8 sm:h-10 md:h-12"
               ]}
               loading="lazy"
