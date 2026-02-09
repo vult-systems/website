@@ -58,8 +58,8 @@
 
   // Add click listeners to all images with lightbox capability
   const initializeLightbox = () => {
-    // Select all images in content areas (excluding nav/header/footer UI)
-    const lightboxImages = document.querySelectorAll('img:not(header img):not(nav img):not(footer img)');
+    // Select all images in content areas (excluding nav/header/footer UI and opt-outs)
+    const lightboxImages = document.querySelectorAll('img:not(header img):not(nav img):not(footer img):not([data-no-lightbox])');
     
     lightboxImages.forEach((img) => {
       const imageElement = img as HTMLImageElement;
