@@ -7,11 +7,141 @@ import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
 import Badge from '@/components/ui/badge.astro';
+import Button from '@/components/ui/button.astro';
+import Card from '@/components/ui/card.astro';
 import profileImg from '@/assets/profile/profile.jpg';
 import { getAboutPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
 
 const seo = getAboutPageSEO();
+
+interface ExperienceEntry {
+	title: string;
+	company: string;
+	dates: string;
+	bullets: string[];
+}
+
+const professionalExperience: ExperienceEntry[] = [
+	{
+		title: '3D Character Modeling (Contract)',
+		company: '343 Industries',
+		dates: '06/2023 - 08/2023',
+		bullets: [
+			'Worked closely with the Character Art Lead and Character artists to create believable sci-fi armors',
+			'Created armor sets for the customization content for Season 5 & 6 "Cyber Showdown" operation launch specifically for the Chimera Spartan Core',
+			'Demonstrated expertise in utilizing Maya and ZBrush creating hard-surface armor utilizing 343I\'s internal Crease Set workflow',
+		],
+	},
+	{
+		title: 'Lead Character Artist (Contract)',
+		company: 'BioWare',
+		dates: '08/2021 - 11/2021',
+		bullets: [
+			'Worked closely with Tech Art and Leads to push the Modernization efforts for the 3D Character Art Pipeline',
+			'Created Platinum Armor Sets for the Monetization Team',
+			'Converted ILM Character Assets to SWTOR\'s character specifications',
+			'Directed internal character team to maintain new practices and onboarded junior artist',
+		],
+	},
+	{
+		title: 'Lead Character Artist / Character Supervisor',
+		company: 'Qualcomm',
+		dates: '06/2018 - 01/2022',
+		bullets: [
+			'Developed internal Cinematic/Marketing/Real-time character pipelines',
+			'Directed internal character team to maintain consistency throughout multiple development cycles',
+			'Created and Optimized 3D characters for runtime on various platforms and devices',
+		],
+	},
+	{
+		title: 'Lead Character Artist (Contract)',
+		company: 'Merge Labs, Inc',
+		dates: '05/2017 - 10/2017',
+		bullets: [
+			'Created characters and props for AR/VR projects',
+			'Optimized characters for runtime on several devices and platforms',
+			'Asset setup in Unity including Mesh, Skeleton, Shader/Material, and LOD setup',
+		],
+	},
+	{
+		title: '3D Character Artist and Generalist',
+		company: 'Spoon Designs, LLC',
+		dates: '11/2013 - 08/2017',
+		bullets: [
+			'Modeling Supervisor on several projects',
+			'Developed pipeline for various Real-Time and Pre-Rendered content',
+			'Optimized game assets for Unity ported projects',
+			'Asset setup and integration within Unity and Unreal Engine',
+		],
+	},
+	{
+		title: '3D Character Artist and Generalist',
+		company: 'Booz Allen Hamilton',
+		dates: '05/2015 - 12/2015',
+		bullets: [
+			'Hard-Surface asset creation for military tech simulations and games',
+			'Optimized game assets for Unity ported projects',
+			'Asset setup and integration within Unity',
+		],
+	},
+	{
+		title: '3D Character Artist (Talent Development)',
+		company: 'Walt Disney Animation Studio',
+		dates: '06/2015 - 08/2015',
+		bullets: [
+			'Sculpted character for feature ready production pipeline',
+			'Optimized character with production ready topology',
+			'Look Development for both Characters and Props',
+			'Developed a short-film from concept to final film',
+		],
+	},
+];
+
+const academicExperience: ExperienceEntry[] = [
+	{
+		title: 'Instructor & Modeling Concentration Coordinator',
+		company: 'University of the Incarnate Word',
+		dates: '08/2022 - Present',
+		bullets: [
+			'Redefined Modeling Curriculum, ensuring alignment with industry standards',
+			'Recruited, interviewed, and onboarded additional modeling faculty',
+			'Provided comprehensive advising to students as their core Faculty Advisor and Instructor',
+			'Designed, Created, and Instructed modeling course content for all cohorts and productions',
+		],
+	},
+	{
+		title: 'Vice President and Instructor',
+		company: 'Class Creatives, Inc',
+		dates: '09/2019 - 12/2021',
+		bullets: [],
+	},
+	{
+		title: 'Part-time Instructor (Spring)',
+		company: 'Kajaani University, Ketunpolku, Finland',
+		dates: '09/2019 - 05/2020',
+		bullets: [],
+	},
+];
+
+interface Education {
+	degree: string;
+	school: string;
+	dates: string;
+}
+
+const education: Education[] = [
+	{
+		degree: 'Master of Game Development (MGD), Game Environment Arts',
+		school: 'University of the Incarnate Word',
+		dates: '08/2023 - Present',
+	},
+	{
+		degree: 'Bachelors of Fine Arts (BFA), 3D Animation and Game Design',
+		school: 'University of the Incarnate Word',
+		dates: '01/2013 - 08/2017',
+	},
+];
 ---
 
 <BaseLayout 
@@ -72,6 +202,18 @@ const seo = getAboutPageSEO();
 									</div>
 								</div>
 							</div>
+
+							<!-- Download Resume -->
+							<div class="pt-4">
+								<Button variant="outline" size="base" href="/CarlosGarcia_Resume_2026.pdf">
+									<span class="flex items-center gap-2">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+										</svg>
+										Download Resume (PDF)
+									</span>
+								</Button>
+							</div>
 						</div>
 					</div>
 
@@ -99,33 +241,79 @@ const seo = getAboutPageSEO();
 								bridging the gap between creative intent and technical implementation.
 							</Text>
 						</div>
-						
-						<!-- Teaching & Education -->
+
+						<!-- Professional Experience -->
 						<div>
-							<Heading level={2} size="2xl" class="mb-4">Teaching & Education</Heading>
-							<Text variant="secondary" class="leading-relaxed mb-4">
-								I'm passionate about creative education and helping artists develop both their craft and their 
-								understanding of the underlying systems. My teaching focuses on building strong fundamentals while 
-								exploring the why behind techniques and workflows.
-							</Text>
-							<Text variant="secondary" class="leading-relaxed">
-								I believe in teaching that connects making, method, and mindset—helping artists build with intention 
-								and understand the full context of their creative decisions.
-							</Text>
+							<Heading level={2} size="2xl" class="mb-6">Professional Experience</Heading>
+							<div class="space-y-6">
+								{professionalExperience.map((entry) => (
+									<Card variant="bordered" padding="sm">
+										<div class="flex flex-wrap items-start justify-between gap-2 mb-2">
+											<div>
+												<Text variant="primary" size="base" class="font-medium">{entry.title}</Text>
+												<Text variant="accent" size="sm">{entry.company}</Text>
+											</div>
+											<Badge variant="accent" size="sm">{entry.dates}</Badge>
+										</div>
+										{entry.bullets.length > 0 && (
+											<ul class="space-y-1 mt-3">
+												{entry.bullets.map((bullet) => (
+													<li class="flex gap-2 text-sm text-foreground-secondary">
+														<span class="text-accent mt-1 shrink-0">-</span>
+														<span>{bullet}</span>
+													</li>
+												))}
+											</ul>
+										)}
+									</Card>
+								))}
+							</div>
 						</div>
-						
-						<!-- Background -->
+
+						<!-- Academic Experience -->
 						<div>
-							<Heading level={2} size="2xl" class="mb-4">Background</Heading>
-							<Text variant="secondary" class="leading-relaxed mb-4">
-								Based in {SITE.author.location.full}, I work across digital sculpture, character modeling, and 
-								technical art direction. My practice combines hands-on creation with systems thinking, always 
-								looking for ways to make complex workflows more accessible.
-							</Text>
-							<Text variant="secondary" class="leading-relaxed">
-								This workspace documents my projects, process, and ongoing exploration of 3D art, technical pipelines, 
-								and creative education.
-							</Text>
+							<Heading level={2} size="2xl" class="mb-6">Academic Experience</Heading>
+							<div class="space-y-6">
+								{academicExperience.map((entry) => (
+									<Card variant="bordered" padding="sm">
+										<div class="flex flex-wrap items-start justify-between gap-2 mb-2">
+											<div>
+												<Text variant="primary" size="base" class="font-medium">{entry.title}</Text>
+												<Text variant="accent" size="sm">{entry.company}</Text>
+											</div>
+											<Badge variant="accent" size="sm">{entry.dates}</Badge>
+										</div>
+										{entry.bullets.length > 0 && (
+											<ul class="space-y-1 mt-3">
+												{entry.bullets.map((bullet) => (
+													<li class="flex gap-2 text-sm text-foreground-secondary">
+														<span class="text-accent mt-1 shrink-0">-</span>
+														<span>{bullet}</span>
+													</li>
+												))}
+											</ul>
+										)}
+									</Card>
+								))}
+							</div>
+						</div>
+
+						<!-- Education -->
+						<div>
+							<Heading level={2} size="2xl" class="mb-6">Education</Heading>
+							<div class="space-y-4">
+								{education.map((edu) => (
+									<Card variant="bordered" padding="sm">
+										<div class="flex flex-wrap items-start justify-between gap-2">
+											<div>
+												<Text variant="primary" size="base" class="font-medium">{edu.degree}</Text>
+												<Text variant="accent" size="sm">{edu.school}</Text>
+											</div>
+											<Badge variant="accent" size="sm">{edu.dates}</Badge>
+										</div>
+									</Card>
+								))}
+							</div>
 						</div>
 
 						<!-- CTA -->
@@ -133,13 +321,21 @@ const seo = getAboutPageSEO();
 							<Text variant="secondary" class="mb-4">
 								Interested in collaborating or learning more about my work?
 							</Text>
-							<div class="flex gap-4">
+							<div class="flex flex-wrap gap-4">
 								<Link href="/art" variant="accent">
 									View Work >
 								</Link>
-								<Link href="/log" variant="accent">
-									Read Log >
+								<Link href="/learn" variant="accent">
+									Teaching >
 								</Link>
+								<Button variant="outline" size="sm" href="/CarlosGarcia_Resume_2026.pdf">
+									<span class="flex items-center gap-2">
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+										</svg>
+										Resume (PDF)
+									</span>
+								</Button>
 							</div>
 						</div>
 					</div>
