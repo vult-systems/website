@@ -176,44 +176,34 @@ const resources = [
 								<Heading level={3} size="lg" class="mb-4">
 									{level.year}
 								</Heading>
-								<div class="space-y-3">
+								<div class="grid sm:grid-cols-2 gap-3">
 									{level.courses.map((course) => (
 										<Card variant="bordered" padding="sm">
-											<div class="flex items-start gap-4">
-												{/* Syllabus Thumbnail */}
-												{course.syllabus && (
-													<div class="flex-shrink-0">
-														<Image
-															src={course.syllabus}
-															alt={`${course.code} Syllabus`}
-															width={80}
-															height={104}
-															class="rounded border border-border object-cover cursor-pointer hover:opacity-80 transition-opacity"
-															style="aspect-ratio: 3/4;"
-														/>
+											<div class="flex items-center gap-3 mb-3">
+												<Badge variant="accent" size="sm">{course.code}</Badge>
+												<Text variant="primary" size="sm">{course.title}</Text>
+											</div>
+											{/* Syllabus & Assignment Thumbnails */}
+											<div class="flex gap-2 flex-wrap">
+												{/* Syllabus placeholder */}
+												<div class="flex-shrink-0 group relative">
+													<div class="w-16 h-20 rounded border border-border bg-foreground/5 flex items-center justify-center cursor-pointer hover:bg-foreground/10 transition-colors">
+														<svg class="w-5 h-5 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+														</svg>
 													</div>
-												)}
-												<div class="flex-1 min-w-0">
-													<div class="flex items-center gap-3 mb-1">
-														<Badge variant="accent" size="sm">{course.code}</Badge>
-														<Text variant="primary" size="sm">{course.title}</Text>
-													</div>
-													{/* Assignment Thumbnails */}
-													{course.assignments && course.assignments.length > 0 && (
-														<div class="flex gap-2 mt-3 flex-wrap">
-															{course.assignments.map((assignment) => (
-																<Image
-																	src={assignment.image}
-																	alt={`${course.code} - ${assignment.title}`}
-																	width={72}
-																	height={72}
-																	class="rounded border border-border object-cover cursor-pointer hover:opacity-80 transition-opacity"
-																	style="aspect-ratio: 1;"
-																/>
-															))}
-														</div>
-													)}
+													<Text variant="muted" size="sm" class="text-[10px] text-center mt-1">Syllabus</Text>
 												</div>
+												{/* Assignment placeholders */}
+												{[1, 2, 3].map((n) => (
+													<div class="flex-shrink-0">
+														<div class="w-16 h-16 rounded border border-border bg-foreground/5 flex items-center justify-center cursor-pointer hover:bg-foreground/10 transition-colors">
+															<svg class="w-5 h-5 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+															</svg>
+														</div>
+													</div>
+												))}
 											</div>
 										</Card>
 									))}
