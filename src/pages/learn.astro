@@ -161,12 +161,24 @@ const resources = [
 					</Text>
 				</div>
 
-				<!-- Courses / Curriculum -->
-				<section class="mb-20">
-					<Heading level={2} size="2xl" class="mb-2">
-						Curriculum
-					</Heading>
-					<Text variant="secondary" class="mb-8 max-w-3xl">
+				<!-- Tab Navigation -->
+				<div class="mb-10">
+					<div class="flex gap-6 border-b-2 border-foreground-secondary/10">
+						<button class="learn-tab pb-3 text-base text-accent border-b-2 border-accent -mb-[2px] transition-colors" data-tab="curriculum" style="font-family: 'Besley', serif !important;">
+							Curriculum
+						</button>
+						<button class="learn-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-tab="student-work" style="font-family: 'Besley', serif !important;">
+							Student Work
+						</button>
+						<button class="learn-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-tab="tools" style="font-family: 'Besley', serif !important;">
+							Tools & Resources
+						</button>
+					</div>
+				</div>
+
+				<!-- Tab: Curriculum -->
+				<div id="tab-curriculum" class="learn-tab-content">
+					<Text variant="secondary" class="mb-8">
 						Courses I've developed and taught, organized by year. The sequence builds from foundational 
 						modeling skills through advanced production and thesis work.
 					</Text>
@@ -216,14 +228,11 @@ const resources = [
 							</div>
 						))}
 					</div>
-				</section>
+				</div>
 
-				<!-- Student Showcase -->
-				<section class="mb-20">
-					<Heading level={2} size="2xl" class="mb-2">
-						Student Showcase
-					</Heading>
-					<Text variant="secondary" class="mb-8 max-w-3xl">
+				<!-- Tab: Student Work -->
+				<div id="tab-student-work" class="learn-tab-content hidden">
+					<Text variant="secondary" class="mb-8">
 						Highlights from student work across my courses. These artists came in with curiosity and left 
 						with portfolio-ready pieces and a real understanding of production workflows.
 					</Text>
@@ -238,14 +247,11 @@ const resources = [
 							</Text>
 						</div>
 					</Card>
-				</section>
+				</div>
 
-				<!-- Tools & Resources -->
-				<section class="mb-20">
-					<Heading level={2} size="2xl" class="mb-2">
-						Tools & Resources
-					</Heading>
-					<Text variant="secondary" class="mb-8 max-w-3xl">
+				<!-- Tab: Tools & Resources -->
+				<div id="tab-tools" class="learn-tab-content hidden">
+					<Text variant="secondary" class="mb-8">
 						Software, tools, and technologies used across my courses. This is the stack students work with to 
 						build industry-relevant skills.
 					</Text>
@@ -271,7 +277,7 @@ const resources = [
 							</Card>
 						))}
 					</div>
-				</section>
+				</div>
 
 				<!-- CTA -->
 				<section class="pt-8 border-t-2 border-foreground-secondary/10">
@@ -296,6 +302,34 @@ const resources = [
 </BaseLayout>
 
 <script>
+	// Tab switching logic
+	const initTabs = () => {
+		const tabs = document.querySelectorAll('.learn-tab');
+		const panels = document.querySelectorAll('.learn-tab-content');
+
+		tabs.forEach((tab) => {
+			tab.addEventListener('click', () => {
+				const target = (tab as HTMLElement).dataset.tab;
+				// Update tab styles
+				tabs.forEach((t) => {
+					t.classList.remove('text-accent', 'border-accent');
+					t.classList.add('text-foreground-secondary', 'border-transparent');
+				});
+				tab.classList.remove('text-foreground-secondary', 'border-transparent');
+				tab.classList.add('text-accent', 'border-accent');
+				// Show/hide panels
+				panels.forEach((panel) => {
+					if (panel.id === `tab-${target}`) {
+						panel.classList.remove('hidden');
+					} else {
+						panel.classList.add('hidden');
+					}
+				});
+			});
+		});
+	};
+	initTabs();
+
 	// Make placeholder thumbnails clickable with a lightbox-style overlay
 	const initLearnLightbox = () => {
 		const triggers = document.querySelectorAll('.learn-lightbox-trigger');
