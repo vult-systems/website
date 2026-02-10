@@ -282,16 +282,22 @@ const resources = [
 								<Card variant="bordered" padding="none">
 									{piece.video ? (
 										<!-- Video -->
-										<div class="relative bg-black rounded-t-md overflow-hidden">
+										<div class="video-lightbox-trigger relative bg-black rounded-t-md overflow-hidden cursor-pointer" data-video={piece.video}>
 											<video
 												src={piece.video}
-												class="w-full h-auto"
+												class="w-full h-auto pointer-events-none"
 												autoplay
 												loop
 												muted
 												playsinline
 												preload="auto"
-											/>
+											></video>
+											<!-- Play overlay hint -->
+											<div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/20">
+												<svg class="w-12 h-12 text-white/80" fill="currentColor" viewBox="0 0 24 24">
+													<path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9.5 16.5l7-4.5-7-4.5v9z" />
+												</svg>
+											</div>
 										</div>
 									) : (
 										<!-- Placeholder thumbnail -->

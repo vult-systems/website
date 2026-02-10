@@ -15,8 +15,8 @@
       <span class="text-xl">×</span>
     </button>
     
-    <!-- Zoom Controls -->
-    <div class="absolute bottom-4 right-4 z-[10] flex gap-2">
+    <!-- Zoom Controls (hidden for video) -->
+    <div id="zoom-controls" class="absolute bottom-4 right-4 z-[10] flex gap-2">
       <button id="zoom-out" class="w-10 h-10 rounded-full bg-card border border-border hover:bg-card-hover transition-colors flex items-center justify-center cursor-pointer">
         <span class="text-lg">−</span>
       </button>
@@ -39,14 +39,29 @@
         draggable="false"
       />
     </div>
+
+    <!-- Video Container -->
+    <div id="video-wrapper" class="rounded-lg bg-black border-2 border-foreground-secondary/10 shadow-2xl max-w-full max-h-[calc(100vh-6rem)] flex items-center justify-center opacity-0 scale-90 transition-all duration-200 ease-out hidden">
+      <video
+        id="lightbox-video"
+        src=""
+        class="max-w-full max-h-[calc(100vh-6rem)] object-contain rounded-lg"
+        controls
+        loop
+        playsinline
+      ></video>
+    </div>
   </div>
 </div>
 
 <script>
   const lightbox = document.getElementById('lightbox');
   const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
+  const lightboxVideo = document.getElementById('lightbox-video') as HTMLVideoElement;
   const imageWrapper = document.getElementById('image-wrapper');
+  const videoWrapper = document.getElementById('video-wrapper');
   const closeBtn = document.getElementById('close-btn');
+  const zoomControls = document.getElementById('zoom-controls');
   const zoomIn = document.getElementById('zoom-in');
   const zoomOut = document.getElementById('zoom-out');
   const zoomReset = document.getElementById('zoom-reset');
@@ -55,6 +70,7 @@
   let isDragging = false;
   let startX = 0, startY = 0;
   let currentX = 0, currentY = 0;
+  let isVideoMode = false;
 
   // Add click listeners to all images with lightbox capability
   const initializeLightbox = () => {
@@ -73,17 +89,24 @@
     });
   };
 
+  // Expose openVideoLightbox globally for other scripts to call
+  (window as any).__openVideoLightbox = openVideoLightbox;
+
   const openLightbox = (src: string, alt: string) => {
     if (!lightbox || !lightboxImage || !imageWrapper) return;
     
+    isVideoMode = false;
     lightboxImage.src = src;
     lightboxImage.alt = alt;
     
-    // Show lightbox
+    // Show image, hide video
+    imageWrapper.classList.remove('hidden');
+    videoWrapper?.classList.add('hidden');
+    zoomControls?.classList.remove('hidden');
+    
     lightbox.classList.remove('invisible', 'opacity-0');
     lightbox.classList.add('visible', 'opacity-100');
     
-    // Animate image wrapper after a brief delay
     requestAnimationFrame(() => {
       imageWrapper?.classList.remove('opacity-0', 'scale-90');
       imageWrapper?.classList.add('opacity-100', 'scale-100');
@@ -93,14 +116,44 @@
     resetZoom();
   };
 
+  const openVideoLightbox = (src: string) => {
+    if (!lightbox || !lightboxVideo || !videoWrapper) return;
+    
+    isVideoMode = true;
+    lightboxVideo.src = src;
+    
+    // Show video, hide image
+    videoWrapper.classList.remove('hidden');
+    imageWrapper?.classList.add('hidden');
+    zoomControls?.classList.add('hidden');
+    
+    lightbox.classList.remove('invisible', 'opacity-0');
+    lightbox.classList.add('visible', 'opacity-100');
+    
+    requestAnimationFrame(() => {
+      videoWrapper.classList.remove('opacity-0', 'scale-90');
+      videoWrapper.classList.add('opacity-100', 'scale-100');
+      lightboxVideo.play();
+    });
+    
+    document.body.style.overflow = 'hidden';
+  };
+
   const closeLightbox = () => {
-    if (!lightbox || !imageWrapper) return;
+    if (!lightbox) return;
     
-    // Animate image wrapper out
-    imageWrapper.classList.remove('opacity-100', 'scale-100');
-    imageWrapper.classList.add('opacity-0', 'scale-90');
+    const activeWrapper = isVideoMode ? videoWrapper : imageWrapper;
+    if (!activeWrapper) return;
     
-    // Hide lightbox after animation
+    activeWrapper.classList.remove('opacity-100', 'scale-100');
+    activeWrapper.classList.add('opacity-0', 'scale-90');
+    
+    // Stop video if playing
+    if (isVideoMode && lightboxVideo) {
+      lightboxVideo.pause();
+      lightboxVideo.src = '';
+    }
+    
     setTimeout(() => {
       lightbox.classList.remove('visible', 'opacity-100');
       lightbox.classList.add('invisible', 'opacity-0');
@@ -133,10 +186,19 @@
       initializeLightbox();
     });
 
+    // Video lightbox: use event delegation (immune to cloning/timing issues)
+    document.addEventListener('click', (e) => {
+      const trigger = (e.target as HTMLElement).closest('.video-lightbox-trigger[data-video]');
+      if (trigger) {
+        const videoSrc = (trigger as HTMLElement).dataset.video;
+        if (videoSrc) openVideoLightbox(videoSrc);
+      }
+    });
+
     // Close button
     closeBtn?.addEventListener('click', closeLightbox);
     
-    // Click outside to close
+    // Click outside to close (but not on video controls)
     lightbox.addEventListener('click', (e) => {
       if (e.target === lightbox) {
         closeLightbox();
