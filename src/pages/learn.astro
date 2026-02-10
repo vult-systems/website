@@ -108,17 +108,17 @@ interface StudentPiece {
 	title: string;
 	course: string;
 	year: string;
+	video?: string;       // Path to video in public/ (e.g. '/student-work/file.mp4')
 	// image?: ImageMetadata;  // Uncomment and import when adding real images
 }
 
 const studentWork: StudentPiece[] = [
 	// -------------------------------------------------------------------
 	// To add real student work:
-	//   1. Drop images into src/assets/learn/student-work/
-	//   2. Import them at the top of the frontmatter
-	//   3. Add the image property to the entry below
+	//   Videos: Drop MP4s into public/student-work/ and set video path
+	//   Images: Drop into src/assets/learn/student-work/, import, add image prop
 	// -------------------------------------------------------------------
-	{ student: 'Student Name', title: 'Character Project', course: 'ANGD 2361', year: '2025' },
+	{ student: 'Alvarez', title: 'Space Cat Turnaround', course: 'ANGD 2361', year: '2025', video: '/student-work/Alvarez-Space-Cat-Turnaround.mp4' },
 	{ student: 'Student Name', title: 'Environment Scene', course: 'ANGD 2334', year: '2025' },
 	{ student: 'Student Name', title: 'Hard Surface Asset', course: 'ANGD 1312', year: '2025' },
 	{ student: 'Student Name', title: 'Sculpt Study', course: 'ANGD 1314', year: '2025' },
@@ -280,13 +280,27 @@ const resources = [
 						{studentWork.map((piece) => (
 							<div class="student-item" data-year={piece.year}>
 								<Card variant="bordered" padding="none">
-									<!-- Placeholder thumbnail -->
-									<div class="learn-lightbox-trigger relative aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 transition-all" data-label={`${piece.student} — ${piece.title}`}>
-										<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-										</svg>
-										<span class="text-xs text-foreground-muted">Image Coming Soon</span>
-									</div>
+									{piece.video ? (
+										<!-- Video -->
+										<div class="relative aspect-[4/3] bg-black rounded-t-md overflow-hidden">
+											<video
+												src={piece.video}
+												class="w-full h-full object-cover"
+												controls
+												preload="metadata"
+												loop
+												muted
+											/>
+										</div>
+									) : (
+										<!-- Placeholder thumbnail -->
+										<div class="learn-lightbox-trigger relative aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 transition-all" data-label={`${piece.student} — ${piece.title}`}>
+											<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+											</svg>
+											<span class="text-xs text-foreground-muted">Image Coming Soon</span>
+										</div>
+									)}
 									<!-- Info -->
 									<div class="p-4 space-y-2">
 										<Text variant="primary" size="sm" class="font-medium">{piece.title}</Text>
