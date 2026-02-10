@@ -55,42 +55,26 @@
 </div>
 
 <script>
-  const lightbox = document.getElementById('lightbox');
-  const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
-  const lightboxVideo = document.getElementById('lightbox-video') as HTMLVideoElement;
-  const imageWrapper = document.getElementById('image-wrapper');
-  const videoWrapper = document.getElementById('video-wrapper');
-  const closeBtn = document.getElementById('close-btn');
-  const zoomControls = document.getElementById('zoom-controls');
-  const zoomIn = document.getElementById('zoom-in');
-  const zoomOut = document.getElementById('zoom-out');
-  const zoomReset = document.getElementById('zoom-reset');
-
   let scale = 1;
   let isDragging = false;
   let startX = 0, startY = 0;
   let currentX = 0, currentY = 0;
   let isVideoMode = false;
 
-  // Add click listeners to all images with lightbox capability
-  const initializeLightbox = () => {
-    // Select all images in content areas (excluding nav/header/footer UI and opt-outs)
-    const lightboxImages = document.querySelectorAll('img:not(header img):not(nav img):not(footer img):not([data-no-lightbox])');
-    
-    lightboxImages.forEach((img) => {
-      const imageElement = img as HTMLImageElement;
-      // Add cursor pointer and hover effect
-      imageElement.style.cursor = 'pointer';
-      imageElement.classList.add('hover:scale-[1.02]', 'transition-transform', 'duration-300');
-      
-      imageElement.addEventListener('click', () => {
-        openLightbox(imageElement.src, imageElement.alt);
-      });
-    });
+  const updateTransform = () => {
+    const img = document.getElementById('lightbox-image') as HTMLImageElement;
+    if (img) {
+      img.style.transform = `scale(${scale}) translate(${currentX / scale}px, ${currentY / scale}px)`;
+      img.style.cursor = scale > 1 ? 'grab' : 'default';
+    }
   };
 
-  // Expose openVideoLightbox globally for other scripts to call
-  (window as any).__openVideoLightbox = openVideoLightbox;
+  const resetZoom = () => {
+    scale = 1;
+    currentX = 0;
+    currentY = 0;
+    updateTransform();
+  };
 
   const openLightbox = (src: string, alt: string) => {
     const lb = document.getElementById('lightbox');
@@ -99,24 +83,23 @@
     const vw = document.getElementById('video-wrapper');
     const zc = document.getElementById('zoom-controls');
     if (!lb || !img || !iw) return;
-    
+
     isVideoMode = false;
     img.src = src;
     img.alt = alt;
-    
-    // Show image, hide video
+
     iw.classList.remove('hidden');
     vw?.classList.add('hidden');
     zc?.classList.remove('hidden');
-    
+
     lb.classList.remove('invisible', 'opacity-0');
     lb.classList.add('visible', 'opacity-100');
-    
+
     requestAnimationFrame(() => {
       iw.classList.remove('opacity-0', 'scale-90');
       iw.classList.add('opacity-100', 'scale-100');
     });
-    
+
     document.body.style.overflow = 'hidden';
     resetZoom();
   };
@@ -128,24 +111,23 @@
     const iw = document.getElementById('image-wrapper');
     const zc = document.getElementById('zoom-controls');
     if (!lb || !vid || !vw) return;
-    
+
     isVideoMode = true;
     vid.src = src;
-    
-    // Show video, hide image
+
     vw.classList.remove('hidden');
     iw?.classList.add('hidden');
     zc?.classList.add('hidden');
-    
+
     lb.classList.remove('invisible', 'opacity-0');
     lb.classList.add('visible', 'opacity-100');
-    
+
     requestAnimationFrame(() => {
       vw.classList.remove('opacity-0', 'scale-90');
       vw.classList.add('opacity-100', 'scale-100');
       vid.play();
     });
-    
+
     document.body.style.overflow = 'hidden';
   };
 
@@ -155,140 +137,138 @@
     const vw = document.getElementById('video-wrapper');
     const vid = document.getElementById('lightbox-video') as HTMLVideoElement;
     if (!lb) return;
-    
+
     const activeWrapper = isVideoMode ? vw : iw;
     if (!activeWrapper) return;
-    
+
     activeWrapper.classList.remove('opacity-100', 'scale-100');
     activeWrapper.classList.add('opacity-0', 'scale-90');
-    
-    // Stop video if playing
+
     if (isVideoMode && vid) {
       vid.pause();
       vid.src = '';
     }
-    
+
     setTimeout(() => {
       lb.classList.remove('visible', 'opacity-100');
       lb.classList.add('invisible', 'opacity-0');
     }, 200);
-    
+
     document.body.style.overflow = '';
     resetZoom();
   };
 
-  const updateTransform = () => {
-    if (lightboxImage) {
-      lightboxImage.style.transform = `scale(${scale}) translate(${currentX / scale}px, ${currentY / scale}px)`;
-      lightboxImage.style.cursor = scale > 1 ? 'grab' : 'default';
+  // Add click listeners to all content images
+  const initializeLightbox = () => {
+    const lightboxImages = document.querySelectorAll('img:not(header img):not(nav img):not(footer img):not([data-no-lightbox])');
+    lightboxImages.forEach((img) => {
+      const imageElement = img as HTMLImageElement;
+      imageElement.style.cursor = 'pointer';
+      imageElement.classList.add('hover:scale-[1.02]', 'transition-transform', 'duration-300');
+      imageElement.addEventListener('click', () => {
+        openLightbox(imageElement.src, imageElement.alt);
+      });
+    });
+  };
+
+  // --- Event listeners using delegation (no stale refs) ---
+
+  // Video lightbox clicks (delegation)
+  document.addEventListener('click', (e) => {
+    const trigger = (e.target as HTMLElement).closest('.video-lightbox-trigger[data-video]');
+    if (trigger) {
+      const videoSrc = (trigger as HTMLElement).dataset.video;
+      if (videoSrc) openVideoLightbox(videoSrc);
     }
-  };
+  });
 
-  const resetZoom = () => {
-    scale = 1;
-    currentX = 0;
-    currentY = 0;
-    updateTransform();
-  };
+  // Close button (delegation)
+  document.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('#close-btn')) {
+      closeLightbox();
+    }
+  });
 
-  if (lightbox && lightboxImage && imageWrapper) {
-    // Initialize on page load
-    initializeLightbox();
-    
-    // Re-initialize after view transitions
-    document.addEventListener('astro:page-load', () => {
-      initializeLightbox();
-    });
+  // Click outside content to close
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.id === 'lightbox') {
+      closeLightbox();
+    }
+  });
 
-    // Video lightbox: use event delegation (immune to cloning/timing issues)
-    document.addEventListener('click', (e) => {
-      const trigger = (e.target as HTMLElement).closest('.video-lightbox-trigger[data-video]');
-      if (trigger) {
-        const videoSrc = (trigger as HTMLElement).dataset.video;
-        if (videoSrc) openVideoLightbox(videoSrc);
-      }
-    });
-
-    // Close button
-    closeBtn?.addEventListener('click', closeLightbox);
-    
-    // Click outside to close (but not on video controls)
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) {
-        closeLightbox();
-      }
-    });
-
-    // Zoom controls
-    zoomIn?.addEventListener('click', () => {
+  // Zoom controls (delegation)
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('#zoom-in')) {
       scale = Math.min(scale + 0.5, 4);
       updateTransform();
-    });
-
-    zoomOut?.addEventListener('click', () => {
+    } else if (target.closest('#zoom-out')) {
       scale = Math.max(scale - 0.5, 1);
-      if (scale === 1) {
-        currentX = 0;
-        currentY = 0;
-      }
+      if (scale === 1) { currentX = 0; currentY = 0; }
       updateTransform();
-    });
+    } else if (target.closest('#zoom-reset')) {
+      resetZoom();
+    }
+  });
 
-    zoomReset?.addEventListener('click', resetZoom);
+  // Drag to pan
+  document.addEventListener('mousedown', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.id === 'lightbox-image' && scale > 1) {
+      e.preventDefault();
+      isDragging = true;
+      startX = e.clientX - currentX;
+      startY = e.clientY - currentY;
+      target.style.cursor = 'grabbing';
+      target.style.transition = 'none';
+    }
+  });
 
-    // Drag to pan
-    lightboxImage.addEventListener('mousedown', (e) => {
-      if (scale > 1) {
-        e.preventDefault();
-        isDragging = true;
-        startX = e.clientX - currentX;
-        startY = e.clientY - currentY;
-        lightboxImage.style.cursor = 'grabbing';
-        lightboxImage.style.transition = 'none';
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging && scale > 1) {
+      e.preventDefault();
+      const img = document.getElementById('lightbox-image') as HTMLImageElement;
+      currentX = e.clientX - startX;
+      currentY = e.clientY - startY;
+      if (img) img.style.transform = `scale(${scale}) translate(${currentX / scale}px, ${currentY / scale}px)`;
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      const img = document.getElementById('lightbox-image') as HTMLImageElement;
+      if (img) {
+        img.style.cursor = scale > 1 ? 'grab' : 'default';
+        img.style.transition = '';
       }
-    });
+    }
+  });
 
-    document.addEventListener('mousemove', (e) => {
-      if (isDragging && scale > 1) {
-        e.preventDefault();
-        currentX = e.clientX - startX;
-        currentY = e.clientY - startY;
-        lightboxImage.style.transform = `scale(${scale}) translate(${currentX / scale}px, ${currentY / scale}px)`;
-      }
-    });
-
-    document.addEventListener('mouseup', () => {
-      if (isDragging) {
-        isDragging = false;
-        if (lightboxImage) {
-          lightboxImage.style.cursor = scale > 1 ? 'grab' : 'default';
-          lightboxImage.style.transition = '';
-        }
-      }
-    });
-
-    // Prevent accidental selection
-    lightboxImage.addEventListener('dragstart', (e) => e.preventDefault());
-
-    // Mouse wheel zoom
-    imageWrapper?.addEventListener('wheel', (e) => {
+  // Mouse wheel zoom on image wrapper
+  document.addEventListener('wheel', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('#image-wrapper')) {
       e.preventDefault();
       const delta = e.deltaY > 0 ? -0.1 : 0.1;
       scale = Math.max(1, Math.min(4, scale + delta));
-      
-      if (scale === 1) {
-        currentX = 0;
-        currentY = 0;
-      }
-      
+      if (scale === 1) { currentX = 0; currentY = 0; }
       updateTransform();
-    });
+    }
+  }, { passive: false });
 
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !lightbox.classList.contains('invisible')) {
-        closeLightbox();
-      }
-    });
-  }
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    const lb = document.getElementById('lightbox');
+    if (e.key === 'Escape' && lb && !lb.classList.contains('invisible')) {
+      closeLightbox();
+    }
+  });
+
+  // Initialize image listeners
+  initializeLightbox();
+  document.addEventListener('astro:page-load', () => {
+    initializeLightbox();
+  });
 </script>
