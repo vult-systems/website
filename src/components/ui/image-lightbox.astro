@@ -93,23 +93,28 @@
   (window as any).__openVideoLightbox = openVideoLightbox;
 
   const openLightbox = (src: string, alt: string) => {
-    if (!lightbox || !lightboxImage || !imageWrapper) return;
+    const lb = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-image') as HTMLImageElement;
+    const iw = document.getElementById('image-wrapper');
+    const vw = document.getElementById('video-wrapper');
+    const zc = document.getElementById('zoom-controls');
+    if (!lb || !img || !iw) return;
     
     isVideoMode = false;
-    lightboxImage.src = src;
-    lightboxImage.alt = alt;
+    img.src = src;
+    img.alt = alt;
     
     // Show image, hide video
-    imageWrapper.classList.remove('hidden');
-    videoWrapper?.classList.add('hidden');
-    zoomControls?.classList.remove('hidden');
+    iw.classList.remove('hidden');
+    vw?.classList.add('hidden');
+    zc?.classList.remove('hidden');
     
-    lightbox.classList.remove('invisible', 'opacity-0');
-    lightbox.classList.add('visible', 'opacity-100');
+    lb.classList.remove('invisible', 'opacity-0');
+    lb.classList.add('visible', 'opacity-100');
     
     requestAnimationFrame(() => {
-      imageWrapper?.classList.remove('opacity-0', 'scale-90');
-      imageWrapper?.classList.add('opacity-100', 'scale-100');
+      iw.classList.remove('opacity-0', 'scale-90');
+      iw.classList.add('opacity-100', 'scale-100');
     });
     
     document.body.style.overflow = 'hidden';
@@ -117,46 +122,55 @@
   };
 
   const openVideoLightbox = (src: string) => {
-    if (!lightbox || !lightboxVideo || !videoWrapper) return;
+    const lb = document.getElementById('lightbox');
+    const vid = document.getElementById('lightbox-video') as HTMLVideoElement;
+    const vw = document.getElementById('video-wrapper');
+    const iw = document.getElementById('image-wrapper');
+    const zc = document.getElementById('zoom-controls');
+    if (!lb || !vid || !vw) return;
     
     isVideoMode = true;
-    lightboxVideo.src = src;
+    vid.src = src;
     
     // Show video, hide image
-    videoWrapper.classList.remove('hidden');
-    imageWrapper?.classList.add('hidden');
-    zoomControls?.classList.add('hidden');
+    vw.classList.remove('hidden');
+    iw?.classList.add('hidden');
+    zc?.classList.add('hidden');
     
-    lightbox.classList.remove('invisible', 'opacity-0');
-    lightbox.classList.add('visible', 'opacity-100');
+    lb.classList.remove('invisible', 'opacity-0');
+    lb.classList.add('visible', 'opacity-100');
     
     requestAnimationFrame(() => {
-      videoWrapper.classList.remove('opacity-0', 'scale-90');
-      videoWrapper.classList.add('opacity-100', 'scale-100');
-      lightboxVideo.play();
+      vw.classList.remove('opacity-0', 'scale-90');
+      vw.classList.add('opacity-100', 'scale-100');
+      vid.play();
     });
     
     document.body.style.overflow = 'hidden';
   };
 
   const closeLightbox = () => {
-    if (!lightbox) return;
+    const lb = document.getElementById('lightbox');
+    const iw = document.getElementById('image-wrapper');
+    const vw = document.getElementById('video-wrapper');
+    const vid = document.getElementById('lightbox-video') as HTMLVideoElement;
+    if (!lb) return;
     
-    const activeWrapper = isVideoMode ? videoWrapper : imageWrapper;
+    const activeWrapper = isVideoMode ? vw : iw;
     if (!activeWrapper) return;
     
     activeWrapper.classList.remove('opacity-100', 'scale-100');
     activeWrapper.classList.add('opacity-0', 'scale-90');
     
     // Stop video if playing
-    if (isVideoMode && lightboxVideo) {
-      lightboxVideo.pause();
-      lightboxVideo.src = '';
+    if (isVideoMode && vid) {
+      vid.pause();
+      vid.src = '';
     }
     
     setTimeout(() => {
-      lightbox.classList.remove('visible', 'opacity-100');
-      lightbox.classList.add('invisible', 'opacity-0');
+      lb.classList.remove('visible', 'opacity-100');
+      lb.classList.add('invisible', 'opacity-0');
     }, 200);
     
     document.body.style.overflow = '';
