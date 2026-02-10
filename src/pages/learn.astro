@@ -282,14 +282,15 @@ const resources = [
 								<Card variant="bordered" padding="none">
 									{piece.video ? (
 										<!-- Video -->
-										<div class="relative aspect-[4/3] bg-black rounded-t-md overflow-hidden">
+										<div class="relative bg-black rounded-t-md overflow-hidden">
 											<video
 												src={piece.video}
-												class="w-full h-full object-cover"
-												controls
-												preload="metadata"
+												class="w-full h-auto"
+												autoplay
 												loop
 												muted
+												playsinline
+												preload="auto"
 											/>
 										</div>
 									) : (
