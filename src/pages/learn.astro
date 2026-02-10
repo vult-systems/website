@@ -102,6 +102,33 @@ const curriculum: CurriculumYear[] = [
 	},
 ];
 
+// Student Work Gallery
+interface StudentPiece {
+	student: string;
+	title: string;
+	course: string;
+	year: string;
+	// image?: ImageMetadata;  // Uncomment and import when adding real images
+}
+
+const studentWork: StudentPiece[] = [
+	// -------------------------------------------------------------------
+	// To add real student work:
+	//   1. Drop images into src/assets/learn/student-work/
+	//   2. Import them at the top of the frontmatter
+	//   3. Add the image property to the entry below
+	// -------------------------------------------------------------------
+	{ student: 'Student Name', title: 'Character Project', course: 'ANGD 2361', year: '2025' },
+	{ student: 'Student Name', title: 'Environment Scene', course: 'ANGD 2334', year: '2025' },
+	{ student: 'Student Name', title: 'Hard Surface Asset', course: 'ANGD 1312', year: '2025' },
+	{ student: 'Student Name', title: 'Sculpt Study', course: 'ANGD 1314', year: '2025' },
+	{ student: 'Student Name', title: 'Character Design', course: 'ANGD 3361', year: '2025' },
+	{ student: 'Student Name', title: 'Thesis Project', course: 'ANGD 4360', year: '2025' },
+	{ student: 'Student Name', title: 'Armor Set', course: 'ANGD 3362', year: '2024' },
+	{ student: 'Student Name', title: 'Environment Diorama', course: 'ANGD 3332', year: '2024' },
+	{ student: 'Student Name', title: 'Anatomy Study', course: 'ANGD 1380', year: '2024' },
+];
+
 // Resources
 const resources = [
 	{
@@ -236,17 +263,43 @@ const resources = [
 						Highlights from student work across my courses. These artists came in with curiosity and left 
 						with portfolio-ready pieces and a real understanding of production workflows.
 					</Text>
+
+					<!-- Year filter -->
+					<div class="flex gap-4 mb-8">
+						<button class="student-filter text-accent border-b-2 border-accent pb-1 transition-colors" data-year="all" style="font-family: 'Besley', serif !important;">
+							All
+						</button>
+						{[...new Set(studentWork.map(s => s.year))].sort().reverse().map((year) => (
+							<button class="student-filter text-foreground-secondary border-b-2 border-transparent pb-1 hover:text-accent transition-colors" data-year={year} style="font-family: 'Besley', serif !important;">
+								{year}
+							</button>
+						))}
+					</div>
 					
-					<Card variant="bordered" padding="lg">
-						<div class="text-center py-8">
-							<Text variant="muted" size="lg" class="mb-2">
-								Coming Soon
-							</Text>
-							<Text variant="secondary" size="sm">
-								Student showcase gallery is currently being curated.
-							</Text>
-						</div>
-					</Card>
+					<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="student-grid">
+						{studentWork.map((piece) => (
+							<div class="student-item" data-year={piece.year}>
+								<Card variant="bordered" padding="none">
+									<!-- Placeholder thumbnail -->
+									<div class="learn-lightbox-trigger relative aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 transition-all" data-label={`${piece.student} — ${piece.title}`}>
+										<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+										</svg>
+										<span class="text-xs text-foreground-muted">Image Coming Soon</span>
+									</div>
+									<!-- Info -->
+									<div class="p-4 space-y-2">
+										<Text variant="primary" size="sm" class="font-medium">{piece.title}</Text>
+										<Text variant="muted" size="sm">{piece.student}</Text>
+										<div class="flex gap-2">
+											<Badge size="sm" variant="accent">{piece.course}</Badge>
+											<Badge size="sm">{piece.year}</Badge>
+										</div>
+									</div>
+								</Card>
+							</div>
+						))}
+					</div>
 				</div>
 
 				<!-- Tab: Tools & Resources -->
@@ -390,9 +443,42 @@ const resources = [
 		});
 	};
 
+	// Student work year filter
+	const initStudentFilter = () => {
+		const filters = document.querySelectorAll('.student-filter');
+		const items = document.querySelectorAll('.student-item');
+		if (!filters.length) return;
+
+		filters.forEach((btn) => {
+			const fresh = btn.cloneNode(true);
+			btn.parentNode?.replaceChild(fresh, btn);
+		});
+
+		const freshFilters = document.querySelectorAll('.student-filter');
+		freshFilters.forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const year = (btn as HTMLElement).dataset.year;
+				freshFilters.forEach((b) => {
+					b.classList.remove('text-accent', 'border-accent');
+					b.classList.add('text-foreground-secondary', 'border-transparent');
+				});
+				btn.classList.remove('text-foreground-secondary', 'border-transparent');
+				btn.classList.add('text-accent', 'border-accent');
+				items.forEach((item) => {
+					if (year === 'all' || item.getAttribute('data-year') === year) {
+						(item as HTMLElement).style.display = '';
+					} else {
+						(item as HTMLElement).style.display = 'none';
+					}
+				});
+			});
+		});
+	};
+
 	const initAll = () => {
 		initTabs();
 		initLearnLightbox();
+		initStudentFilter();
 	};
 
 	initAll();
