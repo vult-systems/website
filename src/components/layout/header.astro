@@ -56,12 +56,52 @@ const currentPath = Astro.url.pathname;
                     </li>
                 </ul>
             </nav>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden flex flex-col gap-[5px] items-center justify-center p-1 -mb-[2px]" aria-label="Toggle menu">
+                <span class="hamburger-line block w-5 h-[2px] bg-foreground transition-all duration-300"></span>
+                <span class="hamburger-line block w-5 h-[2px] bg-foreground transition-all duration-300"></span>
+                <span class="hamburger-line block w-5 h-[2px] bg-foreground transition-all duration-300"></span>
+            </button>
             
             <div transition:persist="theme-toggle">
                 <ThemeToggle />
             </div>
         </div>
     </div>
+</div>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu" class="md:hidden fixed inset-0 top-24 z-40 bg-background/95 backdrop-blur-lg hidden">
+    <nav class="max-w-[102rem] mx-auto px-6 sm:px-8 pt-8">
+        <ul class="flex flex-col gap-6">
+            <li>
+                <a href="/art" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/art') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                    Art
+                </a>
+            </li>
+            <li>
+                <a href="/learn" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/learn') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                    Learn
+                </a>
+            </li>
+            <li>
+                <a href="/log" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/log') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                    Log
+                </a>
+            </li>
+            <li>
+                <a href="/vult" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/vult') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                    Vult
+                </a>
+            </li>
+            <li>
+                <a href="/about" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/about') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                    About
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 <style>
@@ -75,4 +115,44 @@ header, nav, .header-text, nav a, nav ul, nav li {
 nav a.text-base {
     font-family: 'Besley', serif !important;
 }
+
+/* Hamburger animation */
+#mobile-menu-btn.open .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+#mobile-menu-btn.open .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+#mobile-menu-btn.open .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
 </style>
+
+<script>
+    const initMobileMenu = () => {
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        if (!btn || !menu) return;
+
+        const fresh = btn.cloneNode(true) as HTMLElement;
+        btn.parentNode?.replaceChild(fresh, btn);
+
+        fresh.addEventListener('click', () => {
+            fresh.classList.toggle('open');
+            menu.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+        });
+
+        // Close on link click
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                fresh.classList.remove('open');
+                menu.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            });
+        });
+    };
+
+    initMobileMenu();
+    document.addEventListener('astro:after-swap', initMobileMenu);
+</script>
