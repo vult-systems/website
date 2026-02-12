@@ -72,31 +72,31 @@ const currentPath = Astro.url.pathname;
 </div>
 
 <!-- Mobile Menu Overlay -->
-<div id="mobile-menu" class="md:hidden fixed inset-0 top-24 z-40 bg-background/95 backdrop-blur-lg hidden">
-    <nav class="max-w-[102rem] mx-auto px-6 sm:px-8 pt-8">
-        <ul class="flex flex-col gap-6">
+<div id="mobile-menu" class="md:hidden fixed left-0 right-0 top-24 z-40 bg-background border-b-2 border-foreground-secondary/10 shadow-lg hidden">
+    <nav class="max-w-[102rem] mx-auto px-6 sm:px-8 py-6">
+        <ul class="flex flex-col gap-4">
             <li>
-                <a href="/art" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/art') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/art" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/art') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     Art
                 </a>
             </li>
             <li>
-                <a href="/learn" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/learn') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/learn" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/learn') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     Learn
                 </a>
             </li>
             <li>
-                <a href="/log" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/log') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/log" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/log') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     Log
                 </a>
             </li>
             <li>
-                <a href="/vult" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/vult') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/vult" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/vult') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     Vult
                 </a>
             </li>
             <li>
-                <a href="/about" class={`text-2xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/about') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/about" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/about') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     About
                 </a>
             </li>
@@ -140,7 +140,6 @@ nav a.text-base {
         fresh.addEventListener('click', () => {
             fresh.classList.toggle('open');
             menu.classList.toggle('hidden');
-            document.body.classList.toggle('overflow-hidden');
         });
 
         // Close on link click
@@ -148,7 +147,6 @@ nav a.text-base {
             link.addEventListener('click', () => {
                 fresh.classList.remove('open');
                 menu.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
             });
         });
     };
