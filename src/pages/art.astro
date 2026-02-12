@@ -27,8 +27,16 @@ const artData = artPieces.map(piece => ({
 
 // Build category list
 const categoryLabels: Record<string, string> = {
+	'character': 'Characters',
+	'3d': 'Props',
+	'environment': 'Environment',
+	'digital': 'Digital',
+	'concept': 'Concept',
+	'abstract': 'Abstract',
+};
+const badgeLabels: Record<string, string> = {
 	'character': 'Character',
-	'3d': '3D / Hard Surface',
+	'3d': 'Prop',
 	'environment': 'Environment',
 	'digital': 'Digital',
 	'concept': 'Concept',
@@ -102,12 +110,7 @@ const seo = getArtPageSEO();
 											{piece.description}
 										</Text>
 									)}
-									<div class="flex flex-wrap gap-2">
-										<Badge size="sm">{categoryLabels[piece.category] || piece.category}</Badge>
-										{piece.tools?.slice(0, 3).map((tool) => (
-											<Badge size="sm" variant="accent">{tool}</Badge>
-										))}
-									</div>
+									<Badge size="sm">{badgeLabels[piece.category] || piece.category}</Badge>
 								</div>
 							</Card>
 						</div>

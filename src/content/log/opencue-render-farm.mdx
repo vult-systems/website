@@ -1,0 +1,46 @@
+---
+title: "Distributed Rendering with OpenCue"
+description: "How we set up a distributed rendering pipeline using OpenCue to handle large-scale 3D renders across our studio."
+pubDate: 2026-02-10
+author: "Carlos Garcia"
+tags: ["Pipeline", "Technical", "Infrastructure"]
+draft: false
+heroImage: "@/assets/blog-placeholders/procedural-workflow.jpg"
+---
+
+## The Problem
+
+Rendering at scale is a bottleneck. Whether it's turntables for portfolio pieces, batch exports for client reviews, or heavy Marmoset bakes, waiting on a single machine kills momentum. We needed a way to distribute work across every available machine in the studio.
+
+## Why OpenCue
+
+OpenCue is Sony Pictures Imageworks' open-source render management system. It's battle-tested on feature films and handles everything from job submission to queue prioritization to failure recovery. Most importantly, it's free and actively maintained.
+
+Other options like Deadline or Qube are solid, but OpenCue gave us:
+- Full control over the codebase
+- No per-node licensing
+- A system designed for studios, not just farms
+
+## Our Setup
+
+The farm runs across a mix of workstations and dedicated render nodes. When artists aren't at their machines, those cycles go to the queue. The architecture is straightforward:
+
+- **Cuebot**: The brain. Manages job scheduling and node assignments
+- **RQD**: The agent running on each render node, waiting for work
+- **CueGUI / CueSubmit**: Artist-facing tools for submission and monitoring
+
+We containerized Cuebot with Docker for easy deployment and wrote custom submission scripts that integrate with our Maya and Houdini pipelines.
+
+## Lessons Learned
+
+**Start simple.** Our first iteration was overly complex. Now we have three job priorities: urgent, standard, and overnight. That's it.
+
+**Monitor everything.** We added Grafana dashboards to track node utilization, job throughput, and failure rates. Visibility changed how we allocate resources.
+
+**Artists need feedback.** The default CueGUI works, but we built a simplified web dashboard so artists can check job status without learning a new tool.
+
+## What's Next
+
+We're working on automatic job splitting for heavy scenes and better integration with our asset management system. The goal is one-click submission from any DCC with smart defaults based on scene complexity.
+
+The farm has already paid for itself in time saved. More importantly, it removed rendering as a blocker from our creative process.
