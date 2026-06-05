@@ -98,9 +98,9 @@ export function getLearnPageSEO(): PageSEO {
  */
 export function getVultPageSEO(): PageSEO {
   return {
-    title: `Vult Studio | ${SITE.author.name}`,
-    description: `Studio work and client projects by ${SITE.author.name}.`,
-    keywords: 'Vult Studio, Client Work, Collaborations, Professional Projects'
+    title: `Vult | ${SITE.author.name}`,
+    description: `Vult is a production studio creating cinematic crash and medical visualizations built from verified case data for litigation and mediation.`,
+    keywords: 'Vult, Vult Labs, Production Studio, Crash Visualization, Medical Visualization, Litigation Support, Legal Animation, Forensic Animation'
   };
 }
 

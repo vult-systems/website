@@ -1,26 +1,91 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/base-layout.astro';
 import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
-import ComingSoonSection from '@/components/sections/coming-soon-section.astro';
+import PageMain from '@/components/layout/page-main.astro';
+import PageContainer from '@/components/layout/page-container.astro';
+import Heading from '@/components/ui/heading.astro';
+import Text from '@/components/ui/text.astro';
+import Button from '@/components/ui/button.astro';
+import Badge from '@/components/ui/badge.astro';
+import vultLogo from '@/assets/logos/vult-logo-wht.png';
 import { getVultPageSEO } from '@/config/seo';
 
 const seo = getVultPageSEO();
 ---
 
-<BaseLayout 
-	title={seo.title} 
+<BaseLayout
+	title={seo.title}
 	description={seo.description}
 	keywords={seo.keywords}
 >
 <Header />
-	<main class="min-h-screen w-full text-foreground">
-		<div class="relative z-10">
-			<ComingSoonSection 
-				title="Vult" 
-				description="Studio work and collaborative projects."
-			/>
-		</div>
-	</main>
+<PageMain class="text-foreground">
+	<div class="relative z-10 w-full py-24 sm:py-32">
+		<PageContainer>
+
+			<!-- Page Header -->
+			<div class="mb-16">
+				<Image
+					src={vultLogo}
+					alt="Vult"
+					width={180}
+					height={60}
+					class="h-9 w-auto mb-6"
+				/>
+				<Heading level={1} size="4xl" class="mb-4">
+					Cinematic visualizations for the courtroom.
+				</Heading>
+				<Text size="lg" variant="secondary" class="mb-4">
+					Vult is my production studio. We develop cinematic crash and medical visualizations for litigation, translating complex case materials into clear visual narratives that hold up in mediation and trial.
+				</Text>
+				<Text size="lg" variant="secondary" class="mb-4">
+					Every project is built from verified evidence — accident reports, vehicle data, medical records, imaging, and expert analysis — and reconstructed through a cinematic production process to clarify how events unfolded and how injuries occurred.
+				</Text>
+				<Text size="lg" variant="secondary">
+					Each reconstruction is developed in close collaboration with attorneys and subject-matter experts to ensure the work remains accurate, defensible, and clear for the courtroom.
+				</Text>
+			</div>
+
+			<!-- Services -->
+			<div class="grid sm:grid-cols-2 gap-6 mb-16">
+
+				<div class="border-2 border-border rounded-md p-6 space-y-3">
+					<Badge variant="accent">Crash</Badge>
+					<Heading level={3} size="xl">Crash Reconstruction</Heading>
+					<Text variant="secondary">
+						Vehicle dynamics, roadway evidence, and expert analysis reconstructed into a clear visual account of the collision. Every element grounded in the evidentiary record.
+					</Text>
+				</div>
+
+				<div class="border-2 border-border rounded-md p-6 space-y-3">
+					<Badge variant="accent">Medical</Badge>
+					<Heading level={3} size="xl">Medical Visualization</Heading>
+					<Text variant="secondary">
+						Anatomy, trauma, and treatment translated into clear visual explanations of the injury. Rendered with clinical accuracy for a non-specialist audience.
+					</Text>
+				</div>
+
+			</div>
+
+			<!-- Image grid – drop mockup images here when ready -->
+			<!-- Example:
+			<div class="grid sm:grid-cols-2 gap-4 mb-16">
+				<Image src={mockup1} alt="Crash reconstruction" class="w-full rounded-md border-2 border-border" />
+				<Image src={mockup2} alt="Medical visualization" class="w-full rounded-md border-2 border-border" />
+			</div>
+			-->
+
+			<!-- CTA -->
+			<div class="border-t-2 border-foreground-secondary/10 pt-10">
+				<Button href="https://www.vultlabs.com" variant="outline" size="base">
+					Check it out →
+				</Button>
+			</div>
+
+		</PageContainer>
+	</div>
+</PageMain>
 <Footer />
 </BaseLayout>
