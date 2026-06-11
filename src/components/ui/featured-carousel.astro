@@ -201,7 +201,11 @@ const carouselPieces = artPieces.slice(0, 5);
     const FRICTION = 0.92;
     const MIN_VELOCITY = 0.05;
 
-    let pos = 0;
+    // Start with Foundation Explorer (index 1) and Foundation Explorer Female (index 2)
+    // centered by offsetting one card width + gap to the left
+    const firstItem = track.querySelector('.carousel-item') as HTMLElement;
+    const gapSize = parseInt(getComputedStyle(track).gap) || 24;
+    let pos = firstItem ? -(firstItem.offsetWidth + gapSize) : 0;
     let isDragging = false;
     let hasDragged = false;
     let dragStartX = 0;
