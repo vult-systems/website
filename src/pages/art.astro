@@ -86,12 +86,12 @@ const seo = getArtPageSEO();
 					{artData.map((piece) => (
 						<div class="art-item" data-category={piece.category}>
 							<Card padding="none" interactive href={`/art/${piece.slug}`}>
-							<div class="relative aspect-square overflow-hidden rounded-sm">
+							<div class="relative aspect-square overflow-hidden rounded-sm bg-card">
 									{piece.heroImage && (
 										<img
 											src={piece.heroImage}
 											alt={piece.title}
-											class="w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]"
+											class="art-img w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]"
 											loading="lazy"
 											data-no-lightbox
 										/>
@@ -128,6 +128,15 @@ const seo = getArtPageSEO();
 
 	.art-item.hidden {
 		display: none;
+	}
+
+	.art-img {
+		opacity: 0;
+		transition: opacity 0.4s ease-in-out, filter 0.5s ease, brightness 0.5s ease;
+	}
+
+	.art-img.loaded {
+		opacity: 1;
 	}
 </style>
 
@@ -176,4 +185,16 @@ const seo = getArtPageSEO();
 
 	initArtTabs();
 	document.addEventListener('astro:after-swap', initArtTabs);
+
+	const initImageFade = () => {
+		document.querySelectorAll<HTMLImageElement>('.art-img').forEach((img) => {
+			if (img.complete) {
+				img.classList.add('loaded');
+			} else {
+				img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+			}
+		});
+	};
+
+	document.addEventListener('astro:page-load', initImageFade);
 </script>
