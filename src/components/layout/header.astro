@@ -31,27 +31,27 @@ const currentPath = Astro.url.pathname;
             <nav class="hidden md:block">
                 <ul class="flex gap-x-6 lg:gap-x-8">
                     <li>
-                        <a href="/art" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/art') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/art" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                             Art
                         </a>
                     </li>
                     <li>
-                        <a href="/learn" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/learn') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/learn" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                             Learn
                         </a>
                     </li>
                     <li>
-                        <a href="/log" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/log') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/log" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                             Log
                         </a>
                     </li>
                     <li>
-                        <a href="/vult" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/vult') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/vult" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                             Vult
                         </a>
                     </li>
                     <li>
-                        <a href="/about" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/about') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/about" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                             About
                         </a>
                     </li>
@@ -77,27 +77,27 @@ const currentPath = Astro.url.pathname;
     <nav class="max-w-[102rem] mx-auto px-6 sm:px-8 py-6">
         <ul class="flex flex-col gap-4">
             <li>
-                <a href="/art" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/art') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/art" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                     Art
                 </a>
             </li>
             <li>
-                <a href="/learn" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/learn') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/learn" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                     Learn
                 </a>
             </li>
             <li>
-                <a href="/log" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/log') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/log" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                     Log
                 </a>
             </li>
             <li>
-                <a href="/vult" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/vult') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/vult" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                     Vult
                 </a>
             </li>
             <li>
-                <a href="/about" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/about') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/about" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
                     About
                 </a>
             </li>
@@ -154,4 +154,18 @@ nav a.text-base {
 
     initMobileMenu();
     document.addEventListener('astro:after-swap', initMobileMenu);
+
+    const updateActiveNav = () => {
+        const path = window.location.pathname;
+        document.querySelectorAll('[data-nav-link]').forEach((el) => {
+            const href = el.getAttribute('href') ?? '';
+            const isActive = href !== '/' && path.startsWith(href);
+            el.classList.toggle('text-accent', isActive);
+            el.classList.toggle('scale-105', isActive);
+            el.classList.toggle('text-foreground-secondary', !isActive);
+        });
+    };
+
+    updateActiveNav();
+    document.addEventListener('astro:after-swap', updateActiveNav);
 </script>

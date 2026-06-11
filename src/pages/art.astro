@@ -54,7 +54,7 @@ const seo = getArtPageSEO();
 >
 	<Header />
 	<PageMain class="text-foreground">
-		<div class="relative z-10 w-full py-24 sm:py-32">
+		<div class="relative z-10 w-full py-8 sm:py-12">
 			<PageContainer>
 				
 				<!-- Page Header -->
@@ -63,11 +63,7 @@ const seo = getArtPageSEO();
 						Art
 					</Heading>
 					<Text size="lg" variant="secondary" class="mb-4">
-						A collection of professional, personal, and exploratory 3D work. These pieces span client projects, 
-						studio collaborations, and self-directed studies across character art, hard surface modeling, and real-time rendering.
-					</Text>
-					<Text size="lg" variant="secondary">
-						Each project links to a full breakdown with renders, wireframes, and process notes where available.
+						A collection of professional, personal, and exploratory 3D work. These pieces span client projects, studio collaborations, and self-directed studies across real-time and offline productions. Each project links to a breakdown with renders, wireframes, and process where available.
 					</Text>
 				</div>
 
@@ -86,51 +82,29 @@ const seo = getArtPageSEO();
 				</div>
 
 				<!-- Art Grid -->
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="art-grid">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1" id="art-grid">
 					{artData.map((piece) => (
 						<div class="art-item" data-category={piece.category}>
 							<Card padding="none" interactive href={`/art/${piece.slug}`}>
-								<div class="relative aspect-[4/3] overflow-hidden">
+							<div class="relative aspect-[4/3] overflow-hidden rounded-sm">
 									{piece.heroImage && (
 										<img
 											src={piece.heroImage}
 											alt={piece.title}
-											class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+											class="w-full h-full object-cover transition-all duration-500 group-hover:brightness-[0.25]"
 											loading="lazy"
 											data-no-lightbox
 										/>
 									)}
-								</div>
-								<div class="p-6 space-y-3">
-									<Heading level={3} size="lg" class="line-clamp-2">
-										{piece.title}
-									</Heading>
-									{piece.description && (
-										<Text size="sm" variant="secondary" class="line-clamp-2">
-											{piece.description}
-										</Text>
-									)}
-									<Badge size="sm">{badgeLabels[piece.category] || piece.category}</Badge>
+									<div class="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+										<p class="text-white font-medium text-xl leading-tight">{piece.title}</p>
+										{piece.description && <p class="text-white/70 text-base line-clamp-1 leading-tight">{piece.description}</p>}
+									</div>
 								</div>
 							</Card>
 						</div>
 					))}
 				</div>
-
-				<!-- CTA -->
-				<section class="mt-16 pt-8 border-t-2 border-foreground-secondary/10">
-					<Text variant="secondary" class="mb-4">
-						Interested in working together or seeing more of my process?
-					</Text>
-					<div class="flex gap-4">
-						<Link href="/about" variant="accent">
-							Get in Touch
-						</Link>
-						<Link href="/learn" variant="accent">
-							Teaching
-						</Link>
-					</div>
-				</section>
 
 			</PageContainer>
 		</div>

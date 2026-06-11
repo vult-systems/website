@@ -121,7 +121,7 @@ export const components = {
       lg: 'p-8',
     },
     
-    interactive: 'group hover:bg-card-hover hover:border-border-hover hover:scale-[1.02] transition-all duration-300 cursor-pointer',
+    interactive: 'group hover:bg-card-hover hover:border-border-hover hover:scale-[1.005] transition-all duration-300 cursor-pointer',
   },
 
   link: {
