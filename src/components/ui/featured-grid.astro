@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import Heading from './heading.astro';
 import Text from './text.astro';
 import { layout } from '@/config/design';
@@ -58,12 +59,26 @@ const getImageSrc = (image: string | ImageMetadata | undefined): string => {
             <Card padding="none" interactive href={`/art/${piece.slug}`}>
               <!-- Image -->
               <div class="relative aspect-[4/3] overflow-hidden">
-                <img
-                  src={getImageSrc(piece.heroImage)}
-                  alt={piece.title}
-                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
+                {typeof piece.heroImage === 'object' && piece.heroImage ? (
+                  <Image
+                    src={piece.heroImage}
+                    alt={piece.title}
+                    width={600}
+                    height={450}
+                    format="webp"
+                    quality={82}
+                    fit="cover"
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                  />
+                ) : (
+                  <img
+                    src={getImageSrc(piece.heroImage)}
+                    alt={piece.title}
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                  />
+                )}
               </div>
               
               <!-- Content -->
