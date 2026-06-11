@@ -5,22 +5,26 @@ pubDate: 2024-08-15
 category: "character"
 tags: ["zbrush", "character", "cinematic", "3d", "star-wars"]
 featured: true
-tools: ["ZBrush", "Maya", "Substance Painter", "Marmoset"]
+tools: ["ZBrush", "Maya", "Substance Painter", "Marmoset", "Marvelous Designer"]
 heroImage: "../../assets/swtor/bioware-valkorian-thumb-01.png"
+client: "BioWare"
+project: "Star Wars: The Old Republic"
+role: "3D Character Artist"
 order: 5
 size: "medium"
 ---
 
 import { Image } from 'astro:assets';
+import Heading from '@/components/ui/heading.astro';
 import valkorian01 from '@/assets/swtor/bioware-valkorian-01.png';
 import valkorian02 from '@/assets/swtor/bioware-valkorian-02.jpg';
 import valkorian03 from '@/assets/swtor/bioware-valkorian-03.jpg';
 
-## Project Overview
+<Heading level={2} size="4xl">Project Overview</Heading>
 
 Contributed to character development for BioWare's Star Wars: The Old Republic expansion content. Focused on creating high-fidelity character assets for cinematic sequences and in-game hero characters, working within the established Star Wars visual language while pushing the quality bar for the MMO space.
 
-<Image src={valkorian01} alt="Valkorian Character Art" class="rounded-md border border-border my-8" />
+<Image src={valkorian01} alt="Valkorian Character Art" class="rounded-md my-8" />
 
 ## Technical Details
 
@@ -29,14 +33,14 @@ Contributed to character development for BioWare's Star Wars: The Old Republic e
 - **Style**: Realistic proportions with stylized details matching Star Wars aesthetic
 - **Detail Level**: Cinematic-quality assets for key story moments
 
-<Image src={valkorian02} alt="Valkorian Detail View" class="rounded-md border border-border my-8" />
+<Image src={valkorian02} alt="Valkorian Detail View" class="rounded-md my-8" />
 
 ### Texturing & Materials
 - **Pipeline**: PBR workflow optimized for real-time cinematics
 - **Maps**: Full PBR texture sets with subsurface scattering for skin
 - **Resolution**: 4K hero textures with optimized game-ready versions
 
-<Image src={valkorian03} alt="Valkorian Alternate Angle" class="rounded-md border border-border my-8" />
+<Image src={valkorian03} alt="Valkorian Alternate Angle" class="rounded-md my-8" />
 
 ### Pipeline Integration
 - **Engine**: Integrated with BioWare's proprietary engine

@@ -11,32 +11,33 @@
 <div id="lightbox" class="fixed inset-0 bg-background/95 backdrop-blur-md z-[9999] opacity-0 invisible transition-all duration-200 ease-out flex items-center justify-center p-8">
   <div id="lightbox-container" class="relative max-w-7xl w-full h-full flex items-center justify-center">
     <!-- Close Button -->
-    <button id="close-btn" class="absolute top-4 right-4 z-[10] w-10 h-10 rounded-full bg-card border border-border hover:bg-card-hover transition-colors flex items-center justify-center cursor-pointer">
-      <span class="text-xl">×</span>
+    <button id="close-btn" class="absolute top-4 right-4 z-[10] w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 flex items-center justify-center cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
     
     <!-- Zoom Controls (hidden for video) -->
     <div id="zoom-controls" class="absolute bottom-4 right-4 z-[10] flex gap-2">
-      <button id="zoom-out" class="w-10 h-10 rounded-full bg-card border border-border hover:bg-card-hover transition-colors flex items-center justify-center cursor-pointer">
-        <span class="text-lg">−</span>
+      <button id="zoom-out" class="w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 flex items-center justify-center cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
       </button>
-      <button id="zoom-reset" class="px-4 h-10 rounded-full bg-card border border-border hover:bg-card-hover transition-colors flex items-center justify-center cursor-pointer text-xs">
+      <button id="zoom-reset" class="px-4 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 flex items-center justify-center cursor-pointer text-xs">
         Reset
       </button>
-      <button id="zoom-in" class="w-10 h-10 rounded-full bg-card border border-border hover:bg-card-hover transition-colors flex items-center justify-center cursor-pointer">
-        <span class="text-lg">+</span>
+      <button id="zoom-in" class="w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 flex items-center justify-center cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
       </button>
     </div>
     
     <!-- Image Container -->
-    <div id="image-wrapper" class="overflow-hidden rounded-lg bg-card border-2 border-foreground-secondary/10 shadow-2xl max-w-full max-h-[calc(100vh-6rem)] flex items-center justify-center opacity-0 scale-90 transition-all duration-200 ease-out">
+    <div id="image-wrapper" class="rounded-lg shadow-2xl w-[90vw] h-[85vh] flex items-center justify-center opacity-0 scale-90 transition-all duration-200 ease-out">
       <img
         id="lightbox-image"
         src=""
         alt=""
-        class="max-w-full max-h-[calc(100vh-6rem)] object-contain transition-transform duration-150 ease-out select-none"
+        class="w-full h-full object-contain transition-transform duration-150 ease-out select-none"
         style="cursor: grab;"
         draggable="false"
+        data-no-lightbox
       />
     </div>
 
@@ -57,6 +58,7 @@
 <script>
   let scale = 1;
   let isDragging = false;
+  let hasDragged = false;
   let startX = 0, startY = 0;
   let currentX = 0, currentY = 0;
   let isVideoMode = false;
@@ -218,6 +220,7 @@
     if (target.id === 'lightbox-image' && scale > 1) {
       e.preventDefault();
       isDragging = true;
+      hasDragged = false;
       startX = e.clientX - currentX;
       startY = e.clientY - currentY;
       target.style.cursor = 'grabbing';
@@ -228,6 +231,7 @@
   document.addEventListener('mousemove', (e) => {
     if (isDragging && scale > 1) {
       e.preventDefault();
+      hasDragged = true;
       const img = document.getElementById('lightbox-image') as HTMLImageElement;
       currentX = e.clientX - startX;
       currentY = e.clientY - startY;
@@ -245,6 +249,14 @@
       }
     }
   });
+
+  // Suppress click after drag so the lightbox doesn't re-open and reset zoom
+  document.addEventListener('click', (e) => {
+    if (hasDragged) {
+      hasDragged = false;
+      e.stopImmediatePropagation();
+    }
+  }, true);
 
   // Mouse wheel zoom on image wrapper
   document.addEventListener('wheel', (e) => {

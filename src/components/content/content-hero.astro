@@ -25,17 +25,17 @@ const {
 const heroImageSrc = typeof heroImage === 'string' ? heroImage : heroImage?.src;
 ---
 
-<section class="py-20 md:py-32">
+<section class="py-8 sm:py-12">
   <div class={layout.container}>
-    <div class="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center">
+    <div class="flex flex-col items-start gap-4 text-left">
       <!-- Title -->
-      <Heading level={1} size="4xl" align="center" class="max-w-3xl text-pretty">
+      <Heading level={1} size="4xl" class="text-pretty mb-0">
         {title}
       </Heading>
       
       <!-- Description -->
       {description && (
-        <Text size="xl" variant="secondary" align="center" class="max-w-3xl">
+        <Text size="xl" variant="secondary" class="leading-tight !text-foreground-muted">
           {description}
         </Text>
       )}
@@ -60,7 +60,7 @@ const heroImageSrc = typeof heroImage === 'string' ? heroImage : heroImage?.src;
           id="hero-image"
           src={heroImageSrc}
           alt={title}
-          class="mb-8 mt-4 aspect-[4/3] w-full rounded-md object-cover"
+          class="mb-8 mt-4 w-full rounded-md object-cover"
         />
       )}
     </div>
