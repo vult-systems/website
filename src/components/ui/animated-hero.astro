@@ -1,10 +1,12 @@
 ---
 import { Image } from 'astro:assets';
 import profileImg from '@/assets/profile/profile.jpg';
+import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
 import { SITE } from '@/config/site';
+import { layout } from '@/config/design';
 
 interface Props {
   class?: string;
@@ -15,28 +17,28 @@ const { class: className = "" } = Astro.props;
 // Define the rotating content for different pages
 const rotatingContent = [
   {
-    text: "digital craftmanship",
+    text: "Portfolio Works",
     icon: "🎨",
     link: "/art",
-    linkText: "ART"
+    linkText: "Art"
   },
   {
-    text: "studio practice",
+    text: "Studio Practice",
     icon: "⚡",
     link: "/vult",
-    linkText: "VULT"
+    linkText: "Vult"
   },
   {
-    text: "creative education",
+    text: "Creative Education",
     icon: "📚",
     link: "/learn",
-    linkText: "LEARN"
+    linkText: "Learn"
   },
   {
-    text: "documenting process",
+    text: "Rambling Thoughts",
     icon: "📝",
     link: "/log",
-    linkText: "LOG"
+    linkText: "Log"
   }
 ];
 
@@ -47,36 +49,42 @@ const sectionClasses = [
 ---
 
 <section class={sectionClasses} id="animated-hero-section">
-  <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+  <!-- Background Image -->
+  <div class="absolute inset-0 -z-10 overflow-hidden">
+    <Image
+      src={heroBg}
+      alt=""
+      class="w-full h-full object-cover object-center"
+      loading="eager"
+      widths={[800, 1200, 1920]}
+    />
+    <div class="absolute inset-0 bg-black/85"></div>
+  </div>
+  <div class={layout.container}>
     <div class="grid items-center gap-12 lg:grid-cols-[1.5fr_1.1fr]">
       
       <!-- Left Column - Animated Text (hidden on mobile) -->
       <div class="hidden lg:flex flex-col items-start text-left order-1 -mt-12">
-        <div class="mb-0">
-          <Heading level={1} size="4.5xl" class="mb-0 text-foreground-muted !font-extralight leading-none">
+        <div class="mb-4">
+          <Heading level={1} size="3xl" class="mb-0 text-foreground-muted !font-extralight leading-none">
             This is my<br />workspace for
           </Heading>
         </div>
-        <div class="relative mb-16 w-full" style="min-height: 6rem;">
+        <div class="relative mb-8 w-full" style="min-height: 10rem;">
           <div id="rotating-text" class="absolute inset-0">
             {rotatingContent.map((item, index) => (
               <div 
                 class={`rotating-item ${index === 0 ? 'active' : ''}`}
                 data-index={index}
               >
-                <Heading level={2} size="4.5xl" class="text-foreground !font-extralight mb-6">
+                <Heading level={2} size="5xl" class="text-foreground !font-extralight mb-4">
                   {item.text}
                 </Heading>
-                <div class="flex items-center gap-3 mb-6">
-                  <span class="text-4xl" role="img" aria-label="icon">
-                    {item.icon}
-                  </span>
-                </div>
                 <Link
                   variant="accent"
                   href={item.link}
                 >
-                  {item.linkText} >
+                  {item.linkText}
                 </Link>
               </div>
             ))}
@@ -99,17 +107,16 @@ const sectionClasses = [
         </div>
         
         <div class="text-left">
-            <Text variant="primary" size="md" class="mb-0 !font-normal text-justify leading-tight">
-              Creating art, tools, and learning systems.
+            <Text variant="primary" size="xl" class="mb-0 !font-normal text-justify leading-tight">
+              Creating Art and Educational Content.
             </Text>
 
-            <Text variant="secondary" size="md" class="mb-2 text-justify leading-tight !text-foreground-muted">
-              I'm a 3D artist and educator based in San Antonio, working across digital media, pipeline development, and creative instruction. 
-              I love creating and sharing what I learn along the way.
+            <Text variant="secondary" size="xl" class="mb-2 text-justify leading-tight !text-foreground-muted">
+              I'm a 3D artist and educator based in San Antonio, Texas, working across real-time and offline productions while striving to create thoughtful and impactful creative instruction.
             </Text>
 
           <Link variant="accent" href="/about">
-            ABOUT ME >
+            About Me
           </Link>
         </div>
       </div>

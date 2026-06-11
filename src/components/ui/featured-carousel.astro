@@ -1,6 +1,7 @@
 ---
 import Text from './text.astro';
 import Link from './link.astro';
+import { layout } from '@/config/design';
 import Badge from './badge.astro';
 import Card from './card.astro';
 import type { ImageMetadata } from 'astro';
@@ -42,30 +43,31 @@ const getImageSrc = (image: string | ImageMetadata | undefined): string => {
 const carouselPieces = artPieces.slice(0, 5);
 ---
 
-<section class:list={["relative z-10 py-16 sm:py-20 overflow-hidden", className]}>
-  <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-    
-    <!-- Section Header (Experience section style) -->
-    <div class="mb-10 sm:mb-12 text-left">
-      {title && (
-        <Text variant="primary" size="md" class="mb-0 !font-normal leading-tight">
-          {title}
-        </Text>
-      )}
-      {description && (
-        <Text variant="secondary" size="md" class="mb-2 leading-tight !text-foreground-muted lg:max-w-[50%]">
-          {description}
-        </Text>
-      )}
-      <Link variant="accent" href={linkHref}>
-        {linkText}
-      </Link>
+<section class:list={["relative z-10 py-8 sm:py-10 overflow-hidden", className]}>
+  {(title || description || linkText) && (
+    <div class={layout.container}>
+      <!-- Section Header (Experience section style) -->
+      <div class="mb-10 sm:mb-12 text-left">
+        {title && (
+          <Text variant="primary" size="md" class="mb-0 !font-normal leading-tight">
+            {title}
+          </Text>
+        )}
+        {description && (
+          <Text variant="secondary" size="md" class="mb-2 leading-tight !text-foreground-muted lg:max-w-[50%]">
+            {description}
+          </Text>
+        )}
+        <Link variant="accent" href={linkHref}>
+          {linkText}
+        </Link>
+      </div>
     </div>
-  </div>
+  )}
 
   <!-- Carousel Container - Full width overflow -->
-  <div class="carousel-container">
-    <div class="carousel-track">
+  <div class="carousel-container" id="carouselContainer">
+    <div class="carousel-track" id="carouselTrack">
       <!-- First set of cards -->
       {carouselPieces.map((piece) => (
         <div class="carousel-item">
@@ -77,25 +79,20 @@ const carouselPieces = artPieces.slice(0, 5);
                 alt={piece.title}
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
+                draggable="false"
               />
             </div>
             
             <!-- Content -->
-            <div class="p-6 space-y-3">
-              <Text variant="primary" size="md" class="!font-medium">
+            <div class="p-6 space-y-0">
+              <Text variant="primary" size="lg" class="!font-medium mb-0 leading-tight">
                 {piece.title}
               </Text>
               {piece.description && (
-                <Text size="sm" variant="secondary" class="line-clamp-2">
+                <Text size="base" variant="secondary" class="line-clamp-1 leading-tight !text-foreground-muted">
                   {piece.description}
                 </Text>
               )}
-              <!-- Category Badge -->
-              <div>
-                <Badge size="sm">
-                  {piece.category}
-                </Badge>
-              </div>
             </div>
           </Card>
         </div>
@@ -111,25 +108,20 @@ const carouselPieces = artPieces.slice(0, 5);
                 alt={piece.title}
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
+                draggable="false"
               />
             </div>
             
             <!-- Content -->
             <div class="p-6 space-y-3">
-              <Text variant="primary" size="md" class="!font-medium">
+              <Text variant="primary" size="lg" class="!font-medium mb-0 leading-tight">
                 {piece.title}
               </Text>
               {piece.description && (
-                <Text size="sm" variant="secondary" class="line-clamp-2">
+                <Text size="base" variant="secondary" class="line-clamp-1 leading-tight !text-foreground-muted">
                   {piece.description}
                 </Text>
               )}
-              <!-- Category Badge -->
-              <div>
-                <Badge size="sm">
-                  {piece.category}
-                </Badge>
-              </div>
             </div>
           </Card>
         </div>
@@ -143,6 +135,12 @@ const carouselPieces = artPieces.slice(0, 5);
     width: 100%;
     overflow: hidden;
     padding: 0 1.5rem;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .carousel-container.dragging {
+    cursor: grabbing;
   }
 
   @media (min-width: 640px) {
@@ -166,37 +164,168 @@ const carouselPieces = artPieces.slice(0, 5);
   .carousel-track {
     display: flex;
     gap: 1.5rem;
-    animation: scroll 180s linear infinite;
     width: max-content;
-  }
-
-  .carousel-track:hover {
-    animation-play-state: paused;
+    will-change: transform;
   }
 
   .carousel-item {
     flex-shrink: 0;
-    width: 440px;
+    width: 800px;
   }
 
   @media (min-width: 640px) {
     .carousel-item {
-      width: 520px;
+      width: 960px;
     }
   }
 
   @media (min-width: 768px) {
     .carousel-item {
-      width: 600px;
+      width: 1100px;
     }
   }
 
-  @keyframes scroll {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(calc(-50% - 0.75rem));
-    }
-  }
 </style>
+
+<script>
+  function initCarousel() {
+    const container = document.getElementById('carouselContainer') as HTMLElement;
+    const track = document.getElementById('carouselTrack') as HTMLElement;
+    if (!container || !track) return;
+
+    // Kill any previous loop attached to this container
+    const prevRaf = (container as any).__carouselRaf;
+    if (prevRaf) cancelAnimationFrame(prevRaf);
+
+    const AUTO_SPEED = 0.4;
+    const FRICTION = 0.92;
+    const MIN_VELOCITY = 0.05;
+
+    let pos = 0;
+    let isDragging = false;
+    let hasDragged = false;
+    let dragStartX = 0;
+    let dragStartPos = 0;
+    let velocity = 0;
+    let isMomentum = false;
+    let lastX = 0;
+    let lastTime = 0;
+
+    const halfWidth = () => track.scrollWidth / 2;
+
+    const wrap = () => {
+      const hw = halfWidth();
+      if (hw <= 0) return;
+      while (pos <= -hw) pos += hw;
+      while (pos > 0) pos -= hw;
+    };
+
+    let rafId: number;
+    const tick = () => {
+      if (isDragging) {
+        // position set directly by handlers
+      } else if (isMomentum) {
+        velocity *= FRICTION;
+        pos += velocity;
+        wrap();
+        track.style.transform = `translateX(${pos}px)`;
+        if (Math.abs(velocity) < MIN_VELOCITY) {
+          isMomentum = false;
+          velocity = 0;
+        }
+      } else {
+        pos -= AUTO_SPEED;
+        wrap();
+        track.style.transform = `translateX(${pos}px)`;
+      }
+      rafId = requestAnimationFrame(tick);
+      (container as any).__carouselRaf = rafId;
+    };
+
+    rafId = requestAnimationFrame(tick);
+    (container as any).__carouselRaf = rafId;
+
+    container.addEventListener('dragstart', (e: DragEvent) => e.preventDefault());
+
+    // ── Mouse ──
+    const onMouseDown = (e: MouseEvent) => {
+      isDragging = true;
+      isMomentum = false;
+      hasDragged = false;
+      velocity = 0;
+      dragStartX = e.clientX;
+      dragStartPos = pos;
+      lastX = e.clientX;
+      lastTime = performance.now();
+      container.classList.add('dragging');
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      const delta = e.clientX - dragStartX;
+      if (Math.abs(delta) > 4) hasDragged = true;
+      pos = dragStartPos + delta;
+      wrap();
+      track.style.transform = `translateX(${pos}px)`;
+      const now = performance.now();
+      const dt = now - lastTime;
+      if (dt > 0) velocity = (e.clientX - lastX) / dt * 16;
+      lastX = e.clientX;
+      lastTime = now;
+    };
+
+    const onMouseUp = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      container.classList.remove('dragging');
+      if (hasDragged) {
+        isMomentum = Math.abs(velocity) > MIN_VELOCITY;
+        const suppress = (ev: Event) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          container.removeEventListener('click', suppress, true);
+        };
+        container.addEventListener('click', suppress, true);
+      }
+    };
+
+    container.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+    // ── Touch ──
+    container.addEventListener('touchstart', (e: TouchEvent) => {
+      isDragging = true;
+      isMomentum = false;
+      hasDragged = false;
+      velocity = 0;
+      dragStartX = e.touches[0].clientX;
+      dragStartPos = pos;
+      lastX = e.touches[0].clientX;
+      lastTime = performance.now();
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e: TouchEvent) => {
+      if (!isDragging) return;
+      const delta = e.touches[0].clientX - dragStartX;
+      if (Math.abs(delta) > 4) hasDragged = true;
+      pos = dragStartPos + delta;
+      wrap();
+      track.style.transform = `translateX(${pos}px)`;
+      const now = performance.now();
+      const dt = now - lastTime;
+      if (dt > 0) velocity = (e.touches[0].clientX - lastX) / dt * 16;
+      lastX = e.touches[0].clientX;
+      lastTime = now;
+    }, { passive: true });
+
+    container.addEventListener('touchend', () => {
+      isDragging = false;
+      isMomentum = Math.abs(velocity) > MIN_VELOCITY;
+    });
+  }
+
+  // Run on first load and every subsequent View Transition navigation
+  initCarousel();
+  document.addEventListener('astro:page-load', initCarousel);
+</script>

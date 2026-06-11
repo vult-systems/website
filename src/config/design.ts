@@ -170,7 +170,7 @@ export const components = {
     sizes: {
       xs: 'text-xs',
       sm: 'text-sm',
-      base: 'text-base',
+      base: 'text-xl',
       lg: 'text-lg',
       xl: 'text-xl',
     },
@@ -196,7 +196,7 @@ export const components = {
  * Layout utilities
  */
 export const layout = {
-  container: 'max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16',
+  container: 'max-w-[102rem] mx-auto px-4 sm:px-6 md:px-8',
   section: {
     base: 'py-16 sm:py-24',
     sm: 'py-8 sm:py-12',

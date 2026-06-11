@@ -1,0 +1,140 @@
+---
+// Simple test page for animations - no dependencies
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animation Test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, sans-serif;
+        background: #0a0a0a;
+        color: #fff;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        padding: 2rem;
+      }
+
+      /* All animated items start hidden */
+      .fade-item {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      /* When .show is added, animate in */
+      .fade-item.show {
+        animation: fadeUp 0.8s ease-out forwards;
+      }
+
+      /* Stagger delays */
+      .fade-item:nth-child(1).show {
+        animation-delay: 0s;
+      }
+      .fade-item:nth-child(2).show {
+        animation-delay: 0.15s;
+      }
+      .fade-item:nth-child(3).show {
+        animation-delay: 0.3s;
+      }
+      .fade-item:nth-child(4).show {
+        animation-delay: 0.45s;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 200;
+      }
+
+      p {
+        font-size: 1.25rem;
+        color: #888;
+        max-width: 500px;
+        text-align: center;
+      }
+
+      .box {
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        border-radius: 12px;
+      }
+
+      button {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        background: #f59e0b;
+        color: #000;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1 class="fade-item">Hello World</h1>
+      <p class="fade-item">
+        This is a test of the page load animation. Elements should fade in one
+        by one.
+      </p>
+      <div class="box fade-item"></div>
+      <p class="fade-item">This is the last element to appear.</p>
+    </div>
+
+    <button onclick="resetAnimation()">Reset Animation</button>
+
+    <script>
+      function triggerAnimation() {
+        const items = document.querySelectorAll(".fade-item");
+
+        // Remove show class first
+        items.forEach((item) => item.classList.remove("show"));
+
+        // Force reflow
+        void document.body.offsetHeight;
+
+        // Add show class after small delay
+        setTimeout(() => {
+          items.forEach((item) => item.classList.add("show"));
+        }, 100);
+      }
+
+      function resetAnimation() {
+        const items = document.querySelectorAll(".fade-item");
+        items.forEach((item) => item.classList.remove("show"));
+
+        setTimeout(() => {
+          triggerAnimation();
+        }, 100);
+      }
+
+      // Run on page load
+      triggerAnimation();
+    </script>
+  </body>
+</html>

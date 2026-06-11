@@ -1,6 +1,7 @@
 ---
 import Heading from '../ui/heading.astro';
 import Text from '../ui/text.astro';
+import { layout } from '@/config/design';
 
 interface Props {
   title: string;
@@ -25,7 +26,7 @@ const heroImageSrc = typeof heroImage === 'string' ? heroImage : heroImage?.src;
 ---
 
 <section class="py-20 md:py-32">
-  <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+  <div class={layout.container}>
     <div class="mx-auto flex max-w-5xl flex-col items-center gap-4 text-center">
       <!-- Title -->
       <Heading level={1} size="4xl" align="center" class="max-w-3xl text-pretty">

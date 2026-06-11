@@ -3,6 +3,7 @@ import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
 import { Image } from 'astro:assets';
+import { layout } from '@/config/design';
 
 // Import logo images - white versions (for dark mode)
 import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
@@ -55,30 +56,30 @@ const defaultLogos: Logo[] = [
 ];
 
 const {
-  title = "Studios & Creative Teams I've Worked With",
-  description = "I've worked across a lot of different corners of the industry: game studios, defense, national labs, startups, academia. Building characters, assets, and pipelines for AAA games, consumer tech, scientific visualization, and a bit of everything in between. If it involves 3D, chances are I've developed something for it.",
+  title = "Studios and Creative Teams I've Worked With",
+  description = "Since beginning my professional journey in 2013, I've had the opportunity to work across a wide range of roles. From intern to art director, and many in between, it's been a rewarding path filled with opportunities to learn, grow, and collaborate with talented teams. Below are a few of the studios and creative partners I've had the pleasure of working with throughout my career.",
   logos = defaultLogos,
   class: className = ''
 } = Astro.props;
 ---
 
 <section class:list={["relative z-10 py-16 sm:py-20", className]}>
-  <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+  <div class={layout.container}>
     
     <!-- Section Header -->
     <div class="mb-10 sm:mb-12 text-left">
       {title && (
-        <Text variant="primary" size="md" class="mb-0 !font-normal leading-tight">
+        <Text variant="primary" size="base" class="mb-0 !font-normal leading-tight">
           {title}
         </Text>
       )}
       {description && (
-        <Text variant="secondary" size="md" class="mb-2 leading-tight !text-foreground-muted lg:max-w-[50%]">
+        <Text variant="secondary" size="base" class="mb-2 leading-tight !text-foreground-muted">
           {description}
         </Text>
       )}
       <Link variant="accent" href="/about">
-        ABOUT ME >
+        Experience
       </Link>
     </div>
 

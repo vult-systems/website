@@ -3,13 +3,14 @@ import { Image } from 'astro:assets';
 import logoSvg from '@/assets/brand/logo.svg';
 import ThemeToggle from '@/components/ui/theme-toggle.astro';
 import { SITE } from '@/config/site';
+import { layout } from '@/config/design';
 
 const currentPath = Astro.url.pathname;
 ---
 
 <div class="w-full bg-background/90 backdrop-blur-lg sticky top-0 left-0 right-0 z-50" transition:persist>
-    <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-        <div class="flex h-24 items-end justify-between pb-6 border-b-2 border-foreground-secondary/10">
+    <div class={layout.container}>
+        <div class="flex h-16 items-end justify-between pb-4 border-b-2 border-foreground-secondary/10">
         <a href="/" class="flex items-end gap-x-3 hover:scale-105 transition-transform duration-200">
             <Image
                 src={logoSvg}
@@ -21,7 +22,7 @@ const currentPath = Astro.url.pathname;
                 transition:name="site-logo"
                 transition:animate="initial"
             />
-            <span class="text-base font-normal text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title" style="font-family: 'Besley', serif !important;">
+            <span class="text-xl font-normal text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title" style="font-family: 'Besley', serif !important;">
                 {SITE.name}
             </span>
         </a>
@@ -30,27 +31,27 @@ const currentPath = Astro.url.pathname;
             <nav class="hidden md:block">
                 <ul class="flex gap-x-6 lg:gap-x-8">
                     <li>
-                        <a href="/art" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/art') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/art" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/art') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Art
                         </a>
                     </li>
                     <li>
-                        <a href="/learn" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/learn') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/learn" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/learn') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Learn
                         </a>
                     </li>
                     <li>
-                        <a href="/log" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/log') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/log" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/log') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Log
                         </a>
                     </li>
                     <li>
-                        <a href="/vult" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/vult') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/vult" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/vult') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             Vult
                         </a>
                     </li>
                     <li>
-                        <a href="/about" class={`text-base inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/about') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                        <a href="/about" class={`text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 ${currentPath.startsWith('/about') ? 'text-accent scale-105' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                             About
                         </a>
                     </li>
@@ -76,27 +77,27 @@ const currentPath = Astro.url.pathname;
     <nav class="max-w-[102rem] mx-auto px-6 sm:px-8 py-6">
         <ul class="flex flex-col gap-4">
             <li>
-                <a href="/art" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/art') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/art" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/art') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     Art
                 </a>
             </li>
             <li>
-                <a href="/learn" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/learn') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/learn" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/learn') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     Learn
                 </a>
             </li>
             <li>
-                <a href="/log" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/log') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/log" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/log') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     Log
                 </a>
             </li>
             <li>
-                <a href="/vult" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/vult') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/vult" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/vult') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     Vult
                 </a>
             </li>
             <li>
-                <a href="/about" class={`text-lg inline-block hover:text-accent transition-colors ${currentPath.startsWith('/about') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
+                <a href="/about" class={`text-xl inline-block hover:text-accent transition-colors ${currentPath.startsWith('/about') ? 'text-accent' : 'text-foreground-secondary'}`} style="font-family: 'Besley', serif !important;">
                     About
                 </a>
             </li>

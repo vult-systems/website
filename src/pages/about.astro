@@ -11,6 +11,7 @@ import profileImg from '@/assets/profile/profile.jpg';
 import resumeThumb from '@/assets/profile/resume-thumbnail.png';
 import { getAboutPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
+import { layout } from '@/config/design';
 
 const seo = getAboutPageSEO();
 ---
@@ -23,7 +24,7 @@ const seo = getAboutPageSEO();
 <Header />
 	<main class="min-h-screen w-full text-foreground">
 		<div class="relative z-10 w-full py-24 sm:py-32">
-			<div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+			<div class={layout.container}>
 				
 				<!-- Two Column Layout -->
 				<div class="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16">
@@ -63,12 +64,12 @@ const seo = getAboutPageSEO();
 								<div class="space-y-2">
 									<div>
 										<Link href={SITE.social.github} variant="accent">
-											GitHub >
+											GitHub
 										</Link>
 									</div>
 									<div>
 										<Link href={SITE.social.linkedin} variant="accent">
-											LinkedIn >
+											LinkedIn
 										</Link>
 									</div>
 								</div>
@@ -125,10 +126,10 @@ const seo = getAboutPageSEO();
 							</Text>
 							<div class="flex flex-wrap gap-4">
 								<Link href="/art" variant="accent">
-									View Work >
+									View Work
 								</Link>
 								<Link href="/learn" variant="accent">
-									Teaching >
+									Teaching
 								</Link>
 							</div>
 						</div>

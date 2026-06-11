@@ -1,0 +1,203 @@
+---
+/**
+ * Scroll Reveal Component
+ *
+ * Animates children when they enter the viewport using Intersection Observer.
+ * Supports various animation types and stagger delays for lists.
+ *
+ * @example
+ * <ScrollReveal animation="fade-up">
+ *   <Card>Content animates on scroll</Card>
+ * </ScrollReveal>
+ *
+ * <ScrollReveal animation="scale" delay={200}>
+ *   <div>Delayed animation</div>
+ * </ScrollReveal>
+ */
+
+type AnimationType =
+  | "fade-up"
+  | "fade-down"
+  | "fade-left"
+  | "fade-right"
+  | "scale"
+  | "blur";
+type TagType = "div" | "section" | "article" | "li" | "span";
+
+interface Props {
+  /** Animation type */
+  animation?: AnimationType;
+  /** Delay in milliseconds */
+  delay?: number;
+  /** Duration in milliseconds */
+  duration?: number;
+  /** How much of element should be visible before triggering (0-1) */
+  threshold?: number;
+  /** Only animate once */
+  once?: boolean;
+  /** HTML tag to render */
+  as?: TagType;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  animation = "fade-up" as AnimationType,
+  delay = 0,
+  duration = 500,
+  threshold = 0.15,
+  once = true,
+  as: Tag = "div" as TagType,
+  class: className = "",
+} = Astro.props as any as Props;
+
+const animationMap: Record<AnimationType, string> = {
+  "fade-up": "animate-fade-in-up",
+  "fade-down": "animate-fade-in-down",
+  "fade-left": "animate-fade-in-left",
+  "fade-right": "animate-fade-in-right",
+  scale: "animate-scale-in",
+  blur: "animate-blur-in",
+};
+
+const animationClass: string = animationMap[animation as AnimationType];
+---
+
+{
+  Tag === "div" && (
+    <div
+      class:list={["scroll-reveal-element", className]}
+      data-animation={animationClass}
+      data-delay={delay}
+      data-duration={duration}
+      data-threshold={threshold}
+      data-once={once}
+    >
+      <slot />
+    </div>
+  )
+}
+{
+  Tag === "section" && (
+    <section
+      class:list={["scroll-reveal-element", className]}
+      data-animation={animationClass}
+      data-delay={delay}
+      data-duration={duration}
+      data-threshold={threshold}
+      data-once={once}
+    >
+      <slot />
+    </section>
+  )
+}
+{
+  Tag === "article" && (
+    <article
+      class:list={["scroll-reveal-element", className]}
+      data-animation={animationClass}
+      data-delay={delay}
+      data-duration={duration}
+      data-threshold={threshold}
+      data-once={once}
+    >
+      <slot />
+    </article>
+  )
+}
+{
+  Tag === "li" && (
+    <li
+      class:list={["scroll-reveal-element", className]}
+      data-animation={animationClass}
+      data-delay={delay}
+      data-duration={duration}
+      data-threshold={threshold}
+      data-once={once}
+    >
+      <slot />
+    </li>
+  )
+}
+{
+  Tag === "span" && (
+    <span
+      class:list={["scroll-reveal-element", className]}
+      data-animation={animationClass}
+      data-delay={delay}
+      data-duration={duration}
+      data-threshold={threshold}
+      data-once={once}
+    >
+      <slot />
+    </span>
+  )
+}
+
+<style>
+  .scroll-reveal-element {
+    opacity: 0;
+  }
+
+  .scroll-reveal-element.is-visible {
+    opacity: 1;
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-reveal-element {
+      opacity: 1 !important;
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Intersection Observer for scroll-triggered animations
+  function initScrollReveal() {
+    const elements = document.querySelectorAll(
+      ".scroll-reveal-element:not(.initialized)"
+    );
+
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            const animation = el.dataset.animation;
+            const delay = parseInt(el.dataset.delay || "0");
+            const duration = parseInt(el.dataset.duration || "600");
+            const once = el.dataset.once === "true";
+
+            setTimeout(() => {
+              el.style.animationDuration = `${duration}ms`;
+              el.classList.add("is-visible");
+              if (animation) {
+                el.classList.add(animation);
+              }
+            }, delay);
+
+            if (once) {
+              observer.unobserve(el);
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    elements.forEach((el) => {
+      el.classList.add("initialized");
+      observer.observe(el);
+    });
+  }
+
+  // Initialize on load and after view transitions
+  initScrollReveal();
+  document.addEventListener("astro:page-load", initScrollReveal);
+</script>

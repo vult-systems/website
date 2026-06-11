@@ -1,6 +1,7 @@
 ---
 import Heading from './heading.astro';
 import Text from './text.astro';
+import { layout } from '@/config/design';
 import Link from './link.astro';
 import Badge from './badge.astro';
 import Card from './card.astro';
@@ -35,7 +36,7 @@ const getImageSrc = (image: string | ImageMetadata | undefined): string => {
 ---
 
 <section class="relative z-10 py-24 sm:py-24">
-  <div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+  <div class={layout.container}>
     
     <!-- Section Header -->
     {(title || description) && (

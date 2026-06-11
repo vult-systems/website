@@ -1,0 +1,174 @@
+---
+/**
+ * Stagger Container Component
+ *
+ * Automatically applies staggered animation delays to child elements.
+ * Use with grid layouts for beautiful cascading reveal effects.
+ *
+ * @example
+ * <StaggerContainer stagger={100}>
+ *   <Card>First</Card>
+ *   <Card>Second (100ms delay)</Card>
+ *   <Card>Third (200ms delay)</Card>
+ * </StaggerContainer>
+ */
+
+type AnimationType =
+  | "fade-up"
+  | "fade-down"
+  | "fade-left"
+  | "fade-right"
+  | "scale"
+  | "blur";
+type TagType = "div" | "ul" | "ol" | "section";
+
+interface Props {
+  /** Animation type for children */
+  animation?: AnimationType;
+  /** Delay between each child animation in ms */
+  stagger?: number;
+  /** Base delay before animations start */
+  baseDelay?: number;
+  /** HTML tag to render */
+  as?: TagType;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  animation = "fade-up" as AnimationType,
+  stagger = 100,
+  baseDelay = 0,
+  as: Tag = "div" as TagType,
+  class: className = "",
+} = Astro.props as any as Props;
+
+const animationMap: Record<AnimationType, string> = {
+  "fade-up": "animate-fade-in-up",
+  "fade-down": "animate-fade-in-down",
+  "fade-left": "animate-fade-in-left",
+  "fade-right": "animate-fade-in-right",
+  scale: "animate-scale-in",
+  blur: "animate-blur-in",
+};
+
+const animationClass: string = animationMap[animation as AnimationType];
+---
+
+{
+  Tag === "div" && (
+    <div
+      class:list={["stagger-container", className]}
+      data-animation={animationClass}
+      data-stagger={stagger}
+      data-base-delay={baseDelay}
+    >
+      <slot />
+    </div>
+  )
+}
+{
+  Tag === "ul" && (
+    <ul
+      class:list={["stagger-container", className]}
+      data-animation={animationClass}
+      data-stagger={stagger}
+      data-base-delay={baseDelay}
+    >
+      <slot />
+    </ul>
+  )
+}
+{
+  Tag === "ol" && (
+    <ol
+      class:list={["stagger-container", className]}
+      data-animation={animationClass}
+      data-stagger={stagger}
+      data-base-delay={baseDelay}
+    >
+      <slot />
+    </ol>
+  )
+}
+{
+  Tag === "section" && (
+    <section
+      class:list={["stagger-container", className]}
+      data-animation={animationClass}
+      data-stagger={stagger}
+      data-base-delay={baseDelay}
+    >
+      <slot />
+    </section>
+  )
+}
+
+<style>
+  .stagger-container > :global(*) {
+    opacity: 0;
+  }
+
+  .stagger-container.is-visible > :global(*) {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stagger-container > :global(*) {
+      opacity: 1 !important;
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  function initStaggerContainers() {
+    const containers = document.querySelectorAll(
+      ".stagger-container:not(.stagger-initialized)"
+    );
+
+    if (!containers.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const container = entry.target as HTMLElement;
+            const animation = container.dataset.animation;
+            const stagger = parseInt(container.dataset.stagger || "100");
+            const baseDelay = parseInt(container.dataset.baseDelay || "0");
+
+            container.classList.add("is-visible");
+
+            const children = container.children;
+            Array.from(children).forEach((child, index) => {
+              const delay = baseDelay + index * stagger;
+              const el = child as HTMLElement;
+
+              setTimeout(() => {
+                el.style.opacity = "1";
+                if (animation) {
+                  el.classList.add(animation);
+                }
+              }, delay);
+            });
+
+            observer.unobserve(container);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    containers.forEach((container) => {
+      container.classList.add("stagger-initialized");
+      observer.observe(container);
+    });
+  }
+
+  initStaggerContainers();
+  document.addEventListener("astro:page-load", initStaggerContainers);
+</script>

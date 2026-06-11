@@ -7,6 +7,7 @@ import AnimatedHero from '@/components/ui/animated-hero.astro';
 import ExperienceSection from '@/components/sections/experience-section.astro';
 import FeaturedCarousel from '@/components/ui/featured-carousel.astro';
 import { getHomePageSEO } from '@/config/seo';
+import { layout } from '@/config/design';
 
 // Get featured art pieces
 const artPieces = await getCollection('art');
@@ -45,24 +46,19 @@ const seo = getHomePageSEO();
 >
 <Header />
 	<main class="min-h-screen w-full text-foreground">
+		<!-- Featured Carousel -->
+		<FeaturedCarousel artPieces={featuredArt} title="" description="" linkText="" />
+
 		<!-- Hero Section -->
 		<AnimatedHero />
 
 		<!-- Divider -->
-		<div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
+		<div class={layout.container}>
 			<div class="border-b-2 border-foreground-secondary/10"></div>
 		</div>
 
 		<!-- Experience Section -->
 		<ExperienceSection />
-
-		<!-- Divider -->
-		<div class="max-w-[102rem] mx-auto px-6 sm:px-8 md:px-12 lg:px-16">
-			<div class="border-b-2 border-foreground-secondary/10"></div>
-		</div>
-
-		<!-- Featured Work -->
-		<FeaturedCarousel artPieces={featuredArt} />
 	</main>
 <Footer />
 </BaseLayout>
