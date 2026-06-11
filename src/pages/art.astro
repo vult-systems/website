@@ -115,8 +115,12 @@ const seo = getArtPageSEO();
 								<img
 									src={piece.heroImage}
 									alt={piece.title}
+									width={800}
+									height={800}
 									class="art-img w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]"
 									loading={piece.eager ? 'eager' : 'lazy'}
+									fetchpriority={piece.eager ? 'high' : 'auto'}
+									decoding="async"
 									data-no-lightbox
 								/>
 							)}
@@ -155,8 +159,8 @@ const seo = getArtPageSEO();
 	}
 
 	.art-img {
-		opacity: 0;
-		transition: opacity 0.4s ease-in-out, filter 0.5s ease, brightness 0.5s ease;
+		opacity: 0.01;
+		transition: opacity 0.2s ease-out;
 	}
 
 	.art-img.loaded {
