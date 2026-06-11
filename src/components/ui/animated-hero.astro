@@ -23,12 +23,6 @@ const rotatingContent = [
     linkText: "Art"
   },
   {
-    text: "Studio Practice",
-    icon: "⚡",
-    link: "/vult",
-    linkText: "Vult"
-  },
-  {
     text: "Creative Education",
     icon: "📚",
     link: "/learn",
@@ -58,7 +52,7 @@ const sectionClasses = [
       loading="eager"
       widths={[800, 1200, 1920]}
     />
-    <div class="absolute inset-0 bg-black/85"></div>
+    <div class="absolute inset-0 bg-white/85 dark:bg-black/85"></div>
   </div>
   <div class={layout.container}>
     <div class="grid items-center gap-12 lg:grid-cols-[1.5fr_1.1fr]">
@@ -147,19 +141,33 @@ const sectionClasses = [
 </style>
 
 <script>
-  // Text rotation logic
-  const rotatingTextContainer = document.getElementById('rotating-text');
-  
-  if (rotatingTextContainer) {
+  let heroInterval: ReturnType<typeof setInterval> | null = null;
+
+  function initAnimatedHero() {
+    // Clear any existing interval
+    if (heroInterval) {
+      clearInterval(heroInterval);
+      heroInterval = null;
+    }
+
+    const rotatingTextContainer = document.getElementById('rotating-text');
+    if (!rotatingTextContainer) return;
+
     const items = rotatingTextContainer.querySelectorAll('.rotating-item');
     let currentIndex = 0;
     const displayDuration = 4000;
     const transitionDuration = 400;
 
+    // Reset to first item
+    items.forEach((item, i) => {
+      item.classList.remove('active', 'exiting');
+      if (i === 0) item.classList.add('active');
+    });
+
     function rotateContent() {
       const currentItem = items[currentIndex];
       currentItem.classList.add('exiting');
-      
+
       setTimeout(() => {
         currentItem.classList.remove('active', 'exiting');
         currentIndex = (currentIndex + 1) % items.length;
@@ -167,6 +175,14 @@ const sectionClasses = [
       }, transitionDuration);
     }
 
-    setInterval(rotateContent, displayDuration);
+    heroInterval = setInterval(rotateContent, displayDuration);
   }
+
+  document.addEventListener('astro:page-load', initAnimatedHero);
+  document.addEventListener('astro:before-swap', () => {
+    if (heroInterval) {
+      clearInterval(heroInterval);
+      heroInterval = null;
+    }
+  });
 </script>

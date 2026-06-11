@@ -73,7 +73,7 @@ const carouselPieces = artPieces.slice(0, 5);
         <div class="carousel-item">
           <Card padding="none" interactive href={`/art/${piece.slug}`}>
             <!-- Image -->
-            <div class="relative aspect-[4/3] overflow-hidden">
+            <div class="relative aspect-square overflow-hidden">
               <img
                 src={getImageSrc(piece.heroImage)}
                 alt={piece.title}
@@ -98,11 +98,12 @@ const carouselPieces = artPieces.slice(0, 5);
         </div>
       ))}
       <!-- Duplicate set for seamless loop -->
+
       {carouselPieces.map((piece) => (
         <div class="carousel-item">
           <Card padding="none" interactive href={`/art/${piece.slug}`}>
             <!-- Image -->
-            <div class="relative aspect-[4/3] overflow-hidden">
+            <div class="relative aspect-square overflow-hidden">
               <img
                 src={getImageSrc(piece.heroImage)}
                 alt={piece.title}

@@ -5,19 +5,20 @@
 @layer base {
   :root {
     /* Semantic color system - Light mode */
-    --background: 0 0% 0%;               /* black */
-    --foreground-secondary: 0 0% 38%;     /* gray-600 */
-    --foreground-muted: 0 0% 62%;         /* gray-500 */
+    --background: 0 0% 97%;              /* near white */
+    --foreground: 0 0% 5%;               /* near black */
+    --foreground-secondary: 0 0% 20%;     /* dark gray */
+    --foreground-muted: 0 0% 38%;         /* medium gray */
     
-    --border: 0 0% 85%;                   /* gray-400 - darker */
-    --border-hover: 0 0% 65%;             /* gray-500 - darker */
+    --border: 0 0% 85%;                   /* light gray */
+    --border-hover: 0 0% 65%;             /* medium gray */
     
     --accent: 28 100% 52%;                /* #FF7C0A */
     --accent-hover: 28 100% 45%;           /* #FF7C0A darker */
     
     /* Component backgrounds */
-    --card-bg: 0 0% 0%;                  /* black */
-    --card-bg-hover: 0 0% 5%;             /* near black on hover */
+    --card-bg: 0 0% 94%;                  /* light gray card */
+    --card-bg-hover: 0 0% 90%;            /* slightly darker on hover */
     
     /* Other semantic tokens */
     --radius: 0.375rem;                   /* 6px - smaller, tighter radius */

@@ -86,19 +86,20 @@ const seo = getArtPageSEO();
 					{artData.map((piece) => (
 						<div class="art-item" data-category={piece.category}>
 							<Card padding="none" interactive href={`/art/${piece.slug}`}>
-							<div class="relative aspect-[4/3] overflow-hidden rounded-sm">
+							<div class="relative aspect-square overflow-hidden rounded-sm">
 									{piece.heroImage && (
 										<img
 											src={piece.heroImage}
 											alt={piece.title}
-											class="w-full h-full object-cover transition-all duration-500 group-hover:brightness-[0.25]"
+											class="w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]"
 											loading="lazy"
 											data-no-lightbox
 										/>
 									)}
+									<div class="absolute inset-0 bg-white/80 dark:bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 									<div class="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-										<p class="text-white font-medium text-xl leading-tight">{piece.title}</p>
-										{piece.description && <p class="text-white/70 text-base line-clamp-1 leading-tight">{piece.description}</p>}
+										<p class="text-foreground dark:text-white font-medium text-xl leading-tight">{piece.title}</p>
+										{piece.description && <p class="text-foreground-secondary dark:text-white/70 text-base line-clamp-1 leading-tight">{piece.description}</p>}
 									</div>
 								</div>
 							</Card>
