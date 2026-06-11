@@ -220,20 +220,18 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		to { opacity: 0; }
 	}
 
-	/* Global image fade-in */
-	img:not([data-no-lightbox]):not(#lightbox-image) {
-		opacity: 0.01;
-		transition: opacity 0.2s ease-out, transform 0.5s ease, filter 0.5s ease;
+	/* Global image fade-in — uses animation not transition so it doesn't conflict with hover transitions */
+	img:not([data-no-lightbox]):not(#lightbox-image):not(.img-ready):not(.img-loaded) {
+		opacity: 0;
 	}
 
 	img.img-loaded:not([data-no-lightbox]):not(#lightbox-image) {
-		opacity: 1;
+		animation: img-fade-in 0.25s ease-out both;
 	}
 
-	/* Skip fade for already-cached images (complete before JS runs) */
-	img.img-ready:not([data-no-lightbox]):not(#lightbox-image) {
-		opacity: 1;
-		transition: transform 0.5s ease, filter 0.5s ease;
+	@keyframes img-fade-in {
+		from { opacity: 0; }
+		to   { opacity: 1; }
 	}
 
 	/* Logo and title persist without animation */
