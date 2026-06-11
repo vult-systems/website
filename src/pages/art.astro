@@ -18,7 +18,7 @@ const artData = artPieces.map(piece => ({
 	slug: piece.slug,
 	title: piece.data.title,
 	description: piece.data.description,
-	heroImage: typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src,
+	heroImage: piece.data.heroImage,
 	category: piece.data.category,
 	tags: piece.data.tags,
 	tools: piece.data.tools,
