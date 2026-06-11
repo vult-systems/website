@@ -220,6 +220,22 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		to { opacity: 0; }
 	}
 
+	/* Global image fade-in */
+	img:not([data-no-lightbox]):not(#lightbox-image) {
+		opacity: 0.01;
+		transition: opacity 0.2s ease-out;
+	}
+
+	img.img-loaded:not([data-no-lightbox]):not(#lightbox-image) {
+		opacity: 1;
+	}
+
+	/* Skip fade for already-cached images (complete before JS runs) */
+	img.img-ready:not([data-no-lightbox]):not(#lightbox-image) {
+		opacity: 1;
+		transition: none;
+	}
+
 	/* Logo and title persist without animation */
 	::view-transition-old(site-logo),
 	::view-transition-new(site-logo),
@@ -239,3 +255,19 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 </style>
 
 <script>
+	const initImageFadeGlobal = () => {
+		const imgs = document.querySelectorAll<HTMLImageElement>(
+			'img:not([data-no-lightbox]):not(#lightbox-image)'
+		);
+		imgs.forEach((img) => {
+			if (img.complete && img.naturalWidth > 0) {
+				img.classList.add('img-ready');
+			} else {
+				img.addEventListener('load', () => img.classList.add('img-loaded'), { once: true });
+				img.addEventListener('error', () => img.classList.add('img-loaded'), { once: true });
+			}
+		});
+	};
+
+	document.addEventListener('astro:page-load', initImageFadeGlobal);
+</script>

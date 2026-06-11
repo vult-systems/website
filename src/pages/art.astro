@@ -157,31 +157,6 @@ const seo = getArtPageSEO();
 	.art-item.hidden {
 		display: none;
 	}
-
-	.art-img {
-		opacity: 0.01;
-		transition: opacity 0.2s ease-out;
-	}
-
-	.art-img.loaded {
-		opacity: 1;
-	}
-
-	.shimmer {
-		background: linear-gradient(90deg, hsl(var(--card)) 25%, hsl(var(--card-hover)) 50%, hsl(var(--card)) 75%);
-		background-size: 200% 100%;
-		animation: shimmer 1.6s infinite;
-	}
-
-	.shimmer:has(.art-img.loaded) {
-		animation: none;
-		background: hsl(var(--card));
-	}
-
-	@keyframes shimmer {
-		0% { background-position: 200% 0; }
-		100% { background-position: -200% 0; }
-	}
 </style>
 
 <script>
@@ -229,16 +204,4 @@ const seo = getArtPageSEO();
 
 	initArtTabs();
 	document.addEventListener('astro:after-swap', initArtTabs);
-
-	const initImageFade = () => {
-		document.querySelectorAll<HTMLImageElement>('.art-img').forEach((img) => {
-			if (img.complete) {
-				img.classList.add('loaded');
-			} else {
-				img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
-			}
-		});
-	};
-
-	document.addEventListener('astro:page-load', initImageFade);
 </script>
