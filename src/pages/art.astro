@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import BaseLayout from '@/layouts/base-layout.astro';
 import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
@@ -14,15 +15,38 @@ import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { getArtPageSEO } from '@/config/seo';
 
 const artPieces = (await getCollection('art')).sort((a, b) => a.data.order - b.data.order);
-const artData = artPieces.map(piece => ({
-	slug: piece.slug,
-	title: piece.data.title,
-	description: piece.data.description,
-	heroImage: typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src,
-	category: piece.data.category,
-	tags: piece.data.tags,
-	tools: piece.data.tools,
-	featured: piece.data.featured,
+
+// Pre-generate optimized WebP thumbnails at build time
+const artData = await Promise.all(artPieces.map(async (piece, index) => {
+	let optimizedSrc: string | undefined;
+	if (piece.data.heroImage && typeof piece.data.heroImage === 'object') {
+		try {
+			const optimized = await getImage({
+				src: piece.data.heroImage,
+				width: 800,
+				height: 800,
+				format: 'webp',
+				quality: 82,
+				fit: 'cover',
+			});
+			optimizedSrc = optimized.src;
+		} catch {
+			optimizedSrc = typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src;
+		}
+	} else {
+		optimizedSrc = typeof piece.data.heroImage === 'string' ? piece.data.heroImage : undefined;
+	}
+	return {
+		slug: piece.slug,
+		title: piece.data.title,
+		description: piece.data.description,
+		heroImage: optimizedSrc,
+		category: piece.data.category,
+		tags: piece.data.tags,
+		tools: piece.data.tools,
+		featured: piece.data.featured,
+		eager: index < 3,
+	};
 }));
 
 // Build category list
@@ -86,16 +110,16 @@ const seo = getArtPageSEO();
 					{artData.map((piece) => (
 						<div class="art-item" data-category={piece.category}>
 							<Card padding="none" interactive href={`/art/${piece.slug}`}>
-							<div class="relative aspect-square overflow-hidden rounded-sm bg-card">
-									{piece.heroImage && (
-										<img
-											src={piece.heroImage}
-											alt={piece.title}
-											class="art-img w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]"
-											loading="lazy"
-											data-no-lightbox
-										/>
-									)}
+				<div class="relative aspect-square overflow-hidden rounded-sm bg-card shimmer">
+							{piece.heroImage && (
+								<img
+									src={piece.heroImage}
+									alt={piece.title}
+									class="art-img w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]"
+									loading={piece.eager ? 'eager' : 'lazy'}
+									data-no-lightbox
+								/>
+							)}
 									<div class="absolute inset-0 bg-white/80 dark:bg-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 									<div class="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 										<p class="text-foreground dark:text-white font-medium text-xl leading-tight">{piece.title}</p>
@@ -137,6 +161,22 @@ const seo = getArtPageSEO();
 
 	.art-img.loaded {
 		opacity: 1;
+	}
+
+	.shimmer {
+		background: linear-gradient(90deg, hsl(var(--card)) 25%, hsl(var(--card-hover)) 50%, hsl(var(--card)) 75%);
+		background-size: 200% 100%;
+		animation: shimmer 1.6s infinite;
+	}
+
+	.shimmer:has(.art-img.loaded) {
+		animation: none;
+		background: hsl(var(--card));
+	}
+
+	@keyframes shimmer {
+		0% { background-position: 200% 0; }
+		100% { background-position: -200% 0; }
 	}
 </style>
 
