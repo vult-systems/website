@@ -8,6 +8,8 @@ import PageContainer from '@/components/layout/page-container.astro';
 import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Badge from '@/components/ui/badge.astro';
+import { Image } from 'astro:assets';
+import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getBlogPageSEO } from '@/config/seo';
 
 const logPosts = await getCollection('log', ({ data }) => {
@@ -54,6 +56,28 @@ const seo = getBlogPageSEO();
 >
 	<Header />
 	<PageMain class="text-foreground">
+		<!-- Page Header with Background -->
+		<div class="relative w-full py-8 sm:py-10">
+			<div class="absolute inset-0 -z-10 overflow-hidden">
+				<Image
+					src={heroBg}
+					alt=""
+					class="w-full h-full object-cover object-center"
+					loading="eager"
+					widths={[800, 1200, 1920]}
+				/>
+				<div class="absolute inset-0 bg-white/85 dark:bg-black/85"></div>
+			</div>
+			<PageContainer>
+				<Heading level={1} size="4xl" class="mb-4">
+					Log
+				</Heading>
+				<Text size="lg" variant="secondary">
+					Thoughts, process notes, and work in progress.
+				</Text>
+			</PageContainer>
+		</div>
+
 		<div class="relative z-10 w-full py-8 sm:py-12">
 			<PageContainer>
 

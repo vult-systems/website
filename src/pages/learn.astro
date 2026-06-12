@@ -11,6 +11,8 @@ import Badge from '@/components/ui/badge.astro';
 import Card from '@/components/ui/card.astro';
 import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { Image } from 'astro:assets';
+import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
+import alienBustThumb from '@/assets/courses/organic-modeling/alien-bust/cg-alienbust-thumb-01.png';
 import { getLearnPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
 
@@ -43,12 +45,23 @@ interface CourseAssignment {
 	title: string;
 }
 
+interface CourseProject {
+	slug: string;
+	title: string;
+	description: string;
+	thumbnail?: ImageMetadata;
+}
+
 interface Course {
 	code: string;
 	title: string;
 	description: string;
+	outcomes?: string;
+	required?: string;
+	audience?: string;
 	syllabus?: ImageMetadata;
 	assignments?: CourseAssignment[];
+	projects?: CourseProject[];
 }
 
 interface CurriculumYear {
@@ -61,43 +74,68 @@ const curriculum: CurriculumYear[] = [
 	{
 		year: 'Freshman',
 		courses: [
-			{ code: 'ANGD 1101', title: 'Orientation to ANGD', description: 'Introduction to the Animation and Game Design program, its culture, expectations, and the industry landscape students are preparing for.' },
-			{ code: 'ANGD 1312', title: 'Hard Surface Modeling', description: 'Fundamentals of polygonal modeling for mechanical and manufactured objects. Emphasis on clean topology, edge flow, and production-ready geometry.' },
-			{ code: 'ANGD 1314', title: 'Organic Modeling', description: 'Introduction to sculpting and modeling organic forms. Covers body proportions, natural shapes, and transitioning between high and low poly workflows.' },
-			{ code: 'FYES 1211', title: 'First Year Experience Seminar', description: 'University transition course focused on academic skills, professional development, and building habits for creative careers.' },
+			{
+				code: 'ANGD 1314',
+				title: 'Organic Modeling',
+				description: 'This beginner-level studio course offers an overview of character sculpting and modeling techniques, laying the foundation for creating detailed, production-ready 3D character sculptures. It blends traditional art principles with a technical approach to mastering ZBrush for both organic and hard surface techniques.',
+				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
+				audience: 'This is a Freshman level course required of ANGD BFA majors.',
+				projects: [
+					{ slug: 'alien-bust', title: 'Alien Bust', description: '', thumbnail: alienBustThumb },
+					{ slug: 'elemental-golem', title: 'Elemental Golem', description: '' },
+					{ slug: 'nerf-gun', title: 'Nerf Gun', description: '' },
+					{ slug: 'bipedal-character', title: 'Bipedal Character', description: '' },
+				],
+			},
 		],
 	},
 	{
 		year: 'Sophomore',
 		courses: [
-			{ code: 'ANGD 2333', title: 'Environment Production I', description: 'Fundamentals of environment art production. Students build modular assets and learn scene composition for real-time engines.' },
-			{ code: 'ANGD 2334', title: 'Environment Production II', description: 'Continued environment work with focus on texturing, lighting, and presentation. Students develop a polished environment portfolio piece.' },
-			{ code: 'ANGD 2361', title: 'Character Modeling I', description: 'Introduction to character creation. Covers base mesh construction, anatomical landmarks, and the fundamentals of building believable characters.' },
-			{ code: 'ANGD 1380', title: 'Anatomy for Animators', description: 'Study of human anatomy as it applies to 3D art and animation. Skeletal structure, musculature, and how the body moves and deforms.' },
+			{
+				code: 'ANGD 1380',
+				title: 'Anatomy for 3D Artists',
+				description: 'This lecture course develops anatomical knowledge for artists and animators, with a focus on superficial human anatomy, including major muscle groups, skeletal structures, and surface forms of the body.',
+				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
+				audience: 'This is a Sophomore level course required of ANGD BFA majors.',
+				projects: [
+					{ slug: 'skeletal-study', title: 'Skeletal Reference Study', description: 'Model a skeletal reference for animation study.' },
+					{ slug: 'muscle-groups', title: 'Muscle Group Analysis', description: 'Layer primary muscle groups over a base skeleton.' },
+					{ slug: 'gesture-figure', title: 'Gesture & Figure', description: 'Dynamic figure study focusing on movement and weight.' },
+				],
+			},
 		],
 	},
 	{
-		year: 'Junior',
+		year: 'Sophomore / Junior',
 		courses: [
-			{ code: 'ANGD 3331', title: 'Environment Production III', description: 'Advanced environment techniques including procedural workflows, trim sheets, and large-scale scene construction.' },
-			{ code: 'ANGD 3361', title: 'Character Modeling II', description: 'Intermediate character art. Students tackle facial modeling, clothing, accessories, and begin developing personal style within production constraints.' },
-			{ code: 'ANGD 3330', title: 'History of Games', description: 'Survey of the game industry from its origins to today. People, companies, technology, and the cultural forces that shaped interactive entertainment.' },
-			{ code: 'ANGD 3332', title: 'Environment Production IV', description: 'Capstone environment course. Students produce a fully realized environment ready for portfolio presentation and industry review.' },
-			{ code: 'ANGD 4140', title: 'Senior Thesis Workshop', description: 'Pre-production planning for the senior thesis. Concept development, scope definition, pipeline planning, and milestone scheduling.' },
-			{ code: 'ANGD 3362', title: 'Character Modeling III', description: 'Advanced character creation covering hair, cloth, armor systems, and final presentation. Portfolio-ready character pieces are the deliverable.' },
-		],
-	},
-	{
-		year: 'Senior',
-		courses: [
-			{ code: 'ANGD 4350', title: 'Senior Thesis Production I', description: 'First semester of thesis execution. Students produce work against their approved plan with regular critiques, reviews, and milestone check-ins.' },
-			{ code: 'ANGD 4360', title: 'Senior Thesis Production II', description: 'Final semester of thesis work. Polish, presentation, and defense of the completed thesis project before faculty and industry reviewers.' },
-		],
-	},
-	{
-		year: 'Graduate',
-		courses: [
-			{ code: 'ANGD 6332', title: 'Graduate Environment Arts IV', description: 'Graduate-level environment art production with emphasis on research-driven process, advanced techniques, and publishable quality work.' },
+			{
+				code: 'ANGD 2333 · 2334 · 3331',
+				title: 'Environment Production I–III',
+				description: 'This progressive studio course sequence develops the skills required to create production-ready 3D environments for both real-time and offline workflows. Students explore modular workflows, hard-surface and organic asset creation, materials, lighting, composition, optimization, world-building, and engine integration while producing increasingly complex environments for games and cinematic applications.',
+				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
+				audience: 'This is a Sophomore–Junior level course required of ANGD BFA majors.',
+				projects: [
+					{ slug: 'trim-sheet', title: 'Trim Sheet Design', description: 'Create a production-ready trim sheet for an environment set.' },
+					{ slug: 'modular-kit', title: 'Modular Kit', description: 'Build a modular architecture kit for real-time use.' },
+					{ slug: 'hero-prop', title: 'Hero Prop', description: 'Fully textured hero asset with LODs.' },
+					{ slug: 'full-scene', title: 'Full Scene Assembly', description: 'A complete, lit environment built from the semester\'s assets.' },
+				],
+			},
+			{
+				code: 'ANGD 2361 · 3361 · 3362',
+				title: 'Character Modeling I–III',
+				description: 'This progressive studio course sequence focuses on the creation of production-ready 3D characters for both real-time and offline workflows. Students develop skills in anatomy, sculpting, topology, clothing, materials, grooming, optimization, and rigging while advancing from foundational character principles to fully realized, industry-centric character art.',
+				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
+				audience: 'This is a Sophomore–Junior level course required of ANGD BFA majors.',
+				projects: [
+					{ slug: 'base-mesh', title: 'Base Mesh', description: '' },
+					{ slug: 'highpoly-sculpt', title: 'High-Poly Sculpt', description: '' },
+					{ slug: 'retopology', title: 'Retopology', description: '' },
+					{ slug: 'texturing', title: 'Texturing', description: '' },
+					{ slug: 'final-character', title: 'Final Character', description: '' },
+				],
+			},
 		],
 	},
 ];
@@ -163,345 +201,584 @@ const resources = [
 		],
 	},
 ];
+
+// Flatten all courses for sidebar nav
+const allCourses = curriculum.flatMap(level =>
+	level.courses.map(c => ({ ...c, year: level.year }))
+);
+const courseId = (code: string) => code.toLowerCase().replace(/\s+/g, '-');
+const resourceId = (category: string) => category.toLowerCase().replace(/[\s&]+/g, '-');
 ---
 
+
 <BaseLayout 
-	title={seo.title} 
-	description={seo.description}
-	keywords={seo.keywords}
+title={seo.title} 
+description={seo.description}
+keywords={seo.keywords}
 >
-	<Header />
-	<PageMain class="text-foreground">
-		<div class="relative z-10 w-full py-8 sm:py-12">
-			<PageContainer>
-				
-				<!-- Page Header -->
-				<div class="mb-16">
-					<Heading level={1} size="4xl" class="mb-4">
-						Learn
+<Header />
+<PageMain class="text-foreground">
+<!-- Page Header with Background -->
+<div class="relative w-full py-8 sm:py-10">
+<div class="absolute inset-0 -z-10 overflow-hidden">
+<Image
+src={heroBg}
+alt=""
+class="w-full h-full object-cover object-center"
+loading="eager"
+widths={[800, 1200, 1920]}
+/>
+<div class="absolute inset-0 bg-white/85 dark:bg-black/85"></div>
+</div>
+<PageContainer>
+<Heading level={1} size="4xl" class="mb-4">
+Learn
+</Heading>
+<Text size="lg" variant="secondary" class="mb-4">
+A hub for my academic work, curriculum, and the courses I teach. Everything from introductory modeling and anatomy 
+to game history and senior thesis production. Below you'll find courses I've created, revised, or taught, along with student work and the tools and resources we use in the program.
+</Text>
+</PageContainer>
+</div>
+
+<div class="relative z-10 w-full py-8 sm:py-12">
+<PageContainer>
+
+<!-- Tab Navigation -->
+<div class="mb-10 overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
+<div class="flex gap-6 border-b-2 border-foreground-secondary/10 whitespace-nowrap min-w-max sm:min-w-0">
+<button class="learn-tab pb-3 text-base text-accent border-b-2 border-accent -mb-[2px] transition-colors" data-tab="classes" style="font-family: 'Besley', serif !important;">
+Classes
+</button>
+<button class="learn-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-tab="student-work" style="font-family: 'Besley', serif !important;">
+Student Work
+</button>
+<button class="learn-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-tab="tools" style="font-family: 'Besley', serif !important;">
+Tools & Resources
+</button>
+</div>
+</div>
+
+<!-- Content with Sidebar -->
+<div class="flex gap-12 lg:gap-16 relative">
+
+<!-- Sidebar -->
+<aside class="hidden lg:block w-72 shrink-0">
+<div class="sticky top-32">
+
+<!-- Sidebar: Classes -->
+<div id="sidebar-classes" class="learn-sidebar">
+<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+Courses
+</Text>
+<nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
+{allCourses.map((course) => (
+<a
+href={`#${courseId(course.code)}`}
+class="learn-nav-link block leading-snug group"
+data-slug={courseId(course.code)}
+>
+<span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{course.code}</span>
+<span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{course.title}</span>
+</a>
+))}
+</nav>
+</div>
+
+<!-- Sidebar: Student Work -->
+<div id="sidebar-student-work" class="learn-sidebar hidden">
+<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+Work
+</Text>
+<nav class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4">
+{studentWork.map((piece) => (
+<a
+href={`#student-${piece.student.toLowerCase().replace(/\s+/g, '-')}-${piece.title.toLowerCase().replace(/\s+/g, '-')}`}
+class="learn-nav-link block text-sm text-foreground-secondary hover:text-accent transition-colors leading-snug"
+data-slug={`student-${piece.student.toLowerCase().replace(/\s+/g, '-')}-${piece.title.toLowerCase().replace(/\s+/g, '-')}`}
+style="font-family: 'Besley', serif !important;"
+>
+{piece.title}
+</a>
+))}
+</nav>
+</div>
+
+<!-- Sidebar: Tools -->
+<div id="sidebar-tools" class="learn-sidebar hidden">
+<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+Categories
+</Text>
+<nav class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4">
+{resources.map((group) => (
+<a
+href={`#${resourceId(group.category)}`}
+class="learn-nav-link block text-sm text-foreground-secondary hover:text-accent transition-colors leading-snug"
+data-slug={resourceId(group.category)}
+style="font-family: 'Besley', serif !important;"
+>
+{group.category}
+</a>
+))}
+</nav>
+</div>
+
+</div>
+</aside>
+
+<!-- Main Content -->
+<div class="flex-1 min-w-0">
+
+<!-- Panel: Classes -->
+<div id="panel-classes" class="learn-panel">
+
+	<!-- Course list -->
+	<div id="classes-list" class="space-y-3 hidden">
+		{allCourses.map((course) => (
+			<button
+				class="course-card w-full text-left rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-5 group"
+				data-course={courseId(course.code)}
+			>
+				<div class="flex items-start justify-between gap-4">
+					<div class="min-w-0">
+						<div class="flex items-center gap-2 mb-2">
+							<span class="text-xs font-medium text-accent" style="font-family: 'Besley', serif !important;">{course.code}</span>
+							<span class="text-xs text-foreground-muted">{course.year}</span>
+						</div>
+						<p class="text-base font-medium text-foreground mb-1" style="font-family: 'Besley', serif !important;">{course.title}</p>
+						<p class="text-sm text-foreground-secondary line-clamp-2">{course.description}</p>
+					</div>
+					<svg class="w-5 h-5 text-foreground-muted group-hover:text-accent transition-colors shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+					</svg>
+				</div>
+			</button>
+		))}
+	</div>
+
+	<!-- Course detail -->
+	<div id="classes-detail">
+
+		<!-- Dynamic course content -->
+		{allCourses.map((course) => (
+			<div id={`detail-${courseId(course.code)}`} class="course-detail-content hidden">
+				<div class="mb-8">
+					<div class="flex items-center gap-3 mb-3">
+						<Badge variant="accent" size="sm">{course.code}</Badge>
+						<Badge variant="outline" size="sm">{course.year}</Badge>
+					</div>
+					<Heading level={2} size="2xl" class="mb-3">
+						{course.title}
 					</Heading>
-					<Text size="lg" variant="secondary" class="mb-4">
-						A hub for my academic work, curriculum, and the courses I teach. Everything from introductory modeling and anatomy 
-						to game history and senior thesis production.
+					<Text size="base" variant="secondary">
+						{course.description}
 					</Text>
-					<Text size="lg" variant="secondary">
-						Below you'll find courses I've created, revised, or taught, along with student work and the tools and resources we use in the program.
-					</Text>
+					{course.outcomes && (
+						<div class="mt-5">
+							<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Outcomes</p>
+							<Text size="base" variant="secondary">{course.outcomes}</Text>
+						</div>
+					)}
+					{(course.required || course.audience) && (
+						<div class="mt-4 flex flex-col gap-2">
+							{course.required && (
+								<p class="text-base" style="font-family: 'Besley', serif !important;">
+									<span class="text-foreground-muted">Required: </span>
+									<span class="text-foreground-secondary">{course.required}</span>
+								</p>
+							)}
+							{course.audience && (
+								<p class="text-base" style="font-family: 'Besley', serif !important;">
+									<span class="text-foreground-muted">Audience: </span>
+									<span class="text-foreground-secondary">{course.audience}</span>
+								</p>
+							)}
+						</div>
+					)}
 				</div>
 
-				<!-- Tab Navigation -->
-				<div class="mb-10 overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
-					<div class="flex gap-6 border-b-2 border-foreground-secondary/10 whitespace-nowrap min-w-max sm:min-w-0">
-						<button class="learn-tab pb-3 text-base text-accent border-b-2 border-accent -mb-[2px] transition-colors" data-tab="curriculum" style="font-family: 'Besley', serif !important;">
-							Curriculum
-						</button>
-						<button class="learn-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-tab="student-work" style="font-family: 'Besley', serif !important;">
-							Student Work
-						</button>
-						<button class="learn-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-tab="tools" style="font-family: 'Besley', serif !important;">
-							Tools & Resources
-						</button>
-					</div>
-				</div>
-
-				<!-- Tab: Curriculum -->
-				<div id="tab-curriculum" class="learn-tab-content">
-					<Text variant="secondary" class="mb-8">
-						Courses I've developed and taught, organized by year. The sequence builds from foundational 
-						modeling skills through advanced production and thesis work.
-					</Text>
-
-					<div class="space-y-8">
-						{curriculum.map((level) => (
-							<div>
-								<Heading level={3} size="lg" class="mb-4">
-									{level.year}
-								</Heading>
-								<div class="grid sm:grid-cols-2 gap-3">
-									{level.courses.map((course) => (
-										<Card variant="bordered" padding="sm">
-											<div class="flex items-center gap-3 mb-2">
-												<Badge variant="accent" size="sm">{course.code}</Badge>
-												<Text variant="primary" size="sm">{course.title}</Text>
-											</div>
-											<Text variant="muted" size="sm" class="mb-4">
-												{course.description}
-											</Text>
-											{/* Syllabus & Assignment Thumbnails */}
-											<div class="flex gap-3 flex-wrap">
-												{/* Syllabus placeholder */}
-												<div class="flex-shrink-0">
-													<div class="learn-lightbox-trigger w-24 h-32 rounded border border-border bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 hover:border-accent/40 transition-all" data-label={`${course.code} Syllabus & Outline`}>
-														<svg class="w-7 h-7 text-foreground-muted mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-														</svg>
-														<span class="text-[10px] text-foreground-muted">Syllabus</span>
-													</div>
-												</div>
-												{/* Assignment placeholders */}
-												{[1, 2, 3].map((n) => (
-													<div class="flex-shrink-0">
-														<div class="learn-lightbox-trigger w-24 h-24 rounded border border-border bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 hover:border-accent/40 transition-all" data-label={`${course.code} Assignment ${n}`}>
-															<svg class="w-7 h-7 text-foreground-muted mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-															</svg>
-															<span class="text-[10px] text-foreground-muted">Assignment {n}</span>
-														</div>
-													</div>
-												))}
-											</div>
-										</Card>
-									))}
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-
-				<!-- Tab: Student Work -->
-				<div id="tab-student-work" class="learn-tab-content hidden">
-					<Text variant="secondary" class="mb-8">
-						Highlights from student work across my courses.
-					</Text>
-
-					<!-- Year filter -->
-					<div class="flex gap-4 mb-8">
-						<button class="student-filter text-accent border-b-2 border-accent pb-1 transition-colors" data-year="all" style="font-family: 'Besley', serif !important;">
-							All
-						</button>
-						{[...new Set(studentWork.map(s => s.year))].sort().reverse().map((year) => (
-							<button class="student-filter text-foreground-secondary border-b-2 border-transparent pb-1 hover:text-accent transition-colors" data-year={year} style="font-family: 'Besley', serif !important;">
-								{year}
-							</button>
-						))}
-					</div>
-					
-					<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="student-grid">
-						{studentWork.map((piece) => (
-							<div class="student-item" data-year={piece.year}>
-								<Card variant="bordered" padding="none">
-									{piece.video ? (
-										<!-- Video -->
-										<div class="video-lightbox-trigger relative bg-black rounded-t-md overflow-hidden cursor-pointer" data-video={piece.video}>
-											<video
-												src={piece.video}
-												class="w-full h-auto pointer-events-none"
-												autoplay
-												loop
-												muted
-												playsinline
-												preload="auto"
-											></video>
-											<!-- Click target + hover hint -->
-											<div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20 group">
-												<svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-													<path d="M8 5v14l11-7z" />
-												</svg>
-											</div>
-										</div>
+				<!-- Project cards -->
+				<div class="grid grid-cols-1 gap-4">
+					{(course.projects || []).map((project) => (
+						<button
+							class="project-card w-full text-left rounded-lg border border-border bg-card overflow-hidden group transition-transform duration-300 hover:scale-[1.01]"
+							data-course={courseId(course.code)}
+							data-project={project.slug}
+						>
+							<div class="flex items-stretch">
+								<!-- Thumbnail -->
+								<div class="relative shrink-0 bg-foreground/5 flex items-center justify-center overflow-hidden rounded-l-lg" style="width: 34rem; aspect-ratio: 3840/2426; isolation: isolate;">
+									{project.thumbnail ? (
+										<Image src={project.thumbnail} alt={project.title} class="absolute inset-0 w-full h-full object-cover" data-no-lightbox />
 									) : (
-										<!-- Placeholder thumbnail -->
-										<div class="learn-lightbox-trigger relative aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 transition-all" data-label={`${piece.student} — ${piece.title}`}>
-											<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-											</svg>
-											<span class="text-xs text-foreground-muted">Image Coming Soon</span>
-										</div>
+										<svg class="w-10 h-10 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+										</svg>
 									)}
-									<!-- Info -->
-									<div class="p-4 space-y-2">
-										<Text variant="primary" size="sm" class="font-medium">{piece.title}</Text>
-										<Text variant="muted" size="sm">{piece.student}</Text>
-										<div class="flex gap-2">
-											<Badge size="sm" variant="accent">{piece.course}</Badge>
-											<Badge size="sm">{piece.year}</Badge>
-										</div>
-									</div>
-								</Card>
-							</div>
-						))}
-					</div>
-				</div>
-
-				<!-- Tab: Tools & Resources -->
-				<div id="tab-tools" class="learn-tab-content hidden">
-					<Text variant="secondary" class="mb-8">
-						Software, tools, and technologies used across my courses. This is the stack students work with to 
-						build industry-relevant skills.
-					</Text>
-
-					<div class="grid sm:grid-cols-2 gap-6">
-						{resources.map((group) => (
-							<Card variant="bordered" padding="lg">
-								<Heading level={3} size="lg" class="mb-4">
-									{group.category}
-								</Heading>
-								<div class="space-y-3">
-									{group.items.map((item) => (
-										<div>
-											<Text variant="primary" size="sm" class="font-medium">
-												{item.name}
-											</Text>
-											<Text variant="muted" size="sm">
-												{item.description}
-											</Text>
-										</div>
-									))}
 								</div>
-							</Card>
-						))}
-					</div>
+								<!-- Text -->
+								<div class="w-[32rem] shrink-0 p-6 flex flex-col justify-center border-l border-border">
+									<p class="text-base text-foreground-muted mb-3 whitespace-nowrap" style="font-family: 'Besley', serif !important;">{course.code} - {course.title}</p>
+									<p class="text-5xl font-normal text-foreground mb-4 leading-tight" style="font-family: 'Besley', serif !important;">{project.title}</p>
+									<span class="inline-block text-base text-accent transition-colors duration-200" style="font-family: 'Besley', serif !important;">View Content</span>
+								</div>
+							</div>
+						</button>
+					))}
 				</div>
+			</div>
+		))}
 
-				<!-- CTA -->
-				<section class="pt-8 border-t-2 border-foreground-secondary/10">
-					<Text variant="secondary" class="mb-4">
-						Interested in collaborating on curriculum, workshops, or guest lectures?
-					</Text>
-					<div class="flex gap-4">
-						<Link href="/about" variant="accent">
-							Get in Touch >
-						</Link>
-						<Link href="/art" variant="accent">
-							View My Work >
-						</Link>
-					</div>
-				</section>
+	</div>
 
-			</PageContainer>
-		</div>
-	</PageMain>
-	<Footer />
-	<ImageLightbox />
+	<!-- Project detail -->
+	<div id="project-detail" class="hidden">
+		<button id="project-back" class="flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors mb-8" style="font-family: 'Besley', serif !important;">
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
+			</svg>
+			Back to Course
+		</button>
+		{allCourses.flatMap((course) => (course.projects || []).map((project) => (
+			<div id={`project-${courseId(course.code)}-${project.slug}`} class="project-detail-content hidden">
+				<Heading level={2} size="2xl" class="mb-3">{project.title}</Heading>
+				<div class="mb-6"><Badge variant="accent" size="sm">{course.code}</Badge></div>
+				<Text size="lg" variant="secondary" class="mb-8">{project.description}</Text>
+				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
+					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+					<span class="text-sm text-foreground-muted">Project content coming soon</span>
+				</div>
+			</div>
+		)))}
+	</div>
+
+</div>
+
+<!-- Panel: Student Work -->
+<div id="panel-student-work" class="learn-panel hidden">
+<!-- Year filter -->
+<div class="flex gap-4 mb-8">
+<button class="student-filter text-accent border-b-2 border-accent pb-1 transition-colors" data-year="all" style="font-family: 'Besley', serif !important;">
+All
+</button>
+{[...new Set(studentWork.map(s => s.year))].sort().reverse().map((year) => (
+<button class="student-filter text-foreground-secondary border-b-2 border-transparent pb-1 hover:text-accent transition-colors" data-year={year} style="font-family: 'Besley', serif !important;">
+{year}
+</button>
+))}
+</div>
+
+<div class="grid sm:grid-cols-2 gap-6" id="student-grid">
+{studentWork.map((piece) => (
+<div
+class="student-item"
+data-year={piece.year}
+id={`student-${piece.student.toLowerCase().replace(/\s+/g, '-')}-${piece.title.toLowerCase().replace(/\s+/g, '-')}`}
+>
+<Card variant="bordered" padding="none">
+{piece.video ? (
+<div class="video-lightbox-trigger relative bg-black rounded-t-md overflow-hidden cursor-pointer" data-video={piece.video}>
+<video
+src={piece.video}
+class="w-full h-auto pointer-events-none"
+autoplay
+loop
+muted
+playsinline
+preload="auto"
+></video>
+<div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20 group">
+<svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+<path d="M8 5v14l11-7z" />
+</svg>
+</div>
+</div>
+) : (
+<div class="learn-lightbox-trigger relative aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 transition-all" data-label={`${piece.student} — ${piece.title}`}>
+<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+</svg>
+<span class="text-xs text-foreground-muted">Image Coming Soon</span>
+</div>
+)}
+<div class="p-4 space-y-2">
+<Text variant="primary" size="sm" class="font-medium">{piece.title}</Text>
+<Text variant="muted" size="sm">{piece.student}</Text>
+<div class="flex gap-2">
+<Badge size="sm" variant="accent">{piece.course}</Badge>
+<Badge size="sm">{piece.year}</Badge>
+</div>
+</div>
+</Card>
+</div>
+))}
+</div>
+</div>
+
+<!-- Panel: Tools & Resources -->
+<div id="panel-tools" class="learn-panel hidden">
+{resources.map((group, index) => (
+<article id={resourceId(group.category)} class="learn-entry scroll-mt-32">
+{index > 0 && (
+<div class="border-t-2 border-foreground-secondary/10 my-12"></div>
+)}
+<Heading level={2} size="2xl" class="mb-6">
+{group.category}
+</Heading>
+<div class="space-y-4">
+{group.items.map((item) => (
+<div>
+<Text variant="primary" size="base" class="font-medium">{item.name}</Text>
+<Text variant="muted" size="sm">{item.description}</Text>
+</div>
+))}
+</div>
+</article>
+))}
+</div>
+
+</div>
+</div>
+
+
+</PageContainer>
+</div>
+</PageMain>
+<Footer />
+<ImageLightbox />
 </BaseLayout>
 
+<style>
+.learn-nav-link {
+	opacity: 0.45;
+	transition: opacity 0.15s;
+}
+.learn-nav-link.active,
+.learn-nav-link:hover {
+	opacity: 1;
+}
+</style>
+
 <script>
-	// Tab switching logic
-	const initTabs = () => {
-		const tabs = document.querySelectorAll('.learn-tab');
-		const panels = document.querySelectorAll('.learn-tab-content');
-		if (!tabs.length) return;
+const initLearn = () => {
+// --- Tab switching ---
+const tabs = document.querySelectorAll<HTMLElement>('.learn-tab');
+const panels = document.querySelectorAll<HTMLElement>('.learn-panel');
+const sidebars = document.querySelectorAll<HTMLElement>('.learn-sidebar');
 
-		tabs.forEach((tab) => {
-			// Clone & replace to remove any stale listeners
-			const fresh = tab.cloneNode(true);
-			tab.parentNode?.replaceChild(fresh, tab);
-		});
+tabs.forEach((tab) => {
+const fresh = tab.cloneNode(true) as HTMLElement;
+tab.parentNode?.replaceChild(fresh, tab);
+});
 
-		// Re-query after clone
-		const freshTabs = document.querySelectorAll('.learn-tab');
-		freshTabs.forEach((tab) => {
-			tab.addEventListener('click', () => {
-				const target = (tab as HTMLElement).dataset.tab;
-				freshTabs.forEach((t) => {
-					t.classList.remove('text-accent', 'border-accent');
-					t.classList.add('text-foreground-secondary', 'border-transparent');
-				});
-				tab.classList.remove('text-foreground-secondary', 'border-transparent');
-				tab.classList.add('text-accent', 'border-accent');
-				panels.forEach((panel) => {
-					if (panel.id === `tab-${target}`) {
-						panel.classList.remove('hidden');
-					} else {
-						panel.classList.add('hidden');
-					}
-				});
-			});
-		});
-	};
+document.querySelectorAll<HTMLElement>('.learn-tab').forEach((tab) => {
+tab.addEventListener('click', () => {
+const target = tab.dataset.tab!;
 
-	// Make placeholder thumbnails clickable with a lightbox-style overlay
-	const initLearnLightbox = () => {
-		const triggers = document.querySelectorAll('.learn-lightbox-trigger');
-		const lightbox = document.getElementById('lightbox');
-		const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
-		const imageWrapper = document.getElementById('image-wrapper');
-		if (!triggers.length) return;
+document.querySelectorAll<HTMLElement>('.learn-tab').forEach((t) => {
+t.classList.remove('text-accent', 'border-accent');
+t.classList.add('text-foreground-secondary', 'border-transparent');
+});
+tab.classList.remove('text-foreground-secondary', 'border-transparent');
+tab.classList.add('text-accent', 'border-accent');
 
-		triggers.forEach((trigger) => {
-			const fresh = trigger.cloneNode(true);
-			trigger.parentNode?.replaceChild(fresh, trigger);
-		});
+panels.forEach((panel) => {
+panel.classList.toggle('hidden', panel.id !== `panel-${target}`);
+});
+sidebars.forEach((sidebar) => {
+sidebar.classList.toggle('hidden', sidebar.id !== `sidebar-${target}`);
+});
 
-		document.querySelectorAll('.learn-lightbox-trigger').forEach((trigger) => {
-			trigger.addEventListener('click', () => {
-				if (!lightbox || !lightboxImage || !imageWrapper) return;
+// Re-init scroll observer for the new active panel
+initScrollSpy();
+});
+});
 
-				const label = (trigger as HTMLElement).dataset.label || 'Preview';
+// --- Scroll spy for sidebar nav ---
+let observer: IntersectionObserver | null = null;
+const initScrollSpy = () => {
+if (observer) observer.disconnect();
+const entries = document.querySelectorAll<HTMLElement>('.learn-entry');
+const navLinks = document.querySelectorAll<HTMLElement>('.learn-nav-link');
+if (!entries.length || !navLinks.length) return;
 
-				const canvas = document.createElement('canvas');
-				canvas.width = 800;
-				canvas.height = 1000;
-				const ctx = canvas.getContext('2d');
-				if (ctx) {
-					const isDark = document.documentElement.classList.contains('dark');
-					ctx.fillStyle = isDark ? '#1a1a1a' : '#f0f0f0';
-					ctx.fillRect(0, 0, 800, 1000);
-					ctx.strokeStyle = isDark ? '#333' : '#ccc';
-					ctx.lineWidth = 2;
-					ctx.strokeRect(20, 20, 760, 960);
-					ctx.fillStyle = isDark ? '#888' : '#666';
-					ctx.font = '24px system-ui, sans-serif';
-					ctx.textAlign = 'center';
-					ctx.fillText(label, 400, 480);
-					ctx.font = '16px system-ui, sans-serif';
-					ctx.fillText('Content coming soon', 400, 520);
-				}
+observer = new IntersectionObserver(
+(observed) => {
+observed.forEach((entry) => {
+if (entry.isIntersecting) {
+const id = entry.target.id;
+navLinks.forEach((link) => {
+link.classList.toggle('active', link.dataset.slug === id);
+});
+}
+});
+},
+{ rootMargin: '-20% 0px -60% 0px' }
+);
+entries.forEach((entry) => observer!.observe(entry));
+};
+initScrollSpy();
 
-				lightboxImage.src = canvas.toDataURL();
-				lightboxImage.alt = label;
+// --- Course drill-down ---
+const openCourseDetail = (courseSlug: string) => {
+document.getElementById('project-detail')?.classList.add('hidden');
+const list = document.getElementById('classes-list');
+const detail = document.getElementById('classes-detail');
+if (!list || !detail) return;
+list.classList.add('hidden');
+detail.classList.remove('hidden');
+document.querySelectorAll<HTMLElement>('.course-detail-content').forEach((el) => {
+el.classList.toggle('hidden', el.id !== `detail-${courseSlug}`);
+});
+document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link').forEach((link) => {
+link.classList.toggle('active', link.dataset.slug === courseSlug);
+});
+initLearnLightbox();
+initProjectCards();
+};
 
-				lightbox.classList.remove('invisible', 'opacity-0');
-				lightbox.classList.add('visible', 'opacity-100');
+const closeCourseDetail = () => {
+const list = document.getElementById('classes-list');
+const detail = document.getElementById('classes-detail');
+if (!list || !detail) return;
+detail.classList.add('hidden');
+list.classList.remove('hidden');
+document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link').forEach((l) => l.classList.remove('active'));
+};
 
-				requestAnimationFrame(() => {
-					imageWrapper?.classList.remove('opacity-0', 'scale-90');
-					imageWrapper?.classList.add('opacity-100', 'scale-100');
-				});
+// --- Project drill-down ---
+const openProjectDetail = (courseSlug: string, projectSlug: string) => {
+const detail = document.getElementById('classes-detail');
+const projectDetail = document.getElementById('project-detail');
+if (!detail || !projectDetail) return;
+detail.classList.add('hidden');
+projectDetail.classList.remove('hidden');
+document.querySelectorAll<HTMLElement>('.project-detail-content').forEach((el) => {
+el.classList.toggle('hidden', el.id !== `project-${courseSlug}-${projectSlug}`);
+});
+};
 
-				document.body.style.overflow = 'hidden';
-			});
-		});
-	};
+const initProjectCards = () => {
+document.querySelectorAll<HTMLElement>('.project-card').forEach((card) => {
+const fresh = card.cloneNode(true) as HTMLElement;
+card.parentNode?.replaceChild(fresh, card);
+});
+document.querySelectorAll<HTMLElement>('.project-card').forEach((card) => {
+card.addEventListener('click', () => openProjectDetail(card.dataset.course!, card.dataset.project!));
+});
+const projectBackBtn = document.getElementById('project-back');
+if (projectBackBtn) {
+const freshBack = projectBackBtn.cloneNode(true) as HTMLElement;
+projectBackBtn.parentNode?.replaceChild(freshBack, projectBackBtn);
+document.getElementById('project-back')?.addEventListener('click', () => {
+const activeLink = document.querySelector<HTMLElement>('#sidebar-classes .learn-nav-link.active');
+openCourseDetail(activeLink?.dataset.slug || 'angd-1314');
+});
+}
+};
 
-	// Student work year filter
-	const initStudentFilter = () => {
-		const filters = document.querySelectorAll('.student-filter');
-		const items = document.querySelectorAll('.student-item');
-		if (!filters.length) return;
+// Course cards
+document.querySelectorAll<HTMLElement>('.course-card').forEach((card) => {
+const fresh = card.cloneNode(true) as HTMLElement;
+card.parentNode?.replaceChild(fresh, card);
+});
+document.querySelectorAll<HTMLElement>('.course-card').forEach((card) => {
+card.addEventListener('click', () => openCourseDetail(card.dataset.course!));
+});
 
-		filters.forEach((btn) => {
-			const fresh = btn.cloneNode(true);
-			btn.parentNode?.replaceChild(fresh, btn);
-		});
+// Back button
+const backBtn = document.getElementById('classes-back');
+if (backBtn) {
+const freshBack = backBtn.cloneNode(true) as HTMLElement;
+backBtn.parentNode?.replaceChild(freshBack, backBtn);
+document.getElementById('classes-back')?.addEventListener('click', closeCourseDetail);
+}
 
-		const freshFilters = document.querySelectorAll('.student-filter');
-		freshFilters.forEach((btn) => {
-			btn.addEventListener('click', () => {
-				const year = (btn as HTMLElement).dataset.year;
-				freshFilters.forEach((b) => {
-					b.classList.remove('text-accent', 'border-accent');
-					b.classList.add('text-foreground-secondary', 'border-transparent');
-				});
-				btn.classList.remove('text-foreground-secondary', 'border-transparent');
-				btn.classList.add('text-accent', 'border-accent');
-				items.forEach((item) => {
-					if (year === 'all' || item.getAttribute('data-year') === year) {
-						(item as HTMLElement).style.display = '';
-					} else {
-						(item as HTMLElement).style.display = 'none';
-					}
-				});
-			});
-		});
-	};
+// Sidebar nav for Classes opens detail directly
+document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link').forEach((link) => {
+const fresh = link.cloneNode(true) as HTMLElement;
+link.parentNode?.replaceChild(fresh, link);
+});
+document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link').forEach((link) => {
+link.addEventListener('click', (e) => {
+e.preventDefault();
+openCourseDetail(link.dataset.slug!);
+});
+});
 
-	const initAll = () => {
-		initTabs();
-		initLearnLightbox();
-		initStudentFilter();
-	};
+// --- Lightbox placeholders ---
+const initLearnLightbox = () => {
+document.querySelectorAll('.learn-lightbox-trigger').forEach((trigger) => {
+const fresh = trigger.cloneNode(true);
+trigger.parentNode?.replaceChild(fresh, trigger);
+});
+document.querySelectorAll<HTMLElement>('.learn-lightbox-trigger').forEach((trigger) => {
+trigger.addEventListener('click', () => {
+const lightbox = document.getElementById('lightbox');
+const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
+const imageWrapper = document.getElementById('image-wrapper');
+if (!lightbox || !lightboxImage || !imageWrapper) return;
+const label = trigger.dataset.label || 'Preview';
+const canvas = document.createElement('canvas');
+canvas.width = 800; canvas.height = 1000;
+const ctx = canvas.getContext('2d');
+if (ctx) {
+const isDark = document.documentElement.classList.contains('dark');
+ctx.fillStyle = isDark ? '#1a1a1a' : '#f0f0f0';
+ctx.fillRect(0, 0, 800, 1000);
+ctx.strokeStyle = isDark ? '#333' : '#ccc';
+ctx.lineWidth = 2;
+ctx.strokeRect(20, 20, 760, 960);
+ctx.fillStyle = isDark ? '#888' : '#666';
+ctx.font = '24px system-ui, sans-serif';
+ctx.textAlign = 'center';
+ctx.fillText(label, 400, 480);
+ctx.font = '16px system-ui, sans-serif';
+ctx.fillText('Content coming soon', 400, 520);
+}
+lightboxImage.src = canvas.toDataURL();
+lightboxImage.alt = label;
+lightbox.classList.remove('invisible', 'opacity-0');
+lightbox.classList.add('visible', 'opacity-100');
+requestAnimationFrame(() => {
+imageWrapper.classList.remove('opacity-0', 'scale-90');
+imageWrapper.classList.add('opacity-100', 'scale-100');
+});
+document.body.style.overflow = 'hidden';
+});
+});
+};
+initLearnLightbox();
 
-	initAll();
-	document.addEventListener('astro:after-swap', initAll);
+// --- Student year filter ---
+const initStudentFilter = () => {
+document.querySelectorAll('.student-filter').forEach((btn) => {
+const fresh = btn.cloneNode(true);
+btn.parentNode?.replaceChild(fresh, btn);
+});
+document.querySelectorAll<HTMLElement>('.student-filter').forEach((btn) => {
+btn.addEventListener('click', () => {
+const year = btn.dataset.year;
+document.querySelectorAll<HTMLElement>('.student-filter').forEach((b) => {
+b.classList.remove('text-accent', 'border-accent');
+b.classList.add('text-foreground-secondary', 'border-transparent');
+});
+btn.classList.remove('text-foreground-secondary', 'border-transparent');
+btn.classList.add('text-accent', 'border-accent');
+document.querySelectorAll<HTMLElement>('.student-item').forEach((item) => {
+item.style.display = (year === 'all' || item.dataset.year === year) ? '' : 'none';
+});
+});
+});
+};
+initStudentFilter();
+
+// Auto-open Organic Modeling by default
+openCourseDetail('angd-1314');
+};
+
+initLearn();
+document.addEventListener('astro:after-swap', initLearn);
 </script>

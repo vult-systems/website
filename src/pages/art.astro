@@ -12,6 +12,8 @@ import Link from '@/components/ui/link.astro';
 import Badge from '@/components/ui/badge.astro';
 import Card from '@/components/ui/card.astro';
 import ImageLightbox from '@/components/ui/image-lightbox.astro';
+import { Image } from 'astro:assets';
+import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getArtPageSEO } from '@/config/seo';
 
 const artPieces = (await getCollection('art')).sort((a, b) => a.data.order - b.data.order);
@@ -78,18 +80,30 @@ const seo = getArtPageSEO();
 >
 	<Header />
 	<PageMain class="text-foreground">
+		<!-- Page Header with Background -->
+		<div class="relative w-full py-8 sm:py-10">
+			<div class="absolute inset-0 -z-10 overflow-hidden">
+				<Image
+					src={heroBg}
+					alt=""
+					class="w-full h-full object-cover object-center"
+					loading="eager"
+					widths={[800, 1200, 1920]}
+				/>
+				<div class="absolute inset-0 bg-white/85 dark:bg-black/85"></div>
+			</div>
+			<PageContainer>
+				<Heading level={1} size="4xl" class="mb-4">
+					Art
+				</Heading>
+				<Text size="lg" variant="secondary" class="mb-4">
+					A collection of professional, personal, and exploratory 3D work. These pieces span client projects, studio collaborations, and self-directed studies across real-time and offline productions. Each project links to a breakdown with renders, wireframes, and process where available.
+				</Text>
+			</PageContainer>
+		</div>
+
 		<div class="relative z-10 w-full py-8 sm:py-12">
 			<PageContainer>
-				
-				<!-- Page Header -->
-				<div class="mb-16">
-					<Heading level={1} size="4xl" class="mb-4">
-						Art
-					</Heading>
-					<Text size="lg" variant="secondary" class="mb-4">
-						A collection of professional, personal, and exploratory 3D work. These pieces span client projects, studio collaborations, and self-directed studies across real-time and offline productions. Each project links to a breakdown with renders, wireframes, and process where available.
-					</Text>
-				</div>
 
 				<!-- Tab Navigation -->
 				<div class="mb-10 overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">

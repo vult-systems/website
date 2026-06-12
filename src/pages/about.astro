@@ -12,6 +12,52 @@ import resumeThumb from '@/assets/profile/resume-thumbnail.png';
 import { getAboutPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
 import { layout } from '@/config/design';
+import zbrushLogo from '@/assets/logos/software-maxon-zbrush-logo-01.png';
+import mayaLogo from '@/assets/logos/software-autodesk-maya-logo-01.png';
+import maxLogo from '@/assets/logos/software-autodesk-3dsmax.png';
+import substanceLogo from '@/assets/logos/software-substance-painter-logo-01.webp';
+import marmosetLogo from '@/assets/logos/software-marmoset-toolbag-logo-01.png';
+import marvelousLogo from '@/assets/logos/software-marvelous-designer-logo.png';
+import ue5Logo from '@/assets/logos/software-ue5.png';
+import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
+import uiw3dLogoWht from '@/assets/logos/uiw3d-horiz-logo-wht.png';
+import logo343iWht from '@/assets/logos/343i-logo-wht.png';
+import biowareLogoWht from '@/assets/logos/bioware-logo-wht.png';
+import disneyLogoWht from '@/assets/logos/walt-disney-logo-wht.png';
+import newtekLogoWht from '@/assets/logos/newtek-logo-wht.png';
+import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
+import uiw3dLogoBlk from '@/assets/logos/uiw3d-horiz-logo-blk.png';
+import logo343iBlk from '@/assets/logos/343i-logo-blk.png';
+import biowareLogoBlk from '@/assets/logos/bioware-logo-blk.png';
+import disneyLogoBlk from '@/assets/logos/walt-disney-logo-blk.png';
+import newtekLogoBlk from '@/assets/logos/newtek-logo-blk.png';
+import qualcommLogoClr from '@/assets/logos/qualcomm-logo-clr.png';
+import mergeVrLogoClr from '@/assets/logos/merge-vr-logo-clr.png';
+import usafaLogoClr from '@/assets/logos/usafa-logo-clr.png';
+import losAlamosLogoClr from '@/assets/logos/losalamos-logo-clr.png';
+
+const software = [
+	{ name: 'ZBrush', logo: zbrushLogo },
+	{ name: 'Maya', logo: mayaLogo },
+	{ name: '3ds Max', logo: maxLogo },
+	{ name: 'Substance Painter', logo: substanceLogo },
+	{ name: 'Marmoset Toolbag', logo: marmosetLogo },
+	{ name: 'Marvelous Designer', logo: marvelousLogo },
+	{ name: 'Unreal Engine 5', logo: ue5Logo },
+];
+
+const experienceLogos = [
+	{ name: 'Vult Systems', imageLight: vultLogoBlk, imageDark: vultLogoWht },
+	{ name: 'UIW 3D', imageLight: uiw3dLogoBlk, imageDark: uiw3dLogoWht },
+	{ name: '343 Industries', imageLight: logo343iBlk, imageDark: logo343iWht },
+	{ name: 'BioWare', imageLight: biowareLogoBlk, imageDark: biowareLogoWht },
+	{ name: 'Qualcomm', imageLight: qualcommLogoClr, imageDark: qualcommLogoClr },
+	{ name: 'Walt Disney', imageLight: disneyLogoBlk, imageDark: disneyLogoWht },
+	{ name: 'Merge VR', imageLight: mergeVrLogoClr, imageDark: mergeVrLogoClr },
+	{ name: 'US Air Force Academy', imageLight: usafaLogoClr, imageDark: usafaLogoClr },
+	{ name: 'NewTek', imageLight: newtekLogoBlk, imageDark: newtekLogoWht },
+	{ name: 'Los Alamos', imageLight: losAlamosLogoClr, imageDark: losAlamosLogoClr },
+];
 
 const seo = getAboutPageSEO();
 ---
@@ -25,9 +71,8 @@ const seo = getAboutPageSEO();
 	<main class="min-h-screen w-full text-foreground">
 		<div class="relative z-10 w-full py-8 sm:py-12">
 			<div class={layout.container}>
-				
 				<!-- Two Column Layout -->
-				<div class="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-16">
+				<div class="grid lg:grid-cols-[420px_1fr] gap-8 lg:gap-10">
 					
 					<!-- Left Column - Image & Quick Info -->
 					<div class="space-y-8">
@@ -44,34 +89,29 @@ const seo = getAboutPageSEO();
 							/>
 						</div>
 						
-						<div class="space-y-4">
+						<div class="space-y-4 max-w-[420px]">
 							<div>
-								<Text variant="secondary" size="sm" class="mb-1">Location</Text>
-								<Text variant="primary" size="base">{SITE.author.location.full}</Text>
-							</div>
-							
-							<div>
-								<Text variant="secondary" size="sm" class="mb-1">Focus</Text>
-								<div class="flex flex-wrap gap-2 mt-2">
-									<Badge>3D Character Art</Badge>
-									<Badge>Digital Sculpture</Badge>
-									<Badge>Education</Badge>
+								<Text variant="secondary" size="sm" class="mb-1">Contact</Text>
+								<div class="space-y-0.5">
+									<Text variant="primary" class="!text-base">theartofcarlos@gmail.com</Text>
+									<Text variant="primary" class="!text-base">(210) 279-5903</Text>
 								</div>
 							</div>
+
+							<div>
+								<Text variant="secondary" size="sm" class="mb-1">Location</Text>
+								<Text variant="primary" class="!text-base">{SITE.author.location.full}</Text>
+							</div>
 							
 							<div>
-								<Text variant="secondary" size="sm" class="mb-2">Connect</Text>
-								<div class="space-y-2">
-									<div>
-										<Link href={SITE.social.github} variant="accent">
-											GitHub
-										</Link>
-									</div>
-									<div>
-										<Link href={SITE.social.linkedin} variant="accent">
-											LinkedIn
-										</Link>
-									</div>
+								<Text variant="secondary" size="sm" class="mb-3">Software</Text>
+								<div class="grid grid-cols-2 gap-2 mt-2">
+									{software.map(s => (
+										<div class="flex items-center gap-2 px-2 py-1.5 rounded-md bg-foreground/5">
+											<Image src={s.logo} alt={s.name} width={60} height={24} class="h-5 w-auto object-contain shrink-0" data-no-lightbox />
+											<span class="text-sm text-foreground-secondary leading-tight" style="font-family: 'Besley', serif !important;">{s.name}</span>
+										</div>
+									))}
 								</div>
 							</div>
 						</div>
@@ -82,17 +122,30 @@ const seo = getAboutPageSEO();
 						<!-- Header & Bio -->
 						<div>
 							<Heading level={1} size="4xl" class="mb-6">About</Heading>
-							<Text variant="secondary" class="leading-relaxed mb-4">
-								I'm a 3D character artist and educator based in {SITE.author.location.full}. I'm a generalist by training 
-								and a character artist by focus, with broad experience working alongside studios such as 343 Industries, 
-								BioWare, Qualcomm, NewTek, Walt Disney Animation, and more.
-							</Text>
-							<Text variant="secondary" class="leading-relaxed mb-4">
+						<Text variant="secondary" class="!text-base leading-relaxed mb-4">
+							I'm a 3D character artist and educator based in {SITE.author.location.full}. I'm a generalist by training 
+							and a character artist by focus, with broad experience working alongside studios such as 343 Industries, 
+							BioWare, Qualcomm, NewTek, Walt Disney Animation, and more.
+						</Text>
+						<Text variant="secondary" class="!text-base leading-relaxed mb-4">
 								I currently teach at the University of the Incarnate Word, where I work with an incredible team to coordinate 
 								our program and develop curriculum that bridges industry practice with strong academic foundations. Through 
 								Vult, I also run my private client work across multiple areas of the 3D industry, collaborating with artists, 
 								students, and companies on a wide range of creative and technical projects.
 							</Text>
+						</div>
+
+						<!-- Experience Logos -->
+						<div>
+
+							<div class="grid grid-cols-5 gap-x-8 gap-y-6 items-center">
+								{experienceLogos.map(logo => (
+									<div class="flex items-center justify-center">
+										<Image src={logo.imageLight} alt={logo.name} width={240} height={96} class="h-8 w-auto object-contain dark:hidden" data-no-lightbox />
+										<Image src={logo.imageDark} alt={logo.name} width={240} height={96} class="h-8 w-auto object-contain hidden dark:block" data-no-lightbox />
+									</div>
+								))}
+							</div>
 						</div>
 
 						<!-- Resume -->
