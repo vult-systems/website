@@ -267,5 +267,8 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		});
 	};
 
+	// Run immediately (catches initial page load before astro:page-load fires)
+	initImageFadeGlobal();
+	// Run again on ViewTransitions navigation
 	document.addEventListener('astro:page-load', initImageFadeGlobal);
 </script>
