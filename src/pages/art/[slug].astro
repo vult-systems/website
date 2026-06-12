@@ -19,6 +19,7 @@ import unityLogoWht from '@/assets/logos/software-unity-wht.png';
 import unityLogoBlk from '@/assets/logos/software-unity-blk.png';
 import ue4Logo from '@/assets/logos/software-ue4.png';
 import marvelousLogo from '@/assets/logos/software-marvelous-designer-logo.png';
+import max3dsLogo from '@/assets/logos/software-autodesk-3dsmax.png';
 import logo343wht from '@/assets/logos/343i-logo-wht.png';
 import logo343blk from '@/assets/logos/343i-logo-blk.png';
 import haloInfiniteLogo from '@/assets/logos/halo-infinite-logo-01.png';
@@ -32,6 +33,7 @@ import biowareLogoWht from '@/assets/logos/bioware-logo-wht.png';
 import biowareLogoBlk from '@/assets/logos/bioware-logo-blk.png';
 import uiw3dLogoWht from '@/assets/logos/uiw3d-horiz-logo-wht.png';
 import uiw3dLogoBlk from '@/assets/logos/uiw3d-horiz-logo-blk.png';
+import swtorLogo from '@/assets/logos/star-wars-the-old-republic-logo-hd-png.png';
 
 const toolLogos: Record<string, string | { light: string; dark: string }> = {
   'Maya': mayaLogo.src,
@@ -42,6 +44,7 @@ const toolLogos: Record<string, string | { light: string; dark: string }> = {
   'Unity': { light: unityLogoBlk.src, dark: unityLogoWht.src },
   'Unreal Engine 4': ue4Logo.src,
   'Marvelous Designer': marvelousLogo.src,
+  '3ds Max': max3dsLogo.src,
 };
 
 const clientLogos: Record<string, { light: string; dark: string }> = {
@@ -55,14 +58,17 @@ const clientLogos: Record<string, { light: string; dark: string }> = {
 const projectLogos: Record<string, { light: string; dark: string }> = {
   'Halo Infinite': { light: haloInfiniteLogo.src, dark: haloInfiniteLogo.src },
   'Snapdragon': { light: snapdragonLogoBlk.src, dark: snapdragonLogoWht.src },
+  'Star Wars: The Old Republic': { light: swtorLogo.src, dark: swtorLogo.src },
 };
 
 const clientLogoSizes: Record<string, string> = {
   '343 Industries': 'w-1/2',
+  'BioWare': 'w-3/5',
 };
 
 const projectLogoSizes: Record<string, string> = {
   'Halo Infinite': 'w-4/5',
+  'Star Wars: The Old Republic': 'w-4/5',
 };
 
 export async function getStaticPaths() {

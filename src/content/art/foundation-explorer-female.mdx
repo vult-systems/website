@@ -1,6 +1,6 @@
 ---
 title: "Foundation Explorer"
-description: "Developed utilizing Unity's High Definition Render Pipeline (HDRP) to push the hardware of various Qualcomm Snapdragon platforms."
+description: "Created for a Unity HDRP cinematic on Qualcomm Snapdragon devices before evolving into a multi-platform technical demo."
 heroImage: "../../assets/foundation-explorer-female/carlos-garcia-foundation-explorer-female-thumb-01.png"
 pubDate: 2024-11-06
 category: "character"
@@ -10,40 +10,59 @@ featured: true
 client: "Qualcomm"
 project: "Snapdragon"
 role: "3D Character Artist"
-order: 2
+order: 3
 size: "medium"
 ---
 
 import { Image } from 'astro:assets';
 import Heading from '@/components/ui/heading.astro';
+import Concept from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-concept.jpg';
+import Arnold from '@/assets/foundation-explorer-female/carlos-garcia-foundation-explorer-female-arnold.webp';
+import femaleExplorer01 from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-01.jpg';
 import femaleExplorer02 from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-02.jpg';
 import femaleExplorerSkins from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-skins.png';
+import bakes from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-bakes.jpg';
+import wires from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-wires.jpg';
+import high01 from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-high-01.jpg';
+import high02 from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-high-02.jpg';
+import high03 from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-high-03.jpg';
+import high04 from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-high-04.jpg';
+import marvelous05 from '@/assets/foundation-explorer-female/carlos-garcia-foundation-femaleexplorer-marvelous-designer-05.jpg';
 
 <Heading level={2} size="4xl">Project Overview</Heading>
 
-A female variant of the Foundation Explorer series, designed with the same modular tactical approach as the original. This character maintains the utilitarian aesthetic while exploring different silhouette proportions and gear configurations.
+This character was initially created for a real-time cinematic showcasing Unity HDRP on Qualcomm Snapdragon devices. As production evolved, the team pivoted toward a multi-platform technical demo designed to showcase the full capabilities of the hardware.
 
-<Image src={femaleExplorer02} alt="Foundation Female Explorer - Full Body" class="rounded-md my-8" />
+The final project included a real-time cinematic in Unity HDRP, a third-person over-the-shoulder shooter in UE4, and an AR drone experience, all connected through a shared multiplayer lobby for players to access and explore.
 
-<Image src={femaleExplorerSkins} alt="Foundation Female Explorer - Skin Variants" class="rounded-md my-8" />
+<Image src={Arnold} alt="Foundation Female Explorer - Arnold" class="rounded-md my-8" />
 
-## Design Approach
+<Image src={femaleExplorer01} alt="Foundation Female Explorer - Full Body Main Skin" class="rounded-md my-8" />
 
-Building on the Foundation Explorer design language:
-- Modular equipment systems
-- Functional tactical gear placement
-- Balanced proportions and readable silhouette
-- Consistent material and surface treatment
+<Image src={bakes} alt="Baked textures" class="rounded-md my-8"  />
 
-## Technical Details
+<Image src={wires} alt="Wireframe view" class="rounded-md my-8" />
 
-Character modeling workflow:
-- Base mesh and proportions established in Maya
-- High-resolution sculpting in ZBrush
-- Hard-surface detailing for tactical equipment
-- Modular attachment system for gear customization
+## Role & Responsibilities
 
-## Series Continuity
+I was responsible for all aspects of character development, including:
 
-This variant explores how the Foundation Explorer design system adapts across different character types while maintaining visual consistency and functional design principles.
+- **Hi-Poly** - Initial cloth blockout in Marvelous Designer for simulation, followed by detailing, cleanup, and hard-surface refinement in ZBrush
+- **Optimization & Retopology** - Game-ready meshes and multiple LODs created in Maya for each platform experience and player controller
+- **Texturing** - Physically based materials authored in Substance Painter to meet platform-specific requirements
+- **Engine Integration** - Character implementation in both Unity HDRP and Unreal Engine 4
+- **Lighting & Presentation** - Final look development and presentation renders to support visual fidelity and marketing goals
 
+<Image src={high01} alt="High-poly sculpt 1" class="rounded-md my-8" />
+
+<Image src={high02} alt="High-poly sculpt 2" class="rounded-md my-8" />
+
+<Image src={high03} alt="High-poly sculpt 3" class="rounded-md my-8" />
+
+<Image src={high04} alt="High-poly sculpt 4" class="rounded-md my-8" />
+
+<Image src={marvelous05} alt="Marvelous Designer cloth simulation" class="rounded-md my-8" />
+
+**Concept Art**: [Gorgio Baroni](https://www.artstation.com/giorgiobaroni)
+
+<Image src={Concept} alt="Concept Art" class="rounded-md my-8" />

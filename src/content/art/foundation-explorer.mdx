@@ -1,6 +1,6 @@
 ---
-title: "Foundation: Explorer"
-description: "A real-time cinematic character developed for Unity HDRP on Snapdragon devices, later integrated into UE4, featuring complete character development from sculpting to integration with concept art by Gorgio Baroni."
+title: "Foundation Explorer"
+description: "Created for a Unity HDRP cinematic on Qualcomm Snapdragon devices before evolving into a multi-platform technical demo."
 heroImage: "../../assets/foundation-explorer/carlos-garcia-foundation-explorer-thumb-01.png"
 pubDate: 2024-09-15
 category: "character"
@@ -10,7 +10,7 @@ featured: true
 client: "Qualcomm"
 project: "Snapdragon"
 role: "3D Character Artist"
-order: 3
+order: 2
 size: "tall"
 ---
 
@@ -21,116 +21,62 @@ import closeup from '../../assets/foundation-explorer/carlos-garcia-snapdragonqu
 import actionShot from '../../assets/foundation-explorer/carlos-garcia-snapdragonqualcomm-02.jpg';
 import conceptArt from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-concept.jpg';
 import desertTan from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-01.jpg';
-import wireframe from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-02.jpg';
-import sculpt from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-03.jpg';
+import wireframe from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-06.jpg';
+import bakes from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-05.jpg';
 import forestGreen from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-04.jpg';
-import crimsonRed from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-05.jpg';
-import navyBlue from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-06.jpg';
+import crimsonRed from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-03.jpg';
+import navyBlue from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-02.jpg';
+import wip01 from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-wips-01.jpg';
+import wip02 from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-wips-02.jpg';
+import wip03 from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-wips-03.jpg';
+import wip04 from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-wips-04.jpg';
+import wip05 from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-wips-05.jpg';
+import wip06 from '../../assets/foundation-explorer/carlos-garcia-foundation-explorer-wips-06.jpg';
 
 <Heading level={2} size="4xl">Project Overview</Heading>
 
-The **Foundation Explorer** is a highly detailed real-time character initially developed to showcase the capabilities of Unity's High Definition Render Pipeline (HDRP) on Qualcomm Snapdragon mobile devices. Late in production, we pivoted to a third-person camera perspective, and the character was successfully integrated into Unreal Engine 4.
+This character was initially created for a real-time cinematic showcasing Unity HDRP on Qualcomm Snapdragon devices. As production evolved, the team pivoted toward a multi-platform technical demo designed to showcase the full capabilities of the hardware.
 
-This project demonstrates cross-platform versatility and the technical optimization required to achieve cinematic-quality visuals on mobile hardware while maintaining performance.
+The final project included a real-time cinematic in Unity HDRP, a third-person over-the-shoulder shooter in UE4, and an AR drone experience, all connected through a shared multiplayer lobby for players to access and explore.
+
+<Image src={closeup} alt="Detailed view of helmet and upper body design" />
+
+<Image src={actionShot} alt="Dynamic character pose highlighting mobility" />
 
 <Image src={presentation} alt="Foundation Explorer showcased at Snapdragon event" />
 
 ## Role & Responsibilities
 
-I was responsible for all aspects of the character development:
+I was responsible for all aspects of character development, including:
 
-- **Hi-poly sculpting** in ZBrush with detailed anatomical and hard-surface forms
-- **Optimization & retopology** for real-time performance on mobile devices
-- **Texturing** with physically-based materials and surface detailing
-- **Engine integration** in both Unity HDRP and Unreal Engine 4
-- **Lighting & presentation** to showcase visual fidelity
+- **Hi-Poly** - Initial cloth blockout in Marvelous Designer for simulation, followed by detailing, cleanup, and hard-surface refinement in ZBrush
+- **Optimization & Retopology** - Game-ready meshes and multiple LODs created in Maya for each platform experience and player controller
+- **Texturing** - Physically based materials authored in Substance Painter to meet platform-specific requirements
+- **Engine Integration** - Character implementation in both Unity HDRP and Unreal Engine 4
+- **Lighting & Presentation** - Final look development and presentation renders to support visual fidelity and marketing goals
 
-I also sculpted the initial hi-poly block-in of the drone backpack accessory, with final sculpt touches and optimization completed by **Michael Withem**.
+I also sculpted the initial high-poly block-in for the drone backpack accessory, with final sculpt refinement and optimization completed by my colleague **Michael Withem**.
 
-**Concept Art**: Gorgio Baroni
+<Image src={desertTan} alt="Original skin variant of the character" />
+
+<Image src={bakes} alt="Baked textures of the character" />
+
+<Image src={wireframe} alt="Wireframe view of the character" />
+
+**Concept Art**: [Gorgio Baroni](https://www.artstation.com/giorgiobaroni)
 
 <Image src={conceptArt} alt="Original concept art by Gorgio Baroni" />
 
-## Technical Approach
+## Work in Progress
 
-### Cross-Platform Pipeline
+<Image src={wip01} alt="Work in progress of the high poly asset" />
 
-Successfully transitioning from Unity HDRP to Unreal Engine 4 required careful consideration of:
+<Image src={wip02} alt="Work in progress of the legs for the high poly asset" />
 
-- Asset format compatibility and shader recreation
-- Material conversion between rendering pipelines
-- Lighting setup adaptation for different engines
-- Performance profiling and optimization in both environments
+<Image src={wip03} alt="Work in progress of the drone for the high poly asset" />
 
-### Mobile Optimization
+<Image src={wip04} alt="Work in progress of the Marvelous Designer sim for the torso assets" />
 
-The character was optimized to maintain 60fps on Snapdragon hardware:
+<Image src={wip05} alt="Work in progress of the accessories for the high poly asset" />
 
-- Efficient topology with strategic polygon distribution
-- LOD system for dynamic performance scaling
-- Optimized texture resolutions for memory constraints
-- Mobile-friendly shader complexity
-
-<div class="grid grid-cols-2 gap-4 my-8">
-  <Image src={closeup} alt="Detailed view of helmet and upper body design" />
-  <Image src={actionShot} alt="Dynamic character pose highlighting mobility" />
-</div>
-
-## Visual Development
-
-The character features a utilitarian sci-fi aesthetic with modular design elements:
-
-- **Functional details**: Weathered surfaces, control panels, and technical elements
-- **Material variety**: Hard-surface armor, soft fabrics, worn metals, and glowing tech
-- **Backpack drone**: Autonomous support unit adding asymmetry and storytelling depth
-- **Customizable color schemes**: Multiple variants demonstrating material flexibility
-
-### Color Variations
-
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-8">
-  <div>
-    <Image src={desertTan} alt="Desert tan variant" />
-    <p class="text-sm text-center mt-2">Desert Tan</p>
-  </div>
-  <div>
-    <Image src={forestGreen} alt="Forest green variant" />
-    <p class="text-sm text-center mt-2">Forest Green</p>
-  </div>
-  <div>
-    <Image src={crimsonRed} alt="Crimson red variant" />
-    <p class="text-sm text-center mt-2">Crimson Red</p>
-  </div>
-  <div>
-    <Image src={navyBlue} alt="Navy blue variant" />
-    <p class="text-sm text-center mt-2">Navy Blue</p>
-  </div>
-</div>
-
-## Technical Views
-
-<div class="grid grid-cols-2 gap-4 my-8">
-  <div>
-    <Image src={wireframe} alt="Optimized wireframe topology" />
-    <p class="text-sm text-center mt-2">Optimized topology for real-time rendering</p>
-  </div>
-  <div>
-    <Image src={sculpt} alt="High-poly ZBrush sculpt" />
-    <p class="text-sm text-center mt-2">High-resolution ZBrush sculpt detail</p>
-  </div>
-</div>
-
-## Outcomes
-
-This character successfully demonstrated:
-
-- **Mobile performance**: 60fps on Snapdragon hardware
-- **Visual fidelity**: AAA-quality visuals within technical constraints  
-- **Pipeline flexibility**: Seamless transition between major game engines
-- **Scalability**: Strong performance across multiple platforms and quality settings
-
-The Foundation Explorer was showcased at major industry events and served as a technical benchmark for real-time character rendering on mobile devices, demonstrating up to **75% performance improvement** with Snapdragon's Game Post Processing Accelerator.
-
----
-
-*Character development by Carlos Garcia. Drone optimization by Michael Withem. Concept art by Gorgio Baroni.*  
-*Project developed for Snapdragon Studios / Qualcomm*
+<Image src={wip06} alt="Work in progress of the Marvelous Designer outfit" />
