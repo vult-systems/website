@@ -19,6 +19,7 @@ import substanceLogo from '@/assets/logos/software-substance-painter-logo-01.web
 import marmosetLogo from '@/assets/logos/software-marmoset-toolbag-logo-01.png';
 import marvelousLogo from '@/assets/logos/software-marvelous-designer-logo.png';
 import ue5Logo from '@/assets/logos/software-ue5.png';
+import ue5LogoWht from '@/assets/logos/software-ue5-wht.png';
 import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
 import uiw3dLogoWht from '@/assets/logos/uiw3d-horiz-logo-wht.png';
 import logo343iWht from '@/assets/logos/343i-logo-wht.png';
@@ -43,7 +44,7 @@ const software = [
 	{ name: 'Substance Painter', logo: substanceLogo },
 	{ name: 'Marmoset Toolbag', logo: marmosetLogo },
 	{ name: 'Marvelous Designer', logo: marvelousLogo },
-	{ name: 'Unreal Engine 5', logo: ue5Logo },
+	{ name: 'Unreal Engine 5', logo: ue5Logo, logoDark: ue5LogoWht },
 ];
 
 const experienceLogos = [
@@ -108,7 +109,14 @@ const seo = getAboutPageSEO();
 								<div class="grid grid-cols-2 gap-2 mt-2">
 									{software.map(s => (
 										<div class="flex items-center gap-2 px-2 py-1.5 rounded-md bg-foreground/5">
+										{s.logoDark ? (
+											<>
+												<Image src={s.logo} alt={s.name} width={60} height={24} class="h-5 w-auto object-contain shrink-0 dark:hidden" data-no-lightbox />
+												<Image src={s.logoDark} alt={s.name} width={60} height={24} class="h-5 w-auto object-contain shrink-0 hidden dark:block" data-no-lightbox />
+											</>
+										) : (
 											<Image src={s.logo} alt={s.name} width={60} height={24} class="h-5 w-auto object-contain shrink-0" data-no-lightbox />
+										)}
 											<span class="text-sm text-foreground-secondary leading-tight" style="font-family: 'Besley', serif !important;">{s.name}</span>
 										</div>
 									))}
