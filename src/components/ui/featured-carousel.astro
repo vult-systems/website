@@ -182,31 +182,30 @@ const carouselPieces = artPieces.slice(0, 5);
 
   .carousel-item {
     flex-shrink: 0;
-    /* vh cap at every breakpoint — square card can never be taller than the viewport */
-    width: min(clamp(260px, 82vw, 480px), calc(100vh - 184px));
+    width: min(clamp(300px, 94vw, 560px), calc(100vh - 184px));
   }
 
   @media (min-width: 640px) {
     .carousel-item {
-      width: min(clamp(380px, 74vw, 680px), calc(100vh - 184px));
+      width: min(clamp(460px, 88vw, 800px), calc(100vh - 184px));
     }
   }
 
   @media (min-width: 768px) {
     .carousel-item {
-      width: min(clamp(480px, 66vw, 840px), calc(100vh - 184px));
+      width: min(clamp(560px, 80vw, 980px), calc(100vh - 184px));
     }
   }
 
   @media (min-width: 1024px) {
     .carousel-item {
-      width: min(clamp(540px, 60vw, 980px), calc(100vh - 184px));
+      width: min(clamp(660px, 74vw, 1140px), calc(100vh - 184px));
     }
   }
 
   @media (min-width: 1920px) {
     .carousel-item {
-      width: min(clamp(680px, 54vw, 1260px), calc(100vh - 184px));
+      width: min(clamp(800px, 68vw, 1480px), calc(100vh - 184px));
     }
   }
 
