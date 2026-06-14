@@ -61,4 +61,62 @@ const seo = getHomePageSEO();
 		<ExperienceSection />
 	</main>
 <Footer />
+
+<!-- Bottom fade gradient -->
+<div
+  id="scroll-gradient"
+  class="fixed bottom-0 left-0 right-0 h-40 z-30 pointer-events-none"
+  style="background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.7)); opacity: 1; transition: opacity 0.4s ease;"
+></div>
+
+<!-- Scroll indicator — fades out once user scrolls -->
+<button
+  id="scroll-hint"
+  aria-label="Scroll down"
+  class="scroll-hint-btn fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-0.5 transition-colors duration-200 px-5 py-2 rounded-md backdrop-blur-sm border shadow-lg text-white/60 hover:text-accent bg-black/60 border-white/10 dark:bg-black/75 dark:border-white/10"
+  style="font-size: 0.65rem; opacity: 1; transition: opacity 0.4s ease; width: fit-content;"
+>
+  <span class="tracking-widest uppercase" style="font-size: 0.6rem; font-family: 'Besley', serif;">Scroll</span>
+  <svg style="width: 1rem; height: 1rem; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+  </svg>
+</button>
+
+<style>
+  @keyframes scroll-hint-pulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50%       { transform: translateX(-50%) scale(1.12); }
+  }
+  .scroll-hint-btn {
+    animation: scroll-hint-pulse 2s ease-in-out infinite;
+  }
+</style>
+
+<script>
+  const initScrollHint = () => {
+    const hint = document.getElementById('scroll-hint');
+    const gradient = document.getElementById('scroll-gradient');
+    if (!hint) return;
+
+    hint.addEventListener('click', () => {
+      window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' });
+    });
+
+    const onScroll = () => {
+      const scrolled = window.scrollY > 80;
+      const opacity = scrolled ? '0' : '1';
+      const pointer = scrolled ? 'none' : 'auto';
+      hint.style.opacity = opacity;
+      hint.style.pointerEvents = pointer;
+      if (gradient) gradient.style.opacity = opacity;
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  };
+
+  initScrollHint();
+  document.addEventListener('astro:after-swap', initScrollHint);
+</script>
+
 </BaseLayout>
