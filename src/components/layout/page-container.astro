@@ -7,7 +7,7 @@ interface Props {
 
 const { maxWidth = 'wide', class: className } = Astro.props;
 const maxWidthClass = maxWidth === 'wide' ? 'max-w-[102rem]' : 'max-w-6xl';
-const paddingClass = 'px-4 sm:px-6 md:px-8';
+const paddingClass = 'px-4 sm:px-6 md:px-8 3xl:px-16 4xl:px-24';
 ---
 
 <div class:list={[maxWidthClass, "mx-auto", paddingClass, className]}>

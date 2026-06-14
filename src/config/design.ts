@@ -150,10 +150,10 @@ export const components = {
       lg: 'text-2xl',
       xl: 'text-3xl',
       '2xl': 'text-4xl',
-      '3xl': 'text-5xl',
-      '4xl': 'text-6xl',
-      '4.5xl': 'text-[4rem]',
-      '5xl': 'text-7xl',
+      '3xl': 'text-4xl lg:text-5xl',
+      '4xl': 'text-5xl lg:text-6xl',
+      '4.5xl': 'text-[3.5rem] lg:text-[4rem]',
+      '5xl': 'text-6xl lg:text-7xl',
     },
   },
 
@@ -196,7 +196,7 @@ export const components = {
  * Layout utilities
  */
 export const layout = {
-  container: 'max-w-[102rem] mx-auto px-4 sm:px-6 md:px-8',
+  container: 'max-w-[102rem] mx-auto px-4 sm:px-6 md:px-8 3xl:px-16 4xl:px-24',
   section: {
     base: 'py-16 sm:py-24',
     sm: 'py-8 sm:py-12',

@@ -206,18 +206,35 @@ const carouselPieces = artPieces.slice(0, 5);
 
   .carousel-item {
     flex-shrink: 0;
-    width: 800px;
+    width: clamp(280px, 88vw, 460px);
   }
 
   @media (min-width: 640px) {
     .carousel-item {
-      width: 960px;
+      width: clamp(420px, 78vw, 680px);
     }
   }
 
   @media (min-width: 768px) {
     .carousel-item {
-      width: 1100px;
+      width: clamp(540px, 70vw, 820px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .carousel-item {
+      /*
+       * min() ensures the card (which is square) never overflows vertically.
+       * 220px = header (64) + section padding (40) + card text area (80) + buffer (36).
+       * So image height = card width ≤ viewport height − 220px.
+       */
+      width: min(clamp(500px, 60vw, 960px), calc(100vh - 220px));
+    }
+  }
+
+  @media (min-width: 1920px) {
+    .carousel-item {
+      width: min(clamp(600px, 52vw, 1100px), calc(100vh - 220px));
     }
   }
 
