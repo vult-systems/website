@@ -1,0 +1,17 @@
+---
+interface Props {
+  caption?: string;
+  class?: string;
+}
+
+const { caption, class: className } = Astro.props;
+---
+
+<figure class:list={["my-8 not-prose", className]}>
+  <slot />
+  {caption && (
+    <figcaption class="mt-2 text-center text-sm text-foreground-secondary">
+      {caption}
+    </figcaption>
+  )}
+</figure>
