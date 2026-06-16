@@ -17,6 +17,7 @@ import { getLearnPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
 import mayaLogoImg from '@/assets/logos/software-autodesk-maya-logo-01.png';
 import pythonLogoImg from '@/assets/logos/programming-python-logo.png';
+import zbrushLogoImg from '@/assets/logos/software-maxon-zbrush-logo-01.png';
 
 // Server-side Python syntax highlighter (Kanagawa Dragon colors)
 const seo = getLearnPageSEO();
@@ -179,6 +180,7 @@ interface ResourceItem {
 	previewHtml?: string;
 	previewLang?: string;
 	logos?: ImageMetadata[];
+	thumbnail?: ImageMetadata;
 }
 
 interface ResourceSubsection {
@@ -239,10 +241,20 @@ const resources: { category: string; items?: ResourceItem[]; subsections?: Resou
 		],
 	},
 	{
-		category: 'Sculpting',
-		items: [
-			{ name: 'ZBrush', description: 'High-resolution digital sculpting and detailing' },
-			{ name: 'Blender', description: 'Open-source 3D creation suite' },
+		category: 'ZBrush',
+		subsections: [
+			{
+				label: 'Brushes',
+				items: [
+					{ name: 'Brush Pack Template', description: 'Template entry — add a brush .ZBP file and thumbnail here.', logos: [zbrushLogoImg] },
+				],
+			},
+			{
+				label: 'UI Configs',
+				items: [
+					{ name: 'UI Config Template', description: 'Template entry — add a UI config file and thumbnail here.', logos: [zbrushLogoImg] },
+				],
+			},
 		],
 	},
 	{
@@ -601,7 +613,13 @@ data-autoplay
 				<Text variant="secondary" size="xs" class="uppercase tracking-widest mb-3 block">{sub.label}</Text>
 				<div class="grid sm:grid-cols-2 gap-4">
 					{sub.items.map((item) => (
-					<div class="flex flex-col justify-between gap-3 rounded-md border border-border bg-card p-4 transition-transform duration-300 hover:scale-[1.01]">
+					<div class="flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
+						{item.thumbnail ? (
+							<div class="relative aspect-video bg-foreground/5 overflow-hidden">
+								<Image src={item.thumbnail} alt={item.name} class="absolute inset-0 w-full h-full object-cover" data-no-lightbox />
+							</div>
+						) : null}
+						<div class="p-4 flex flex-col gap-3 flex-1">
 						<div>
 							<div class="flex items-center justify-between gap-2 mb-1">
 								<Text variant="primary" size="sm" class="font-medium">{item.name}</Text>
@@ -633,6 +651,7 @@ data-autoplay
 								Download
 							</a>
 						)}
+						</div>
 					</div>
 					))}
 				</div>
@@ -642,7 +661,13 @@ data-autoplay
 ) : (
 	<div class="grid sm:grid-cols-2 gap-4">
 	{(group.items ?? []).map((item) => (
-	<div class="flex flex-col justify-between gap-3 rounded-md border border-border bg-card p-4 transition-transform duration-300 hover:scale-[1.01]">
+	<div class="flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
+		{item.thumbnail ? (
+			<div class="relative aspect-video bg-foreground/5 overflow-hidden">
+				<Image src={item.thumbnail} alt={item.name} class="absolute inset-0 w-full h-full object-cover" data-no-lightbox />
+			</div>
+		) : null}
+		<div class="p-4 flex flex-col gap-3 flex-1">
 		<div>
 			<div class="flex items-center justify-between gap-2 mb-1">
 				<Text variant="primary" size="sm" class="font-medium">{item.name}</Text>
@@ -674,6 +699,7 @@ data-autoplay
 				Download
 			</a>
 		)}
+		</div>
 	</div>
 	))}
 	</div>
