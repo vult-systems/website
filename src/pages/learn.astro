@@ -17,7 +17,21 @@ import { getLearnPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
 import mayaLogoImg from '@/assets/logos/software-autodesk-maya-logo-01.png';
 import pythonLogoImg from '@/assets/logos/programming-python-logo.png';
+import substancePainterLogoImg from '@/assets/logos/software-substance-painter-logo-01.webp';
+import batLogoImg from '@/assets/logos/programming-bat-logo.png';
 import zbrushLogoImg from '@/assets/logos/software-maxon-zbrush-logo-01.png';
+import zbrushBrushMaskDepth from '@/assets/learn/resources/zbrush/zbrush-brush-mask-depth.png';
+import zbrushBrushSoftForms from '@/assets/learn/resources/zbrush/zbrush-brush-softforms.png';
+import zbrushCustomMenus from '@/assets/learn/resources/zbrush/zbrush-custom-menus.png';
+import zbrushMatClayPurple from '@/assets/learn/resources/zbrush/zbrush-mat-clay-purple.png';
+import zbrushMatCloth from '@/assets/learn/resources/zbrush/zbrush-mat-cloth.png';
+import zbrushMatMetal from '@/assets/learn/resources/zbrush/zbrush-mat-metal.png';
+import zbrushMatSkin from '@/assets/learn/resources/zbrush/zbrush-mat-skin.png';
+import spSmartMatColorVar01 from '@/assets/learn/resources/substance-painter/substancepainter-smartmat-colorvar-01.png';
+import mayaScriptPurgeRedshift from '@/assets/learn/resources/maya/maya-script-purge-redshift-nodes.png';
+import mayaScriptCreasedEdges from '@/assets/learn/resources/maya/maya-script-selectcreatededges.png';
+import mayaScriptLocatorsToJoints from '@/assets/learn/resources/maya/maya-script-locators-to-joints.png';
+import mountSDriveThumb from '@/assets/learn/resources/pipeline/mount-s-drive.png';
 
 // Server-side Python syntax highlighter (Kanagawa Dragon colors)
 const seo = getLearnPageSEO();
@@ -175,12 +189,14 @@ const studentWork: StudentPiece[] = [
 // Resources
 interface ResourceItem {
 	name: string;
-	description: string;
+	description?: string;
 	download?: string;
 	previewHtml?: string;
 	previewLang?: string;
 	logos?: ImageMetadata[];
 	thumbnail?: ImageMetadata;
+	howToUse?: string;
+	hidden?: boolean;
 }
 
 interface ResourceSubsection {
@@ -195,7 +211,56 @@ const resources: { category: string; items?: ResourceItem[]; subsections?: Resou
 			{
 				label: 'Scripts',
 				items: [
-			{ name: 'Purge Redshift Nodes', description: 'Removes the Redshift unsupported nodes popup and error when opening scenes in Maya without Redshift installed.', download: '/downloads/maya-purge-redshift-nodes.py', previewLang: 'python', logos: [mayaLogoImg, pythonLogoImg], previewHtml: `<span class="hl-keyword">import</span> maya.<span class="hl-builtin">cmds</span> <span class="hl-keyword">as</span> <span class="hl-builtin">cmds</span>
+			{ name: 'Select Creased Edges', description: 'Selects all creased edges on a polygon object. Useful for assets exported from ZBrush with creased edges for use in Maya\'s Crease Set Editor.', howToUse: '1. Select a polygon object in the viewport.\n2. Open the Script Editor (Python tab).\n3. Paste the script and press Ctrl+Enter.\n4. Maya will switch to edge selection mode and highlight all creased edges.\n5. Open Windows > Modeling Editors > Crease Set Editor to manage the selection.', download: '/downloads/maya-select-creased-edges.py', previewLang: 'python', logos: [mayaLogoImg, pythonLogoImg], thumbnail: mayaScriptCreasedEdges, previewHtml: `<span class="hl-keyword">import</span> maya.<span class="hl-builtin">cmds</span> <span class="hl-keyword">as</span> <span class="hl-builtin">cmds</span>
+
+<span class="hl-keyword">def</span> <span class="hl-decorator">select_creased_edges</span>():
+    selection = <span class="hl-builtin">cmds</span>.ls(selection=<span class="hl-keyword">True</span>, long=<span class="hl-keyword">True</span>)
+    <span class="hl-keyword">if not</span> selection:
+        <span class="hl-builtin">cmds</span>.warning(<span class="hl-string">"Please select a polygon object."</span>)
+        <span class="hl-keyword">return</span>
+
+    obj = selection[<span class="hl-number">0</span>]
+    edge_count = <span class="hl-builtin">cmds</span>.polyEvaluate(obj, edge=<span class="hl-keyword">True</span>)
+    creased_edges = []
+
+    <span class="hl-keyword">for</span> i <span class="hl-keyword">in</span> <span class="hl-builtin">range</span>(edge_count):
+        edge = <span class="hl-string">f"{obj}.e[{i}]"</span>
+        crease = <span class="hl-builtin">cmds</span>.polyCrease(edge, query=<span class="hl-keyword">True</span>, value=<span class="hl-keyword">True</span>)
+        <span class="hl-keyword">if</span> crease <span class="hl-keyword">and</span> crease[<span class="hl-number">0</span>] > <span class="hl-number">0.0</span>:
+            creased_edges.append(edge)
+
+    <span class="hl-keyword">if</span> creased_edges:
+        <span class="hl-builtin">cmds</span>.selectType(edge=<span class="hl-keyword">True</span>)
+        <span class="hl-builtin">cmds</span>.select(creased_edges, replace=<span class="hl-keyword">True</span>)
+        <span class="hl-builtin">print</span>(<span class="hl-string">f"Selected {len(creased_edges)} creased edge(s)."</span>)
+    <span class="hl-keyword">else</span>:
+        <span class="hl-builtin">cmds</span>.warning(<span class="hl-string">"No creased edges found on the selected object."</span>)
+
+<span class="hl-decorator">select_creased_edges</span>()` },
+			{ name: 'Joints to Locators', hidden: true, howToUse: '1. Select one or more joints in the viewport.\n2. Open the Script Editor (Windows > General Editors > Script Editor).\n3. Set the tab to Python.\n4. Paste the script and press Ctrl+Enter to run.\n5. A locator named [joint]_locator will be created at each joint\'s position and orientation.', download: '/downloads/maya-joints-to-locators.py', previewLang: 'python', logos: [mayaLogoImg, pythonLogoImg], thumbnail: mayaScriptLocatorsToJoints, previewHtml: `<span class="hl-keyword">import</span> maya.<span class="hl-builtin">cmds</span> <span class="hl-keyword">as</span> <span class="hl-builtin">cmds</span>
+
+<span class="hl-keyword">def</span> <span class="hl-decorator">joints_to_locators</span>():
+    <span class="hl-comment"># Get a list of all selected joints</span>
+    selected_joints = <span class="hl-builtin">cmds</span>.ls(selection=<span class="hl-keyword">True</span>, <span class="hl-builtin">type</span>=<span class="hl-string">'joint'</span>)
+
+    <span class="hl-keyword">if not</span> selected_joints:
+        <span class="hl-builtin">print</span>(<span class="hl-string">"Please select at least one joint."</span>)
+        <span class="hl-keyword">return</span>
+
+    <span class="hl-comment"># Loop through each selected joint</span>
+    <span class="hl-keyword">for</span> joint <span class="hl-keyword">in</span> selected_joints:
+        <span class="hl-comment"># Create a locator</span>
+        locator_name = joint + <span class="hl-string">"_locator"</span>
+        locator = <span class="hl-builtin">cmds</span>.spaceLocator(name=locator_name)[<span class="hl-number">0</span>]
+
+        <span class="hl-comment"># Match the locator's position and orientation to the joint</span>
+        <span class="hl-builtin">cmds</span>.delete(<span class="hl-builtin">cmds</span>.pointConstraint(joint, locator))
+        <span class="hl-builtin">cmds</span>.delete(<span class="hl-builtin">cmds</span>.orientConstraint(joint, locator))
+
+        <span class="hl-builtin">print</span>(<span class="hl-string">f"Locator created for {joint}: {locator_name}"</span>)
+
+<span class="hl-decorator">joints_to_locators</span>()` },
+			{ name: 'Purge Redshift Nodes', description: 'Removes the Redshift unsupported nodes popup and error when opening scenes in Maya without Redshift installed.', howToUse: '1. Open Maya and load your scene.\n2. Open the Script Editor (Windows > General Editors > Script Editor).\n3. Set the tab to Python.\n4. Paste the script and press Ctrl+Enter to run.\n5. A confirmation will print in the output window listing deleted nodes.', download: '/downloads/maya-purge-redshift-nodes.py', previewLang: 'python', logos: [mayaLogoImg, pythonLogoImg], thumbnail: mayaScriptPurgeRedshift, previewHtml: `<span class="hl-keyword">import</span> maya.<span class="hl-builtin">cmds</span> <span class="hl-keyword">as</span> <span class="hl-builtin">cmds</span>
 
 <span class="hl-keyword">def</span> <span class="hl-decorator">purge_redshift_from_loaded_scene</span>():
     deleted = []
@@ -231,51 +296,61 @@ const resources: { category: string; items?: ResourceItem[]; subsections?: Resou
 <span class="hl-decorator">purge_redshift_from_loaded_scene</span>()` },
 				],
 			},
-			{
-				label: 'Languages',
-				items: [
-					{ name: 'Python', description: 'Scripting for Maya, pipeline tools, and automation' },
-					{ name: 'MEL', description: 'Maya Embedded Language for quick automation' },
-				],
-			},
 		],
 	},
 	{
 		category: 'ZBrush',
 		subsections: [
 			{
-				label: 'Brushes',
+				label: 'UI Configs',
 				items: [
-					{ name: 'Brush Pack Template', description: 'Template entry — add a brush .ZBP file and thumbnail here.', logos: [zbrushLogoImg] },
+					{ name: 'ZBrush UI 2026', description: 'Custom ZBrush interface and menu for 2026.', howToUse: '1. Download the .cfg file.\n2. In ZBrush, go to Preferences > Config > Load UI.\n3. Navigate to and select the downloaded .cfg file.\n4. Save the config via Preferences > Config > Save UI so it persists on next launch.', logos: [zbrushLogoImg], thumbnail: zbrushCustomMenus, download: '/downloads/uiw3d-zbrush-ui-2026.cfg' },
 				],
 			},
 			{
-				label: 'UI Configs',
+				label: 'Brushes',
 				items: [
-					{ name: 'UI Config Template', description: 'Template entry — add a UI config file and thumbnail here.', logos: [zbrushLogoImg] },
+					{ name: 'Mask Depth', description: 'Custom mask depth brush for ZBrush. Useful for masking out 90 degree planes.', howToUse: '1. Download the .ZBP file.\n2. In ZBrush, open the Brush palette and click Import.\n3. Select the downloaded .ZBP file.\n4. The brush will appear in your brush inventory and can be saved to your startup brushes.', logos: [zbrushLogoImg], thumbnail: zbrushBrushMaskDepth, download: '/downloads/uiw3d-mask-depth.zbp' },
+					{ name: 'Soft Forms', description: 'Pablanders gio soft forms brush.', howToUse: '1. Download the .ZBP file.\n2. In ZBrush, open the Brush palette and click Import.\n3. Select the downloaded .ZBP file.\n4. The brush will appear in your brush inventory and can be saved to your startup brushes.\nSource: <a href="https://www.pablander.academy/newsletter/the-gio-brush" target="_blank" rel="noopener noreferrer" class="underline">Pablander Academy — The Gio Brush</a>', logos: [zbrushLogoImg], thumbnail: zbrushBrushSoftForms, download: '/downloads/uiw3d-soft-forms.zbp' },
+				],
+			},
+			{
+				label: 'Materials',
+				items: [
+					{ name: 'Skin', description: 'Custom skin material for ZBrush.', howToUse: '1. Download the .ZMT file.\n2. In ZBrush, open the Material palette and click Load.\n3. Select the downloaded .ZMT file.\n4. The material will appear in your material inventory. Use CopyMat/PasteMat to apply it to a subtool.', logos: [zbrushLogoImg], thumbnail: zbrushMatSkin, download: '/downloads/uiw3d-skin.zmt' },
+					{ name: 'Clay Purple', description: 'Custom clay purple material for ZBrush.', howToUse: '1. Download the .ZMT file.\n2. In ZBrush, open the Material palette and click Load.\n3. Select the downloaded .ZMT file.\n4. Apply via CopyMat/PasteMat or set as active material.', logos: [zbrushLogoImg], thumbnail: zbrushMatClayPurple, download: '/downloads/uiw3d-clay-purple.zmt' },
+					{ name: 'Cloth', description: 'Custom cloth material for ZBrush.', howToUse: '1. Download the .ZMT file.\n2. In ZBrush, open the Material palette and click Load.\n3. Select the downloaded .ZMT file.\n4. Apply via CopyMat/PasteMat or set as active material.', logos: [zbrushLogoImg], thumbnail: zbrushMatCloth, download: '/downloads/uiw3d-cloth.zmt' },
+					{ name: 'Metal', description: 'Custom metal material for ZBrush.', howToUse: '1. Download the .ZMT file.\n2. In ZBrush, open the Material palette and click Load.\n3. Select the downloaded .ZMT file.\n4. Apply via CopyMat/PasteMat or set as active material.', logos: [zbrushLogoImg], thumbnail: zbrushMatMetal, download: '/downloads/uiw3d-metal.ZMT' },
 				],
 			},
 		],
 	},
 	{
-		category: 'Texturing',
-		items: [
-			{ name: 'Substance 3D Painter', description: 'PBR texturing and material authoring' },
-			{ name: 'Substance 3D Designer', description: 'Procedural material creation' },
-			{ name: 'Marmoset Toolbag', description: 'Real-time rendering and baking' },
-		],
-	},
-	{
-		category: 'Engines',
-		items: [
-			{ name: 'Unreal Engine 5', description: 'Real-time rendering, Nanite, Lumen, and MetaHumans' },
-			{ name: 'Unity', description: 'Cross-platform real-time engine' },
+		category: 'Substance Painter',
+		subsections: [
+			{
+				label: 'Smart Materials',
+				items: [
+					{ name: 'Color Variation 01', description: 'Smart material for procedural color variation.', howToUse: '1. Download the .spsm file.\n2. In Substance 3D Painter, open the Assets panel.\n3. Click Import Resource and select the .spsm file, targeting Project or Shelf.\n4. Drag the smart material from the Assets panel onto a layer to apply it.', logos: [substancePainterLogoImg], thumbnail: spSmartMatColorVar01, download: '/downloads/uiw3d-color-var-01.spsm' },
+				],
+			},
 		],
 	},
 	{
 		category: 'Pipeline',
-		items: [
-			{ name: 'Git', description: 'Version control for collaborative projects' },
+		subsections: [
+			{
+				label: 'Scripts',
+				items: [
+					{ name: 'Mount S: Drive', description: 'Maps S: as a virtual drive pointing to the script\'s directory. Ensures a universal project path across all machines.', howToUse: '1. Download the .bat file and place it in the root of your project folder.\n2. Double-click the .bat file to run it.\n3. S: will now point to that folder on your machine.\n4. All project paths using S:\\ will resolve correctly regardless of where the project is stored.\n5. Re-run the .bat any time you move the project or on a new machine.', download: '/downloads/mount-s-drive.bat', previewLang: 'batch', logos: [batLogoImg], thumbnail: mountSDriveThumb, previewHtml: `<span class="hl-keyword">@echo off</span>
+<span class="hl-keyword">set</span> <span class="hl-string">"TARGET_DIR=%~dp0"</span>
+<span class="hl-keyword">set</span> <span class="hl-string">"TARGET_DIR=%TARGET_DIR:~0,-1%"</span>
+<span class="hl-builtin">subst</span> S: /d
+<span class="hl-builtin">subst</span> S: <span class="hl-string">"%TARGET_DIR%"</span>
+<span class="hl-builtin">echo</span> S: drive now mapped to: %TARGET_DIR%
+<span class="hl-builtin">pause</span>` },
+				],
+			},
 		],
 	},
 ];
@@ -287,6 +362,19 @@ const allCourses = curriculum.flatMap(level =>
 const courseId = (code: string) => code.toLowerCase().replace(/\s+/g, '-');
 const resourceId = (category: string) => category.toLowerCase().replace(/[\s&]+/g, '-');
 const studentId = (piece: StudentPiece) => `student-${piece.student.toLowerCase().replace(/\s+/g, '-')}-${piece.title.toLowerCase().replace(/\s+/g, '-')}`;
+
+// Build a flat lookup of howToUse by item name for inline JS injection
+const resourceHowToMap: Record<string, string[]> = {};
+for (const group of resources) {
+	const allItems = group.subsections
+		? group.subsections.flatMap(s => s.items)
+		: (group.items ?? []);
+	for (const item of allItems) {
+		if (item.howToUse) {
+			resourceHowToMap[item.name] = item.howToUse.split('\n').map(s => s.trim()).filter(Boolean);
+		}
+	}
+}
 ---
 
 
@@ -611,12 +699,17 @@ data-autoplay
 		{group.subsections.map((sub) => (
 			<div>
 				<Text variant="secondary" size="xs" class="uppercase tracking-widest mb-3 block">{sub.label}</Text>
-				<div class="grid sm:grid-cols-2 gap-4">
-					{sub.items.map((item) => (
-					<div class="flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
+				<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+					{sub.items.filter(item => !item.hidden).map((item) => (
+					<div
+						class="resource-card cursor-pointer flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.01]"
+						data-name={item.name}
+						data-description={item.description}
+						data-download={item.download ?? ''}
+					>
 						{item.thumbnail ? (
-							<div class="relative aspect-video bg-foreground/5 overflow-hidden">
-								<Image src={item.thumbnail} alt={item.name} class="absolute inset-0 w-full h-full object-cover" data-no-lightbox />
+							<div class="bg-foreground/5 overflow-hidden flex items-center justify-center p-2">
+								<Image src={item.thumbnail} alt={item.name} class="w-full h-auto object-contain max-h-48" data-no-lightbox />
 							</div>
 						) : null}
 						<div class="p-4 flex flex-col gap-3 flex-1">
@@ -659,12 +752,17 @@ data-autoplay
 		))}
 	</div>
 ) : (
-	<div class="grid sm:grid-cols-2 gap-4">
-	{(group.items ?? []).map((item) => (
-	<div class="flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.01]">
+	<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+	{(group.items ?? []).filter(item => !item.hidden).map((item) => (
+	<div
+		class="resource-card cursor-pointer flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.01]"
+		data-name={item.name}
+		data-description={item.description}
+		data-download={item.download ?? ''}
+	>
 		{item.thumbnail ? (
-			<div class="relative aspect-video bg-foreground/5 overflow-hidden">
-				<Image src={item.thumbnail} alt={item.name} class="absolute inset-0 w-full h-full object-cover" data-no-lightbox />
+			<div class="bg-foreground/5 overflow-hidden flex items-center justify-center p-2">
+				<Image src={item.thumbnail} alt={item.name} class="w-full h-auto object-contain max-h-48" data-no-lightbox />
 			</div>
 		) : null}
 		<div class="p-4 flex flex-col gap-3 flex-1">
@@ -711,11 +809,38 @@ data-autoplay
 </div>
 </div>
 
+<!-- Resource Card Modal -->
+<div id="resource-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+	<div id="resource-modal-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+	<div class="resource-modal-card relative z-10 w-full max-w-lg rounded-xl border border-border bg-card shadow-2xl overflow-hidden">
+		<button id="resource-modal-close" class="absolute top-3 right-3 z-10 flex items-center justify-center w-7 h-7 rounded-full bg-foreground/10 hover:bg-foreground/20 transition-colors">
+			<svg class="w-3.5 h-3.5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+		</button>
+		<div id="resource-modal-thumb" class="bg-foreground/5 flex items-center justify-center p-4 hidden">
+			<img id="resource-modal-img" src="" alt="" class="w-full h-auto object-contain max-h-64" />
+		</div>
+		<div class="p-6 overflow-y-auto max-h-[70vh]">
+			<p id="resource-modal-name" class="text-xl font-medium text-foreground mb-2" style="font-family: 'Besley', serif"></p>
+			<p id="resource-modal-desc" class="text-sm text-foreground-secondary mb-5"></p>
+			<div id="resource-modal-how-to" class="hidden mb-5">
+				<p class="text-xs uppercase tracking-widest text-foreground-muted mb-2" style="font-family: 'Besley', serif">How to Use</p>
+				<ol id="resource-modal-how-to-list" class="space-y-1.5 text-sm text-foreground-secondary list-none"></ol>
+			</div>
+			<a id="resource-modal-download" href="#" download class="hidden inline-flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors" style="font-family: 'Besley', serif">
+				<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+				Download
+			</a>
+		</div>
+	</div>
+</div>
 
 </PageContainer>
 </div>
 </PageMain>
 <Footer />
+<script is:inline define:vars={{ resourceHowToMap }}>
+window.__resourceHowTo = resourceHowToMap;
+</script>
 <ImageLightbox />
 </BaseLayout>
 
@@ -730,6 +855,14 @@ data-autoplay
 }
 /* Code block — uses site theme colors */
 .code-block { background: hsl(var(--card-bg)); color: hsl(var(--foreground)); margin: 0 !important; border-radius: 0 !important; }
+/* Resource modal */
+#resource-modal.open { display: flex; }
+.resource-modal-card { animation: modal-in 0.18s ease; }
+@keyframes modal-in { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+/* Resource modal */
+#resource-modal.open { display: flex; }
+.resource-modal-card { animation: modal-in 0.18s ease; }
+@keyframes modal-in { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 </style>
 
 <script>
@@ -767,6 +900,23 @@ const tabs = document.querySelectorAll<HTMLElement>('.learn-tab');
 const panels = document.querySelectorAll<HTMLElement>('.learn-panel');
 const sidebars = document.querySelectorAll<HTMLElement>('.learn-sidebar');
 
+function activateTab(target: string) {
+  document.querySelectorAll<HTMLElement>('.learn-tab').forEach((t) => {
+    const isActive = t.dataset.tab === target;
+    t.classList.toggle('text-accent', isActive);
+    t.classList.toggle('border-accent', isActive);
+    t.classList.toggle('text-foreground-secondary', !isActive);
+    t.classList.toggle('border-transparent', !isActive);
+  });
+  panels.forEach((panel) => {
+    panel.classList.toggle('hidden', panel.id !== `panel-${target}`);
+  });
+  sidebars.forEach((sidebar) => {
+    sidebar.classList.toggle('hidden', sidebar.id !== `sidebar-${target}`);
+  });
+  initScrollSpy();
+}
+
 tabs.forEach((tab) => {
 const fresh = tab.cloneNode(true) as HTMLElement;
 tab.parentNode?.replaceChild(fresh, tab);
@@ -775,23 +925,8 @@ tab.parentNode?.replaceChild(fresh, tab);
 document.querySelectorAll<HTMLElement>('.learn-tab').forEach((tab) => {
 tab.addEventListener('click', () => {
 const target = tab.dataset.tab!;
-
-document.querySelectorAll<HTMLElement>('.learn-tab').forEach((t) => {
-t.classList.remove('text-accent', 'border-accent');
-t.classList.add('text-foreground-secondary', 'border-transparent');
-});
-tab.classList.remove('text-foreground-secondary', 'border-transparent');
-tab.classList.add('text-accent', 'border-accent');
-
-panels.forEach((panel) => {
-panel.classList.toggle('hidden', panel.id !== `panel-${target}`);
-});
-sidebars.forEach((sidebar) => {
-sidebar.classList.toggle('hidden', sidebar.id !== `sidebar-${target}`);
-});
-
-// Re-init scroll observer for the new active panel
-initScrollSpy();
+sessionStorage.setItem('learn-tab', target);
+activateTab(target);
 });
 });
 
@@ -819,6 +954,13 @@ link.classList.toggle('active', link.dataset.slug === id);
 entries.forEach((entry) => observer!.observe(entry));
 };
 initScrollSpy();
+
+// Restore tab from sessionStorage
+const savedTab = sessionStorage.getItem('learn-tab');
+const validTabs = Array.from(document.querySelectorAll<HTMLElement>('.learn-tab')).map(t => t.dataset.tab!);
+if (savedTab && validTabs.includes(savedTab)) {
+  activateTab(savedTab);
+}
 
 // --- Course drill-down ---
 const openCourseDetail = (courseSlug: string) => {
@@ -976,6 +1118,69 @@ initStudentFilter();
 
 // Auto-open Organic Modeling by default
 openCourseDetail('angd-1314');
+
+// --- Resource card modal ---
+const modal = document.getElementById('resource-modal')!;
+const modalImg = document.getElementById('resource-modal-img') as HTMLImageElement;
+const modalThumb = document.getElementById('resource-modal-thumb')!;
+const modalName = document.getElementById('resource-modal-name')!;
+const modalDesc = document.getElementById('resource-modal-desc')!;
+const modalDownload = document.getElementById('resource-modal-download') as HTMLAnchorElement;
+const modalHowTo = document.getElementById('resource-modal-how-to')!;
+const modalHowToList = document.getElementById('resource-modal-how-to-list')!;
+
+const openResourceModal = (card: HTMLElement) => {
+  const name = card.dataset.name ?? '';
+  const desc = card.dataset.description ?? '';
+  const download = card.dataset.download ?? '';
+  const howToUse: string[] = ((window as any).__resourceHowTo?.[name] ?? []);
+  const imgEl = card.querySelector<HTMLImageElement>('img[data-no-lightbox]');
+
+  modalName.textContent = name;
+  modalDesc.textContent = desc;
+
+  if (imgEl?.src) {
+    modalImg.src = imgEl.src;
+    modalImg.alt = name;
+    modalThumb.classList.remove('hidden');
+  } else {
+    modalThumb.classList.add('hidden');
+  }
+
+  if (howToUse.length) {
+    modalHowToList.innerHTML = howToUse.map((step, i) => `<li class="flex gap-2"><span class="text-accent font-medium shrink-0">${i + 1}.</span><span>${step.replace(/^\d+\.\s*/, '')}</span></li>`).join('');
+    modalHowTo.classList.remove('hidden');
+  } else {
+    modalHowTo.classList.add('hidden');
+  }
+
+  if (download) {
+    modalDownload.href = download;
+    modalDownload.classList.remove('hidden');
+  } else {
+    modalDownload.classList.add('hidden');
+  }
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+const closeResourceModal = () => {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+document.querySelectorAll<HTMLElement>('.resource-card').forEach((card) => {
+  card.addEventListener('click', (e) => {
+    // Don't open modal when clicking download link inside the card
+    if ((e.target as HTMLElement).closest('a')) return;
+    openResourceModal(card);
+  });
+});
+
+document.getElementById('resource-modal-close')?.addEventListener('click', closeResourceModal);
+document.getElementById('resource-modal-backdrop')?.addEventListener('click', closeResourceModal);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeResourceModal(); });
 };
 
 initLearn();
