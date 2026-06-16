@@ -863,7 +863,8 @@ const initLearn = () => {
 
 // --- Copy buttons ---
 document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
     const code = btn.dataset.code ?? '';
     navigator.clipboard.writeText(code).then(() => {
       btn.textContent = 'Copied!';
