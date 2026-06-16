@@ -56,7 +56,7 @@ const defaultLogos: Logo[] = [
 ];
 
 const {
-  title = "Studios and Creative Teams I've Worked With",
+  title = "Studios I've Worked With",
   description = "Since beginning my professional journey in 2013, I've had the opportunity to work across a wide range of roles. From intern to art director, and many in between, it's been a rewarding path filled with opportunities to learn, grow, and collaborate with talented teams. Below are a few of the studios and creative partners I've had the pleasure of working with throughout my career.",
   logos = defaultLogos,
   class: className = ''
@@ -69,9 +69,9 @@ const {
     <!-- Section Header -->
     <div class="mb-10 sm:mb-12 text-left">
       {title && (
-        <Text variant="primary" size="base" class="mb-0 !font-normal leading-tight">
+        <Heading level={2} size="4xl" class="mb-4">
           {title}
-        </Text>
+        </Heading>
       )}
       {description && (
         <Text variant="secondary" size="base" class="mb-2 leading-tight !text-foreground-muted">

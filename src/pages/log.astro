@@ -184,4 +184,15 @@ const seo = getBlogPageSEO();
 
 	initLogNav();
 	document.addEventListener('astro:after-swap', initLogNav);
+
+	const openProseLinksInNewTab = () => {
+		document.querySelectorAll<HTMLAnchorElement>('.prose a[href]').forEach((a) => {
+			if (a.hostname !== location.hostname) {
+				a.target = '_blank';
+				a.rel = 'noopener noreferrer';
+			}
+		});
+	};
+	openProseLinksInNewTab();
+	document.addEventListener('astro:after-swap', openProseLinksInNewTab);
 </script>

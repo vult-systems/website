@@ -8,6 +8,13 @@ import ExperienceSection from '@/components/sections/experience-section.astro';
 import FeaturedCarousel from '@/components/ui/featured-carousel.astro';
 import { getHomePageSEO } from '@/config/seo';
 import { layout } from '@/config/design';
+import Text from '@/components/ui/text.astro';
+import Link from '@/components/ui/link.astro';
+import Heading from '@/components/ui/heading.astro';
+import { Image } from 'astro:assets';
+import alienBustThumb from '@/assets/courses/organic-modeling/alien-bust/cg-alienbust-thumb-02.png';
+import zbrushMenusThumb from '@/assets/learn/resources/thumbs/learn-thumbnail-landingpage.png';
+import opencueThumb from '@/assets/log/opencue-render/uiw3d-opencue-001.png';
 
 // Get featured art pieces
 const artPieces = await getCollection('art');
@@ -59,13 +66,108 @@ const seo = getHomePageSEO();
 
 		<!-- Experience Section -->
 		<ExperienceSection />
+
+		<!-- Divider -->
+		<div class={layout.container}>
+			<div class="border-b-2 border-foreground-secondary/10"></div>
+		</div>
+
+		<!-- Learn Section -->
+		<section class="relative z-10 py-16 sm:py-20">
+			<div class={layout.container}>
+				<div class="mb-8 text-left">
+					<Heading level={2} size="4xl" class="mb-4">
+						Courses, Student Works, & Resources
+					</Heading>
+					<Text variant="secondary" size="base" class="mb-4 leading-relaxed !text-foreground-muted">
+						Supplemental materials from my 3D Animation and Game Design courses at the University of the Incarnate Word, made public for students and anyone interested in the craft. Browse class snippets, student work from the program, and resources.
+					</Text>
+					<Link variant="accent" href="/learn">
+						Learn
+					</Link>
+				</div>
+
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					<!-- Classes -->
+					<a href="/learn" class="group rounded-md border border-border bg-card overflow-hidden transition-colors duration-200 flex flex-col">
+						<div class="overflow-hidden bg-foreground/5 aspect-square">
+							<Image src={alienBustThumb} alt="Classes" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
+						</div>
+						<div class="p-4 flex flex-col gap-1">
+							<p class="text-base font-medium text-foreground transition-colors">Classes</p>
+							<p class="text-base text-foreground-muted line-clamp-2">Learning materials and course content spanning organic modeling, character art, environment, and production tools used in my instruction at UIW.</p>
+						</div>
+					</a>
+
+					<!-- Student Work -->
+					<a href="/learn#student-work" class="group rounded-md border border-border bg-card overflow-hidden transition-colors duration-200 flex flex-col">
+						<div class="overflow-hidden bg-foreground/5 aspect-square">
+						<img src="/student-work/Neal-Hong-Bust-01.png" alt="Student Work" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" loading="lazy" />
+						</div>
+						<div class="p-4 flex flex-col gap-1">
+							<p class="text-base font-medium text-foreground transition-colors">Student Work</p>
+							<p class="text-base text-foreground-muted line-clamp-2">Work produced by students throughout their time in my 3D Animation and Game Design classes at UIW.</p>
+						</div>
+					</a>
+
+					<!-- Tools & Resources -->
+					<a href="/learn#tools" class="group rounded-md border border-border bg-card overflow-hidden transition-colors duration-200 flex flex-col">
+						<div class="overflow-hidden bg-foreground/5 aspect-square">
+							<Image src={zbrushMenusThumb} alt="Tools & Resources" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
+						</div>
+						<div class="p-4 flex flex-col gap-1">
+							<p class="text-base font-medium text-foreground transition-colors">Tools & Resources</p>
+							<p class="text-base text-foreground-muted line-clamp-2">Free downloads used directly in my courses, including ZBrush assets, Maya scripts, and pipeline tools.</p>
+						</div>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- Divider -->
+		<div class={layout.container}>
+			<div class="border-b-2 border-foreground-secondary/10"></div>
+		</div>
+
+		<!-- Log Section -->
+		<section class="relative z-10 py-16 sm:py-20">
+			<div class={layout.container}>
+				<div class="flex flex-col sm:flex-row gap-8 items-start">
+					<a href="/log" class="rounded-md border border-border bg-card overflow-hidden block sm:max-w-md w-full flex-shrink-0">
+						<div class="aspect-video overflow-hidden bg-foreground/5">
+							<Image src={opencueThumb} alt="OpenCue render farm" class="w-full h-full object-cover" />
+						</div>
+						<div class="p-4">
+							<p class="text-base font-medium text-foreground">Rethinking Rendering for Higher Education with Sony's OpenCue</p>
+							<p class="text-sm text-foreground-muted mt-1 line-clamp-2">Setting up Sony's OpenCue render farm for student film production at the University of the Incarnate Word.</p>
+						</div>
+					</a>
+					<div class="flex-1 min-w-0">
+						<Heading level={2} size="4xl" class="mb-4">
+							Dev Journal
+						</Heading>
+						<Text variant="secondary" size="base" class="mb-4 leading-relaxed !text-foreground-muted">
+							An ongoing record of projects, experiments, and technical writeups from my work in production and education. Currently documenting the design and rollout of a Sony OpenCue render farm built for student film production at UIW, covering infrastructure decisions, lessons learned, and what works for us in our university lab environment.
+						</Text>
+						<Link variant="accent" href="/log">
+							Log
+						</Link>
+					</div>
+				</div>
+			</div>
+		</section>
 	</main>
 <Footer />
 
 <!-- Bottom fade gradient — covers the below-fold content until user scrolls -->
 <div
   id="scroll-gradient"
-  class="fixed bottom-0 left-0 right-0 z-30 pointer-events-none"
+  class="fixed bottom-0 left-0 right-0 z-30 pointer-events-none dark:hidden"
+  style="height: 40vh; background: linear-gradient(to bottom, transparent 0%, transparent 60%, rgba(255,255,255,0.4) 80%, rgba(255,255,255,0.75) 100%); opacity: 1; transition: opacity 0.6s ease;"
+></div>
+<div
+  id="scroll-gradient-dark"
+  class="fixed bottom-0 left-0 right-0 z-30 pointer-events-none hidden dark:block"
   style="height: 40vh; background: linear-gradient(to bottom, transparent 0%, transparent 40%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0.98) 100%); opacity: 1; transition: opacity 0.6s ease;"
 ></div>
 
@@ -96,6 +198,7 @@ const seo = getHomePageSEO();
   const initScrollHint = () => {
     const hint = document.getElementById('scroll-hint');
     const gradient = document.getElementById('scroll-gradient');
+    const gradientDark = document.getElementById('scroll-gradient-dark');
     if (!hint) return;
 
     hint.addEventListener('click', () => {
@@ -109,6 +212,7 @@ const seo = getHomePageSEO();
       hint.style.opacity = opacity;
       hint.style.pointerEvents = pointer;
       if (gradient) gradient.style.opacity = opacity;
+      if (gradientDark) gradientDark.style.opacity = opacity;
     };
 
     onScroll();

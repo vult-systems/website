@@ -166,24 +166,13 @@ interface StudentPiece {
 	year: string;
 	portfolio?: string;   // URL to student's portfolio
 	video?: string;       // Path to video in public/ (e.g. '/student-work/file.mp4')
-	// image?: ImageMetadata;  // Uncomment and import when adding real images
+	image?: string;       // Path to image in public/ (e.g. '/student-work/file.png')
 }
 
 const studentWork: StudentPiece[] = [
-	// -------------------------------------------------------------------
-	// To add real student work:
-	//   Videos: Drop MP4s into public/student-work/ and set video path
-	//   Images: Drop into src/assets/learn/student-work/, import, add image prop
-	// -------------------------------------------------------------------
 	{ student: 'Annamarie Alvarez', title: 'Space Cat Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://annamariealvarez.com/characters', video: '/student-work/Alvarez-Space-Cat-Turnaround.mp4' },
 	{ student: 'Annamarie Alvarez', title: 'Finn Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://annamariealvarez.com/characters', video: '/student-work/Alvarez-Finn-Turnaround.mp4' },
-	{ student: 'Student Name', title: 'Hard Surface Asset', course: 'ANGD 1312', year: '2025' },
-	{ student: 'Student Name', title: 'Sculpt Study', course: 'ANGD 1314', year: '2025' },
-	{ student: 'Student Name', title: 'Character Design', course: 'ANGD 3361', year: '2025' },
-	{ student: 'Student Name', title: 'Thesis Project', course: 'ANGD 4360', year: '2025' },
-	{ student: 'Student Name', title: 'Armor Set', course: 'ANGD 3362', year: '2024' },
-	{ student: 'Student Name', title: 'Environment Diorama', course: 'ANGD 3332', year: '2024' },
-	{ student: 'Student Name', title: 'Anatomy Study', course: 'ANGD 1380', year: '2024' },
+	{ student: 'Christian Neal', title: 'Hong Mei Bust', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/christian_neal', image: '/student-work/Neal-Hong-Bust-01.png' },
 ];
 
 // Resources
@@ -657,8 +646,12 @@ data-autoplay
 </svg>
 </div>
 </div>
+) : piece.image ? (
+<div class="learn-lightbox-trigger relative bg-foreground/5 rounded-t-md overflow-hidden cursor-pointer" data-label={`${piece.student} — ${piece.title}`}>
+<img src={piece.image} alt={`${piece.student} — ${piece.title}`} class="w-full h-auto object-cover" loading="lazy" />
+</div>
 ) : (
-<div class="learn-lightbox-trigger relative aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/10 transition-all" data-label={`${piece.student} — ${piece.title}`}>
+<div class="aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center rounded-t-md">
 <svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 </svg>
@@ -955,11 +948,13 @@ entries.forEach((entry) => observer!.observe(entry));
 };
 initScrollSpy();
 
-// Restore tab from sessionStorage
+// Restore tab — URL hash takes priority over sessionStorage
+const hashTab = location.hash.replace('#', '');
 const savedTab = sessionStorage.getItem('learn-tab');
 const validTabs = Array.from(document.querySelectorAll<HTMLElement>('.learn-tab')).map(t => t.dataset.tab!);
-if (savedTab && validTabs.includes(savedTab)) {
-  activateTab(savedTab);
+const tabToRestore = (hashTab && validTabs.includes(hashTab)) ? hashTab : (savedTab && validTabs.includes(savedTab)) ? savedTab : null;
+if (tabToRestore) {
+  activateTab(tabToRestore);
 }
 
 // --- Course drill-down ---
