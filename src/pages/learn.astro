@@ -15,7 +15,10 @@ import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import alienBustThumb from '@/assets/courses/organic-modeling/alien-bust/cg-alienbust-thumb-01.png';
 import { getLearnPageSEO } from '@/config/seo';
 import { SITE } from '@/config/site';
+import mayaLogoImg from '@/assets/logos/software-autodesk-maya-logo-01.png';
+import pythonLogoImg from '@/assets/logos/programming-python-logo.png';
 
+// Server-side Python syntax highlighter (Kanagawa Dragon colors)
 const seo = getLearnPageSEO();
 
 // -------------------------------------------------------------------
@@ -146,6 +149,7 @@ interface StudentPiece {
 	title: string;
 	course: string;
 	year: string;
+	portfolio?: string;   // URL to student's portfolio
 	video?: string;       // Path to video in public/ (e.g. '/student-work/file.mp4')
 	// image?: ImageMetadata;  // Uncomment and import when adding real images
 }
@@ -156,8 +160,8 @@ const studentWork: StudentPiece[] = [
 	//   Videos: Drop MP4s into public/student-work/ and set video path
 	//   Images: Drop into src/assets/learn/student-work/, import, add image prop
 	// -------------------------------------------------------------------
-	{ student: 'Alvarez', title: 'Space Cat Turnaround', course: 'ANGD 2361', year: '2025', video: '/student-work/Alvarez-Space-Cat-Turnaround.mp4' },
-	{ student: 'Alvarez', title: 'Finn Turnaround', course: 'ANGD 2361', year: '2025', video: '/student-work/Alvarez-Finn-Turnaround.mp4' },
+	{ student: 'Annamarie Alvarez', title: 'Space Cat Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://annamariealvarez.com/characters', video: '/student-work/Alvarez-Space-Cat-Turnaround.mp4' },
+	{ student: 'Annamarie Alvarez', title: 'Finn Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://annamariealvarez.com/characters', video: '/student-work/Alvarez-Finn-Turnaround.mp4' },
 	{ student: 'Student Name', title: 'Hard Surface Asset', course: 'ANGD 1312', year: '2025' },
 	{ student: 'Student Name', title: 'Sculpt Study', course: 'ANGD 1314', year: '2025' },
 	{ student: 'Student Name', title: 'Character Design', course: 'ANGD 3361', year: '2025' },
@@ -168,17 +172,81 @@ const studentWork: StudentPiece[] = [
 ];
 
 // Resources
-const resources = [
+interface ResourceItem {
+	name: string;
+	description: string;
+	download?: string;
+	previewHtml?: string;
+	previewLang?: string;
+	logos?: ImageMetadata[];
+}
+
+interface ResourceSubsection {
+	label: string;
+	items: ResourceItem[];
+}
+
+const resources: { category: string; items?: ResourceItem[]; subsections?: ResourceSubsection[] }[] = [
 	{
-		category: 'Modeling & Sculpting',
+		category: 'Maya',
+		subsections: [
+			{
+				label: 'Scripts',
+				items: [
+			{ name: 'Purge Redshift Nodes', description: 'Removes the Redshift unsupported nodes popup and error when opening scenes in Maya without Redshift installed.', download: '/downloads/maya-purge-redshift-nodes.py', previewLang: 'python', logos: [mayaLogoImg, pythonLogoImg], previewHtml: `<span class="hl-keyword">import</span> maya.<span class="hl-builtin">cmds</span> <span class="hl-keyword">as</span> <span class="hl-builtin">cmds</span>
+
+<span class="hl-keyword">def</span> <span class="hl-decorator">purge_redshift_from_loaded_scene</span>():
+    deleted = []
+
+    <span class="hl-comment"># Get ALL nodes by name pattern (not type-based)</span>
+    all_nodes = <span class="hl-builtin">cmds</span>.ls(long=<span class="hl-keyword">True</span>) <span class="hl-keyword">or</span> []
+
+    <span class="hl-keyword">for</span> n <span class="hl-keyword">in</span> all_nodes:
+        <span class="hl-keyword">try</span>:
+            <span class="hl-keyword">if</span> <span class="hl-string">"redshift"</span> <span class="hl-keyword">in</span> n.lower():
+                <span class="hl-builtin">cmds</span>.lockNode(n, lock=<span class="hl-keyword">False</span>)
+                <span class="hl-builtin">cmds</span>.delete(n)
+                deleted.append(n)
+        <span class="hl-keyword">except</span>:
+            <span class="hl-keyword">pass</span>
+
+    <span class="hl-comment"># Also remove unknown nodes (fallback safety)</span>
+    unknown = <span class="hl-builtin">cmds</span>.ls(<span class="hl-builtin">type</span>=<span class="hl-string">"unknown"</span>) <span class="hl-keyword">or</span> []
+    <span class="hl-keyword">for</span> n <span class="hl-keyword">in</span> unknown:
+        <span class="hl-keyword">try</span>:
+            t = <span class="hl-builtin">cmds</span>.unknownNode(n, q=<span class="hl-keyword">True</span>, typeName=<span class="hl-keyword">True</span>)
+            <span class="hl-keyword">if</span> t <span class="hl-keyword">and</span> <span class="hl-string">"redshift"</span> <span class="hl-keyword">in</span> t.lower():
+                <span class="hl-builtin">cmds</span>.delete(n)
+                deleted.append(n)
+        <span class="hl-keyword">except</span>:
+            <span class="hl-keyword">pass</span>
+
+    <span class="hl-builtin">print</span>(<span class="hl-string">"\\n=== PURGE COMPLETE ==="</span>)
+    <span class="hl-builtin">print</span>(<span class="hl-string">"Deleted:"</span>, <span class="hl-builtin">len</span>(deleted))
+    <span class="hl-keyword">for</span> d <span class="hl-keyword">in</span> deleted:
+        <span class="hl-builtin">print</span>(<span class="hl-string">" -"</span>, d)
+
+<span class="hl-decorator">purge_redshift_from_loaded_scene</span>()` },
+				],
+			},
+			{
+				label: 'Languages',
+				items: [
+					{ name: 'Python', description: 'Scripting for Maya, pipeline tools, and automation' },
+					{ name: 'MEL', description: 'Maya Embedded Language for quick automation' },
+				],
+			},
+		],
+	},
+	{
+		category: 'Sculpting',
 		items: [
-			{ name: 'Maya', description: 'Primary DCC for modeling, rigging, and animation' },
 			{ name: 'ZBrush', description: 'High-resolution digital sculpting and detailing' },
 			{ name: 'Blender', description: 'Open-source 3D creation suite' },
 		],
 	},
 	{
-		category: 'Texturing & Materials',
+		category: 'Texturing',
 		items: [
 			{ name: 'Substance 3D Painter', description: 'PBR texturing and material authoring' },
 			{ name: 'Substance 3D Designer', description: 'Procedural material creation' },
@@ -186,17 +254,15 @@ const resources = [
 		],
 	},
 	{
-		category: 'Engine & Real-Time',
+		category: 'Engines',
 		items: [
 			{ name: 'Unreal Engine 5', description: 'Real-time rendering, Nanite, Lumen, and MetaHumans' },
 			{ name: 'Unity', description: 'Cross-platform real-time engine' },
 		],
 	},
 	{
-		category: 'Pipeline & Scripting',
+		category: 'Pipeline',
 		items: [
-			{ name: 'Python', description: 'Scripting for Maya, pipeline tools, and automation' },
-			{ name: 'MEL', description: 'Maya Embedded Language for quick automation' },
 			{ name: 'Git', description: 'Version control for collaborative projects' },
 		],
 	},
@@ -208,6 +274,7 @@ const allCourses = curriculum.flatMap(level =>
 );
 const courseId = (code: string) => code.toLowerCase().replace(/\s+/g, '-');
 const resourceId = (category: string) => category.toLowerCase().replace(/[\s&]+/g, '-');
+const studentId = (piece: StudentPiece) => `student-${piece.student.toLowerCase().replace(/\s+/g, '-')}-${piece.title.toLowerCase().replace(/\s+/g, '-')}`;
 ---
 
 
@@ -296,17 +363,16 @@ data-slug={courseId(course.code)}
 <!-- Sidebar: Student Work -->
 <div id="sidebar-student-work" class="learn-sidebar hidden">
 <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
-Work
+	Artists
 </Text>
-<nav class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4">
-{studentWork.map((piece) => (
+<nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
+{studentWork.filter((piece, index, arr) => arr.findIndex(p => p.student === piece.student) === index).map((piece) => (
 <a
-href={`#student-${piece.student.toLowerCase().replace(/\s+/g, '-')}-${piece.title.toLowerCase().replace(/\s+/g, '-')}`}
-class="learn-nav-link block text-sm text-foreground-secondary hover:text-accent transition-colors leading-snug"
-data-slug={`student-${piece.student.toLowerCase().replace(/\s+/g, '-')}-${piece.title.toLowerCase().replace(/\s+/g, '-')}`}
-style="font-family: 'Besley', serif !important;"
+href={`#${studentId(piece)}`}
+class="learn-nav-link block leading-snug group"
+data-slug={studentId(piece)}
 >
-{piece.title}
+<span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{piece.student}</span>
 </a>
 ))}
 </nav>
@@ -317,15 +383,14 @@ style="font-family: 'Besley', serif !important;"
 <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
 Categories
 </Text>
-<nav class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4">
+<nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
 {resources.map((group) => (
 <a
 href={`#${resourceId(group.category)}`}
-class="learn-nav-link block text-sm text-foreground-secondary hover:text-accent transition-colors leading-snug"
+class="learn-nav-link block leading-snug group"
 data-slug={resourceId(group.category)}
-style="font-family: 'Besley', serif !important;"
 >
-{group.category}
+<span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{group.category}</span>
 </a>
 ))}
 </nav>
@@ -466,36 +531,25 @@ style="font-family: 'Besley', serif !important;"
 
 <!-- Panel: Student Work -->
 <div id="panel-student-work" class="learn-panel hidden">
-<!-- Year filter -->
-<div class="flex gap-4 mb-8">
-<button class="student-filter text-accent border-b-2 border-accent pb-1 transition-colors" data-year="all" style="font-family: 'Besley', serif !important;">
-All
-</button>
-{[...new Set(studentWork.map(s => s.year))].sort().reverse().map((year) => (
-<button class="student-filter text-foreground-secondary border-b-2 border-transparent pb-1 hover:text-accent transition-colors" data-year={year} style="font-family: 'Besley', serif !important;">
-{year}
-</button>
-))}
-</div>
 
 <div class="grid sm:grid-cols-2 gap-6" id="student-grid">
 {studentWork.map((piece) => (
 <div
 class="student-item"
 data-year={piece.year}
-id={`student-${piece.student.toLowerCase().replace(/\s+/g, '-')}-${piece.title.toLowerCase().replace(/\s+/g, '-')}`}
+id={studentId(piece)}
 >
 <Card variant="bordered" padding="none">
 {piece.video ? (
-<div class="video-lightbox-trigger relative bg-black rounded-t-md overflow-hidden cursor-pointer" data-video={piece.video}>
+<div class="video-lightbox-trigger relative bg-foreground/5 rounded-t-md overflow-hidden cursor-pointer" data-video={piece.video}>
 <video
 src={piece.video}
 class="w-full h-auto pointer-events-none"
-autoplay
 loop
 muted
 playsinline
-preload="auto"
+preload="none"
+data-autoplay
 ></video>
 <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20 group">
 <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
@@ -512,11 +566,16 @@ preload="auto"
 </div>
 )}
 <div class="p-4 space-y-2">
-<Text variant="primary" size="sm" class="font-medium">{piece.title}</Text>
-<Text variant="muted" size="sm">{piece.student}</Text>
-<div class="flex gap-2">
-<Badge size="sm" variant="accent">{piece.course}</Badge>
-<Badge size="sm">{piece.year}</Badge>
+<Text variant="primary" size="sm" class="font-medium">{piece.student}</Text>
+<Text variant="muted" size="sm">{piece.title}</Text>
+<div class="flex flex-col gap-1.5">
+	{piece.portfolio ? (
+		<a href={piece.portfolio} target="_blank" rel="noopener noreferrer">
+			<Badge size="sm" variant="accent" class="self-start">Portfolio</Badge>
+		</a>
+	) : (
+		<Badge size="sm" variant="accent" class="self-start">{piece.course}</Badge>
+	)}
 </div>
 </div>
 </Card>
@@ -535,14 +594,90 @@ preload="auto"
 <Heading level={2} size="2xl" class="mb-6">
 {group.category}
 </Heading>
-<div class="space-y-4">
-{group.items.map((item) => (
-<div>
-<Text variant="primary" size="base" class="font-medium">{item.name}</Text>
-<Text variant="muted" size="sm">{item.description}</Text>
-</div>
-))}
-</div>
+{group.subsections ? (
+	<div class="space-y-8">
+		{group.subsections.map((sub) => (
+			<div>
+				<Text variant="secondary" size="xs" class="uppercase tracking-widest mb-3 block">{sub.label}</Text>
+				<div class="grid sm:grid-cols-2 gap-4">
+					{sub.items.map((item) => (
+					<div class="flex flex-col justify-between gap-3 rounded-md border border-border bg-card p-4 transition-transform duration-300 hover:scale-[1.01]">
+						<div>
+							<div class="flex items-center justify-between gap-2 mb-1">
+								<Text variant="primary" size="sm" class="font-medium">{item.name}</Text>
+								<div class="flex items-center gap-2">
+									{item.logos && item.logos.map((logo) => (
+										<Image src={logo} alt="" width={48} height={20} class="h-4 w-auto object-contain" data-no-lightbox />
+									))}
+								</div>
+							</div>
+							<Text variant="muted" size="sm">{item.description}</Text>
+							{item.previewHtml && (
+								<div class="mt-3 rounded-md border border-border overflow-hidden">
+									<div class="flex items-center justify-between px-3 py-1.5 bg-foreground/5 border-b border-border">
+										<span class="text-xs text-foreground-muted font-mono">{item.previewLang ?? ''}</span>
+										<button
+											class="copy-btn text-xs text-foreground-muted hover:text-accent transition-colors font-mono"
+											data-code={item.previewHtml.replace(/<[^>]+>/g, '')}
+										>Copy</button>
+									</div>
+									<pre class="code-block p-3 text-xs font-mono overflow-auto max-h-52 leading-relaxed m-0"><code set:html={item.previewHtml} /></pre>
+								</div>
+							)}
+						</div>
+						{item.download && (
+							<a href={item.download} download class="inline-flex items-center gap-1.5 text-xs text-foreground-secondary hover:text-accent transition-colors self-start" style="font-family: 'Besley', serif !important;">
+								<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+								</svg>
+								Download
+							</a>
+						)}
+					</div>
+					))}
+				</div>
+			</div>
+		))}
+	</div>
+) : (
+	<div class="grid sm:grid-cols-2 gap-4">
+	{(group.items ?? []).map((item) => (
+	<div class="flex flex-col justify-between gap-3 rounded-md border border-border bg-card p-4 transition-transform duration-300 hover:scale-[1.01]">
+		<div>
+			<div class="flex items-center justify-between gap-2 mb-1">
+				<Text variant="primary" size="sm" class="font-medium">{item.name}</Text>
+				<div class="flex items-center gap-2">
+					{item.logos && item.logos.map((logo) => (
+						<Image src={logo} alt="" width={48} height={20} class="h-4 w-auto object-contain" data-no-lightbox />
+					))}
+				</div>
+			</div>
+			<Text variant="muted" size="sm">{item.description}</Text>
+			{item.previewHtml && (
+				<div class="mt-3 rounded-md border border-border overflow-hidden">
+					<div class="flex items-center justify-between px-3 py-1.5 bg-foreground/5 border-b border-border">
+						<span class="text-xs text-foreground-muted font-mono">{item.previewLang ?? ''}</span>
+						<button
+							class="copy-btn text-xs text-foreground-muted hover:text-accent transition-colors font-mono"
+							data-code={item.previewHtml.replace(/<[^>]+>/g, '')}
+						>Copy</button>
+					</div>
+					<pre class="code-block p-3 text-xs font-mono overflow-auto max-h-52 leading-relaxed m-0"><code set:html={item.previewHtml} /></pre>
+				</div>
+			)}
+		</div>
+		{item.download && (
+			<a href={item.download} download class="inline-flex items-center gap-1.5 text-xs text-foreground-secondary hover:text-accent transition-colors self-start" style="font-family: 'Besley', serif !important;">
+				<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+				</svg>
+				Download
+			</a>
+		)}
+	</div>
+	))}
+	</div>
+)}
 </article>
 ))}
 </div>
@@ -567,10 +702,40 @@ preload="auto"
 .learn-nav-link:hover {
 	opacity: 1;
 }
+/* Code block — uses site theme colors */
+.code-block { background: hsl(var(--card-bg)); color: hsl(var(--foreground)); margin: 0 !important; border-radius: 0 !important; }
 </style>
 
 <script>
 const initLearn = () => {
+
+// --- Copy buttons ---
+document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const code = btn.dataset.code ?? '';
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    });
+  });
+});
+
+// --- Video autoplay via IntersectionObserver ---
+const videoObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    const video = entry.target as HTMLVideoElement;
+    if (entry.isIntersecting) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  });
+}, { threshold: 0.25 });
+
+document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]').forEach((video) => {
+  videoObserver.observe(video);
+});
+
 // --- Tab switching ---
 const tabs = document.querySelectorAll<HTMLElement>('.learn-tab');
 const panels = document.querySelectorAll<HTMLElement>('.learn-panel');
