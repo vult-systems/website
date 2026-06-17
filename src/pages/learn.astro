@@ -680,10 +680,10 @@ data-slug={resourceId(group.category)}
 <!-- Panel: Student Work -->
 <div id="panel-student-work" class="learn-panel hidden">
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="student-grid">
+<div class="flex flex-wrap gap-4" id="student-grid">
 {studentWork.map((piece) => (
 <div
-class="student-item"
+class="student-item w-full sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/2"
 data-year={piece.year}
 data-student={piece.student}
 data-pin={piece.pin ?? ''}
