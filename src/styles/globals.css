@@ -92,10 +92,9 @@
   /* Prevent layout shift during transitions */
   html {
     overflow-y: scroll;
-    scroll-behavior: smooth;
   }
 
-  /* Add smooth scrolling for in-page navigation */
+  /* Smooth scrolling — respects reduced-motion preference */
   @media (prefers-reduced-motion: no-preference) {
     html {
       scroll-behavior: smooth;

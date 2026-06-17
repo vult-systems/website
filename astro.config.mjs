@@ -8,6 +8,10 @@ export default defineConfig({
   site: 'https://carlosgarcia.works',
   base: '/',
   output: 'static',
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'hover',
+  },
   integrations: [
     tailwind({
       applyBaseStyles: false,
