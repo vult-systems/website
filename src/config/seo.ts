@@ -110,7 +110,7 @@ export function getVultPageSEO(): PageSEO {
 export function getHomePageSEO(): PageSEO {
   return {
     title: `${SITE.author.name} | ${SITE.author.role}`,
-    description: `Portfolio of ${SITE.author.name} - 3D character art, modeling, and digital work. Character creation in Maya.`,
-    keywords: `${SITE.author.name}, 3D Character Artist, Character Modeling, Maya, Digital Art, ${SITE.author.location.city}`
+    description: `${SITE.author.name} is a 3D Character Artist & Educator.`,
+    keywords: `${SITE.author.name}, 3D Character Artist, Character Modeling, Maya, ZBrush, Digital Art, ${SITE.author.location.city}`
   };
 }

@@ -26,10 +26,10 @@ const {
 	author = SITE.author.name
 } = Astro.props;
 
-// Use optimized logo as default OG image and favicon
+// Use optimized logo as favicon; use Vult logo as default OG image (Discord/social needs a raster image, not SVG)
 const optimizedLogo = await getImage({ src: logoSvg, format: 'svg' });
-const ogImage = image || optimizedLogo.src;
 const faviconSvg = optimizedLogo.src;
+const ogImage = image || '/CarlosGarcia_Logo.png';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const siteUrl = Astro.site?.toString() || SITE.url;
@@ -80,10 +80,8 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		<!-- Security Headers -->
 		<meta http-equiv="X-Content-Type-Options" content="nosniff" />
 		<meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
-		<meta http-equiv="X-XSS-Protection" content="1; mode=block" />
 		<meta name="referrer" content="strict-origin-when-cross-origin" />
 		<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()" />
-		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data: blob:; connect-src 'self'; frame-src 'self'; base-uri 'self'; form-action 'self';" />
 		
 		<!-- Performance -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
