@@ -30,7 +30,7 @@ export const SITE = {
   // SEO defaults
   seo: {
     defaultTitle: 'Carlos Garcia | 3D Character Artist & Educator',
-    defaultDescription: 'Portfolio of Carlos Garcia - 3D Character Artist & Educator specializing in character art and education',
+    defaultDescription: 'Carlos Garcia is a 3D Character Artist & Educator.',
     keywords: [
       '3D Artist',
       '3D Character Artist',
