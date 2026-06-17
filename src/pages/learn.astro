@@ -167,12 +167,48 @@ interface StudentPiece {
 	portfolio?: string;   // URL to student's portfolio
 	video?: string;       // Path to video in public/ (e.g. '/student-work/file.mp4')
 	image?: string;       // Path to image in public/ (e.g. '/student-work/file.png')
+	aspectratio?: string; // Override video/image aspect ratio (e.g. '1/1', '4/3')
+	pin?: number;         // If set, artist group is pinned at this position (1-based)
 }
 
 const studentWork: StudentPiece[] = [
-	{ student: 'Annamarie Alvarez', title: 'Space Cat Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://annamariealvarez.com/characters', video: '/student-work/Alvarez-Space-Cat-Turnaround.mp4' },
-	{ student: 'Annamarie Alvarez', title: 'Finn Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://annamariealvarez.com/characters', video: '/student-work/Alvarez-Finn-Turnaround.mp4' },
-	{ student: 'Christian Neal', title: 'Hong Mei Bust', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/christian_neal', image: '/student-work/Neal-Hong-Bust-01.png' },
+	{ student: 'Annamarie Alvarez', title: 'Space Cat Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://annamariealvarez.com/characters', video: '/student-work/Alvarez-Space-Cat-Turnaround.mp4', pin: 1 },
+	{ student: 'Annamarie Alvarez', title: 'Finn Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://annamariealvarez.com/characters', video: '/student-work/Alvarez-Finn-Turnaround.mp4', pin: 1 },
+	{ student: 'Aunesty Cano', title: 'Chef', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/aunesty', image: '/student-work/aunesty-cano-chef-01.jpg' },
+	{ student: 'Aunesty Cano', title: "Joel's Backpack", course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/aunesty', image: '/student-work/aunesty-cano-joels-backpack-01.jpg' },
+	{ student: 'Priscilla Chong-Macias', title: 'Dragon Boi', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/priscillac-m', image: '/student-work/Chong-Macias-DragonBoi-01.jpg' },
+	{ student: 'Priscilla Chong-Macias', title: 'Dragon Boi (Detail)', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/priscillac-m', image: '/student-work/Chong-Macias-DragonBoi-02.jpg' },
+	{ student: 'Priscilla Chong-Macias', title: 'Forest Creature — Dark Druid', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/priscillac-m', image: '/student-work/Chong-Macias-ForestCreature-DarkDruid-01.jpg' },
+	{ student: 'Sofia De La Cruz', title: 'Mailbox', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/sofiadlc', image: '/student-work/Sofia-de-la-cruz-Mailbox-01.jpg' },
+	{ student: 'Carmelita Garcia', title: 'Leaf Chameleon', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/cgarcia9', image: '/student-work/carmelita-garcia-leaf-chameleon.jpg' },
+	{ student: 'Ash Lara', title: 'Magic Book', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/ashlara', image: '/student-work/Lara-Magicbook-Beauty-01.webp' },
+	{ student: 'Jia Li', title: 'Tropical Sword', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/jialia_25', image: '/student-work/jia-li-tropical-sword.webp' },
+	{ student: 'Samserai Lopez', title: 'Sally Boy', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/artwork/gR2vxm', image: '/student-work/Samserai-SallyBoy-01.jpg' },
+	{ student: 'Bianca Lugo', title: 'Self Portrait', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/maria_sangredetunaart', image: '/student-work/maria-selfportrait-render-01.jpg', pin: 3 },
+	{ student: 'Fernando Martinez', title: 'Raven Helmet', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/ferisaacmg_3d', image: '/student-work/fernando-isaac-martinez-gonzalez-raven-helmet.jpg' },
+	{ student: 'Ryan Mitchell', title: 'Tenta Book', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/ryanmitchell76', image: '/student-work/RyanMitchell-TentaBook.jpg' },
+	{ student: 'Alexa Munoz', title: "Demeter's Headpiece", course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/mzlexa', image: '/student-work/alexa-munoz-demeters-headplace.jpg' },
+	{ student: 'Christian Neal', title: 'Hong Mei Bust', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/christian_neal', video: '/student-work/Neal-Hong-Bust-Video.mp4', aspectratio: '1/1', pin: 5 },
+	{ student: 'Christian Neal', title: 'Elvraema', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/christian_neal', image: '/student-work/Neal-Elvraema-01.png', pin: 5 },
+	{ student: 'Samantha Olivas', title: 'Witch', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/samonochrome', video: '/student-work/Samantha-Olivas-Witch-01.mp4', pin: 2 },
+	{ student: 'Samantha Olivas', title: 'Apex Legends Fan Art', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/samonochrome', image: '/student-work/Olivas-Apex Legends-01.png', pin: 2 },
+	{ student: 'Samantha Olivas', title: 'Apex Legends Fan Art (Detail)', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/samonochrome', image: '/student-work/Olivas-Apex Legends-02.jpg', pin: 2 },
+	{ student: 'Carlos Razo', title: 'Shao Kahn Hammer', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/crazo', image: '/student-work/carlos-razo-shaokahn-hammer-01.jpg' },
+	{ student: 'Mikael Santiago', title: '1500s Chest', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/mikaelsantiago99', image: '/student-work/mikael-santiago-1500s-chest.jpg' },
+	{ student: 'Alan Savoy', title: 'Handpainted Dwarf', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/alanezequielsavoy', image: '/student-work/alan-ezequiel-savoy-handpainted-dwarf.webp' },
+	{ student: 'Alan Savoy', title: 'Apostle Lin', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/alanezequielsavoy', video: '/student-work/Alan-esezquiel-savoy-Apostle-lin-01.mp4' },
+	{ student: 'Amarissa Soto', title: 'Jason Dragon Sculpt', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/amarissa', image: '/student-work/AmarissaSoto-JaseonDragonSculpt.webp', pin: 4 },
+	{ student: 'Amarissa Soto', title: 'Dragon Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/amarissa', video: '/student-work/AmarissaSoto-Dragon-Turnaround-01.mp4', aspectratio: '4/3', pin: 4 },
+	{ student: 'Clarissa Soto', title: 'Sony DVD and VCR', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/clarissasoto', image: '/student-work/ClarissaSoto-SonyDVDandVCR.png', pin: 4 },
+	{ student: 'Clarissa Soto', title: 'Wyvern Clock', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/clarissasoto', image: '/student-work/ClarissaSoto-wyvern-clock.png', pin: 4 },
+	{ student: 'Clarissa Soto', title: 'Dragon Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/clarissasoto', video: '/student-work/ClarissaSoto-dragon-turnaround.mp4', aspectratio: '1/1', pin: 4 },
+	{ student: 'Janiah Thomas', title: 'El Corazon — Shin (Dorohedoro)', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/janiah', image: '/student-work/janiah-thomas-el-corazon-shin-dorohedoro.jpg' },
+	{ student: 'Janiah Thomas', title: 'Ulala — Space Channel 5', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/janiah', image: '/student-work/janiah-thomas-ulala-space-channel5-01.jpg' },
+	{ student: 'Janiah Thomas', title: 'Ulala — Space Channel 5 (Detail)', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/janiah', image: '/student-work/janiah-thomas-ulala-space-channel5-02.jpg' },
+	{ student: 'Rene Thompson', title: 'Chainsaw Game Prop', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/rtgromp', image: '/student-work/rene-thompson-chainsaw-gameprop.jpg' },
+	{ student: 'Ethan Trevino', title: 'The Scarred Warrior', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/eptrevin', image: '/student-work/Trevino-TheScarredWarrior-01.webp' },
+	{ student: 'Matheus Ubaid', title: 'Valorant Fan Art — Demon Execution Vandal', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/matheusubaid', image: '/student-work/Ubaid-Valorant-FanArt-DemonExecutionVandal-01.png', pin: 6 },
+	{ student: 'Matheus Ubaid', title: 'Valorant Fan Art — Demon Execution Vandal Turnaround', course: 'ANGD 2361', year: '2025', portfolio: 'https://www.artstation.com/matheusubaid', video: '/student-work/Ubaid-Valorant-FanArt-DemonExecutionVandal-02.mp4', pin: 6 },
 ];
 
 // Resources
@@ -364,6 +400,17 @@ for (const group of resources) {
 		}
 	}
 }
+
+// Build pinned order: unique student names in pin order (1-based), then unpinned shuffled after
+const pinnedStudents: string[] = [];
+const pinMap = new Map<string, number>();
+for (const piece of studentWork) {
+	if (piece.pin !== undefined && !pinMap.has(piece.student)) {
+		pinMap.set(piece.student, piece.pin);
+	}
+}
+const sortedPinned = Array.from(pinMap.entries()).sort((a, b) => a[1] - b[1]);
+for (const [name] of sortedPinned) pinnedStudents.push(name);
 ---
 
 
@@ -621,19 +668,21 @@ data-slug={resourceId(group.category)}
 <!-- Panel: Student Work -->
 <div id="panel-student-work" class="learn-panel hidden">
 
-<div class="grid sm:grid-cols-2 gap-6" id="student-grid">
+<div class="flex flex-col sm:flex-row gap-4 items-start" id="student-grid">
 {studentWork.map((piece) => (
 <div
-class="student-item"
+class="student-item mb-4 w-full"
 data-year={piece.year}
+data-student={piece.student}
+data-pin={piece.pin ?? ''}
 id={studentId(piece)}
 >
-<Card variant="bordered" padding="none">
+<div class="rounded-lg border border-border bg-card overflow-hidden">
 {piece.video ? (
-<div class="video-lightbox-trigger relative bg-foreground/5 rounded-t-md overflow-hidden cursor-pointer" data-video={piece.video}>
+<div class="video-lightbox-trigger relative bg-foreground/5 overflow-hidden cursor-pointer" data-video={piece.video} style={piece.aspectratio ? `aspect-ratio:${piece.aspectratio}` : undefined}>
 <video
 src={piece.video}
-class="w-full h-auto pointer-events-none"
+class="w-full h-full object-cover pointer-events-none"
 loop
 muted
 playsinline
@@ -647,11 +696,11 @@ data-autoplay
 </div>
 </div>
 ) : piece.image ? (
-<div class="learn-lightbox-trigger relative bg-foreground/5 rounded-t-md overflow-hidden cursor-pointer" data-label={`${piece.student} — ${piece.title}`}>
+<div class="learn-lightbox-trigger relative bg-foreground/5 overflow-hidden cursor-pointer" data-label={`${piece.student} — ${piece.title}`}>
 <img src={piece.image} alt={`${piece.student} — ${piece.title}`} class="w-full h-auto object-cover" loading="lazy" />
 </div>
 ) : (
-<div class="aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center rounded-t-md">
+<div class="aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center">
 <svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 </svg>
@@ -671,7 +720,7 @@ data-autoplay
 	)}
 </div>
 </div>
-</Card>
+</div>
 </div>
 ))}
 </div>
@@ -695,14 +744,14 @@ data-autoplay
 				<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 					{sub.items.filter(item => !item.hidden).map((item) => (
 					<div
-						class="resource-card cursor-pointer flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.01]"
+						class="resource-card cursor-pointer flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.03]"
 						data-name={item.name}
 						data-description={item.description}
 						data-download={item.download ?? ''}
 					>
 						{item.thumbnail ? (
-							<div class="bg-foreground/5 overflow-hidden flex items-center justify-center p-2">
-								<Image src={item.thumbnail} alt={item.name} class="w-full h-auto object-contain max-h-48" data-no-lightbox />
+							<div class="aspect-square bg-foreground/5 overflow-hidden flex items-center justify-center">
+								<Image src={item.thumbnail} alt={item.name} class="w-full h-full object-contain" data-no-lightbox />
 							</div>
 						) : null}
 						<div class="p-4 flex flex-col gap-3 flex-1">
@@ -748,14 +797,14 @@ data-autoplay
 	<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 	{(group.items ?? []).filter(item => !item.hidden).map((item) => (
 	<div
-		class="resource-card cursor-pointer flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.01]"
+		class="resource-card cursor-pointer flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.03]"
 		data-name={item.name}
 		data-description={item.description}
 		data-download={item.download ?? ''}
 	>
 		{item.thumbnail ? (
-			<div class="bg-foreground/5 overflow-hidden flex items-center justify-center p-2">
-				<Image src={item.thumbnail} alt={item.name} class="w-full h-auto object-contain max-h-48" data-no-lightbox />
+			<div class="aspect-square bg-foreground/5 overflow-hidden flex items-center justify-center">
+				<Image src={item.thumbnail} alt={item.name} class="w-full h-full object-contain" data-no-lightbox />
 			</div>
 		) : null}
 		<div class="p-4 flex flex-col gap-3 flex-1">
@@ -831,8 +880,9 @@ data-autoplay
 </div>
 </PageMain>
 <Footer />
-<script is:inline define:vars={{ resourceHowToMap }}>
+<script is:inline define:vars={{ resourceHowToMap, pinnedStudents }}>
 window.__resourceHowTo = resourceHowToMap;
+window.__pinnedStudents = pinnedStudents;
 </script>
 <ImageLightbox />
 </BaseLayout>
@@ -1058,24 +1108,9 @@ const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElem
 const imageWrapper = document.getElementById('image-wrapper');
 if (!lightbox || !lightboxImage || !imageWrapper) return;
 const label = trigger.dataset.label || 'Preview';
-const canvas = document.createElement('canvas');
-canvas.width = 800; canvas.height = 1000;
-const ctx = canvas.getContext('2d');
-if (ctx) {
-const isDark = document.documentElement.classList.contains('dark');
-ctx.fillStyle = isDark ? '#1a1a1a' : '#f0f0f0';
-ctx.fillRect(0, 0, 800, 1000);
-ctx.strokeStyle = isDark ? '#333' : '#ccc';
-ctx.lineWidth = 2;
-ctx.strokeRect(20, 20, 760, 960);
-ctx.fillStyle = isDark ? '#888' : '#666';
-ctx.font = '24px system-ui, sans-serif';
-ctx.textAlign = 'center';
-ctx.fillText(label, 400, 480);
-ctx.font = '16px system-ui, sans-serif';
-ctx.fillText('Content coming soon', 400, 520);
-}
-lightboxImage.src = canvas.toDataURL();
+const imgEl = trigger.querySelector<HTMLImageElement>('img');
+if (!imgEl?.src) return;
+lightboxImage.src = imgEl.src;
 lightboxImage.alt = label;
 lightbox.classList.remove('invisible', 'opacity-0');
 lightbox.classList.add('visible', 'opacity-100');
@@ -1111,6 +1146,43 @@ item.style.display = (year === 'all' || item.dataset.year === year) ? '' : 'none
 });
 };
 initStudentFilter();
+
+// --- Shuffle student wall (grouped by artist) ---
+const shuffleStudentWall = () => {
+  const grid = document.getElementById('student-grid');
+  if (!grid) return;
+  const pinned: string[] = (window as any).__pinnedStudents ?? [];
+  const items = Array.from(grid.querySelectorAll<HTMLElement>('.student-item'));
+  const groupMap = new Map<string, HTMLElement[]>();
+  items.forEach(item => {
+    const key = item.dataset.student!;
+    if (!groupMap.has(key)) groupMap.set(key, []);
+    groupMap.get(key)!.push(item);
+  });
+  const pinnedGroups: HTMLElement[][] = pinned
+    .map(name => groupMap.get(name))
+    .filter((g): g is HTMLElement[] => !!g);
+  const unpinned: HTMLElement[][] = Array.from(groupMap.values())
+    .filter(g => !pinned.includes(g[0].dataset.student!));
+  for (let i = unpinned.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [unpinned[i], unpinned[j]] = [unpinned[j], unpinned[i]];
+  }
+  const orderedGroups = [...pinnedGroups, ...unpinned];
+
+  // Distribute groups into two flex columns (left-right fill)
+  const col0 = document.createElement('div');
+  const col1 = document.createElement('div');
+  col0.className = 'flex-1 flex flex-col gap-4 min-w-0';
+  col1.className = 'flex-1 flex flex-col gap-4 min-w-0';
+  orderedGroups.forEach((group, i) => {
+    group.forEach(el => (i % 2 === 0 ? col0 : col1).appendChild(el));
+  });
+  grid.innerHTML = '';
+  grid.appendChild(col0);
+  grid.appendChild(col1);
+};
+shuffleStudentWall();
 
 // Auto-open Organic Modeling by default
 openCourseDetail('angd-1314');
