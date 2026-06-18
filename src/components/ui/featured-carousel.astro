@@ -41,7 +41,7 @@ const getImageSrc = (image: string | ImageMetadata | undefined): string => {
 };
 
 // Limit to 5 pieces for the carousel
-const carouselPieces = artPieces.slice(0, 5);
+const carouselPieces = artPieces.slice(0, 6);
 ---
 
 <section class:list={["relative z-10 py-3 sm:py-4 overflow-hidden", className]}>
@@ -225,11 +225,8 @@ const carouselPieces = artPieces.slice(0, 5);
     const FRICTION = 0.92;
     const MIN_VELOCITY = 0.05;
 
-    // Start with Foundation Explorer (index 1) and Foundation Explorer Female (index 2)
-    // centered by offsetting one card width + gap to the left
-    const firstItem = track.querySelector('.carousel-item') as HTMLElement;
-    const gapSize = parseInt(getComputedStyle(track).gap) || 24;
-    let pos = firstItem ? -(firstItem.offsetWidth + gapSize) : 0;
+    // Start with Halo Infinite (index 0) visible on load
+    let pos = 0;
     let isDragging = false;
     let hasDragged = false;
     let dragStartX = 0;
