@@ -40,8 +40,8 @@ const getImageSrc = (image: string | ImageMetadata | undefined): string => {
   return image.src;
 };
 
-// Limit to 5 pieces for the carousel
-const carouselPieces = artPieces.slice(0, 6);
+// Limit to 8 pieces for the carousel
+const carouselPieces = artPieces.slice(0, 8);
 ---
 
 <section class:list={["relative z-10 py-3 sm:py-4 overflow-hidden", className]}>

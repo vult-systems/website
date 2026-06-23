@@ -23,6 +23,8 @@ import ue5LogoWht from '@/assets/logos/software-ue5-wht.png';
 import arnoldLogo from '@/assets/logos/autodesk-maya-arnold-logo.png';
 import marvelousLogo from '@/assets/logos/software-marvelous-designer-logo.png';
 import max3dsLogo from '@/assets/logos/software-autodesk-3dsmax.png';
+import mariLogo from '@/assets/logos/software-mari-logo.png';
+import adobeSuiteLogo from '@/assets/logos/software-adobe-suite-logo.png';
 import logo343wht from '@/assets/logos/343i-logo-wht.png';
 import logo343blk from '@/assets/logos/343i-logo-blk.png';
 import haloInfiniteLogo from '@/assets/logos/halo-infinite-logo-01.png';
@@ -37,6 +39,9 @@ import biowareLogoBlk from '@/assets/logos/bioware-logo-blk.png';
 import uiw3dLogoWht from '@/assets/logos/uiw3d-logo-wht.png';
 import uiw3dLogoBlk from '@/assets/logos/uiw3d-logo-blk.png';
 import swtorLogo from '@/assets/logos/star-wars-the-old-republic-logo-hd-png.png';
+import artstationLogo from '@/assets/logos/artstation-logo-white.png';
+import vertexSchoolLogoWht from '@/assets/logos/vertex-school-logo-wht.png';
+import vertexSchoolLogoBlk from '@/assets/logos/vertex-school-logo-blk.png';
 
 const toolLogos: Record<string, string | { light: string; dark: string }> = {
   'Maya': mayaLogo.src,
@@ -50,6 +55,8 @@ const toolLogos: Record<string, string | { light: string; dark: string }> = {
   'Arnold': arnoldLogo.src,
   'Marvelous Designer': marvelousLogo.src,
   '3ds Max': max3dsLogo.src,
+  'Mari': mariLogo.src,
+  'Adobe Suite': adobeSuiteLogo.src,
 };
 
 const clientLogos: Record<string, { light: string; dark: string }> = {
@@ -58,12 +65,14 @@ const clientLogos: Record<string, { light: string; dark: string }> = {
   'Snapdragon': { light: snapdragonLogoBlk.src, dark: snapdragonLogoWht.src },
   'BioWare': { light: biowareLogoBlk.src, dark: biowareLogoWht.src },
   'UIW3D': { light: uiw3dLogoBlk.src, dark: uiw3dLogoWht.src },
+  'Vertex School': { light: vertexSchoolLogoBlk.src, dark: vertexSchoolLogoWht.src },
 };
 
 const projectLogos: Record<string, { light: string; dark: string }> = {
   'Halo Infinite': { light: haloInfiniteLogo.src, dark: haloInfiniteLogo.src },
   'Snapdragon': { light: snapdragonLogoBlk.src, dark: snapdragonLogoWht.src },
   'Star Wars: The Old Republic': { light: swtorLogo.src, dark: swtorLogo.src },
+  'Beneath the Waves': { light: artstationLogo.src, dark: artstationLogo.src },
 };
 
 const clientLogoSizes: Record<string, string> = {
@@ -75,6 +84,7 @@ const clientLogoSizes: Record<string, string> = {
 const projectLogoSizes: Record<string, string> = {
   'Halo Infinite': 'w-4/5',
   'Star Wars: The Old Republic': 'w-4/5',
+  'Beneath the Waves': 'w-3/4',
 };
 
 export async function getStaticPaths() {
@@ -175,7 +185,7 @@ const formatDate = (date: Date) =>
                       <img
                         src={projectLogos[art.data.project].light}
                         alt={art.data.project}
-                        class={`${projectLogoSizes[art.data.project] ?? 'w-2/3'} h-auto object-contain opacity-80 dark:hidden`}
+                        class={`${projectLogoSizes[art.data.project] ?? 'w-2/3'} h-auto object-contain opacity-80 dark:hidden ${art.data.project === 'Beneath the Waves' ? 'brightness-0' : ''}`}
                         data-no-lightbox
                       />
                       <img
