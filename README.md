@@ -20,7 +20,9 @@ Personal portfolio site for 3D art, studio work, teaching, and technical writing
 | `/` | Landing page — auto-scrolling art carousel + hero |
 | `/art` | Art portfolio grid |
 | `/art/[slug]` | Individual art piece detail |
-| `/learn` | Teaching hub — curriculum, student work, tools |
+| `/courses` | Curriculum and course content |
+| `/students` | Student work showcase |
+| `/resources` | Free tools and downloads |
 | `/log` | Development log / blog |
 | `/log/[slug]` | Individual log entry |
 | `/about` | Bio and experience |

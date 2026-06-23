@@ -1,0 +1,643 @@
+---
+import BaseLayout from '@/layouts/base-layout.astro';
+import Header from '@/components/layout/header.astro';
+import Footer from '@/components/layout/footer.astro';
+import PageMain from '@/components/layout/page-main.astro';
+import PageContainer from '@/components/layout/page-container.astro';
+import Heading from '@/components/ui/heading.astro';
+import Text from '@/components/ui/text.astro';
+import Badge from '@/components/ui/badge.astro';
+import ImageLightbox from '@/components/ui/image-lightbox.astro';
+import { Image } from 'astro:assets';
+import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
+import alienBustThumb from '@/assets/courses/organic-modeling/alien-bust/cg-alienbust-thumb-01.png';
+import { getCoursesPageSEO } from '@/config/seo';
+import RealisticEyeContent from '@/content/learn/the-realistic-eye.mdx';
+import eyeRealisticThumb from '@/assets/courses/char-modeling/eye/realistic/uiw3d-realistic-eye-thumb.png';
+
+const seo = getCoursesPageSEO();
+
+// -------------------------------------------------------------------
+// Syllabus & Assignment Images
+// -------------------------------------------------------------------
+// To add a syllabus thumbnail for a course:
+//   1. Drop a screenshot/image into src/assets/learn/syllabi/
+//      e.g. angd-1312-syllabus.png
+//   2. Import it here:
+//      import syllabus1312 from '@/assets/learn/syllabi/angd-1312-syllabus.png';
+//   3. Add it to the matching course below:
+//      { code: 'ANGD 1312', title: '...', syllabus: syllabus1312 }
+//
+// To add assignment thumbnails for a course:
+//   1. Drop images into src/assets/learn/assignments/
+//      e.g. angd-1312-assign-01.png
+//   2. Import them here:
+//      import assign1312_01 from '@/assets/learn/assignments/angd-1312-assign-01.png';
+//   3. Add them to the matching course:
+//      { code: 'ANGD 1312', title: '...', assignments: [
+//          { image: assign1312_01, title: 'Assignment 1' },
+//      ]}
+// -------------------------------------------------------------------
+
+interface CourseAssignment {
+	image: ImageMetadata;
+	title: string;
+}
+
+interface CourseProject {
+	slug: string;
+	title: string;
+	description: string;
+	thumbnail?: ImageMetadata;
+	contentComponent?: any;
+}
+
+interface Course {
+	code: string;
+	title: string;
+	description: string;
+	outcomes?: string;
+	required?: string;
+	audience?: string;
+	syllabus?: ImageMetadata;
+	assignments?: CourseAssignment[];
+	projects?: CourseProject[];
+}
+
+interface CurriculumYear {
+	year: string;
+	courses: Course[];
+}
+
+// Curriculum organized by year
+const curriculum: CurriculumYear[] = [
+	{
+		year: 'Freshman',
+		courses: [
+			{
+				code: 'ANGD 1314',
+				title: 'Organic Modeling',
+				description: 'This beginner-level studio course offers an overview of character sculpting and modeling techniques, laying the foundation for creating detailed, production-ready 3D character sculptures. It blends traditional art principles with a technical approach to mastering ZBrush for both organic and hard surface techniques.',
+				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
+				audience: 'This is a Freshman level course required of ANGD BFA majors.',
+				projects: [
+					{ slug: 'alien-bust', title: 'Alien Bust', description: '', thumbnail: alienBustThumb },
+					{ slug: 'elemental-golem', title: 'Elemental Golem', description: '' },
+					{ slug: 'nerf-gun', title: 'Nerf Gun', description: '' },
+					{ slug: 'bipedal-character', title: 'Bipedal Character', description: '' },
+				],
+			},
+		],
+	},
+	{
+		year: 'Sophomore',
+		courses: [
+			{
+				code: 'ANGD 1380',
+				title: 'Anatomy for 3D Artists',
+				description: 'This lecture course develops anatomical knowledge for artists and animators, with a focus on superficial human anatomy, including major muscle groups, skeletal structures, and surface forms of the body.',
+				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
+				audience: 'This is a Sophomore level course required of ANGD BFA majors.',
+				projects: [
+					{ slug: 'skeletal-study', title: 'Skeletal Reference Study', description: 'Model a skeletal reference for animation study.' },
+					{ slug: 'muscle-groups', title: 'Muscle Group Analysis', description: 'Layer primary muscle groups over a base skeleton.' },
+					{ slug: 'gesture-figure', title: 'Gesture & Figure', description: 'Dynamic figure study focusing on movement and weight.' },
+				],
+			},
+		],
+	},
+	{
+		year: 'Sophomore / Junior',
+		courses: [
+			{
+				code: 'ANGD 2333 · 2334 · 3331',
+				title: 'Environment Production I–III',
+				description: 'This progressive studio course sequence develops the skills required to create production-ready 3D environments for both real-time and offline workflows. Students explore modular workflows, hard-surface and organic asset creation, materials, lighting, composition, optimization, world-building, and engine integration while producing increasingly complex environments for games and cinematic applications.',
+				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
+				audience: 'This is a Sophomore–Junior level course required of ANGD BFA majors.',
+				projects: [
+					{ slug: 'trim-sheet', title: 'Trim Sheet Design', description: 'Create a production-ready trim sheet for an environment set.' },
+					{ slug: 'modular-kit', title: 'Modular Kit', description: 'Build a modular architecture kit for real-time use.' },
+					{ slug: 'hero-prop', title: 'Hero Prop', description: 'Fully textured hero asset with LODs.' },
+					{ slug: 'full-scene', title: 'Full Scene Assembly', description: 'A complete, lit environment built from the semester\'s assets.' },
+				],
+			},
+			{
+				code: 'ANGD 2361 · 3361 · 3362',
+				title: 'Character Modeling I–III',
+				description: 'This progressive studio course sequence focuses on the creation of production-ready 3D characters for both real-time and offline workflows. Students develop skills in anatomy, sculpting, topology, clothing, materials, grooming, optimization, and rigging while advancing from foundational character principles to fully realized, industry-centric character art.',
+				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
+				audience: 'This is a Sophomore–Junior level course required of ANGD BFA majors.',
+				projects: [
+					{ slug: 'base-mesh', title: 'Base Mesh', description: '' },
+					{
+						slug: 'highpoly-sculpt',
+						title: 'Creating Realistic Real-Time Eyes',
+						description: 'A focused eye study covering anatomy, iris structure, and sculpt development for realistic character work.',
+						thumbnail: eyeRealisticThumb,
+						contentComponent: RealisticEyeContent,
+					},
+					{ slug: 'retopology', title: 'Retopology', description: '' },
+					{ slug: 'texturing', title: 'Texturing', description: '' },
+					{ slug: 'final-character', title: 'Final Character', description: '' },
+				],
+			},
+		],
+	},
+];
+
+// Flatten all courses for sidebar nav
+const allCourses = curriculum.flatMap(level =>
+	level.courses.map(c => ({ ...c, year: level.year }))
+);
+const courseId = (code: string) => code.toLowerCase().replace(/\s+/g, '-');
+---
+
+
+<BaseLayout 
+title={seo.title} 
+description={seo.description}
+keywords={seo.keywords}
+>
+<Header />
+<PageMain class="text-foreground">
+<!-- Page Header with Background -->
+<div class="relative w-full py-8 sm:py-10">
+<div class="absolute inset-0 -z-10 overflow-hidden">
+<Image
+src={heroBg}
+alt=""
+class="w-full h-full object-cover object-center"
+loading="eager"
+widths={[800, 1200, 1920]}
+/>
+<div class="absolute inset-0 bg-white/85 dark:bg-black/85"></div>
+</div>
+<PageContainer>
+<Heading level={1} size="4xl" class="mb-4">
+Courses
+</Heading>
+<Text size="lg" variant="secondary" class="mb-4">
+Teaching has become one of the most meaningful parts of my career. This section serves as a companion resource for the courses I teach, providing students with supplemental lectures, notes, demonstrations, project breakdowns, and reference material used throughout the semester. While these pages do not replace the courses themselves, they offer additional context and resources that students can revisit as they develop their skills and continue growing as artists.
+</Text>
+</PageContainer>
+</div>
+
+<div class="relative z-10 w-full py-8 sm:py-12">
+<PageContainer>
+
+<div class="mb-8">
+	<label for="course-search" class="sr-only">Search courses</label>
+	<div class="flex items-center gap-3 rounded-md border border-border bg-card px-4 py-3 focus-within:border-accent/60 focus-within:ring-1 focus-within:ring-accent/30 transition-colors">
+		<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-foreground-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<circle cx="11" cy="11" r="8" />
+			<path d="m21 21-4.35-4.35" />
+		</svg>
+		<input
+			id="course-search"
+			type="search"
+			placeholder="Search courses..."
+			class="w-full bg-transparent text-sm text-foreground placeholder:text-foreground-muted outline-none"
+			style="font-family: 'Besley', serif !important;"
+			autocomplete="off"
+		/>
+	</div>
+</div>
+
+<!-- Content with Sidebar -->
+<div class="flex gap-12 lg:gap-16 relative">
+
+<!-- Sidebar -->
+<aside class="hidden lg:block w-72 shrink-0">
+<div class="sticky top-32">
+
+<div id="sidebar-classes">
+<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+Courses
+</Text>
+<nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
+{allCourses.map((course) => (
+<a
+href={`#${courseId(course.code)}`}
+class="learn-nav-link block leading-snug group"
+data-slug={courseId(course.code)}
+data-course-nav="true"
+data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description}`).join(' ')}`.toLowerCase()}
+>
+<span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{course.code}</span>
+<span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{course.title}</span>
+</a>
+))}
+</nav>
+
+<div id="sidebar-project-chapters" class="hidden mt-8">
+<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+Chapters
+</Text>
+<nav id="sidebar-project-chapters-nav" class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4"></nav>
+</div>
+</div>
+
+</div>
+</aside>
+
+<!-- Main Content -->
+<div class="flex-1 min-w-0">
+
+<!-- Course list -->
+<div id="classes-list" class="space-y-3 hidden">
+	{allCourses.map((course) => (
+		<button
+			class="course-card w-full text-left rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-5 group"
+			data-course={courseId(course.code)}
+			data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description}`).join(' ')}`.toLowerCase()}
+		>
+			<div class="flex items-start justify-between gap-4">
+				<div class="min-w-0">
+					<div class="flex items-center gap-2 mb-2">
+						<span class="text-xs font-medium text-accent" style="font-family: 'Besley', serif !important;">{course.code}</span>
+						<span class="text-xs text-foreground-muted">{course.year}</span>
+					</div>
+					<p class="text-base font-medium text-foreground mb-1" style="font-family: 'Besley', serif !important;">{course.title}</p>
+					<p class="text-sm text-foreground-secondary line-clamp-2">{course.description}</p>
+				</div>
+				<svg class="w-5 h-5 text-foreground-muted group-hover:text-accent transition-colors shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+				</svg>
+			</div>
+		</button>
+	))}
+</div>
+
+<!-- Course detail -->
+<div id="classes-detail">
+
+	<!-- Dynamic course content -->
+	{allCourses.map((course) => (
+		<div
+			id={`detail-${courseId(course.code)}`}
+			class="course-detail-content hidden"
+			data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description}`).join(' ')}`.toLowerCase()}
+		>
+			<div class="mb-8">
+				<div class="flex items-center gap-3 mb-3">
+					<Badge variant="accent" size="sm">{course.code}</Badge>
+					<Badge variant="outline" size="sm">{course.year}</Badge>
+				</div>
+				<Heading level={2} size="2xl" class="mb-3">
+					{course.title}
+				</Heading>
+				<Text size="base" variant="secondary">
+					{course.description}
+				</Text>
+				{course.outcomes && (
+					<div class="mt-5">
+						<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Outcomes</p>
+						<Text size="base" variant="secondary">{course.outcomes}</Text>
+					</div>
+				)}
+				{(course.required || course.audience) && (
+					<div class="mt-4 flex flex-col gap-2">
+						{course.required && (
+							<p class="text-base" style="font-family: 'Besley', serif !important;">
+								<span class="text-foreground-muted">Required: </span>
+								<span class="text-foreground-secondary">{course.required}</span>
+							</p>
+						)}
+						{course.audience && (
+							<p class="text-base" style="font-family: 'Besley', serif !important;">
+								<span class="text-foreground-muted">Audience: </span>
+								<span class="text-foreground-secondary">{course.audience}</span>
+							</p>
+						)}
+					</div>
+				)}
+			</div>
+
+			<!-- Project cards -->
+			<div class="grid grid-cols-1 gap-4">
+				{(course.projects || []).map((project) => (
+					<button
+						class="project-card w-full text-left rounded-lg border border-border bg-card overflow-hidden group transition-transform duration-300 hover:scale-[1.01]"
+						data-course={courseId(course.code)}
+						data-project={project.slug}
+						data-project-search={`${course.code} ${course.title} ${project.title} ${project.description}`.toLowerCase()}
+					>
+							<div class="flex items-stretch min-w-0">
+								<!-- Thumbnail -->
+								<div class="relative basis-[55%] shrink min-w-0 bg-foreground/5 flex items-center justify-center overflow-hidden rounded-l-lg" style="aspect-ratio: 3840/2426; isolation: isolate;">
+								{project.thumbnail ? (
+									<Image src={project.thumbnail} alt={project.title} class="absolute inset-0 w-full h-full object-cover" widths={[400, 600, 800]} sizes="(min-width: 1024px) 33vw, 55vw" loading="lazy" data-no-lightbox />
+								) : (
+									<svg class="w-10 h-10 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+								)}
+							</div>
+							<!-- Text -->
+								<div class="flex-1 min-w-0 p-4 lg:p-6 flex flex-col justify-center border-l border-border">
+									<p class="text-base text-foreground-muted mb-3 truncate" style="font-family: 'Besley', serif !important;">{course.code} - {course.title}</p>
+									<p class="text-fluid-4xl font-normal text-foreground mb-4 leading-tight" style="font-family: 'Besley', serif !important;">{project.title}</p>
+								<span class="inline-block text-base text-accent transition-colors duration-200" style="font-family: 'Besley', serif !important;">View Content</span>
+							</div>
+						</div>
+					</button>
+				))}
+			</div>
+			<p class="projects-search-empty hidden mt-5 text-sm text-foreground-muted" style="font-family: 'Besley', serif !important;">
+				No project content matches this search.
+			</p>
+		</div>
+	))}
+
+	<p id="classes-search-empty" class="hidden mt-6 text-sm text-foreground-muted" style="font-family: 'Besley', serif !important;">
+		No courses match your search.
+	</p>
+
+</div>
+
+<!-- Project detail -->
+<div id="project-detail" class="hidden">
+	<button id="project-back" class="flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors mb-8" style="font-family: 'Besley', serif !important;">
+		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
+		</svg>
+		Back to Course
+	</button>
+	{allCourses.flatMap((course) => (course.projects || []).map((project) => (
+		<div id={`project-${courseId(course.code)}-${project.slug}`} class="project-detail-content hidden">
+			<Heading level={2} size="2xl" class="mb-3">{project.title}</Heading>
+			<div class="mb-6"><Badge variant="accent" size="sm">{course.code}</Badge></div>
+			<Text size="lg" variant="secondary" class="mb-8">{project.description}</Text>
+			{project.contentComponent ? (
+				<project.contentComponent />
+			) : (
+				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
+					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+					<span class="text-sm text-foreground-muted">Project content coming soon</span>
+				</div>
+			)}
+		</div>
+	)))}
+</div>
+
+</div>
+</div>
+
+</PageContainer>
+</div>
+</PageMain>
+<Footer />
+<ImageLightbox />
+</BaseLayout>
+
+<style>
+.learn-nav-link {
+	opacity: 0.45;
+	transition: opacity 0.15s;
+}
+.learn-nav-link.active,
+.learn-nav-link:hover {
+	opacity: 1;
+}
+.learn-nav-link.active .learn-nav-title {
+	color: hsl(var(--accent));
+}
+</style>
+
+<script>
+const initCourses = () => {
+let applyCourseSearchFilters: (() => void) | null = null;
+
+// --- Course drill-down ---
+const openCourseDetail = (courseSlug: string) => {
+document.getElementById('project-detail')?.classList.add('hidden');
+document.getElementById('sidebar-project-chapters')?.classList.add('hidden');
+const list = document.getElementById('classes-list');
+const detail = document.getElementById('classes-detail');
+if (!list || !detail) return;
+list.classList.add('hidden');
+detail.classList.remove('hidden');
+document.querySelectorAll<HTMLElement>('.course-detail-content').forEach((el) => {
+el.classList.toggle('hidden', el.id !== `detail-${courseSlug}`);
+});
+document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link').forEach((link) => {
+link.classList.toggle('active', link.dataset.slug === courseSlug);
+});
+initProjectCards();
+if (applyCourseSearchFilters) applyCourseSearchFilters();
+};
+
+// --- Search (courses only) ---
+const initCourseSearch = () => {
+	const searchInput = document.getElementById('course-search') as HTMLInputElement | null;
+	if (!searchInput) return;
+
+	const savedQuery = sessionStorage.getItem('course-search') ?? '';
+	searchInput.value = savedQuery;
+
+	const normalize = (value: string) => value.toLowerCase().trim();
+
+	applyCourseSearchFilters = () => {
+		const query = normalize(searchInput.value);
+		const hasQuery = query.length > 0;
+
+		const classLinks = Array.from(document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"]'));
+		const classDetails = Array.from(document.querySelectorAll<HTMLElement>('.course-detail-content'));
+		let classMatches = 0;
+
+		classLinks.forEach((link) => {
+			const haystack = link.dataset.courseSearch ?? '';
+			const match = !hasQuery || haystack.includes(query);
+			link.classList.toggle('hidden', !match);
+		});
+
+		classDetails.forEach((detail) => {
+			const haystack = detail.dataset.courseSearch ?? '';
+			const match = !hasQuery || haystack.includes(query);
+			detail.dataset.searchMatch = match ? 'true' : 'false';
+			if (match) classMatches += 1;
+
+			const projectCards = Array.from(detail.querySelectorAll<HTMLElement>('.project-card'));
+			let projectMatches = 0;
+			projectCards.forEach((card) => {
+				const projectHaystack = card.dataset.projectSearch ?? '';
+				const projectMatch = !hasQuery || projectHaystack.includes(query);
+				card.classList.toggle('hidden', !projectMatch);
+				if (projectMatch) projectMatches += 1;
+			});
+
+			const projectEmpty = detail.querySelector<HTMLElement>('.projects-search-empty');
+			if (projectEmpty) {
+				projectEmpty.classList.toggle('hidden', !hasQuery || projectMatches > 0 || !match);
+			}
+		});
+
+		const classesEmpty = document.getElementById('classes-search-empty');
+		if (classesEmpty) {
+			classesEmpty.classList.toggle('hidden', classMatches > 0);
+		}
+
+		const activeClassLink = document.querySelector<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"].active');
+		const activeSlug = activeClassLink?.dataset.slug;
+		const activeDetail = activeSlug ? document.getElementById(`detail-${activeSlug}`) as HTMLElement | null : null;
+		const activeMatches = activeDetail?.dataset.searchMatch === 'true';
+		const firstVisibleLink = classLinks.find((link) => !link.classList.contains('hidden'));
+
+		if (hasQuery && firstVisibleLink && !activeMatches) {
+			openCourseDetail(firstVisibleLink.dataset.slug!);
+		}
+	};
+
+	searchInput.addEventListener('input', () => {
+		sessionStorage.setItem('course-search', searchInput.value);
+		applyCourseSearchFilters?.();
+	});
+
+	searchInput.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape' && searchInput.value) {
+			searchInput.value = '';
+			sessionStorage.setItem('course-search', '');
+			applyCourseSearchFilters?.();
+		}
+	});
+
+	applyCourseSearchFilters();
+};
+
+let chapterObserver: IntersectionObserver | null = null;
+const buildProjectChapterNav = (projectRoot: HTMLElement) => {
+const chapterWrap = document.getElementById('sidebar-project-chapters');
+const chapterNav = document.getElementById('sidebar-project-chapters-nav');
+if (!chapterWrap || !chapterNav) return;
+
+if (chapterObserver) {
+chapterObserver.disconnect();
+chapterObserver = null;
+}
+
+chapterNav.innerHTML = '';
+const sections = Array.from(projectRoot.querySelectorAll<HTMLElement>('section[id^="part-"]'));
+if (!sections.length) {
+chapterWrap.classList.add('hidden');
+return;
+}
+
+const setActiveChapter = (id: string) => {
+const chapterLinks = Array.from(chapterNav.querySelectorAll<HTMLElement>('.learn-nav-link'));
+chapterLinks.forEach((link) => {
+const isActive = link.dataset.slug === id;
+link.classList.toggle('active', isActive);
+const title = link.querySelector<HTMLElement>('.learn-nav-title');
+if (!title) return;
+title.classList.toggle('text-accent', isActive);
+title.classList.toggle('text-foreground-secondary', !isActive);
+});
+};
+
+sections.forEach((section) => {
+const id = section.id;
+const heading = section.querySelector('h2, h3, h4');
+const label = (heading?.textContent || id).trim();
+const link = document.createElement('a');
+link.href = `#${id}`;
+link.dataset.slug = id;
+link.className = 'learn-nav-link block leading-snug group';
+
+const title = document.createElement('span');
+title.className = 'learn-nav-title block text-base text-foreground-secondary group-hover:text-accent transition-colors';
+title.style.fontFamily = "'Besley', serif";
+title.textContent = label;
+link.appendChild(title);
+
+link.addEventListener('click', (e) => {
+e.preventDefault();
+setActiveChapter(id);
+document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+chapterNav.appendChild(link);
+});
+
+chapterWrap.classList.remove('hidden');
+
+chapterObserver = new IntersectionObserver((entries) => {
+const visible = entries
+.filter((entry) => entry.isIntersecting)
+.sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top));
+if (!visible.length) return;
+const id = (visible[0].target as HTMLElement).id;
+setActiveChapter(id);
+}, { rootMargin: '-18% 0px -70% 0px' });
+
+sections.forEach((section) => chapterObserver!.observe(section));
+if (sections[0]) {
+const firstId = sections[0].id;
+setActiveChapter(firstId);
+}
+};
+
+// --- Project drill-down ---
+const openProjectDetail = (courseSlug: string, projectSlug: string) => {
+const detail = document.getElementById('classes-detail');
+const projectDetail = document.getElementById('project-detail');
+if (!detail || !projectDetail) return;
+detail.classList.add('hidden');
+projectDetail.classList.remove('hidden');
+document.querySelectorAll<HTMLElement>('.project-detail-content').forEach((el) => {
+el.classList.toggle('hidden', el.id !== `project-${courseSlug}-${projectSlug}`);
+});
+const activeProject = document.getElementById(`project-${courseSlug}-${projectSlug}`) as HTMLElement | null;
+if (activeProject) buildProjectChapterNav(activeProject);
+};
+
+const initProjectCards = () => {
+document.querySelectorAll<HTMLElement>('.project-card').forEach((card) => {
+const fresh = card.cloneNode(true) as HTMLElement;
+card.parentNode?.replaceChild(fresh, card);
+});
+document.querySelectorAll<HTMLElement>('.project-card').forEach((card) => {
+card.addEventListener('click', () => openProjectDetail(card.dataset.course!, card.dataset.project!));
+});
+const projectBackBtn = document.getElementById('project-back');
+if (projectBackBtn) {
+const freshBack = projectBackBtn.cloneNode(true) as HTMLElement;
+projectBackBtn.parentNode?.replaceChild(freshBack, projectBackBtn);
+document.getElementById('project-back')?.addEventListener('click', () => {
+	const activeLink = document.querySelector<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"].active');
+openCourseDetail(activeLink?.dataset.slug || 'angd-1314');
+});
+}
+};
+
+// Course cards
+document.querySelectorAll<HTMLElement>('.course-card').forEach((card) => {
+const fresh = card.cloneNode(true) as HTMLElement;
+card.parentNode?.replaceChild(fresh, card);
+});
+document.querySelectorAll<HTMLElement>('.course-card').forEach((card) => {
+card.addEventListener('click', () => openCourseDetail(card.dataset.course!));
+});
+
+// Sidebar nav for Courses opens detail directly
+document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"]').forEach((link) => {
+const fresh = link.cloneNode(true) as HTMLElement;
+link.parentNode?.replaceChild(fresh, link);
+});
+document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"]').forEach((link) => {
+link.addEventListener('click', (e) => {
+e.preventDefault();
+openCourseDetail(link.dataset.slug!);
+});
+});
+
+initCourseSearch();
+
+// Auto-open Organic Modeling by default
+openCourseDetail('angd-1314');
+};
+
+initCourses();
+document.addEventListener('astro:after-swap', initCourses);
+</script>

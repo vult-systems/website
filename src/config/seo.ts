@@ -83,13 +83,35 @@ export function getCodePageSEO(): PageSEO {
 }
 
 /**
- * Generate SEO metadata for Learn page
+ * Generate SEO metadata for Courses page
  */
-export function getLearnPageSEO(): PageSEO {
+export function getCoursesPageSEO(): PageSEO {
   return {
-    title: `Learn | ${SITE.author.name}`,
-    description: `Academia and creative education by ${SITE.author.name}. Curriculum development, student showcase, and teaching resources for 3D character art and pipeline development.`,
-    keywords: 'Education, Academia, Curriculum, Teaching, Maya, Character Modeling, 3D Workflows, Pipeline Development, Student Showcase, Tutorials'
+    title: `Courses | ${SITE.author.name}`,
+    description: `Curriculum and course content by ${SITE.author.name}. Organic modeling, anatomy, environment, and character art courses taught for 3D Animation and Game Design.`,
+    keywords: 'Courses, Curriculum, Teaching, Maya, ZBrush, Character Modeling, Environment Art, 3D Workflows, Game Design, Animation'
+  };
+}
+
+/**
+ * Generate SEO metadata for Resources page
+ */
+export function getResourcesPageSEO(): PageSEO {
+  return {
+    title: `Resources | ${SITE.author.name}`,
+    description: `Free tools and resources by ${SITE.author.name}. ZBrush brushes and materials, Maya scripts, Substance Painter smart materials, and pipeline tools used in instruction.`,
+    keywords: 'Resources, Tools, Downloads, ZBrush, Maya, Substance Painter, Scripts, Brushes, Materials, Pipeline, 3D Workflows'
+  };
+}
+
+/**
+ * Generate SEO metadata for the Student Work showcase page
+ */
+export function getStudentWorkPageSEO(): PageSEO {
+  return {
+    title: `Students | ${SITE.author.name}`,
+    description: `A showcase of student character art and 3D work created in courses taught by ${SITE.author.name}.`,
+    keywords: 'Student Work, Student Showcase, 3D Character Art, Character Modeling, Maya, ZBrush, Game Art, Portfolio'
   };
 }
 

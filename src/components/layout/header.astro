@@ -32,12 +32,22 @@ const currentPath = Astro.url.pathname;
                 <ul class="flex gap-x-6 lg:gap-x-8">
                     <li>
                         <a href="/art" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
-                            Art
+                            Work
                         </a>
                     </li>
                     <li>
-                        <a href="/learn" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
-                            Learn
+                        <a href="/courses" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
+                            Courses
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/students" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
+                            Students
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/resources" data-nav-link class="text-xl inline-block hover:text-accent hover:scale-105 transition-all duration-200 text-foreground-secondary" style="font-family: 'Besley', serif !important;">
+                            Resources
                         </a>
                     </li>
                     <li>
@@ -73,12 +83,22 @@ const currentPath = Astro.url.pathname;
         <ul class="flex flex-col gap-4">
             <li>
                 <a href="/art" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
-                    Art
+                    Work
                 </a>
             </li>
             <li>
-                <a href="/learn" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
-                    Learn
+                <a href="/courses" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
+                    Courses
+                </a>
+            </li>
+            <li>
+                <a href="/students" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
+                    Students
+                </a>
+            </li>
+            <li>
+                <a href="/resources" data-nav-link class="text-xl inline-block hover:text-accent transition-colors text-foreground-secondary" style="font-family: 'Besley', serif !important;">
+                    Resources
                 </a>
             </li>
             <li>
@@ -147,9 +167,20 @@ nav a.text-base {
 
     const updateActiveNav = () => {
         const path = window.location.pathname;
-        document.querySelectorAll('[data-nav-link]').forEach((el) => {
+        const links = Array.from(document.querySelectorAll('[data-nav-link]'));
+
+        // Find the most specific (longest) matching href so only one link is active.
+        let bestHref = '';
+        links.forEach((el) => {
             const href = el.getAttribute('href') ?? '';
-            const isActive = href !== '/' && path.startsWith(href);
+            if (href !== '/' && (path === href || path.startsWith(href + '/')) && href.length > bestHref.length) {
+                bestHref = href;
+            }
+        });
+
+        links.forEach((el) => {
+            const href = el.getAttribute('href') ?? '';
+            const isActive = href === bestHref && bestHref !== '';
             el.classList.toggle('text-accent', isActive);
             el.classList.toggle('scale-105', isActive);
             el.classList.toggle('text-foreground-secondary', !isActive);
