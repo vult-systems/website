@@ -16,35 +16,18 @@ import alienBustThumb from '@/assets/courses/organic-modeling/alien-bust/cg-alie
 import zbrushMenusThumb from '@/assets/learn/resources/thumbs/learn-thumbnail-landingpage.png';
 import opencueThumb from '@/assets/log/opencue-render/uiw3d-opencue-001.png';
 
-// Get featured art pieces
+// Get all art pieces for the carousel (matches the Work page ordering)
 const artPieces = await getCollection('art');
 
-// Define the desired order
-const desiredOrder = [
-  'halo-infinite-character',
-  'foundation-explorer',
-  'foundation-explorer-female',
-  'swtor-valkorian',
-  'rd-10-beneath-the-waves',
-  'carbon-core-brawl',
-  'motorola-4500x',
-  'gf721-thermal-imager',
-];
-
 const featuredArt = artPieces
-  .filter(piece => piece.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
   .map(piece => ({
     slug: piece.slug,
     title: piece.data.title,
     description: piece.data.description,
     heroImage: piece.data.heroImage,
     category: piece.data.category
-  }))
-  .sort((a, b) => {
-    const indexA = desiredOrder.indexOf(a.slug);
-    const indexB = desiredOrder.indexOf(b.slug);
-    return indexA - indexB;
-  });
+  }));
 
 const seo = getHomePageSEO();
 ---

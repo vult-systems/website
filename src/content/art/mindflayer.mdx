@@ -1,0 +1,30 @@
+---
+title: "Mindflayer"
+description: "A collectible sculpture of a mindflayer, sculpted in ZBrush."
+heroImage: "../../assets/mindflayer/mindflayer-thumb-01.png"
+pubDate: 2025-01-01
+category: "character"
+tags: ["Character", "Sculpture", "Collectible", "3D"]
+tools: ["ZBrush"]
+featured: false
+client: "Vult"
+role: "3D Character Artist"
+order: 7
+size: "medium"
+---
+
+import { Image } from 'astro:assets';
+import Heading from '@/components/ui/heading.astro';
+import sculpt01 from '@/assets/mindflayer/mindflayer-sculpt-001.jpg';
+import sculpt02 from '@/assets/mindflayer/mindflayer-sculpt-002.jpg';
+import sculpt03 from '@/assets/mindflayer/mindflayer-sculpt-003.jpg';
+
+<Heading level={2} size="4xl">Project Overview</Heading>
+
+This sculpt was created in ZBrush and prepared for 3D printing as a custom miniature for a tabletop painter. The piece depicts a Mind Flayer consuming a Gith.
+
+<Image src={sculpt01} alt="Mindflayer collectible sculpture" class="rounded-md my-8" />
+
+<Image src={sculpt02} alt="Mindflayer collectible sculpture" class="rounded-md my-8" />
+
+<Image src={sculpt03} alt="Mindflayer collectible sculpture" class="rounded-md my-8" />
