@@ -426,12 +426,12 @@ Chapters
 		Back to Course
 	</button>
 	{allCourses.flatMap((course) => (course.projects || []).map((project) => (
-		<div id={`project-${courseId(course.code)}-${project.slug}`} class="project-detail-content hidden">
+		<div id={`project-${courseId(course.code)}-${project.slug}`} class="project-detail-content hidden max-w-3xl mx-auto">
 			<Heading level={2} size="2xl" class="mb-3">{project.title}</Heading>
 			<div class="mb-6"><Badge variant="accent" size="sm">{course.code}</Badge></div>
 			<Text size="lg" variant="secondary" class="mb-8">{project.description}</Text>
 			{project.body ? (
-				<div class="prose prose-lg dark:prose-invert max-w-3xl"><PortableText value={project.body} /></div>
+				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={project.body} /></div>
 			) : (
 				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
 					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -443,7 +443,7 @@ Chapters
 		</div>
 	)))}
 	{pipeline.flatMap((topic) => topic.threads.map((thread) => (
-		<div id={`project-${topic.slug}-${thread.slug}`} class="project-detail-content hidden">
+		<div id={`project-${topic.slug}-${thread.slug}`} class="project-detail-content hidden max-w-3xl mx-auto">
 			<Heading level={2} size="2xl" class="mb-3">{thread.title}</Heading>
 			<div class="mb-6"><Badge variant="accent" size="sm">{topic.title}</Badge></div>
 			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
@@ -597,7 +597,7 @@ chapterObserver = null;
 }
 
 chapterNav.innerHTML = '';
-const sections = Array.from(projectRoot.querySelectorAll<HTMLElement>('section[id^="part-"]'));
+const sections = Array.from(projectRoot.querySelectorAll<HTMLElement>('h2[id], h3[id], h4[id]'));
 if (!sections.length) {
 chapterWrap.classList.add('hidden');
 return;
@@ -617,8 +617,8 @@ title.classList.toggle('text-foreground-secondary', !isActive);
 
 sections.forEach((section) => {
 const id = section.id;
-const heading = section.querySelector('h2, h3, h4');
-const label = (heading?.textContent || id).trim();
+const label = (section.textContent || id).trim();
+const level = Number(section.tagName.slice(1)) || 2;
 const link = document.createElement('a');
 link.href = `#${id}`;
 link.dataset.slug = id;
@@ -627,6 +627,7 @@ link.className = 'learn-nav-link block leading-snug group';
 const title = document.createElement('span');
 title.className = 'learn-nav-title block text-base text-foreground-secondary group-hover:text-accent transition-colors';
 title.style.fontFamily = "'Besley', serif";
+if (level >= 3) title.style.paddingLeft = `${(level - 2) * 0.9}rem`;
 title.textContent = label;
 link.appendChild(title);
 
