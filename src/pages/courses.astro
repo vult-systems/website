@@ -124,6 +124,8 @@ const allCourses = ((coursesData ?? []) as Course[]).sort(
 );
 const pipeline = (pipelineData ?? []) as PipelineTopic[];
 const courseId = (code: string) => code.toLowerCase().replace(/\s+/g, '-');
+// Pipeline topics are taught as core class content; show this as their "course code".
+const PIPELINE_CODE = 'ANGD Core';
 ---
 
 
@@ -225,8 +227,9 @@ href={`#${topic.slug}`}
 class="learn-nav-link block leading-snug group"
 data-slug={topic.slug}
 data-course-nav="true"
-data-course-search={`${topic.title} ${topic.description} ${topic.threads.map((thread) => `${thread.title} ${thread.description}`).join(' ')}`.toLowerCase()}
+data-course-search={`${PIPELINE_CODE} ${topic.title} ${topic.description} ${topic.threads.map((thread) => `${thread.title} ${thread.description}`).join(' ')}`.toLowerCase()}
 >
+<span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{PIPELINE_CODE}</span>
 <span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{topic.title}</span>
 </a>
 ))}
@@ -357,11 +360,12 @@ Chapters
 		<div
 			id={`detail-${topic.slug}`}
 			class="course-detail-content hidden"
-			data-course-search={`${topic.title} ${topic.description} ${topic.threads.map((thread) => `${thread.title} ${thread.description}`).join(' ')}`.toLowerCase()}
+			data-course-search={`${PIPELINE_CODE} ${topic.title} ${topic.description} ${topic.threads.map((thread) => `${thread.title} ${thread.description}`).join(' ')}`.toLowerCase()}
 		>
 			<div class="mb-8">
 				<div class="flex items-center gap-3 mb-3">
-					<Badge variant="accent" size="sm">Pipeline</Badge>
+					<Badge variant="accent" size="sm">{PIPELINE_CODE}</Badge>
+					<Badge variant="outline" size="sm">Pipeline</Badge>
 				</div>
 				<Heading level={2} size="2xl" class="mb-3">
 					{topic.title}
@@ -393,7 +397,7 @@ Chapters
 							</div>
 							<!-- Text -->
 								<div class="flex-1 min-w-0 p-4 lg:p-6 flex flex-col justify-center border-l border-border">
-									<p class="text-base text-foreground-muted mb-3 truncate" style="font-family: 'Besley', serif !important;">{topic.title}</p>
+									<p class="text-base text-foreground-muted mb-3 truncate" style="font-family: 'Besley', serif !important;">{PIPELINE_CODE} - {topic.title}</p>
 									<p class="text-fluid-4xl font-normal text-foreground mb-4 leading-tight" style="font-family: 'Besley', serif !important;">{thread.title}</p>
 								<span class="inline-block text-base text-accent transition-colors duration-200" style="font-family: 'Besley', serif !important;">View Content</span>
 							</div>
