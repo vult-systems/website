@@ -96,18 +96,6 @@ const seo = getBlogPageSEO();
 								))}
 							</ul>
 						</nav>
-						<div class="toc-pager">
-							{newerPage ? (
-								<a href={`?page=${newerPage}`} class="pager-link">&larr; Newer</a>
-							) : (
-								<span class="pager-link disabled">&larr; Newer</span>
-							)}
-							{olderPage ? (
-								<a href={`?page=${olderPage}`} class="pager-link">Older &rarr;</a>
-							) : (
-								<span class="pager-link disabled">Older &rarr;</span>
-							)}
-						</div>
 					</aside>
 
 					<!-- Posts feed -->
@@ -136,19 +124,6 @@ const seo = getBlogPageSEO();
 								</div>
 							</article>
 						))}
-
-						<div class="feed-pager">
-							{newerPage ? (
-								<a href={`?page=${newerPage}`} class="pager-link">&larr; Newer</a>
-							) : (
-								<span class="pager-link disabled">&larr; Newer</span>
-							)}
-							{olderPage ? (
-								<a href={`?page=${olderPage}`} class="pager-link">Older &rarr;</a>
-							) : (
-								<span class="pager-link disabled">Older &rarr;</span>
-							)}
-						</div>
 					</div>
 
 					<!-- Right sidebar: sections of the current post -->

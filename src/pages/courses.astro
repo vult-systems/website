@@ -501,11 +501,31 @@ Chapters
 </style>
 
 <script>
+let coursesPopstateBound = false;
 const initCourses = () => {
 let applyCourseSearchFilters: (() => void) | null = null;
 
+// --- Shareable deep links (URL <-> open detail) ---
+// Course:  /courses#<courseSlug>
+// Thread:  /courses#<courseSlug>/<threadSlug>
+const updateUrl = (courseSlug: string, projectSlug: string | null) => {
+const hash = projectSlug ? `#${courseSlug}/${projectSlug}` : `#${courseSlug}`;
+if (location.hash !== hash) history.pushState(null, '', hash);
+};
+const restoreFromHash = (): boolean => {
+const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
+if (!raw) return false;
+const [courseSlug, projectSlug] = raw.split('/');
+if (!courseSlug || !document.getElementById(`detail-${courseSlug}`)) return false;
+openCourseDetail(courseSlug, false);
+if (projectSlug && document.getElementById(`project-${courseSlug}-${projectSlug}`)) {
+openProjectDetail(courseSlug, projectSlug, false);
+}
+return true;
+};
+
 // --- Course drill-down ---
-const openCourseDetail = (courseSlug: string) => {
+const openCourseDetail = (courseSlug: string, updateHash = true) => {
 document.getElementById('project-detail')?.classList.add('hidden');
 document.getElementById('sidebar-project-chapters')?.classList.add('hidden');
 document.getElementById('chapters-aside')?.classList.remove('chapters-visible');
@@ -522,6 +542,7 @@ link.classList.toggle('active', link.dataset.slug === courseSlug);
 });
 initProjectCards();
 if (applyCourseSearchFilters) applyCourseSearchFilters();
+if (updateHash) updateUrl(courseSlug, null);
 };
 
 // --- Search (courses only) ---
@@ -581,7 +602,7 @@ const initCourseSearch = () => {
 		const firstVisibleLink = classLinks.find((link) => !link.classList.contains('hidden'));
 
 		if (hasQuery && firstVisibleLink && !activeMatches) {
-			openCourseDetail(firstVisibleLink.dataset.slug!);
+			openCourseDetail(firstVisibleLink.dataset.slug!, false);
 		}
 	};
 
@@ -677,7 +698,7 @@ setActiveChapter(firstId);
 };
 
 // --- Project drill-down ---
-const openProjectDetail = (courseSlug: string, projectSlug: string) => {
+const openProjectDetail = (courseSlug: string, projectSlug: string, updateHash = true) => {
 const detail = document.getElementById('classes-detail');
 const projectDetail = document.getElementById('project-detail');
 if (!detail || !projectDetail) return;
@@ -688,6 +709,7 @@ el.classList.toggle('hidden', el.id !== `project-${courseSlug}-${projectSlug}`);
 });
 const activeProject = document.getElementById(`project-${courseSlug}-${projectSlug}`) as HTMLElement | null;
 if (activeProject) buildProjectChapterNav(activeProject);
+if (updateHash) updateUrl(courseSlug, projectSlug);
 };
 
 const initProjectCards = () => {
@@ -732,8 +754,17 @@ openCourseDetail(link.dataset.slug!);
 
 initCourseSearch();
 
-// Auto-open Organic Modeling by default
-openCourseDetail('angd-1314');
+// Restore state from a shared URL (deep link), else auto-open Organic Modeling
+if (!restoreFromHash()) {
+openCourseDetail('angd-1314', false);
+}
+
+if (!coursesPopstateBound) {
+coursesPopstateBound = true;
+window.addEventListener('popstate', () => {
+if (!restoreFromHash()) openCourseDetail('angd-1314', false);
+});
+}
 };
 
 initCourses();
