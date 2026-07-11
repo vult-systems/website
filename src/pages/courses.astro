@@ -236,13 +236,6 @@ data-course-search={`${PIPELINE_CODE} ${topic.title} ${topic.description} ${topi
 </nav>
 </div>
 
-<div id="sidebar-project-chapters" class="hidden mt-8">
-<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
-Chapters
-</Text>
-<nav id="sidebar-project-chapters-nav" class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4"></nav>
-</div>
-
 </div>
 </aside>
 
@@ -462,6 +455,18 @@ Chapters
 </div>
 
 </div>
+
+<!-- Right sidebar: Chapters (shown when viewing a project) -->
+<aside class="hidden xl:block w-72 shrink-0">
+<div class="sticky top-32">
+<div id="sidebar-project-chapters" class="hidden">
+<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+Chapters
+</Text>
+<nav id="sidebar-project-chapters-nav" class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4"></nav>
+</div>
+</div>
+</aside>
 </div>
 
 </PageContainer>
