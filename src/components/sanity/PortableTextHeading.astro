@@ -1,0 +1,10 @@
+---
+import { slugify, portableTextToPlain } from '@/lib/sanity/toc';
+
+const { node } = Astro.props;
+const id = slugify(portableTextToPlain(node));
+const style = (node?.style ?? 'h2') as 'h2' | 'h3' | 'h4';
+const Tag = style;
+---
+
+<Tag id={id} class="scroll-mt-28"><slot /></Tag>

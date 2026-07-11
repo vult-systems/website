@@ -1,0 +1,39 @@
+/** Helpers for building a table of contents from Portable Text. */
+
+/** Slugify heading text into a stable anchor id. */
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+/** Flatten a Portable Text block's spans into plain text. */
+export function portableTextToPlain(block: any): string {
+  if (!block?.children) return '';
+  return block.children.map((c: any) => c?.text ?? '').join('');
+}
+
+export interface TocHeading {
+  id: string;
+  text: string;
+  level: number;
+}
+
+/** Extract h2/h3/h4 headings (id, text, level) from a Portable Text body. */
+export function getHeadings(body: any): TocHeading[] {
+  if (!Array.isArray(body)) return [];
+  const headings: TocHeading[] = [];
+  for (const block of body) {
+    if (block?._type !== 'block') continue;
+    const style = block.style;
+    if (style !== 'h2' && style !== 'h3' && style !== 'h4') continue;
+    const text = portableTextToPlain(block).trim();
+    if (!text) continue;
+    headings.push({ id: slugify(text), text, level: Number(style.slice(1)) });
+  }
+  return headings;
+}

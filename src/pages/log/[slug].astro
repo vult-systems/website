@@ -6,10 +6,12 @@ import PageMain from '@/components/layout/page-main.astro';
 import ContentHero from '@/components/content/content-hero.astro';
 import ProseContent from '@/components/content/prose-content.astro';
 import PortableText from '@/components/sanity/PortableText.astro';
+import ArticleToc from '@/components/content/article-toc.astro';
 import { getBlogPageSEO } from '@/config/seo';
 import { sanityClient } from '@/lib/sanity/client';
 import { logBySlugQuery } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/image';
+import { getHeadings } from '@/lib/sanity/toc';
 
 // Read live from Sanity at request time.
 export const prerender = false;
@@ -34,6 +36,7 @@ const heroImageUrl = post.heroImage
   ? urlFor(post.heroImage).width(1600).auto('format').url()
   : undefined;
 const seo = getBlogPageSEO(post.title);
+const headings = getHeadings(post.body);
 ---
 
 <BaseLayout
@@ -44,15 +47,39 @@ const seo = getBlogPageSEO(post.title);
 >
   <Header />
   <PageMain>
-    <ContentHero
-      title={post.title}
-      description={post.description}
-      meta={meta}
-      heroImage={heroImageUrl}
-    />
-    <ProseContent>
-      <PortableText value={post.body} />
-    </ProseContent>
+    <div class="article-grid">
+      <ArticleToc headings={headings} />
+      <div class="article-main">
+        <ContentHero
+          title={post.title}
+          description={post.description}
+          meta={meta}
+          heroImage={heroImageUrl}
+        />
+        <ProseContent>
+          <PortableText value={post.body} />
+        </ProseContent>
+      </div>
+    </div>
   </PageMain>
   <Footer />
 </BaseLayout>
+
+<style>
+  .article-grid {
+    display: block;
+  }
+
+  /* On wide screens: center the article, park the TOC in the left margin. */
+  @media (min-width: 1280px) {
+    .article-grid {
+      display: grid;
+      grid-template-columns: 1fr minmax(0, 56rem) 1fr;
+      align-items: start;
+    }
+    .article-main {
+      grid-column: 2;
+      min-width: 0;
+    }
+  }
+</style>
