@@ -41,6 +41,13 @@ export const pipelineTopicType = defineType({
       options: { source: 'title', maxLength: 96 },
       validation: (Rule) => Rule.required(),
     }),
+    defineField({
+      name: 'code',
+      title: 'Code / Label',
+      type: 'string',
+      description: 'Short label shown as this topic\u2019s “course code” (e.g. “ANGD Core”).',
+      initialValue: 'ANGD Core',
+    }),
     defineField({ name: 'description', type: 'text', rows: 3 }),
     defineField({ name: 'order', type: 'number', initialValue: 0 }),
     defineField({

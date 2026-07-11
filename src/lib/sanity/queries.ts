@@ -76,6 +76,7 @@ export const pipelineQuery = `
     _id,
     title,
     "slug": slug.current,
+    code,
     description,
     threads[]{
       title,
