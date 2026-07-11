@@ -25,21 +25,21 @@
   }
  
   .dark {
-    /* Semantic color system - Dark mode (softened near-black to reduce halation) */
-    --background: 0 0% 6%;                /* ~#101010 */
+    /* Semantic color system - Dark mode (near-black; body text kept high-contrast, AAA) */
+    --background: 0 0% 3%;                /* ~#080808 */
     --foreground: 0 0% 97%;              /* near white */
-    --foreground-secondary: 0 0% 88%;     /* brighter body text */
+    --foreground-secondary: 0 0% 88%;     /* body text (AAA contrast on near-black) */
     --foreground-muted: 0 0% 58%;         /* medium gray */
     
-    --border: 0 0% 15%;                   /* visible on near-black */
-    --border-hover: 0 0% 22%;
+    --border: 0 0% 12%;                   /* visible on near-black */
+    --border-hover: 0 0% 18%;
     
     --accent: 28 100% 52%;                /* #FF7C0A */
     --accent-hover: 28 100% 60%;           /* #FF7C0A lighter */
     
     /* Component backgrounds */
-    --card-bg: 0 0% 6%;                  /* match bg; borders define cards */
-    --card-bg-hover: 0 0% 10%;            /* subtle lift on hover */
+    --card-bg: 0 0% 3%;                  /* match bg; borders define cards */
+    --card-bg-hover: 0 0% 7%;            /* subtle lift on hover */
   }
 }
  
@@ -142,12 +142,18 @@
   .prose {
     --reading-font: 'Besley', ui-serif, Georgia, serif;
     --reading-size: 1.1875rem;     /* 19px */
-    --reading-line-height: 1.85;
+    --reading-line-height: 1.7;    /* comfortable body leading (WCAG >= 1.5) */
     --reading-tracking: 0em;
+    --reading-measure: 70ch;       /* ~66-70 chars/line (45-75 is optimal) */
 
     font-size: var(--reading-size);
     line-height: var(--reading-line-height);
     color: hsl(var(--foreground-secondary));
+  }
+
+  /* Constrain line length to a comfortable reading measure; images stay full width */
+  .prose :where(p, ul, ol, blockquote, h1, h2, h3, h4) {
+    max-width: var(--reading-measure);
   }
 
   /* Beat the global `body *` monospace rule for the whole article body */
