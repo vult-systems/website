@@ -1,6 +1,7 @@
 ---
 const { node } = Astro.props;
-const href = node?.href ?? '#';
+// astro-portabletext stores annotation fields under `node.markDef`.
+const href = node?.markDef?.href ?? node?.href ?? '#';
 const external = /^https?:\/\//.test(href);
 ---
 
