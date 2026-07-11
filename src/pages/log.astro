@@ -11,8 +11,7 @@ import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getBlogPageSEO } from '@/config/seo';
 import { sanityClient } from '@/lib/sanity/client';
-import { logListQuery } from '@/lib/sanity/queries';
-import PortableText from '@/components/sanity/PortableText.astro';
+import { logIndexQuery } from '@/lib/sanity/queries';
 
 // Read live from Sanity at request time (instant edits, no rebuild).
 export const prerender = false;
@@ -24,11 +23,10 @@ interface LogPost {
 	description?: string;
 	pubDate: string;
 	tags?: string[];
-	body?: any;
 }
 
-// logListQuery already filters drafts and orders by pubDate desc.
-const renderedPosts: LogPost[] = await sanityClient.fetch(logListQuery);
+// logIndexQuery filters drafts and orders by pubDate desc.
+const posts: LogPost[] = await sanityClient.fetch(logIndexQuery);
 
 const formatDate = (date: string | Date) => {
 	return new Intl.DateTimeFormat('en-US', {
@@ -73,70 +71,41 @@ const seo = getBlogPageSEO();
 		<div class="relative z-10 w-full py-8 sm:py-12">
 			<PageContainer>
 
-				<!-- Content with Sidebar -->
-				<div class="flex gap-12 lg:gap-16 relative">
-					
-					<!-- Sidebar Nav -->
-					<aside class="hidden lg:block w-56 shrink-0">
-						<div class="sticky top-32">
-							<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
-								Entries
-							</Text>
-							<nav class="space-y-3 border-l-2 border-foreground-secondary/10 pl-4">
-								{renderedPosts.map((post) => (
-									<a 
-										href={`#${post.slug}`} 
-										class="log-nav-link block text-sm text-foreground-secondary hover:text-accent transition-colors leading-snug"
-										data-slug={post.slug}
-										style="font-family: 'Besley', serif !important;"
-									>
-										{post.title}
-									</a>
-								))}
-							</nav>
-						</div>
-					</aside>
-
-					<!-- Posts Feed -->
-					<div class="flex-1 min-w-0">
-						{renderedPosts.map((post, index) => (
-							<article id={post.slug} class="log-entry scroll-mt-32 max-w-3xl mx-auto">
-								{index > 0 && (
-									<div class="border-t-2 border-foreground-secondary/10 my-16"></div>
-								)}
-								
-								<!-- Post Header -->
-								<div class="mb-8">
-									<div class="flex items-center gap-3 mb-3">
-										<Text size="sm" variant="secondary">
-											{formatDate(post.pubDate)}
-										</Text>
-										{post.tags && post.tags.length > 0 && (
-											<div class="flex gap-2">
-												{post.tags.slice(0, 3).map((tag) => (
-													<Badge size="sm" variant="outline">{tag}</Badge>
-												))}
-											</div>
-										)}
-									</div>
-									<Heading level={2} size="3xl" class="mb-3">
-										{post.title}
-									</Heading>
-									{post.description && (
-										<Text size="lg" variant="secondary">
-											{post.description}
-										</Text>
+				<!-- Entry list -->
+				<ul class="max-w-3xl mx-auto divide-y divide-foreground-secondary/10">
+					{posts.map((post) => (
+						<li>
+							<a href={`/log/${post.slug}`} class="group block py-8 sm:py-10">
+								<div class="flex flex-wrap items-center gap-3 mb-3">
+									<Text size="sm" variant="secondary">
+										{formatDate(post.pubDate)}
+									</Text>
+									{post.tags && post.tags.length > 0 && (
+										<div class="flex flex-wrap gap-2">
+											{post.tags.slice(0, 3).map((tag) => (
+												<Badge size="sm" variant="outline">{tag}</Badge>
+											))}
+										</div>
 									)}
 								</div>
-
-								<!-- Post Content -->
-								<div class="prose prose-lg dark:prose-invert max-w-none">
-									<PortableText value={post.body} />
-								</div>
-							</article>
-						))}
-					</div>
-				</div>
+								<Heading level={2} size="2xl" class="mb-2 group-hover:text-accent transition-colors">
+									{post.title}
+								</Heading>
+								{post.description && (
+									<Text size="lg" variant="secondary" class="line-clamp-2">
+										{post.description}
+									</Text>
+								)}
+								<span class="mt-4 inline-flex items-center gap-1.5 text-sm text-accent" style="font-family: 'Besley', serif !important;">
+									Read entry
+									<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+									</svg>
+								</span>
+							</a>
+						</li>
+					))}
+				</ul>
 
 			</PageContainer>
 		</div>
@@ -144,47 +113,3 @@ const seo = getBlogPageSEO();
 	<Footer />
 </BaseLayout>
 
-<style>
-	.log-nav-link.active {
-		color: var(--color-accent);
-		font-weight: 500;
-	}
-</style>
-
-<script>
-	const initLogNav = () => {
-		const navLinks = document.querySelectorAll('.log-nav-link');
-		const entries = document.querySelectorAll('.log-entry');
-		if (!navLinks.length || !entries.length) return;
-
-		const observer = new IntersectionObserver(
-			(observerEntries) => {
-				observerEntries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						const slug = entry.target.id;
-						navLinks.forEach((link) => {
-							link.classList.toggle('active', (link as HTMLElement).dataset.slug === slug);
-						});
-					}
-				});
-			},
-			{ rootMargin: '-20% 0px -60% 0px' }
-		);
-
-		entries.forEach((entry) => observer.observe(entry));
-	};
-
-	initLogNav();
-	document.addEventListener('astro:after-swap', initLogNav);
-
-	const openProseLinksInNewTab = () => {
-		document.querySelectorAll<HTMLAnchorElement>('.prose a[href]').forEach((a) => {
-			if (a.hostname !== location.hostname) {
-				a.target = '_blank';
-				a.rel = 'noopener noreferrer';
-			}
-		});
-	};
-	openProseLinksInNewTab();
-	document.addEventListener('astro:after-swap', openProseLinksInNewTab);
-</script>

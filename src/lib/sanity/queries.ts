@@ -1,6 +1,20 @@
 // GROQ queries (plain strings). No runtime dependency required.
 
-/** Published (non-draft) log entries, newest first. */
+/** Lightweight list for the Log index (no body). */
+export const logIndexQuery = `
+  *[_type == "log" && draft != true] | order(pubDate desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    description,
+    pubDate,
+    tags,
+    category,
+    heroImage
+  }
+`;
+
+/** Published (non-draft) log entries, newest first (with body). */
 export const logListQuery = `
   *[_type == "log" && draft != true] | order(pubDate desc) {
     _id,
