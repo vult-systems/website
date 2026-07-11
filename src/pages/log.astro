@@ -11,7 +11,9 @@ import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getBlogPageSEO } from '@/config/seo';
 import { sanityClient } from '@/lib/sanity/client';
-import { logIndexQuery } from '@/lib/sanity/queries';
+import { logListQuery } from '@/lib/sanity/queries';
+import PortableText from '@/components/sanity/PortableText.astro';
+import { getHeadings } from '@/lib/sanity/toc';
 
 // Read live from Sanity at request time (instant edits, no rebuild).
 export const prerender = false;
@@ -23,18 +25,26 @@ interface LogPost {
 	description?: string;
 	pubDate: string;
 	tags?: string[];
+	body?: any;
 }
 
-// logIndexQuery filters drafts and orders by pubDate desc.
-const posts: LogPost[] = await sanityClient.fetch(logIndexQuery);
+const allPosts: LogPost[] = await sanityClient.fetch(logListQuery);
 
-const formatDate = (date: string | Date) => {
-	return new Intl.DateTimeFormat('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	}).format(new Date(date));
-};
+// Pagination
+const PER_PAGE = 8;
+const requested = Number(Astro.url.searchParams.get('page') ?? '1');
+const totalPages = Math.max(1, Math.ceil(allPosts.length / PER_PAGE));
+const page = Math.min(Math.max(1, Number.isFinite(requested) ? requested : 1), totalPages);
+const posts = allPosts.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+const newerPage = page > 1 ? page - 1 : null;
+const olderPage = page < totalPages ? page + 1 : null;
+
+// Section headings per post for the sidebar TOC
+const headingsByPost: Record<string, ReturnType<typeof getHeadings>> = {};
+for (const post of posts) headingsByPost[post.slug] = getHeadings(post.body);
+
+const formatDate = (date: string | Date) =>
+	new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(date));
 
 const seo = getBlogPageSEO();
 ---
@@ -70,46 +80,316 @@ const seo = getBlogPageSEO();
 
 		<div class="relative z-10 w-full py-8 sm:py-12">
 			<PageContainer>
+				<div class="article-grid">
 
-				<!-- Entry list -->
-				<ul class="max-w-3xl mx-auto divide-y divide-foreground-secondary/10">
-					{posts.map((post) => (
-						<li>
-							<a href={`/log/${post.slug}`} class="group block py-8 sm:py-10">
-								<div class="flex flex-wrap items-center gap-3 mb-3">
-									<Text size="sm" variant="secondary">
-										{formatDate(post.pubDate)}
-									</Text>
-									{post.tags && post.tags.length > 0 && (
-										<div class="flex flex-wrap gap-2">
-											{post.tags.slice(0, 3).map((tag) => (
-												<Badge size="sm" variant="outline">{tag}</Badge>
-											))}
-										</div>
+					<!-- Multi-post table of contents -->
+					<aside class="log-toc" aria-label="Posts on this page">
+						<p class="toc-title">Posts on This Page</p>
+						<nav>
+							<ul class="toc-posts">
+								{posts.map((post) => (
+									<li class="toc-post" data-post={post.slug}>
+										<a href={`#${post.slug}`} class="toc-post-link" data-post-link={post.slug}>
+											{post.title}
+										</a>
+										{headingsByPost[post.slug].length > 0 && (
+											<ul class="toc-sections">
+												{headingsByPost[post.slug].map((h) => (
+													<li class:list={[`toc-l${h.level}`]}>
+														<a href={`#${h.id}`} data-toc-id={h.id}>{h.text}</a>
+													</li>
+												))}
+											</ul>
+										)}
+									</li>
+								))}
+							</ul>
+						</nav>
+						<div class="toc-pager">
+							{newerPage ? (
+								<a href={`?page=${newerPage}`} class="pager-link">&larr; Newer</a>
+							) : (
+								<span class="pager-link disabled">&larr; Newer</span>
+							)}
+							{olderPage ? (
+								<a href={`?page=${olderPage}`} class="pager-link">Older &rarr;</a>
+							) : (
+								<span class="pager-link disabled">Older &rarr;</span>
+							)}
+						</div>
+					</aside>
+
+					<!-- Posts feed -->
+					<div class="article-main">
+						{posts.map((post, index) => (
+							<article id={post.slug} data-post={post.slug} class="log-entry scroll-mt-28">
+								{index > 0 && <div class="border-t border-border my-16" />}
+								<div class="mb-8">
+									<div class="flex flex-wrap items-center gap-3 mb-3">
+										<Text size="sm" variant="secondary">{formatDate(post.pubDate)}</Text>
+										{post.tags && post.tags.length > 0 && (
+											<div class="flex flex-wrap gap-2">
+												{post.tags.slice(0, 3).map((tag) => (
+													<Badge size="sm" variant="outline">{tag}</Badge>
+												))}
+											</div>
+										)}
+									</div>
+									<Heading level={2} size="3xl" class="mb-3">{post.title}</Heading>
+									{post.description && (
+										<Text size="lg" variant="secondary">{post.description}</Text>
 									)}
 								</div>
-								<Heading level={2} size="2xl" class="mb-2 group-hover:text-accent transition-colors">
-									{post.title}
-								</Heading>
-								{post.description && (
-									<Text size="lg" variant="secondary" class="line-clamp-2">
-										{post.description}
-									</Text>
-								)}
-								<span class="mt-4 inline-flex items-center gap-1.5 text-sm text-accent" style="font-family: 'Besley', serif !important;">
-									Read entry
-									<svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
-									</svg>
-								</span>
-							</a>
-						</li>
-					))}
-				</ul>
+								<div class="prose prose-lg dark:prose-invert max-w-none">
+									<PortableText value={post.body} />
+								</div>
+							</article>
+						))}
 
+						<div class="feed-pager">
+							{newerPage ? (
+								<a href={`?page=${newerPage}`} class="pager-link">&larr; Newer</a>
+							) : (
+								<span class="pager-link disabled">&larr; Newer</span>
+							)}
+							{olderPage ? (
+								<a href={`?page=${olderPage}`} class="pager-link">Older &rarr;</a>
+							) : (
+								<span class="pager-link disabled">Older &rarr;</span>
+							)}
+						</div>
+					</div>
+
+				</div>
 			</PageContainer>
 		</div>
 	</PageMain>
 	<Footer />
 </BaseLayout>
+
+<style>
+	.article-grid {
+		display: block;
+	}
+
+	/* Center the feed; park the multi-post TOC in the left margin on wide screens */
+	@media (min-width: 1280px) {
+		.article-grid {
+			display: grid;
+			grid-template-columns: 1fr minmax(0, 56rem) 1fr;
+			align-items: start;
+		}
+		.article-main {
+			grid-column: 2;
+			min-width: 0;
+		}
+	}
+
+	/* Each post is a centered reading column */
+	.article-main article {
+		max-width: 48rem;
+		margin-inline: auto;
+	}
+
+	.log-toc {
+		display: none;
+	}
+	@media (min-width: 1280px) {
+		.log-toc {
+			display: block;
+			grid-column: 1;
+			justify-self: end;
+			align-self: start;
+			position: sticky;
+			top: 8rem;
+			width: 17rem;
+			max-height: calc(100vh - 10rem);
+			overflow-y: auto;
+			padding-right: 2rem;
+		}
+	}
+
+	.toc-title {
+		font-family: var(--font-ibm-plex);
+		font-size: 0.7rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: hsl(var(--foreground-muted));
+		margin-bottom: 1rem;
+	}
+
+	.toc-posts {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.toc-post {
+		margin-bottom: 0.85rem;
+	}
+	.toc-post-link {
+		display: block;
+		font-family: 'Besley', serif;
+		font-size: 0.92rem;
+		line-height: 1.35;
+		color: hsl(var(--foreground-secondary));
+		text-decoration: none;
+		padding-left: 0.9rem;
+		border-left: 2px solid hsl(var(--foreground-secondary) / 0.12);
+		transition: color 0.15s, border-color 0.15s;
+	}
+	.toc-post-link:hover {
+		color: hsl(var(--foreground));
+	}
+	.toc-post.active > .toc-post-link {
+		color: hsl(var(--foreground));
+		border-left-color: hsl(var(--accent));
+	}
+
+	.toc-sections {
+		list-style: none;
+		margin: 0.4rem 0 0;
+		padding: 0;
+		display: none;
+	}
+	.toc-post.active .toc-sections {
+		display: block;
+	}
+	.toc-sections a {
+		display: block;
+		font-family: var(--font-ibm-plex);
+		font-size: 0.76rem;
+		line-height: 1.3;
+		color: hsl(var(--foreground-muted));
+		text-decoration: none;
+		padding: 0.26rem 0 0.26rem 1.6rem;
+		margin-left: -2px;
+		border-left: 2px solid transparent;
+		transition: color 0.15s, border-color 0.15s;
+	}
+	.toc-sections .toc-l3 a {
+		padding-left: 2.3rem;
+	}
+	.toc-sections a:hover {
+		color: hsl(var(--foreground-secondary));
+	}
+	.toc-sections a.active {
+		color: hsl(var(--accent));
+		border-left-color: hsl(var(--accent));
+	}
+
+	.toc-pager {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-top: 1.5rem;
+		padding-top: 1rem;
+		border-top: 1px solid hsl(var(--foreground-secondary) / 0.12);
+	}
+	.pager-link {
+		font-family: var(--font-ibm-plex);
+		font-size: 0.78rem;
+		color: hsl(var(--foreground-secondary));
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+	.pager-link:hover {
+		color: hsl(var(--accent));
+	}
+	.pager-link.disabled {
+		color: hsl(var(--foreground-muted) / 0.4);
+		pointer-events: none;
+	}
+
+	/* On narrow screens the sidebar is hidden, so show a pager under the feed */
+	.feed-pager {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 4rem;
+		padding-top: 2rem;
+		border-top: 1px solid hsl(var(--border));
+		max-width: 48rem;
+		margin-inline: auto;
+	}
+	@media (min-width: 1280px) {
+		.feed-pager {
+			display: none;
+		}
+	}
+</style>
+
+<script>
+	const initLogToc = () => {
+		const articles = Array.from(
+			document.querySelectorAll<HTMLElement>('.article-main article[data-post]')
+		);
+		const tocPosts = Array.from(document.querySelectorAll<HTMLElement>('.log-toc .toc-post'));
+		const sectionLinks = Array.from(
+			document.querySelectorAll<HTMLAnchorElement>('.log-toc a[data-toc-id]')
+		);
+		if (!articles.length) return;
+
+		let activePost = '';
+
+		const update = () => {
+			const threshold = window.innerHeight * 0.3;
+
+			// Active post = last article whose top has scrolled above the threshold
+			let current = articles[0];
+			for (const a of articles) {
+				if (a.getBoundingClientRect().top <= threshold) current = a;
+			}
+			const slug = current.dataset.post!;
+			if (slug !== activePost) {
+				activePost = slug;
+				tocPosts.forEach((li) => li.classList.toggle('active', li.dataset.post === slug));
+			}
+
+			// Active section within the active post
+			const headings = Array.from(
+				current.querySelectorAll<HTMLElement>('h2[id], h3[id], h4[id]')
+			);
+			let activeId = '';
+			for (const h of headings) {
+				if (h.getBoundingClientRect().top <= threshold) activeId = h.id;
+			}
+			sectionLinks.forEach((a) => a.classList.toggle('active', a.dataset.tocId === activeId));
+		};
+
+		let ticking = false;
+		const onScroll = () => {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(() => {
+				update();
+				ticking = false;
+			});
+		};
+		window.addEventListener('scroll', onScroll, { passive: true });
+		update();
+
+		// Smooth scroll for TOC anchor clicks
+		document.querySelectorAll<HTMLAnchorElement>('.log-toc a[href^="#"]').forEach((link) => {
+			link.addEventListener('click', (e) => {
+				const id = link.getAttribute('href')!.slice(1);
+				const el = document.getElementById(id);
+				if (el) {
+					e.preventDefault();
+					el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					history.replaceState(null, '', `#${id}`);
+				}
+			});
+		});
+
+		// External links in article bodies open in a new tab
+		document.querySelectorAll<HTMLAnchorElement>('.prose a[href]').forEach((a) => {
+			if (a.hostname && a.hostname !== location.hostname) {
+				a.target = '_blank';
+				a.rel = 'noopener noreferrer';
+			}
+		});
+	};
+
+	initLogToc();
+	document.addEventListener('astro:after-swap', initLogToc);
+</script>
 
