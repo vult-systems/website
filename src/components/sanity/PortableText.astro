@@ -1,0 +1,23 @@
+---
+import { PortableText } from 'astro-portabletext';
+import PortableTextFigure from './PortableTextFigure.astro';
+import PortableTextLink from './PortableTextLink.astro';
+
+interface Props {
+  value: any;
+}
+
+const { value } = Astro.props;
+
+const components = {
+  type: {
+    figure: PortableTextFigure,
+    image: PortableTextFigure,
+  },
+  mark: {
+    link: PortableTextLink,
+  },
+};
+---
+
+{value && <PortableText value={value} components={components} />}

@@ -1,54 +1,57 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/base-layout.astro';
 import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
 import PageMain from '@/components/layout/page-main.astro';
 import ContentHero from '@/components/content/content-hero.astro';
 import ProseContent from '@/components/content/prose-content.astro';
+import PortableText from '@/components/sanity/PortableText.astro';
 import { getBlogPageSEO } from '@/config/seo';
+import { sanityClient } from '@/lib/sanity/client';
+import { logBySlugQuery } from '@/lib/sanity/queries';
+import { urlFor } from '@/lib/sanity/image';
 
-export async function getStaticPaths() {
-  const posts = await getCollection('log', ({ data }) => {
-    return data.draft !== true;
-  });
-  return posts.map(post => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+// Read live from Sanity at request time.
+export const prerender = false;
+
+const { slug } = Astro.params;
+const post = await sanityClient.fetch(logBySlugQuery, { slug });
+
+if (!post) {
+  return new Response('Not found', { status: 404 });
 }
 
-const { post } = Astro.props;
-const { Content } = await post.render();
-
 // Format metadata
-const formattedDate = post.data.pubDate 
-  ? new Date(post.data.pubDate).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+const formattedDate = post.pubDate
+  ? new Date(post.pubDate).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     })
   : '';
 const meta = formattedDate ? `on ${formattedDate}` : '';
-const seo = getBlogPageSEO(post.data.title);
+const heroImageUrl = post.heroImage
+  ? urlFor(post.heroImage).width(1600).auto('format').url()
+  : undefined;
+const seo = getBlogPageSEO(post.title);
 ---
 
 <BaseLayout
   title={seo.title}
-  description={post.data.description}
-  image={post.data.heroImage?.src}
+  description={post.description}
+  image={heroImageUrl}
   type="article"
 >
   <Header />
   <PageMain>
     <ContentHero
-      title={post.data.title}
-      description={post.data.description}
+      title={post.title}
+      description={post.description}
       meta={meta}
-      heroImage={post.data.heroImage}
+      heroImage={heroImageUrl}
     />
     <ProseContent>
-      <Content />
+      <PortableText value={post.body} />
     </ProseContent>
   </PageMain>
   <Footer />

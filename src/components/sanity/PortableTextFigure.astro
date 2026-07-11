@@ -1,0 +1,27 @@
+---
+import { urlFor } from '@/lib/sanity/image';
+
+const { node } = Astro.props;
+
+const src = urlFor(node).width(1200).auto('format').url();
+const src2x = urlFor(node).width(2400).auto('format').url();
+---
+
+<figure class="my-8">
+  <img
+    src={src}
+    srcset={`${src} 1200w, ${src2x} 2400w`}
+    sizes="(max-width: 768px) 100vw, 1200px"
+    alt={node?.alt ?? ''}
+    class="rounded-lg w-full"
+    loading="lazy"
+    decoding="async"
+  />
+  {
+    node?.caption && (
+      <figcaption class="mt-3 text-sm text-foreground-secondary text-center">
+        {node.caption}
+      </figcaption>
+    )
+  }
+</figure>

@@ -4,6 +4,10 @@ dist/
 # generated types
 .astro/
 
+# vercel + sanity local artifacts
+.vercel/
+.sanity/
+
 # dependencies
 node_modules/
 

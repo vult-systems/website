@@ -10,10 +10,14 @@ import Badge from '@/components/ui/badge.astro';
 import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
-import alienBustThumb from '@/assets/courses/organic-modeling/alien-bust/cg-alienbust-thumb-01.png';
 import { getCoursesPageSEO } from '@/config/seo';
-import RealisticEyeContent from '@/content/learn/the-realistic-eye.mdx';
-import eyeRealisticThumb from '@/assets/courses/char-modeling/eye/realistic/uiw3d-realistic-eye-thumb.png';
+import { sanityClient } from '@/lib/sanity/client';
+import { coursesQuery, pipelineQuery } from '@/lib/sanity/queries';
+import { urlFor } from '@/lib/sanity/image';
+import PortableText from '@/components/sanity/PortableText.astro';
+
+// Read live from Sanity at request time (edits appear instantly).
+export const prerender = false;
 
 const seo = getCoursesPageSEO();
 
@@ -47,19 +51,22 @@ interface CourseAssignment {
 interface CourseProject {
 	slug: string;
 	title: string;
-	description: string;
-	thumbnail?: ImageMetadata;
-	contentComponent?: any;
+	description?: string;
+	thumbnail?: any;
+	body?: any;
 }
 
 interface Course {
 	code: string;
 	title: string;
-	description: string;
+	slug?: string;
+	year: string;
+	order?: number;
+	description?: string;
 	outcomes?: string;
 	required?: string;
 	audience?: string;
-	syllabus?: ImageMetadata;
+	syllabus?: any;
 	assignments?: CourseAssignment[];
 	projects?: CourseProject[];
 }
@@ -69,87 +76,53 @@ interface CurriculumYear {
 	courses: Course[];
 }
 
-// Curriculum organized by year
-const curriculum: CurriculumYear[] = [
-	{
-		year: 'Freshman',
-		courses: [
-			{
-				code: 'ANGD 1314',
-				title: 'Organic Modeling',
-				description: 'This beginner-level studio course offers an overview of character sculpting and modeling techniques, laying the foundation for creating detailed, production-ready 3D character sculptures. It blends traditional art principles with a technical approach to mastering ZBrush for both organic and hard surface techniques.',
-				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
-				audience: 'This is a Freshman level course required of ANGD BFA majors.',
-				projects: [
-					{ slug: 'alien-bust', title: 'Alien Bust', description: '', thumbnail: alienBustThumb },
-					{ slug: 'elemental-golem', title: 'Elemental Golem', description: '' },
-					{ slug: 'nerf-gun', title: 'Nerf Gun', description: '' },
-					{ slug: 'bipedal-character', title: 'Bipedal Character', description: '' },
-				],
-			},
-		],
-	},
-	{
-		year: 'Sophomore',
-		courses: [
-			{
-				code: 'ANGD 1380',
-				title: 'Anatomy for 3D Artists',
-				description: 'This lecture course develops anatomical knowledge for artists and animators, with a focus on superficial human anatomy, including major muscle groups, skeletal structures, and surface forms of the body.',
-				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
-				audience: 'This is a Sophomore level course required of ANGD BFA majors.',
-				projects: [
-					{ slug: 'skeletal-study', title: 'Skeletal Reference Study', description: 'Model a skeletal reference for animation study.' },
-					{ slug: 'muscle-groups', title: 'Muscle Group Analysis', description: 'Layer primary muscle groups over a base skeleton.' },
-					{ slug: 'gesture-figure', title: 'Gesture & Figure', description: 'Dynamic figure study focusing on movement and weight.' },
-				],
-			},
-		],
-	},
-	{
-		year: 'Sophomore / Junior',
-		courses: [
-			{
-				code: 'ANGD 2333 · 2334 · 3331',
-				title: 'Environment Production I–III',
-				description: 'This progressive studio course sequence develops the skills required to create production-ready 3D environments for both real-time and offline workflows. Students explore modular workflows, hard-surface and organic asset creation, materials, lighting, composition, optimization, world-building, and engine integration while producing increasingly complex environments for games and cinematic applications.',
-				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
-				audience: 'This is a Sophomore–Junior level course required of ANGD BFA majors.',
-				projects: [
-					{ slug: 'trim-sheet', title: 'Trim Sheet Design', description: 'Create a production-ready trim sheet for an environment set.' },
-					{ slug: 'modular-kit', title: 'Modular Kit', description: 'Build a modular architecture kit for real-time use.' },
-					{ slug: 'hero-prop', title: 'Hero Prop', description: 'Fully textured hero asset with LODs.' },
-					{ slug: 'full-scene', title: 'Full Scene Assembly', description: 'A complete, lit environment built from the semester\'s assets.' },
-				],
-			},
-			{
-				code: 'ANGD 2361 · 3361 · 3362',
-				title: 'Character Modeling I–III',
-				description: 'This progressive studio course sequence focuses on the creation of production-ready 3D characters for both real-time and offline workflows. Students develop skills in anatomy, sculpting, topology, clothing, materials, grooming, optimization, and rigging while advancing from foundational character principles to fully realized, industry-centric character art.',
-				required: 'Graphic Tablet and Hard-drive or USB/C Storage Device',
-				audience: 'This is a Sophomore–Junior level course required of ANGD BFA majors.',
-				projects: [
-					{ slug: 'base-mesh', title: 'Base Mesh', description: '' },
-					{
-						slug: 'highpoly-sculpt',
-						title: 'Creating Realistic Real-Time Eyes',
-						description: 'A focused eye study covering anatomy, iris structure, and sculpt development for realistic character work.',
-						thumbnail: eyeRealisticThumb,
-						contentComponent: RealisticEyeContent,
-					},
-					{ slug: 'retopology', title: 'Retopology', description: '' },
-					{ slug: 'texturing', title: 'Texturing', description: '' },
-					{ slug: 'final-character', title: 'Final Character', description: '' },
-				],
-			},
-		],
-	},
-];
+// -------------------------------------------------------------------
+// Pipeline
+// -------------------------------------------------------------------
+// The Pipeline section is not tied to a specific class. It groups
+// production/workflow topics (e.g. "Source Control") that each contain
+// one or more "threads" (e.g. Git, Perforce, Google Drive).
+//
+// To add a new topic:
+//   1. Add a PipelineTopic to the `pipeline` array below with a unique slug.
+//   2. Add threads with unique slugs within that topic.
+// To attach written content to a thread, import an MDX component and set
+// it as `contentComponent` (same pattern as course projects above).
+// -------------------------------------------------------------------
+interface PipelineThread {
+	slug: string;
+	title: string;
+	description?: string;
+	thumbnail?: any;
+	body?: any;
+}
 
-// Flatten all courses for sidebar nav
-const allCourses = curriculum.flatMap(level =>
-	level.courses.map(c => ({ ...c, year: level.year }))
+interface PipelineTopic {
+	slug: string;
+	title: string;
+	description: string;
+	threads: PipelineThread[];
+}
+
+// Curriculum + pipeline now come from Sanity (editable in the Studio).
+const YEAR_ORDER: Record<string, number> = {
+	'Freshman': 0,
+	'Sophomore': 1,
+	'Sophomore / Junior': 2,
+	'Junior': 3,
+	'Senior': 4,
+};
+const [coursesData, pipelineData] = await Promise.all([
+	sanityClient.fetch(coursesQuery),
+	sanityClient.fetch(pipelineQuery),
+]);
+// Flatten + order for sidebar nav (matches the previous curriculum ordering).
+const allCourses = ((coursesData ?? []) as Course[]).sort(
+	(a, b) =>
+		((YEAR_ORDER[a.year] ?? 99) - (YEAR_ORDER[b.year] ?? 99)) ||
+		((a.order ?? 0) - (b.order ?? 0))
 );
+const pipeline = (pipelineData ?? []) as PipelineTopic[];
 const courseId = (code: string) => code.toLowerCase().replace(/\s+/g, '-');
 ---
 
@@ -239,13 +212,32 @@ data-course-search={`${course.code} ${course.title} ${course.description} ${cour
 </a>
 ))}
 </nav>
+</div>
+
+<div id="sidebar-pipeline" class="mt-8">
+<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+Pipeline
+</Text>
+<nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
+{pipeline.map((topic) => (
+<a
+href={`#${topic.slug}`}
+class="learn-nav-link block leading-snug group"
+data-slug={topic.slug}
+data-course-nav="true"
+data-course-search={`${topic.title} ${topic.description} ${topic.threads.map((thread) => `${thread.title} ${thread.description}`).join(' ')}`.toLowerCase()}
+>
+<span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{topic.title}</span>
+</a>
+))}
+</nav>
+</div>
 
 <div id="sidebar-project-chapters" class="hidden mt-8">
 <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
 Chapters
 </Text>
 <nav id="sidebar-project-chapters-nav" class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4"></nav>
-</div>
 </div>
 
 </div>
@@ -337,7 +329,7 @@ Chapters
 								<!-- Thumbnail -->
 								<div class="relative basis-[55%] shrink min-w-0 bg-foreground/5 flex items-center justify-center overflow-hidden rounded-l-lg" style="aspect-ratio: 3840/2426; isolation: isolate;">
 								{project.thumbnail ? (
-									<Image src={project.thumbnail} alt={project.title} class="absolute inset-0 w-full h-full object-cover" widths={[400, 600, 800]} sizes="(min-width: 1024px) 33vw, 55vw" loading="lazy" data-no-lightbox />
+									<img src={urlFor(project.thumbnail).width(800).auto('format').url()} alt={project.title} class="absolute inset-0 w-full h-full object-cover" loading="lazy" data-no-lightbox />
 								) : (
 									<svg class="w-10 h-10 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -356,6 +348,58 @@ Chapters
 			</div>
 			<p class="projects-search-empty hidden mt-5 text-sm text-foreground-muted" style="font-family: 'Besley', serif !important;">
 				No project content matches this search.
+			</p>
+		</div>
+	))}
+
+	<!-- Pipeline topic content -->
+	{pipeline.map((topic) => (
+		<div
+			id={`detail-${topic.slug}`}
+			class="course-detail-content hidden"
+			data-course-search={`${topic.title} ${topic.description} ${topic.threads.map((thread) => `${thread.title} ${thread.description}`).join(' ')}`.toLowerCase()}
+		>
+			<div class="mb-8">
+				<div class="flex items-center gap-3 mb-3">
+					<Badge variant="accent" size="sm">Pipeline</Badge>
+				</div>
+				<Heading level={2} size="2xl" class="mb-3">
+					{topic.title}
+				</Heading>
+				<Text size="base" variant="secondary">
+					{topic.description}
+				</Text>
+			</div>
+
+			<!-- Thread cards -->
+			<div class="grid grid-cols-1 gap-3">
+				{topic.threads.map((thread) => (
+					<button
+						class="project-card w-full text-left rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-5 group"
+						data-course={topic.slug}
+						data-project={thread.slug}
+						data-project-search={`${topic.title} ${thread.title} ${thread.description}`.toLowerCase()}
+					>
+						<div class="flex items-center gap-4">
+							<div class="shrink-0 w-10 h-10 rounded-md bg-accent/10 flex items-center justify-center">
+								<svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H6a2 2 0 00-2 2z" />
+								</svg>
+							</div>
+							<div class="min-w-0 flex-1">
+								<p class="text-xs text-foreground-muted mb-1 truncate" style="font-family: 'Besley', serif !important;">{topic.title}</p>
+								<p class="text-base font-medium text-foreground mb-1" style="font-family: 'Besley', serif !important;">{thread.title}</p>
+								<p class="text-sm text-foreground-secondary line-clamp-2">{thread.description}</p>
+							</div>
+							<svg class="w-5 h-5 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+							</svg>
+						</div>
+					</button>
+				))}
+			</div>
+			<p class="projects-search-empty hidden mt-5 text-sm text-foreground-muted" style="font-family: 'Besley', serif !important;">
+				No content matches this search.
 			</p>
 		</div>
 	))}
@@ -379,14 +423,31 @@ Chapters
 			<Heading level={2} size="2xl" class="mb-3">{project.title}</Heading>
 			<div class="mb-6"><Badge variant="accent" size="sm">{course.code}</Badge></div>
 			<Text size="lg" variant="secondary" class="mb-8">{project.description}</Text>
-			{project.contentComponent ? (
-				<project.contentComponent />
+			{project.body ? (
+				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={project.body} /></div>
 			) : (
 				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
 					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
 					</svg>
 					<span class="text-sm text-foreground-muted">Project content coming soon</span>
+				</div>
+			)}
+		</div>
+	)))}
+	{pipeline.flatMap((topic) => topic.threads.map((thread) => (
+		<div id={`project-${topic.slug}-${thread.slug}`} class="project-detail-content hidden">
+			<Heading level={2} size="2xl" class="mb-3">{thread.title}</Heading>
+			<div class="mb-6"><Badge variant="accent" size="sm">{topic.title}</Badge></div>
+			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
+			{thread.body ? (
+				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={thread.body} /></div>
+			) : (
+				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
+					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+					<span class="text-sm text-foreground-muted">Content coming soon</span>
 				</div>
 			)}
 		</div>
@@ -433,7 +494,7 @@ detail.classList.remove('hidden');
 document.querySelectorAll<HTMLElement>('.course-detail-content').forEach((el) => {
 el.classList.toggle('hidden', el.id !== `detail-${courseSlug}`);
 });
-document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link').forEach((link) => {
+document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]').forEach((link) => {
 link.classList.toggle('active', link.dataset.slug === courseSlug);
 });
 initProjectCards();
@@ -454,7 +515,7 @@ const initCourseSearch = () => {
 		const query = normalize(searchInput.value);
 		const hasQuery = query.length > 0;
 
-		const classLinks = Array.from(document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"]'));
+		const classLinks = Array.from(document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]'));
 		const classDetails = Array.from(document.querySelectorAll<HTMLElement>('.course-detail-content'));
 		let classMatches = 0;
 
@@ -490,7 +551,7 @@ const initCourseSearch = () => {
 			classesEmpty.classList.toggle('hidden', classMatches > 0);
 		}
 
-		const activeClassLink = document.querySelector<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"].active');
+		const activeClassLink = document.querySelector<HTMLElement>('.learn-nav-link[data-course-nav="true"].active');
 		const activeSlug = activeClassLink?.dataset.slug;
 		const activeDetail = activeSlug ? document.getElementById(`detail-${activeSlug}`) as HTMLElement | null : null;
 		const activeMatches = activeDetail?.dataset.searchMatch === 'true';
@@ -615,7 +676,7 @@ if (projectBackBtn) {
 const freshBack = projectBackBtn.cloneNode(true) as HTMLElement;
 projectBackBtn.parentNode?.replaceChild(freshBack, projectBackBtn);
 document.getElementById('project-back')?.addEventListener('click', () => {
-	const activeLink = document.querySelector<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"].active');
+	const activeLink = document.querySelector<HTMLElement>('.learn-nav-link[data-course-nav="true"].active');
 openCourseDetail(activeLink?.dataset.slug || 'angd-1314');
 });
 }
@@ -630,12 +691,12 @@ document.querySelectorAll<HTMLElement>('.course-card').forEach((card) => {
 card.addEventListener('click', () => openCourseDetail(card.dataset.course!));
 });
 
-// Sidebar nav for Courses opens detail directly
-document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"]').forEach((link) => {
+// Sidebar nav for Courses & Pipeline opens detail directly
+document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]').forEach((link) => {
 const fresh = link.cloneNode(true) as HTMLElement;
 link.parentNode?.replaceChild(fresh, link);
 });
-document.querySelectorAll<HTMLElement>('#sidebar-classes .learn-nav-link[data-course-nav="true"]').forEach((link) => {
+document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]').forEach((link) => {
 link.addEventListener('click', (e) => {
 e.preventDefault();
 openCourseDetail(link.dataset.slug!);

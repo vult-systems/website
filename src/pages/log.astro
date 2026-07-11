@@ -1,5 +1,4 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/base-layout.astro';
 import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
@@ -11,39 +10,32 @@ import Badge from '@/components/ui/badge.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getBlogPageSEO } from '@/config/seo';
+import { sanityClient } from '@/lib/sanity/client';
+import { logListQuery } from '@/lib/sanity/queries';
+import PortableText from '@/components/sanity/PortableText.astro';
 
-const logPosts = await getCollection('log', ({ data }) => {
-	return data.draft !== true;
-});
+// Read live from Sanity at request time (instant edits, no rebuild).
+export const prerender = false;
 
-// Sort posts by date, newest first
-const sortedPosts = logPosts.sort((a, b) => {
-	const dateA = new Date(a.data.pubDate);
-	const dateB = new Date(b.data.pubDate);
-	return dateB.getTime() - dateA.getTime();
-});
+interface LogPost {
+	_id: string;
+	title: string;
+	slug: string;
+	description?: string;
+	pubDate: string;
+	tags?: string[];
+	body?: any;
+}
 
-// Render all posts
-const renderedPosts = await Promise.all(
-	sortedPosts.map(async (post) => {
-		const { Content } = await post.render();
-		return {
-			slug: post.slug,
-			title: post.data.title,
-			description: post.data.description,
-			pubDate: post.data.pubDate,
-			tags: post.data.tags,
-			Content,
-		};
-	})
-);
+// logListQuery already filters drafts and orders by pubDate desc.
+const renderedPosts: LogPost[] = await sanityClient.fetch(logListQuery);
 
-const formatDate = (date: Date) => {
+const formatDate = (date: string | Date) => {
 	return new Intl.DateTimeFormat('en-US', {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
-	}).format(date);
+	}).format(new Date(date));
 };
 
 const seo = getBlogPageSEO();
@@ -139,7 +131,7 @@ const seo = getBlogPageSEO();
 
 								<!-- Post Content -->
 								<div class="prose prose-lg dark:prose-invert max-w-none">
-									<post.Content />
+									<PortableText value={post.body} />
 								</div>
 							</article>
 						))}
