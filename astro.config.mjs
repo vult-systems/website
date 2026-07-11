@@ -23,6 +23,10 @@ export default defineConfig({
   site: 'https://carlosgarcia.works',
   base: '/',
   output: 'static',
+  // /courses was renamed to /learn — keep old shared links working.
+  redirects: {
+    '/courses': '/learn',
+  },
   ...(sanityEnabled ? { adapter: vercel() } : {}),
   prefetch: {
     prefetchAll: true,

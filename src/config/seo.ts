@@ -83,11 +83,11 @@ export function getCodePageSEO(): PageSEO {
 }
 
 /**
- * Generate SEO metadata for Courses page
+ * Generate SEO metadata for the Learn (Education) page
  */
-export function getCoursesPageSEO(): PageSEO {
+export function getLearnPageSEO(): PageSEO {
   return {
-    title: `Courses | ${SITE.author.name}`,
+    title: `Learn | ${SITE.author.name}`,
     description: `Curriculum and course content by ${SITE.author.name}. Organic modeling, anatomy, environment, and character art courses taught for 3D Animation and Game Design.`,
     keywords: 'Courses, Curriculum, Teaching, Maya, ZBrush, Character Modeling, Environment Art, 3D Workflows, Game Design, Animation'
   };

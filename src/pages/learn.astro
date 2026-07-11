@@ -10,7 +10,7 @@ import Badge from '@/components/ui/badge.astro';
 import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
-import { getCoursesPageSEO } from '@/config/seo';
+import { getLearnPageSEO } from '@/config/seo';
 import { sanityClient } from '@/lib/sanity/client';
 import { coursesQuery, pipelineQuery } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/image';
@@ -19,7 +19,7 @@ import PortableText from '@/components/sanity/PortableText.astro';
 // Read live from Sanity at request time (edits appear instantly).
 export const prerender = false;
 
-const seo = getCoursesPageSEO();
+const seo = getLearnPageSEO();
 
 // -------------------------------------------------------------------
 // Syllabus & Assignment Images
@@ -508,8 +508,8 @@ const initCourses = () => {
 let applyCourseSearchFilters: (() => void) | null = null;
 
 // --- Shareable deep links (URL <-> open detail) ---
-// Course:  /courses#<courseSlug>
-// Thread:  /courses#<courseSlug>/<threadSlug>
+// Course:  /learn#<courseSlug>
+// Thread:  /learn#<courseSlug>/<threadSlug>
 const updateUrl = (courseSlug: string, projectSlug: string | null) => {
 const hash = projectSlug ? `#${courseSlug}/${projectSlug}` : `#${courseSlug}`;
 if (location.hash !== hash) history.pushState(null, '', hash);

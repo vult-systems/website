@@ -22,7 +22,7 @@ Personal portfolio site for 3D art, studio work, teaching, and technical writing
 | `/` | Landing page — auto-scrolling art carousel + hero |
 | `/art` | Art portfolio grid |
 | `/art/[slug]` | Individual art piece detail |
-| `/courses` | Curriculum, course projects, and Pipeline topics (from Sanity, SSR). Each course and thread has a shareable deep link, e.g. `/courses#source-control/git` |
+| `/learn` | Curriculum, course projects, and Pipeline topics (from Sanity, SSR). Each course and thread has a shareable deep link, e.g. `/learn#source-control/git`. `/courses` redirects here |
 | `/students` | Student work showcase |
 | `/resources` | Free tools and downloads |
 | `/log` | Development log / blog (from Sanity, SSR) |
@@ -103,5 +103,5 @@ Assets live in `src/assets/` (processed by Astro's image pipeline) and `public/`
 ## Deployment
 
 Deployed to [Vercel](https://vercel.com) as a hybrid SSR site (`@astrojs/vercel`): most pages
-are prerendered, while `/courses` and `/log` render on-demand so Sanity edits appear instantly.
+are prerendered, while `/learn` and `/log` render on-demand so Sanity edits appear instantly.
 The custom domain and TLS are managed in Vercel. Security headers are set in `vercel.json`.
