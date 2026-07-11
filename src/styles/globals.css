@@ -34,8 +34,9 @@
     --border: 0 0% 12%;                   /* visible on near-black */
     --border-hover: 0 0% 18%;
     
-    --accent: 28 100% 52%;                /* #FF7C0A */
-    --accent-hover: 28 100% 60%;           /* #FF7C0A lighter */
+    /* Muted accent for dark mode (less "hot" than light mode's #FF7C0A) */
+    --accent: 28 85% 58%;
+    --accent-hover: 28 90% 66%;
     
     /* Component backgrounds */
     --card-bg: 0 0% 3%;                  /* match bg; borders define cards */
