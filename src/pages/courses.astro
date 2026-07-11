@@ -431,7 +431,7 @@ Chapters
 			<div class="mb-6"><Badge variant="accent" size="sm">{course.code}</Badge></div>
 			<Text size="lg" variant="secondary" class="mb-8">{project.description}</Text>
 			{project.body ? (
-				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={project.body} /></div>
+				<div class="prose prose-lg dark:prose-invert max-w-3xl"><PortableText value={project.body} /></div>
 			) : (
 				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
 					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -448,7 +448,7 @@ Chapters
 			<div class="mb-6"><Badge variant="accent" size="sm">{topic.title}</Badge></div>
 			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
 			{thread.body ? (
-				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={thread.body} /></div>
+				<div class="prose prose-lg dark:prose-invert max-w-3xl"><PortableText value={thread.body} /></div>
 			) : (
 				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
 					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

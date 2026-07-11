@@ -151,11 +151,6 @@
     color: hsl(var(--foreground-secondary));
   }
 
-  /* Constrain line length to a comfortable reading measure; images stay full width */
-  .prose :where(p, ul, ol, blockquote, h1, h2, h3, h4) {
-    max-width: var(--reading-measure);
-  }
-
   /* Beat the global `body *` monospace rule for the whole article body */
   .prose,
   .prose * {
