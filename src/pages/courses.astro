@@ -456,8 +456,8 @@ data-course-search={`${PIPELINE_CODE} ${topic.title} ${topic.description} ${topi
 
 </div>
 
-<!-- Right sidebar: Chapters (shown when viewing a project) -->
-<aside class="hidden xl:block w-72 shrink-0">
+<!-- Right sidebar: Chapters (occupies space only when a project with sections is open) -->
+<aside id="chapters-aside" class="w-72 shrink-0">
 <div class="sticky top-32">
 <div id="sidebar-project-chapters" class="hidden">
 <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
@@ -488,6 +488,16 @@ Chapters
 .learn-nav-link.active .learn-nav-title {
 	color: hsl(var(--accent));
 }
+
+/* Right Chapters sidebar only occupies space when a project with sections is open */
+#chapters-aside {
+	display: none;
+}
+@media (min-width: 1280px) {
+	#chapters-aside.chapters-visible {
+		display: block;
+	}
+}
 </style>
 
 <script>
@@ -498,6 +508,7 @@ let applyCourseSearchFilters: (() => void) | null = null;
 const openCourseDetail = (courseSlug: string) => {
 document.getElementById('project-detail')?.classList.add('hidden');
 document.getElementById('sidebar-project-chapters')?.classList.add('hidden');
+document.getElementById('chapters-aside')?.classList.remove('chapters-visible');
 const list = document.getElementById('classes-list');
 const detail = document.getElementById('classes-detail');
 if (!list || !detail) return;
@@ -602,9 +613,11 @@ chapterObserver = null;
 }
 
 chapterNav.innerHTML = '';
+const chaptersAside = document.getElementById('chapters-aside');
 const sections = Array.from(projectRoot.querySelectorAll<HTMLElement>('h2[id], h3[id], h4[id]'));
 if (!sections.length) {
 chapterWrap.classList.add('hidden');
+chaptersAside?.classList.remove('chapters-visible');
 return;
 }
 
@@ -645,6 +658,7 @@ chapterNav.appendChild(link);
 });
 
 chapterWrap.classList.remove('hidden');
+chaptersAside?.classList.add('chapters-visible');
 
 chapterObserver = new IntersectionObserver((entries) => {
 const visible = entries
