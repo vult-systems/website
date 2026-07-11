@@ -22,7 +22,7 @@ Personal portfolio site for 3D art, studio work, teaching, and technical writing
 | `/` | Landing page — auto-scrolling art carousel + hero |
 | `/art` | Art portfolio grid |
 | `/art/[slug]` | Individual art piece detail |
-| `/courses` | Curriculum, course projects, and Pipeline topics (from Sanity, SSR) |
+| `/courses` | Curriculum, course projects, and Pipeline topics (from Sanity, SSR). Each course and thread has a shareable deep link, e.g. `/courses#source-control/git` |
 | `/students` | Student work showcase |
 | `/resources` | Free tools and downloads |
 | `/log` | Development log / blog (from Sanity, SSR) |
@@ -83,8 +83,9 @@ npm run studio:dev     # Run Sanity Studio locally → http://localhost:3333
 npm run studio:deploy  # Deploy Studio → https://carlosgarcia-works.sanity.studio
 ```
 
-Requires a `.env` (see `.env.example`) with `PUBLIC_SANITY_PROJECT_ID`,
-`PUBLIC_SANITY_DATASET`, and matching `SANITY_STUDIO_*` values.
+The Studio uses a custom theme (`src/sanity/theme.ts`) that mirrors the site's
+near-black + orange palette. Requires a `.env` (see `.env.example`) with
+`PUBLIC_SANITY_PROJECT_ID`, `PUBLIC_SANITY_DATASET`, and matching `SANITY_STUDIO_*` values.
 
 ## Content
 
@@ -94,7 +95,8 @@ Requires a `.env` (see `.env.example`) with `PUBLIC_SANITY_PROJECT_ID`,
 via `@sanity/client` (`src/lib/sanity/`) and render Portable Text with the components in
 `src/components/sanity/`. Edits publish instantly — no rebuild required.
 
-Sanity schemas live in `src/sanity/schemaTypes/`; the Studio config is `sanity.config.ts`.
+Sanity schemas live in `src/sanity/schemaTypes/`; the Studio config is `sanity.config.ts`
+(themed via `src/sanity/theme.ts`).
 
 Assets live in `src/assets/` (processed by Astro's image pipeline) and `public/` (served as-is).
 
