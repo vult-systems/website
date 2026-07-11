@@ -12,7 +12,7 @@ import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getLearnPageSEO } from '@/config/seo';
 import { sanityClient } from '@/lib/sanity/client';
-import { coursesQuery, pipelineQuery } from '@/lib/sanity/queries';
+import { coursesQuery, pipelineQuery, learnPageQuery } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/image';
 import PortableText from '@/components/sanity/PortableText.astro';
 
@@ -113,10 +113,17 @@ const YEAR_ORDER: Record<string, number> = {
 	'Junior': 3,
 	'Senior': 4,
 };
-const [coursesData, pipelineData] = await Promise.all([
+const [coursesData, pipelineData, learnPage] = await Promise.all([
 	sanityClient.fetch(coursesQuery),
 	sanityClient.fetch(pipelineQuery),
+	sanityClient.fetch(learnPageQuery),
 ]);
+// Editable page chrome (with fallbacks if the Learn Page doc is empty).
+const pageTitle = learnPage?.pageTitle || 'Education';
+const pageIntro = learnPage?.intro ||
+	'Teaching has become one of the most meaningful parts of my career. This section serves as a companion resource for the courses I teach, providing students with supplemental lectures, notes, demonstrations, project breakdowns, and reference material used throughout the semester. While these pages do not replace the courses themselves, they offer additional context and resources that students can revisit as they develop their skills and continue growing as artists.';
+const coursesLabel = learnPage?.coursesLabel || 'University Courses';
+const pipelineLabel = learnPage?.pipelineLabel || 'Studio Pipeline';
 // Flatten + order for sidebar nav (matches the previous curriculum ordering).
 const allCourses = ((coursesData ?? []) as Course[]).sort(
 	(a, b) =>
@@ -152,10 +159,10 @@ widths={[800, 1200, 1920]}
 </div>
 <PageContainer>
 <Heading level={1} size="4xl" class="mb-4">
-Education
+{pageTitle}
 </Heading>
 <Text size="lg" variant="secondary" class="mb-4">
-Teaching has become one of the most meaningful parts of my career. This section serves as a companion resource for the courses I teach, providing students with supplemental lectures, notes, demonstrations, project breakdowns, and reference material used throughout the semester. While these pages do not replace the courses themselves, they offer additional context and resources that students can revisit as they develop their skills and continue growing as artists.
+{pageIntro}
 </Text>
 </PageContainer>
 </div>
@@ -200,7 +207,7 @@ Teaching has become one of the most meaningful parts of my career. This section 
 
 <div id="sidebar-classes">
 <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
-University Courses
+{coursesLabel}
 </Text>
 <nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
 {allCourses.map((course) => (
@@ -220,7 +227,7 @@ data-course-search={`${course.code} ${course.title} ${course.description} ${cour
 
 <div id="sidebar-pipeline" class="mt-8">
 <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
-Studio Pipeline
+{pipelineLabel}
 </Text>
 <nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
 {pipeline.map((topic) => (

@@ -1,5 +1,15 @@
 // GROQ queries (plain strings). No runtime dependency required.
 
+/** Editable chrome for the /learn page (singleton settings document). */
+export const learnPageQuery = `
+  *[_type == "learnPage"][0] {
+    pageTitle,
+    intro,
+    coursesLabel,
+    pipelineLabel
+  }
+`;
+
 /** Lightweight list for the Log index (no body). */
 export const logIndexQuery = `
   *[_type == "log" && draft != true] | order(pubDate desc) {
