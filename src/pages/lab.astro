@@ -9,6 +9,8 @@
  */
 
 import { getCollection } from 'astro:content';
+import { sanityClient } from '@/lib/sanity/client';
+import { logListQuery } from '@/lib/sanity/queries';
 import BaseLayout from '@/layouts/base-layout.astro';
 import Header from '@/components/layout/header.astro';
 import Footer from '@/components/layout/footer.astro';
@@ -48,10 +50,9 @@ const featuredArt = artPieces
     category: piece.data.category,
   }));
 
-const logPosts = await getCollection('log');
-const recentPosts = logPosts
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 2);
+const recentPosts = import.meta.env.DEV
+  ? ((await sanityClient.fetch(logListQuery)) as any[]).slice(0, 2)
+  : [];
 
 // Only show in development
 const isDev = import.meta.env.DEV;
@@ -406,14 +407,14 @@ if (!isDev) {
               {recentPosts.map(post => (
                 <Card padding="lg" interactive href={`/log/${post.slug}`}>
                   <div class="flex items-start justify-between mb-3">
-                    <Badge variant="outline">{post.data.category || 'log'}</Badge>
+                    <Badge variant="outline">{post.category || 'log'}</Badge>
                     <Text size="xs" variant="muted">
-                      {post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(post.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </Text>
                   </div>
-                  <Heading level={4} size="lg" class="mb-2">{post.data.title}</Heading>
+                  <Heading level={4} size="lg" class="mb-2">{post.title}</Heading>
                   <Text size="sm" variant="secondary" class="line-clamp-2">
-                    {post.data.description}
+                    {post.description}
                   </Text>
                 </Card>
               ))}
