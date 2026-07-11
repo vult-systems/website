@@ -6,10 +6,12 @@ Personal portfolio site for 3D art, studio work, teaching, and technical writing
 
 ## Stack
 
-- [Astro 5](https://astro.build) — Static site generator with View Transitions
+- [Astro 5](https://astro.build) — Hybrid SSR with View Transitions
 - [TypeScript](https://www.typescriptlang.org/) — Type safety
 - [Tailwind CSS](https://tailwindcss.com) — Styling with custom `3xl`/`4xl` breakpoints (1920px / 2560px)
-- [MDX](https://mdxjs.com) — Enhanced markdown for content
+- [Sanity](https://www.sanity.io) — Headless CMS for Courses, Pipeline, and Log content
+- [Vercel](https://vercel.com) — SSR hosting (via `@astrojs/vercel`)
+- [MDX](https://mdxjs.com) — Markdown for Art content
 - [Partytown](https://partytown.builder.io/) — Analytics off the main thread
 - [Sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/) — Auto-generated sitemap
 
@@ -20,11 +22,11 @@ Personal portfolio site for 3D art, studio work, teaching, and technical writing
 | `/` | Landing page — auto-scrolling art carousel + hero |
 | `/art` | Art portfolio grid |
 | `/art/[slug]` | Individual art piece detail |
-| `/courses` | Curriculum and course content |
+| `/courses` | Curriculum, course projects, and Pipeline topics (from Sanity, SSR) |
 | `/students` | Student work showcase |
 | `/resources` | Free tools and downloads |
-| `/log` | Development log / blog |
-| `/log/[slug]` | Individual log entry |
+| `/log` | Development log / blog (from Sanity, SSR) |
+| `/log/[slug]` | Individual log entry (from Sanity, SSR) |
 | `/about` | Bio and experience |
 | `/lab` | Design system reference (dev use) |
 
@@ -53,37 +55,51 @@ Centralized styling tokens instead of scattered Tailwind classes:
 - Carousel card widths use `min(clamp(vw), calc(100vh - offset))` — never overflow horizontally or vertically regardless of zoom level
 - Fluid typography via CSS `clamp()` for hero headings
 
-**Pure Astro Stack**
+**Astro frontend, no shipped framework JS**
 
-No React, no Vue, no Svelte. Astro components + vanilla TypeScript where needed.
+The public site is Astro components + vanilla TypeScript — no React/Vue/Svelte runtime is
+shipped to visitors. Sanity Studio (which is React-based) runs separately as a hosted app, so
+it never bloats the site bundle.
 - Minimal JavaScript footprint
-- Fast builds
-- 12 dependencies
+- HTML comments are stripped from rendered pages via `src/middleware.ts`
+- Security headers applied via `vercel.json`
 
 ## Development
 
 ```bash
 npm install
-npm run dev      # Dev server → http://localhost:4321
-npm run build    # Production build
+npm run dev      # Astro dev server → http://localhost:4321
+npm run build    # Production build (Vercel output)
 npm run preview  # Preview production build locally
 npm run check    # Type-check all Astro/TS files
 ```
 
 Visit `/lab` in dev to browse the full design system.
 
+### Content Studio (Sanity)
+
+```bash
+npm run studio:dev     # Run Sanity Studio locally → http://localhost:3333
+npm run studio:deploy  # Deploy Studio → https://carlosgarcia-works.sanity.studio
+```
+
+Requires a `.env` (see `.env.example`) with `PUBLIC_SANITY_PROJECT_ID`,
+`PUBLIC_SANITY_DATASET`, and matching `SANITY_STUDIO_*` values.
+
 ## Content
 
-**Art pieces** — `src/content/art/*.mdx`  
-**Log entries** — `src/content/log/*.mdx`  
-**Content schema** — `src/content/config.ts`
+**Art pieces** — `src/content/art/*.mdx` (Astro content collection)  
+**Courses, Pipeline & Log** — [Sanity](https://www.sanity.io), edited in the hosted Studio at
+[carlosgarcia-works.sanity.studio](https://carlosgarcia-works.sanity.studio). Pages fetch live
+via `@sanity/client` (`src/lib/sanity/`) and render Portable Text with the components in
+`src/components/sanity/`. Edits publish instantly — no rebuild required.
+
+Sanity schemas live in `src/sanity/schemaTypes/`; the Studio config is `sanity.config.ts`.
 
 Assets live in `src/assets/` (processed by Astro's image pipeline) and `public/` (served as-is).
 
 ## Deployment
 
-Deployed via static export. `CNAME` file in `public/` handles custom domain routing.
-
----
-
-Built with AI assistance (GitHub Copilot) for rapid iteration.
+Deployed to [Vercel](https://vercel.com) as a hybrid SSR site (`@astrojs/vercel`): most pages
+are prerendered, while `/courses` and `/log` render on-demand so Sanity edits appear instantly.
+The custom domain and TLS are managed in Vercel. Security headers are set in `vercel.json`.

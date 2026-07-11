@@ -11,9 +11,7 @@
     "astro": "astro",
     "studio:dev": "sanity dev",
     "studio:build": "sanity build",
-    "studio:deploy": "sanity deploy",
-    "migrate:log": "node scripts/migrate-log-to-sanity.mjs",
-    "seed:courses": "node scripts/seed-courses-to-sanity.mjs"
+    "studio:deploy": "sanity deploy"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.2",
