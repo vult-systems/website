@@ -25,21 +25,21 @@
   }
  
   .dark {
-    /* Semantic color system - Dark mode */
-    --background: 0 0% 0%;                /* black */
-    --foreground: 0 0% 95%;              /* white */
-    --foreground-secondary: 0 0% 85%;     /* gray-400 */
-    --foreground-muted: 0 0% 55%;         /* gray-500 */
+    /* Semantic color system - Dark mode (softened near-black to reduce halation) */
+    --background: 0 0% 6%;                /* ~#101010 */
+    --foreground: 0 0% 97%;              /* near white */
+    --foreground-secondary: 0 0% 88%;     /* brighter body text */
+    --foreground-muted: 0 0% 58%;         /* medium gray */
     
-    --border: 0 0% 7%;                   /* gray-800 */
-    --border-hover: 0 0% 12%;             /* gray-700 */
+    --border: 0 0% 15%;                   /* visible on near-black */
+    --border-hover: 0 0% 22%;
     
     --accent: 28 100% 52%;                /* #FF7C0A */
     --accent-hover: 28 100% 60%;           /* #FF7C0A lighter */
     
     /* Component backgrounds */
-    --card-bg: 0 0% 0%;                  /* black */
-    --card-bg-hover: 0 0% 5%;             /* near black on hover */
+    --card-bg: 0 0% 6%;                  /* match bg; borders define cards */
+    --card-bg-hover: 0 0% 10%;            /* subtle lift on hover */
   }
 }
  
@@ -127,5 +127,57 @@
   .text-fluid-display {
     font-size: clamp(3rem, 6vw + 0.5rem, 6rem);
     line-height: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Long-form reading surface (Log posts, course/pipeline bodies)
+ * These variables are the dials for testing readability — tweak them here:
+ *   --reading-font          : body typeface for articles
+ *   --reading-size          : base font size
+ *   --reading-line-height   : line spacing
+ *   --reading-tracking      : letter-spacing
+ * ------------------------------------------------------------------------- */
+@layer components {
+  .prose {
+    --reading-font: 'Besley', ui-serif, Georgia, serif;
+    --reading-size: 1.1875rem;     /* 19px */
+    --reading-line-height: 1.85;
+    --reading-tracking: 0em;
+
+    font-size: var(--reading-size);
+    line-height: var(--reading-line-height);
+    color: hsl(var(--foreground-secondary));
+  }
+
+  /* Beat the global `body *` monospace rule for the whole article body */
+  .prose,
+  .prose * {
+    font-family: var(--reading-font);
+    letter-spacing: var(--reading-tracking);
+  }
+
+  /* Code stays monospace */
+  .prose :where(code, pre, kbd, samp) {
+    font-family: var(--font-ibm-plex);
+  }
+
+  /* Headings brighter for contrast */
+  .prose :where(h1, h2, h3, h4) {
+    color: hsl(var(--foreground));
+  }
+
+  .prose :where(strong) {
+    color: hsl(var(--foreground));
+  }
+
+  .prose :where(a) {
+    color: hsl(var(--accent));
+    text-decoration-color: hsl(var(--accent) / 0.4);
+  }
+
+  .prose :where(blockquote) {
+    color: hsl(var(--foreground-secondary));
+    border-inline-start-color: hsl(var(--accent));
   }
 }
