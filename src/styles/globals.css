@@ -163,9 +163,15 @@
     font-family: var(--font-ibm-plex);
   }
 
-  /* Headings brighter for contrast */
+  /* Headings brighter for contrast; balanced line breaks */
   .prose :where(h1, h2, h3, h4) {
     color: hsl(var(--foreground));
+    text-wrap: balance;
+  }
+
+  /* Nicer line breaks: avoid orphans/ragged endings without justified-text complexity */
+  .prose :where(p, li) {
+    text-wrap: pretty;
   }
 
   .prose :where(strong) {
