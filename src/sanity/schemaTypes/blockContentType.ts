@@ -58,5 +58,29 @@ export const blockContentType = defineType({
         { name: 'caption', type: 'string', title: 'Caption' },
       ],
     }),
+    defineArrayMember({
+      type: 'object',
+      name: 'divider',
+      title: 'Divider',
+      fields: [
+        {
+          name: 'variant',
+          type: 'string',
+          title: 'Style',
+          options: {
+            list: [
+              { title: 'Line', value: 'line' },
+              { title: 'Dotted', value: 'dots' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'line',
+        },
+      ],
+      preview: {
+        select: { variant: 'variant' },
+        prepare: ({ variant }) => ({ title: `Divider (${variant || 'line'})` }),
+      },
+    }),
   ],
 });

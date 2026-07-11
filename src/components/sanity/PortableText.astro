@@ -2,6 +2,7 @@
 import { PortableText } from 'astro-portabletext';
 import PortableTextFigure from './PortableTextFigure.astro';
 import PortableTextLink from './PortableTextLink.astro';
+import PortableTextDivider from './PortableTextDivider.astro';
 
 interface Props {
   value: any;
@@ -13,6 +14,7 @@ const components = {
   type: {
     figure: PortableTextFigure,
     image: PortableTextFigure,
+    divider: PortableTextDivider,
   },
   mark: {
     link: PortableTextLink,
