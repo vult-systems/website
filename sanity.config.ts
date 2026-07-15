@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
+import { table } from '@sanity/table';
 import { schemaTypes } from './src/sanity/schemaTypes';
 import { studioTheme } from './src/sanity/theme';
 
@@ -36,6 +37,6 @@ export default defineConfig({
   projectId,
   dataset,
   theme: studioTheme,
-  plugins: [structureTool({ structure }), visionTool({ defaultApiVersion: '2024-10-01' })],
+  plugins: [structureTool({ structure }), visionTool({ defaultApiVersion: '2024-10-01' }), table()],
   schema: { types: schemaTypes },
 });

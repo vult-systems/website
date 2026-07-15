@@ -1,16 +1,17 @@
 ---
+// Renders a table from the @sanity/table plugin.
+// Shape: { _type: 'table', rows: [{ _key, cells: string[] }] }
+// The first row is treated as the header.
 const { node } = Astro.props;
 const rows: Array<{ cells?: string[] }> = Array.isArray(node?.rows) ? node.rows : [];
-const hasHeader = node?.hasHeader !== false;
-const caption = node?.caption as string | undefined;
-const headerRow = hasHeader ? rows[0] : null;
-const bodyRows = hasHeader ? rows.slice(1) : rows;
+const headerRow = rows[0] ?? null;
+const bodyRows = rows.slice(1);
 ---
 
 {
   rows.length > 0 && (
     <figure class="my-8 not-prose overflow-x-auto">
-      <table class="w-full border-collapse text-left text-sm">
+      <table class="w-full table-fixed border-collapse text-left text-sm">
         {headerRow && (
           <thead>
             <tr>
@@ -37,11 +38,6 @@ const bodyRows = hasHeader ? rows.slice(1) : rows;
           ))}
         </tbody>
       </table>
-      {caption && (
-        <figcaption class="mt-2 text-center text-xs text-foreground-muted">
-          {caption}
-        </figcaption>
-      )}
     </figure>
   )
 }
