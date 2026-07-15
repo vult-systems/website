@@ -522,6 +522,38 @@ Chapters
 		display: block;
 	}
 }
+
+/* Glossary term deep-link anchors */
+.glossary-term-anchor {
+	position: relative;
+}
+.glossary-term-anchor.glossary-anchor-copied::after {
+	content: 'Copied!';
+	position: absolute;
+	left: 50%;
+	bottom: 135%;
+	transform: translateX(-50%);
+	white-space: nowrap;
+	font-size: 0.65rem;
+	line-height: 1;
+	padding: 0.2rem 0.4rem;
+	border-radius: 0.25rem;
+	background: hsl(var(--foreground));
+	color: hsl(var(--background));
+	font-family: 'Besley', serif;
+	pointer-events: none;
+}
+.glossary-term-highlight {
+	animation: glossary-flash 2.2s ease-out;
+}
+@keyframes glossary-flash {
+	0%, 15% {
+		background-color: hsl(var(--accent) / 0.18);
+	}
+	100% {
+		background-color: transparent;
+	}
+}
 </style>
 
 <script>
@@ -542,10 +574,49 @@ if (!raw) return false;
 const [courseSlug, projectSlug] = raw.split('/');
 if (!courseSlug || !document.getElementById(`detail-${courseSlug}`)) return false;
 openCourseDetail(courseSlug, false);
-if (projectSlug && document.getElementById(`project-${courseSlug}-${projectSlug}`)) {
+if (projectSlug) {
+if (document.getElementById(`project-${courseSlug}-${projectSlug}`)) {
 openProjectDetail(courseSlug, projectSlug, false);
+} else {
+scrollToGlossaryTerm(courseSlug, projectSlug);
+}
 }
 return true;
+};
+
+// Scroll to an in-page anchor (e.g. a glossary term) inside an open topic panel.
+const scrollToGlossaryTerm = (courseSlug: string, termSlug: string) => {
+const panel = document.getElementById(`detail-${courseSlug}`);
+const target = panel?.querySelector<HTMLElement>(`[id="${termSlug}"]`);
+if (!target) return;
+requestAnimationFrame(() => {
+target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+target.classList.add('glossary-term-highlight');
+window.setTimeout(() => target.classList.remove('glossary-term-highlight'), 2200);
+});
+};
+
+// Turn each glossary term's anchor into a shareable, click-to-copy deep link.
+const initGlossaryAnchors = () => {
+document.querySelectorAll<HTMLAnchorElement>('.glossary-term-anchor').forEach((anchor) => {
+if (anchor.dataset.bound === 'true') return;
+const panel = anchor.closest<HTMLElement>('.course-detail-content');
+const term = anchor.dataset.term;
+if (!panel || !term) return;
+const topicSlug = panel.id.replace(/^detail-/, '');
+const hash = `#${topicSlug}/${term}`;
+anchor.setAttribute('href', hash);
+anchor.dataset.bound = 'true';
+anchor.addEventListener('click', (e) => {
+e.preventDefault();
+history.pushState(null, '', hash);
+const url = `${location.origin}${location.pathname}${hash}`;
+navigator.clipboard?.writeText(url).catch(() => {});
+anchor.classList.add('glossary-anchor-copied');
+window.setTimeout(() => anchor.classList.remove('glossary-anchor-copied'), 1400);
+document.getElementById(term)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+});
 };
 
 // --- Course drill-down ---
@@ -777,8 +848,7 @@ openCourseDetail(link.dataset.slug!);
 });
 
 initCourseSearch();
-
-// Restore state from a shared URL (deep link), else auto-open Organic Modeling
+initGlossaryAnchors();
 if (!restoreFromHash()) {
 openCourseDetail('angd-1314', false);
 }

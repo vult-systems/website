@@ -2,6 +2,7 @@
 // Renders a table from the @sanity/table plugin.
 // Shape: { _type: 'table', rows: [{ _key, cells: string[] }] }
 // The first row is treated as the header.
+import { slugify } from '@/lib/sanity/toc';
 const { node } = Astro.props;
 const rows: Array<{ cells?: string[] }> = Array.isArray(node?.rows) ? node.rows : [];
 const headerRow = rows[0] ?? null;
@@ -30,20 +31,42 @@ const bodyRows = rows.slice(1);
           </thead>
         )}
         <tbody>
-          {bodyRows.map((row) => (
-            <tr>
-              {(row.cells ?? []).map((cell, i) => (
-                <td
-                  class:list={[
-                    'border border-border px-4 py-2 align-top break-words text-foreground-secondary',
-                    i === 0 && 'w-40 sm:w-48 font-medium text-foreground',
-                  ]}
-                >
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {bodyRows.map((row) => {
+            const cells = row.cells ?? [];
+            const termSlug = cells[0] ? slugify(cells[0]) : '';
+            return (
+              <tr class="glossary-term-row">
+                {cells.map((cell, i) =>
+                  i === 0 ? (
+                    <td
+                      id={termSlug || undefined}
+                      class="group/term relative w-40 border border-border px-4 py-2 align-top font-medium text-foreground scroll-mt-28 break-words sm:w-48"
+                    >
+                      <span>{cell}</span>
+                      {termSlug && (
+                        <a
+                          href={`#${termSlug}`}
+                          class="glossary-term-anchor ml-1 inline-flex align-middle text-foreground-muted opacity-0 transition-opacity hover:text-accent focus:opacity-100 group-hover/term:opacity-100"
+                          data-term={termSlug}
+                          aria-label={`Copy link to ${cell}`}
+                          title="Copy link to this term"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                          </svg>
+                        </a>
+                      )}
+                    </td>
+                  ) : (
+                    <td class="border border-border px-4 py-2 align-top break-words text-foreground-secondary">
+                      {cell}
+                    </td>
+                  )
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </figure>
