@@ -15,9 +15,12 @@ const bodyRows = rows.slice(1);
         {headerRow && (
           <thead>
             <tr>
-              {(headerRow.cells ?? []).map((cell) => (
+              {(headerRow.cells ?? []).map((cell, i) => (
                 <th
-                  class="border border-border bg-foreground/[0.04] px-4 py-2 font-medium text-foreground"
+                  class:list={[
+                    'border border-border bg-foreground/[0.04] px-4 py-2 font-medium text-foreground align-top break-words',
+                    i === 0 && 'w-40 sm:w-48',
+                  ]}
                   style="font-family: 'Besley', serif;"
                 >
                   {cell}
@@ -29,8 +32,13 @@ const bodyRows = rows.slice(1);
         <tbody>
           {bodyRows.map((row) => (
             <tr>
-              {(row.cells ?? []).map((cell) => (
-                <td class="border border-border px-4 py-2 align-top text-foreground-secondary">
+              {(row.cells ?? []).map((cell, i) => (
+                <td
+                  class:list={[
+                    'border border-border px-4 py-2 align-top break-words text-foreground-secondary',
+                    i === 0 && 'w-40 sm:w-48 font-medium text-foreground',
+                  ]}
+                >
                   {cell}
                 </td>
               ))}
