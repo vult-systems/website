@@ -1,0 +1,47 @@
+---
+const { node } = Astro.props;
+const rows: Array<{ cells?: string[] }> = Array.isArray(node?.rows) ? node.rows : [];
+const hasHeader = node?.hasHeader !== false;
+const caption = node?.caption as string | undefined;
+const headerRow = hasHeader ? rows[0] : null;
+const bodyRows = hasHeader ? rows.slice(1) : rows;
+---
+
+{
+  rows.length > 0 && (
+    <figure class="my-8 not-prose overflow-x-auto">
+      <table class="w-full border-collapse text-left text-sm">
+        {headerRow && (
+          <thead>
+            <tr>
+              {(headerRow.cells ?? []).map((cell) => (
+                <th
+                  class="border border-border bg-foreground/[0.04] px-4 py-2 font-medium text-foreground"
+                  style="font-family: 'Besley', serif;"
+                >
+                  {cell}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        )}
+        <tbody>
+          {bodyRows.map((row) => (
+            <tr>
+              {(row.cells ?? []).map((cell) => (
+                <td class="border border-border px-4 py-2 align-top text-foreground-secondary">
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {caption && (
+        <figcaption class="mt-2 text-center text-xs text-foreground-muted">
+          {caption}
+        </figcaption>
+      )}
+    </figure>
+  )
+}

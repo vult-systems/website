@@ -51,8 +51,17 @@ export const pipelineTopicType = defineType({
     defineField({ name: 'description', type: 'text', rows: 3 }),
     defineField({ name: 'order', type: 'number', initialValue: 0 }),
     defineField({
+      name: 'body',
+      title: 'Page content',
+      type: 'blockContent',
+      description:
+        'Rich text (and tables) shown directly on the topic\u2019s page. Use this for single-page topics like a Glossary that don\u2019t need threads. If this topic has threads, they take priority and this is ignored.',
+    }),
+    defineField({
       name: 'threads',
       type: 'array',
+      description:
+        'Optional. Sub-pages for this topic (e.g. Git, Perforce). Leave empty for a single-page topic that uses “Page content” above.',
       of: [defineArrayMember({ type: 'pipelineThread' })],
     }),
   ],

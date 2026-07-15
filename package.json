@@ -22,12 +22,12 @@
     "@astrojs/vercel": "^8.2.11",
     "@sanity/client": "^7.23.0",
     "@sanity/image-url": "^2.1.1",
-    "@sanity/vision": "^6.4.0",
+    "@sanity/vision": "^6.5.0",
     "astro": "^5.14.5",
     "astro-portabletext": "^0.13.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "sanity": "^6.4.0",
+    "sanity": "^6.5.0",
     "styled-components": "^6.4.3"
   },
   "devDependencies": {

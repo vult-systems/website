@@ -88,6 +88,7 @@ export const pipelineQuery = `
     "slug": slug.current,
     code,
     description,
+    body,
     threads[]{
       title,
       "slug": slug.current,

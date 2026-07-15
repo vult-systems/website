@@ -82,5 +82,59 @@ export const blockContentType = defineType({
         prepare: ({ variant }) => ({ title: `Divider (${variant || 'line'})` }),
       },
     }),
+    defineArrayMember({
+      type: 'object',
+      name: 'table',
+      title: 'Table',
+      fields: [
+        {
+          name: 'caption',
+          type: 'string',
+          title: 'Caption (optional)',
+        },
+        {
+          name: 'hasHeader',
+          type: 'boolean',
+          title: 'First row is a header',
+          initialValue: true,
+        },
+        {
+          name: 'rows',
+          type: 'array',
+          title: 'Rows',
+          of: [
+            defineArrayMember({
+              type: 'object',
+              name: 'row',
+              title: 'Row',
+              fields: [
+                {
+                  name: 'cells',
+                  type: 'array',
+                  title: 'Cells',
+                  of: [defineArrayMember({ type: 'string' })],
+                  options: { layout: 'grid' },
+                },
+              ],
+              preview: {
+                select: { cells: 'cells' },
+                prepare: ({ cells }) => ({
+                  title: Array.isArray(cells) && cells.length
+                    ? cells.join('  |  ')
+                    : 'Empty row',
+                }),
+              },
+            }),
+          ],
+        },
+      ],
+      preview: {
+        select: { rows: 'rows', caption: 'caption' },
+        prepare: ({ rows, caption }) => ({
+          title: caption || 'Table',
+          subtitle: `${Array.isArray(rows) ? rows.length : 0} row(s)`,
+        }),
+      },
+    }),
   ],
 });
