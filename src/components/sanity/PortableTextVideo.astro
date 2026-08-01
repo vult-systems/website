@@ -8,19 +8,32 @@ const src = fileUrlFor(node?.file?.asset?._ref) ?? node?.url;
 const poster = node?.poster
   ? urlFor(node.poster).width(1600).auto('format').url()
   : undefined;
+
+// Declare the MIME type so the browser doesn't misreport a transient network
+// abort as an unsupported-format error (learn page holds many hidden videos).
+const ext = src?.split('?')[0].split('.').pop()?.toLowerCase();
+const mime =
+  ext === 'webm'
+    ? 'video/webm'
+    : ext === 'ogv' || ext === 'ogg'
+      ? 'video/ogg'
+      : ext === 'mov'
+        ? 'video/quicktime'
+        : 'video/mp4';
 ---
 
 {
   src && (
     <figure class="my-8">
       <video
-        src={src}
         poster={poster}
         controls
         playsinline
-        preload="metadata"
+        preload="none"
         class="rounded-lg w-full bg-black"
-      />
+      >
+        <source src={src} type={mime} />
+      </video>
       {node?.caption && (
         <figcaption class="mt-3 text-sm text-foreground-secondary text-center">
           {node.caption}
