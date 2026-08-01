@@ -237,15 +237,6 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		to   { opacity: 1; }
 	}
 
-	/* Logo and title persist without animation */
-	::view-transition-old(site-logo),
-	::view-transition-new(site-logo),
-	::view-transition-old(site-title),
-	::view-transition-new(site-title) {
-		animation: none;
-		mix-blend-mode: normal;
-	}
-
 	/* Reduced motion support */
 	@media (prefers-reduced-motion: reduce) {
 		::view-transition-old(root),

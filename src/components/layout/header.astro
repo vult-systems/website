@@ -19,10 +19,8 @@ const currentPath = Astro.url.pathname;
                 alt={`${SITE.author.name} Logo`}
                 loading="eager"
                 class="dark:brightness-[.95] mb-[2px]"
-                transition:name="site-logo"
-                transition:animate="initial"
             />
-            <span class="text-xl font-normal text-foreground hover:text-accent transition-colors leading-none" transition:name="site-title" style="font-family: 'Besley', serif !important;">
+            <span class="text-xl font-normal text-foreground hover:text-accent transition-colors leading-none" style="font-family: 'Besley', serif !important;">
                 {SITE.name}
             </span>
         </a>
