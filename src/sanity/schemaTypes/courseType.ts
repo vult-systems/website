@@ -8,6 +8,30 @@ const YEARS = [
   'Senior',
 ];
 
+/** A sub-thread inside a course project (e.g. Reference, Intro to ZBrush, Block Ins). */
+export const courseProjectThreadType = defineType({
+  name: 'courseProjectThread',
+  title: 'Thread',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'title',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'slug',
+      type: 'slug',
+      options: { source: 'title', maxLength: 96 },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({ name: 'description', type: 'text', rows: 2 }),
+    defineField({ name: 'thumbnail', type: 'image', options: { hotspot: true } }),
+    defineField({ name: 'body', type: 'blockContent' }),
+  ],
+  preview: { select: { title: 'title', subtitle: 'description' } },
+});
+
 /** A project/assignment thread inside a course. */
 export const courseProjectType = defineType({
   name: 'courseProject',
@@ -28,6 +52,14 @@ export const courseProjectType = defineType({
     defineField({ name: 'description', type: 'text', rows: 2 }),
     defineField({ name: 'thumbnail', type: 'image', options: { hotspot: true } }),
     defineField({ name: 'body', type: 'blockContent' }),
+    defineField({
+      name: 'threads',
+      title: 'Threads',
+      type: 'array',
+      description:
+        'Optional. Sub-sections within this project (e.g. Reference, Intro to ZBrush, Block Ins). If any threads exist, they are shown as cards and take priority over the "body" above.',
+      of: [defineArrayMember({ type: 'courseProjectThread' })],
+    }),
   ],
   preview: { select: { title: 'title', subtitle: 'description' } },
 });

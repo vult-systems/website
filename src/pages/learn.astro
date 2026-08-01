@@ -48,12 +48,21 @@ interface CourseAssignment {
 	title: string;
 }
 
+interface CourseProjectThread {
+	slug: string;
+	title: string;
+	description?: string;
+	thumbnail?: any;
+	body?: any;
+}
+
 interface CourseProject {
 	slug: string;
 	title: string;
 	description?: string;
 	thumbnail?: any;
 	body?: any;
+	threads?: CourseProjectThread[];
 }
 
 interface Course {
@@ -212,16 +221,49 @@ widths={[800, 1200, 1920]}
 </Text>
 <nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
 {allCourses.map((course) => (
+<div class="course-nav-group">
 <a
 href={`#${courseId(course.code)}`}
 class="learn-nav-link block leading-snug group"
 data-slug={courseId(course.code)}
 data-course-nav="true"
-data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description}`).join(' ')}`.toLowerCase()}
+data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description} ${(project.threads ?? []).map((thread) => `${thread.title} ${thread.description ?? ''}`).join(' ')}`).join(' ')}`.toLowerCase()}
 >
 <span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{course.code}</span>
 <span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{course.title}</span>
 </a>
+{(course.projects?.length ?? 0) > 0 && (
+<div class="course-subnav hidden mt-3 space-y-2 border-l border-foreground-secondary/10 pl-3" data-course-subnav={courseId(course.code)}>
+{(course.projects ?? []).map((project) => (
+<div class="project-nav-group">
+<a
+href={`#${courseId(course.code)}/${project.slug}`}
+class="subnav-link learn-nav-link block leading-snug group"
+data-course={courseId(course.code)}
+data-project={project.slug}
+>
+<span class="learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{project.title}</span>
+</a>
+{(project.threads?.length ?? 0) > 0 && (
+<div class="project-subnav hidden mt-2 space-y-1.5 border-l border-foreground-secondary/10 pl-3" data-course={courseId(course.code)} data-project={project.slug}>
+{(project.threads ?? []).map((thread) => (
+<a
+href={`#${courseId(course.code)}/${project.slug}/${thread.slug}`}
+class="subnav-thread-link learn-nav-link block leading-snug group"
+data-course={courseId(course.code)}
+data-project={project.slug}
+data-thread={thread.slug}
+>
+<span class="learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{thread.title}</span>
+</a>
+))}
+</div>
+)}
+</div>
+))}
+</div>
+)}
+</div>
 ))}
 </nav>
 </div>
@@ -232,6 +274,7 @@ data-course-search={`${course.code} ${course.title} ${course.description} ${cour
 </Text>
 <nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
 {pipeline.map((topic) => (
+<div class="course-nav-group">
 <a
 href={`#${topic.slug}`}
 class="learn-nav-link block leading-snug group"
@@ -242,6 +285,21 @@ data-course-search={`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.descr
 <span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{topic.code ?? PIPELINE_CODE}</span>
 <span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{topic.title}</span>
 </a>
+{(topic.threads?.length ?? 0) > 0 && (
+<div class="course-subnav hidden mt-3 space-y-2 border-l border-foreground-secondary/10 pl-3" data-course-subnav={topic.slug}>
+{(topic.threads ?? []).map((thread) => (
+<a
+href={`#${topic.slug}/${thread.slug}`}
+class="subnav-link learn-nav-link block leading-snug group"
+data-course={topic.slug}
+data-project={thread.slug}
+>
+<span class="learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{thread.title}</span>
+</a>
+))}
+</div>
+)}
+</div>
 ))}
 </nav>
 </div>
@@ -258,7 +316,7 @@ data-course-search={`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.descr
 		<button
 			class="course-card w-full text-left rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-5 group"
 			data-course={courseId(course.code)}
-			data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description}`).join(' ')}`.toLowerCase()}
+			data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description} ${(project.threads ?? []).map((thread) => `${thread.title} ${thread.description ?? ''}`).join(' ')}`).join(' ')}`.toLowerCase()}
 		>
 			<div class="flex items-start justify-between gap-4">
 				<div class="min-w-0">
@@ -285,7 +343,7 @@ data-course-search={`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.descr
 		<div
 			id={`detail-${courseId(course.code)}`}
 			class="course-detail-content hidden"
-			data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description}`).join(' ')}`.toLowerCase()}
+			data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description} ${(project.threads ?? []).map((thread) => `${thread.title} ${thread.description ?? ''}`).join(' ')}`).join(' ')}`.toLowerCase()}
 		>
 			<div class="mb-8">
 				<div class="flex items-center gap-3 mb-3">
@@ -329,7 +387,7 @@ data-course-search={`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.descr
 						class="project-card w-full text-left rounded-lg border border-border bg-card overflow-hidden group transition-transform duration-300 hover:scale-[1.01]"
 						data-course={courseId(course.code)}
 						data-project={project.slug}
-						data-project-search={`${course.code} ${course.title} ${project.title} ${project.description}`.toLowerCase()}
+						data-project-search={`${course.code} ${course.title} ${project.title} ${project.description} ${(project.threads ?? []).map((thread) => `${thread.title} ${thread.description ?? ''}`).join(' ')}`.toLowerCase()}
 					>
 							<div class="flex items-stretch min-w-0">
 								<!-- Thumbnail -->
@@ -443,11 +501,42 @@ data-course-search={`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.descr
 		Back to Course
 	</button>
 	{allCourses.flatMap((course) => (course.projects || []).map((project) => (
-		<div id={`project-${courseId(course.code)}-${project.slug}`} class="project-detail-content hidden max-w-3xl mx-auto">
+		<div id={`project-${courseId(course.code)}-${project.slug}`} class:list={["project-detail-content", "hidden", (project.threads?.length ?? 0) === 0 && "max-w-3xl mx-auto"]}>
 			<Heading level={2} size="2xl" class="mb-3">{project.title}</Heading>
 			<div class="mb-6"><Badge variant="accent" size="sm">{course.code}</Badge></div>
 			<Text size="lg" variant="secondary" class="mb-8">{project.description}</Text>
-			{project.body ? (
+			{(project.threads?.length ?? 0) > 0 ? (
+				<!-- Thread cards (course > project > thread drill-down) -->
+				<div class="grid grid-cols-1 gap-4">
+					{(project.threads ?? []).map((thread) => (
+						<button
+							class="thread-card w-full text-left rounded-lg border border-border bg-card overflow-hidden group transition-transform duration-300 hover:scale-[1.01]"
+							data-course={courseId(course.code)}
+							data-project={project.slug}
+							data-thread={thread.slug}
+						>
+							<div class="flex items-stretch min-w-0">
+								<!-- Thumbnail -->
+								<div class="relative basis-[55%] shrink min-w-0 bg-foreground/5 flex items-center justify-center overflow-hidden rounded-l-lg" style="aspect-ratio: 3840/2426; isolation: isolate;">
+									{thread.thumbnail ? (
+										<img src={urlFor(thread.thumbnail).width(800).auto('format').url()} alt={thread.title} class="absolute inset-0 w-full h-full object-cover" loading="lazy" data-no-lightbox />
+									) : (
+										<svg class="w-10 h-10 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+										</svg>
+									)}
+								</div>
+								<!-- Text -->
+								<div class="flex-1 min-w-0 p-4 lg:p-6 flex flex-col justify-center border-l border-border">
+									<p class="text-base text-foreground-muted mb-3 truncate" style="font-family: 'Besley', serif !important;">{project.title}</p>
+									<p class="text-fluid-4xl font-normal text-foreground mb-4 leading-tight" style="font-family: 'Besley', serif !important;">{thread.title}</p>
+									<span class="inline-block text-base text-accent transition-colors duration-200" style="font-family: 'Besley', serif !important;">View Content</span>
+								</div>
+							</div>
+						</button>
+					))}
+				</div>
+			) : project.body ? (
 				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={project.body} /></div>
 			) : (
 				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
@@ -476,6 +565,36 @@ data-course-search={`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.descr
 			)}
 		</div>
 	)))}
+</div>
+
+<!-- Thread detail (3rd level: course > project > thread) -->
+<div id="thread-detail" class="hidden">
+	<button id="thread-back" class="flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors mb-8" style="font-family: 'Besley', serif !important;">
+		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
+		</svg>
+		Back to Project
+	</button>
+	{allCourses.flatMap((course) => (course.projects || []).flatMap((project) => (project.threads ?? []).map((thread) => (
+		<div id={`thread-${courseId(course.code)}-${project.slug}-${thread.slug}`} class="thread-detail-content hidden max-w-3xl mx-auto">
+			<Heading level={2} size="2xl" class="mb-3">{thread.title}</Heading>
+			<div class="mb-6 flex items-center gap-2">
+				<Badge variant="accent" size="sm">{course.code}</Badge>
+				<Badge variant="outline" size="sm">{project.title}</Badge>
+			</div>
+			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
+			{thread.body ? (
+				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={thread.body} /></div>
+			) : (
+				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
+					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+					<span class="text-sm text-foreground-muted">Content coming soon</span>
+				</div>
+			)}
+		</div>
+	))))}
 </div>
 
 </div>
@@ -563,19 +682,25 @@ let applyCourseSearchFilters: (() => void) | null = null;
 
 // --- Shareable deep links (URL <-> open detail) ---
 // Course:  /learn#<courseSlug>
-// Thread:  /learn#<courseSlug>/<threadSlug>
-const updateUrl = (courseSlug: string, projectSlug: string | null) => {
-const hash = projectSlug ? `#${courseSlug}/${projectSlug}` : `#${courseSlug}`;
+// Project: /learn#<courseSlug>/<projectSlug>
+// Thread:  /learn#<courseSlug>/<projectSlug>/<threadSlug>
+const updateUrl = (courseSlug: string, projectSlug: string | null, threadSlug: string | null = null) => {
+let hash = `#${courseSlug}`;
+if (projectSlug) hash += `/${projectSlug}`;
+if (projectSlug && threadSlug) hash += `/${threadSlug}`;
 if (location.hash !== hash) history.pushState(null, '', hash);
 };
 const restoreFromHash = (): boolean => {
 const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
 if (!raw) return false;
-const [courseSlug, projectSlug] = raw.split('/');
+const [courseSlug, projectSlug, threadSlug] = raw.split('/');
 if (!courseSlug || !document.getElementById(`detail-${courseSlug}`)) return false;
 openCourseDetail(courseSlug, false);
 if (projectSlug) {
-if (document.getElementById(`project-${courseSlug}-${projectSlug}`)) {
+if (threadSlug && document.getElementById(`thread-${courseSlug}-${projectSlug}-${threadSlug}`)) {
+openProjectDetail(courseSlug, projectSlug, false);
+openThreadDetail(courseSlug, projectSlug, threadSlug, false);
+} else if (document.getElementById(`project-${courseSlug}-${projectSlug}`)) {
 openProjectDetail(courseSlug, projectSlug, false);
 } else {
 scrollToGlossaryTerm(courseSlug, projectSlug);
@@ -619,9 +744,41 @@ document.getElementById(term)?.scrollIntoView({ behavior: 'smooth', block: 'star
 });
 };
 
+// --- Sidebar sub-navigation (projects / threads under the active course) ---
+const syncSidebarSubnav = (
+courseSlug: string,
+projectSlug: string | null = null,
+threadSlug: string | null = null,
+) => {
+document.querySelectorAll<HTMLElement>('.course-subnav').forEach((el) => {
+el.classList.toggle('hidden', el.dataset.courseSubnav !== courseSlug);
+});
+document.querySelectorAll<HTMLElement>('.subnav-link').forEach((link) => {
+link.classList.toggle(
+'active',
+link.dataset.course === courseSlug && link.dataset.project === projectSlug,
+);
+});
+document.querySelectorAll<HTMLElement>('.project-subnav').forEach((el) => {
+el.classList.toggle(
+'hidden',
+!(el.dataset.course === courseSlug && el.dataset.project === projectSlug),
+);
+});
+document.querySelectorAll<HTMLElement>('.subnav-thread-link').forEach((link) => {
+link.classList.toggle(
+'active',
+link.dataset.course === courseSlug &&
+link.dataset.project === projectSlug &&
+link.dataset.thread === threadSlug,
+);
+});
+};
+
 // --- Course drill-down ---
 const openCourseDetail = (courseSlug: string, updateHash = true) => {
 document.getElementById('project-detail')?.classList.add('hidden');
+document.getElementById('thread-detail')?.classList.add('hidden');
 document.getElementById('sidebar-project-chapters')?.classList.add('hidden');
 document.getElementById('chapters-aside')?.classList.remove('chapters-visible');
 const list = document.getElementById('classes-list');
@@ -635,6 +792,7 @@ el.classList.toggle('hidden', el.id !== `detail-${courseSlug}`);
 document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]').forEach((link) => {
 link.classList.toggle('active', link.dataset.slug === courseSlug);
 });
+syncSidebarSubnav(courseSlug);
 initProjectCards();
 if (applyCourseSearchFilters) applyCourseSearchFilters();
 if (updateHash) updateUrl(courseSlug, null);
@@ -793,18 +951,63 @@ setActiveChapter(firstId);
 };
 
 // --- Project drill-down ---
+// Track the currently open course/project so thread-level "Back" can return to it.
+let activeCourseSlug = '';
+let activeProjectSlug = '';
+
 const openProjectDetail = (courseSlug: string, projectSlug: string, updateHash = true) => {
 const detail = document.getElementById('classes-detail');
 const projectDetail = document.getElementById('project-detail');
 if (!detail || !projectDetail) return;
+activeCourseSlug = courseSlug;
+activeProjectSlug = projectSlug;
 detail.classList.add('hidden');
+document.getElementById('thread-detail')?.classList.add('hidden');
 projectDetail.classList.remove('hidden');
 document.querySelectorAll<HTMLElement>('.project-detail-content').forEach((el) => {
 el.classList.toggle('hidden', el.id !== `project-${courseSlug}-${projectSlug}`);
 });
 const activeProject = document.getElementById(`project-${courseSlug}-${projectSlug}`) as HTMLElement | null;
-if (activeProject) buildProjectChapterNav(activeProject);
+if (activeProject) {
+initThreadCards();
+buildProjectChapterNav(activeProject);
+}
+syncSidebarSubnav(courseSlug, projectSlug);
 if (updateHash) updateUrl(courseSlug, projectSlug);
+};
+
+// --- Thread drill-down (3rd level: course > project > thread) ---
+const openThreadDetail = (courseSlug: string, projectSlug: string, threadSlug: string, updateHash = true) => {
+const projectDetail = document.getElementById('project-detail');
+const threadDetail = document.getElementById('thread-detail');
+if (!projectDetail || !threadDetail) return;
+projectDetail.classList.add('hidden');
+threadDetail.classList.remove('hidden');
+document.querySelectorAll<HTMLElement>('.thread-detail-content').forEach((el) => {
+el.classList.toggle('hidden', el.id !== `thread-${courseSlug}-${projectSlug}-${threadSlug}`);
+});
+const activeThread = document.getElementById(`thread-${courseSlug}-${projectSlug}-${threadSlug}`) as HTMLElement | null;
+if (activeThread) buildProjectChapterNav(activeThread);
+syncSidebarSubnav(courseSlug, projectSlug, threadSlug);
+if (updateHash) updateUrl(courseSlug, projectSlug, threadSlug);
+};
+
+const initThreadCards = () => {
+document.querySelectorAll<HTMLElement>('.thread-card').forEach((card) => {
+const fresh = card.cloneNode(true) as HTMLElement;
+card.parentNode?.replaceChild(fresh, card);
+});
+document.querySelectorAll<HTMLElement>('.thread-card').forEach((card) => {
+card.addEventListener('click', () => openThreadDetail(card.dataset.course!, card.dataset.project!, card.dataset.thread!));
+});
+const threadBackBtn = document.getElementById('thread-back');
+if (threadBackBtn) {
+const freshBack = threadBackBtn.cloneNode(true) as HTMLElement;
+threadBackBtn.parentNode?.replaceChild(freshBack, threadBackBtn);
+document.getElementById('thread-back')?.addEventListener('click', () => {
+openProjectDetail(activeCourseSlug, activeProjectSlug);
+});
+}
 };
 
 const initProjectCards = () => {
@@ -844,6 +1047,20 @@ document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]'
 link.addEventListener('click', (e) => {
 e.preventDefault();
 openCourseDetail(link.dataset.slug!);
+});
+});
+
+// Sidebar sub-nav: project links (and pipeline threads) open the project/thread detail.
+document.querySelectorAll<HTMLElement>('.subnav-link').forEach((link) => {
+link.addEventListener('click', (e) => {
+e.preventDefault();
+openProjectDetail(link.dataset.course!, link.dataset.project!);
+});
+});
+document.querySelectorAll<HTMLElement>('.subnav-thread-link').forEach((link) => {
+link.addEventListener('click', (e) => {
+e.preventDefault();
+openThreadDetail(link.dataset.course!, link.dataset.project!, link.dataset.thread!);
 });
 });
 

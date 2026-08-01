@@ -75,7 +75,14 @@ export const coursesQuery = `
       "slug": slug.current,
       description,
       thumbnail,
-      body
+      body,
+      threads[]{
+        title,
+        "slug": slug.current,
+        description,
+        thumbnail,
+        body
+      }
     }
   }
 `;
