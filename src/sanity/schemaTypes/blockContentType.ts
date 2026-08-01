@@ -83,6 +83,39 @@ export const blockContentType = defineType({
       },
     }),
     defineArrayMember({
+      type: 'object',
+      name: 'video',
+      title: 'Video',
+      fields: [
+        {
+          name: 'file',
+          title: 'Video file',
+          type: 'file',
+          options: { accept: 'video/*' },
+        },
+        {
+          name: 'url',
+          title: 'External URL',
+          type: 'url',
+          description:
+            'Optional. Direct video URL (e.g. an .mp4/.webm link). Used only when no file is uploaded above.',
+          validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
+        },
+        {
+          name: 'poster',
+          title: 'Poster image',
+          type: 'image',
+          options: { hotspot: true },
+          description: 'Optional. Thumbnail shown before the video plays.',
+        },
+        { name: 'caption', title: 'Caption', type: 'string' },
+      ],
+      preview: {
+        select: { title: 'caption', media: 'poster' },
+        prepare: ({ title, media }) => ({ title: title || 'Video', media }),
+      },
+    }),
+    defineArrayMember({
       type: 'table',
       name: 'table',
       title: 'Table',

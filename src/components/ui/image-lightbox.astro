@@ -168,7 +168,9 @@
       imageElement.style.cursor = 'pointer';
       imageElement.classList.add('hover:scale-[1.02]', 'transition-transform', 'duration-300');
       imageElement.addEventListener('click', () => {
-        openLightbox(imageElement.src, imageElement.alt);
+        // Prefer a full-resolution source so zooming stays crisp.
+        const fullSrc = imageElement.dataset.full || imageElement.currentSrc || imageElement.src;
+        openLightbox(fullSrc, imageElement.alt);
       });
     });
   };

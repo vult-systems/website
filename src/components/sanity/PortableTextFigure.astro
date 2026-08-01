@@ -5,6 +5,13 @@ const { node } = Astro.props;
 
 const src = urlFor(node).width(1200).auto('format').url();
 const src2x = urlFor(node).width(2400).auto('format').url();
+// Full-resolution source for the zoomable lightbox (clamped to the asset size).
+const full = urlFor(node).width(3840).auto('format').url();
+
+// Intrinsic size (from the asset ref `image-<hash>-<w>x<h>-<ext>`) to prevent layout shift.
+const dims = (node?.asset?._ref as string | undefined)?.match(/-(\d+)x(\d+)-/);
+const width = dims ? Number(dims[1]) : undefined;
+const height = dims ? Number(dims[2]) : undefined;
 ---
 
 <figure class="my-8">
@@ -12,6 +19,9 @@ const src2x = urlFor(node).width(2400).auto('format').url();
     src={src}
     srcset={`${src} 1200w, ${src2x} 2400w`}
     sizes="(max-width: 768px) 100vw, 1200px"
+    width={width}
+    height={height}
+    data-full={full}
     alt={node?.alt ?? ''}
     class="rounded-lg w-full"
     loading="lazy"

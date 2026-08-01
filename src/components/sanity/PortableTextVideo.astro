@@ -1,0 +1,31 @@
+---
+import { urlFor, fileUrlFor } from '@/lib/sanity/image';
+
+const { node } = Astro.props;
+
+// Prefer an uploaded Sanity file; fall back to an external direct-video URL.
+const src = fileUrlFor(node?.file?.asset?._ref) ?? node?.url;
+const poster = node?.poster
+  ? urlFor(node.poster).width(1600).auto('format').url()
+  : undefined;
+---
+
+{
+  src && (
+    <figure class="my-8">
+      <video
+        src={src}
+        poster={poster}
+        controls
+        playsinline
+        preload="metadata"
+        class="rounded-lg w-full bg-black"
+      />
+      {node?.caption && (
+        <figcaption class="mt-3 text-sm text-foreground-secondary text-center">
+          {node.caption}
+        </figcaption>
+      )}
+    </figure>
+  )
+}
