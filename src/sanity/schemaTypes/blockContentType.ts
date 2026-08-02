@@ -120,5 +120,26 @@ export const blockContentType = defineType({
       name: 'table',
       title: 'Table',
     }),
+    defineArrayMember({
+      type: 'object',
+      name: 'slideBreak',
+      title: 'Slide break',
+      description:
+        'Marks where a new slide starts in Present mode. Invisible on the page. If a lecture has any slide breaks, Present splits only at these points; otherwise it auto-splits by headings.',
+      fields: [
+        {
+          name: 'label',
+          type: 'string',
+          title: 'Note (optional)',
+          description: 'Only shown in the editor to help you find this break.',
+        },
+      ],
+      preview: {
+        select: { label: 'label' },
+        prepare: ({ label }) => ({
+          title: label ? `Slide break \u2014 ${label}` : 'Slide break',
+        }),
+      },
+    }),
   ],
 });

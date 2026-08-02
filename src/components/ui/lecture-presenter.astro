@@ -114,7 +114,7 @@
           (subtitle ? `<p class="lp-subtitle">${subtitle}</p>` : '') +
         `</div>`
       );
-      // Group remaining content by top-level H2/H1 headings.
+      // Group remaining content into slides.
       let group: HTMLElement[] = [];
       const flush = () => {
         if (!group.length) return;
@@ -124,12 +124,22 @@
         out.push(deck.outerHTML);
         group = [];
       };
-      Array.from(body.children).forEach((node) => {
-        const tag = (node as HTMLElement).tagName;
-        if (tag === 'H1' || tag === 'H2' || tag === 'H3') {
-          flush();
+      const children = Array.from(body.children) as HTMLElement[];
+      // Author-controlled breaks take priority; otherwise auto-split by heading.
+      const hasManualBreaks = children.some((n) => n.hasAttribute('data-slide-break'));
+      children.forEach((node) => {
+        if (hasManualBreaks) {
+          if (node.hasAttribute('data-slide-break')) {
+            flush();
+            return; // don't render the marker itself
+          }
+        } else {
+          const tag = node.tagName;
+          if (tag === 'H1' || tag === 'H2' || tag === 'H3') {
+            flush();
+          }
         }
-        group.push(node as HTMLElement);
+        group.push(node);
       });
       flush();
       return out;

@@ -140,6 +140,11 @@
  *   --reading-tracking      : letter-spacing
  * ------------------------------------------------------------------------- */
 @layer components {
+  /* Presentation-only slide boundary: never visible in the reading view. */
+  .lecture-slide-break {
+    display: none;
+  }
+
   .prose {
     --reading-font: 'Besley', ui-serif, Georgia, serif;
     --reading-size: 1.1875rem;     /* 19px */
