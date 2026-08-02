@@ -8,6 +8,8 @@ import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Badge from '@/components/ui/badge.astro';
 import ImageLightbox from '@/components/ui/image-lightbox.astro';
+import LectureActions from '@/components/ui/lecture-actions.astro';
+import LecturePresenter from '@/components/ui/lecture-presenter.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getLearnPageSEO } from '@/config/seo';
@@ -468,8 +470,11 @@ data-project={thread.slug}
 			</div>
 			) : topic.body ? (
 			<!-- Single-page topic (e.g. Glossary): render body directly, no threads -->
-			<div class="prose prose-lg dark:prose-invert max-w-none">
-				<PortableText value={topic.body} />
+			<div class="lecture-block" data-lecture-title={topic.title} data-lecture-subtitle={topic.description}>
+				<LectureActions />
+				<div class="prose prose-lg dark:prose-invert max-w-none lecture-body">
+					<PortableText value={topic.body} />
+				</div>
 			</div>
 			) : (
 			<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
@@ -536,7 +541,10 @@ data-project={thread.slug}
 					))}
 				</div>
 			) : project.body ? (
-				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={project.body} /></div>
+				<div class="lecture-block" data-lecture-title={project.title} data-lecture-subtitle={project.description}>
+					<LectureActions />
+					<div class="prose prose-lg dark:prose-invert max-w-none lecture-body"><PortableText value={project.body} /></div>
+				</div>
 			) : (
 				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
 					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -553,7 +561,10 @@ data-project={thread.slug}
 			<div class="mb-6"><Badge variant="accent" size="sm">{topic.title}</Badge></div>
 			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
 			{thread.body ? (
-				<div class="prose prose-lg dark:prose-invert max-w-3xl"><PortableText value={thread.body} /></div>
+				<div class="lecture-block" data-lecture-title={thread.title} data-lecture-subtitle={thread.description}>
+					<LectureActions />
+					<div class="prose prose-lg dark:prose-invert max-w-3xl lecture-body"><PortableText value={thread.body} /></div>
+				</div>
 			) : (
 				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
 					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -583,7 +594,10 @@ data-project={thread.slug}
 			</div>
 			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
 			{thread.body ? (
-				<div class="prose prose-lg dark:prose-invert max-w-none"><PortableText value={thread.body} /></div>
+				<div class="lecture-block" data-lecture-title={thread.title} data-lecture-subtitle={thread.description}>
+					<LectureActions />
+					<div class="prose prose-lg dark:prose-invert max-w-none lecture-body"><PortableText value={thread.body} /></div>
+				</div>
 			) : (
 				<div class="aspect-video rounded-lg border border-border bg-foreground/5 flex flex-col items-center justify-center">
 					<svg class="w-10 h-10 text-foreground-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -616,6 +630,7 @@ Chapters
 </PageMain>
 <Footer />
 <ImageLightbox />
+<LecturePresenter />
 </BaseLayout>
 
 <style>

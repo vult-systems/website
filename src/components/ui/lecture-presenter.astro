@@ -1,0 +1,248 @@
+---
+/**
+ * Lecture Presenter
+ *
+ * Turns any `.lecture-block` (a lecture body authored in Sanity) into a
+ * fullscreen, keyboard-driven slide deck for teaching in class, plus a
+ * clean print-to-PDF of the same content. Mount once per page.
+ */
+---
+
+<div id="lecture-presenter" class="fixed inset-0 z-[9998] hidden bg-background text-foreground">
+  <div class="absolute inset-0 flex flex-col">
+    <!-- Top bar -->
+    <div class="flex items-center justify-between gap-4 px-6 py-3 border-b border-foreground-secondary/10">
+      <span id="lp-title" class="truncate text-sm text-foreground-secondary" style="font-family: 'Besley', serif !important;"></span>
+      <div class="flex items-center gap-2">
+        <button id="lp-fs" class="rounded-md border border-foreground/20 bg-background/90 px-3 h-9 text-xs text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" style="font-family: 'Besley', serif !important;">Fullscreen</button>
+        <button id="lp-exit" class="rounded-md border border-foreground/20 bg-background/90 px-3 h-9 text-xs text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" style="font-family: 'Besley', serif !important;">Exit&nbsp;(Esc)</button>
+      </div>
+    </div>
+
+    <!-- Slide stage -->
+    <div class="relative flex-1 overflow-hidden">
+      <div id="lp-slide" class="absolute inset-0 overflow-auto px-6 sm:px-12 lg:px-24 py-10 flex flex-col justify-center"></div>
+      <!-- Click zones for prev/next -->
+      <button id="lp-zone-prev" class="absolute left-0 top-0 h-full w-1/4 cursor-w-resize opacity-0" aria-label="Previous slide"></button>
+      <button id="lp-zone-next" class="absolute right-0 top-0 h-full w-1/2 cursor-e-resize opacity-0" aria-label="Next slide"></button>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center gap-4 px-6 py-3 border-t border-foreground-secondary/10">
+      <button id="lp-prev" class="rounded-md border border-foreground/20 bg-background/90 w-9 h-9 flex items-center justify-center text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" aria-label="Previous slide">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+      </button>
+      <div class="flex-1 h-1 rounded bg-foreground/10 overflow-hidden">
+        <div id="lp-progress" class="h-full bg-accent transition-[width] duration-200" style="width: 0%"></div>
+      </div>
+      <span id="lp-counter" class="text-xs tabular-nums text-foreground-secondary" style="font-family: 'Besley', serif !important;">1 / 1</span>
+      <button id="lp-next" class="rounded-md border border-foreground/20 bg-background/90 w-9 h-9 flex items-center justify-center text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" aria-label="Next slide">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  /* --- Presenter slide typography --- */
+  #lecture-presenter #lp-slide .lp-deck {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+  #lecture-presenter #lp-slide :is(h1, h2, h3) {
+    font-family: 'Besley', serif !important;
+    line-height: 1.1;
+  }
+  #lecture-presenter #lp-slide h1 { font-size: clamp(2rem, 5vw, 4rem); }
+  #lecture-presenter #lp-slide h2 { font-size: clamp(1.75rem, 4vw, 3.25rem); margin-bottom: 1rem; }
+  #lecture-presenter #lp-slide h3 { font-size: clamp(1.35rem, 3vw, 2.25rem); }
+  #lecture-presenter #lp-slide p,
+  #lecture-presenter #lp-slide li { font-size: clamp(1.05rem, 1.9vw, 1.7rem); line-height: 1.5; }
+  #lecture-presenter #lp-slide ul,
+  #lecture-presenter #lp-slide ol { padding-left: 1.5em; }
+  #lecture-presenter #lp-slide li { margin-block: 0.4em; }
+  #lecture-presenter #lp-slide img,
+  #lecture-presenter #lp-slide video {
+    max-height: 62vh;
+    width: auto;
+    max-width: 100%;
+    margin-inline: auto;
+    border-radius: 0.5rem;
+  }
+  #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
+  #lecture-presenter #lp-slide .lp-subtitle { font-size: clamp(1.1rem, 2vw, 1.6rem); opacity: 0.7; }
+
+  /* --- Print to PDF: show only the active lecture --- */
+  @media print {
+    body.printing-lecture #lecture-presenter,
+    body.printing-lecture .lecture-actions { display: none !important; }
+    body.printing-lecture * { visibility: hidden !important; }
+    body.printing-lecture .print-target,
+    body.printing-lecture .print-target * { visibility: visible !important; }
+    body.printing-lecture .print-target {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      color: #111 !important;
+      background: #fff !important;
+    }
+    body.printing-lecture .print-target :is(h1, h2, h3, h4, p, li, span, td, th, figcaption) {
+      color: #111 !important;
+    }
+    body.printing-lecture .print-target img { break-inside: avoid; }
+  }
+</style>
+
+<script>
+  const initLecturePresenter = () => {
+    if ((window as any).__lecturePresenterBound) return;
+    (window as any).__lecturePresenterBound = true;
+
+    const $ = (id: string) => document.getElementById(id);
+
+    let slides: string[] = [];
+    let index = 0;
+
+    const buildSlides = (body: HTMLElement, title: string, subtitle: string): string[] => {
+      const out: string[] = [];
+      // Title slide
+      out.push(
+        `<div class="lp-deck text-center flex flex-col items-center justify-center gap-4">` +
+          `<h1>${title || 'Lecture'}</h1>` +
+          (subtitle ? `<p class="lp-subtitle">${subtitle}</p>` : '') +
+        `</div>`
+      );
+      // Group remaining content by top-level H2/H1 headings.
+      let group: HTMLElement[] = [];
+      const flush = () => {
+        if (!group.length) return;
+        const deck = document.createElement('div');
+        deck.className = 'lp-deck';
+        group.forEach((n) => deck.appendChild(n.cloneNode(true)));
+        out.push(deck.outerHTML);
+        group = [];
+      };
+      Array.from(body.children).forEach((node) => {
+        const tag = (node as HTMLElement).tagName;
+        if (tag === 'H1' || tag === 'H2' || tag === 'H3') {
+          flush();
+        }
+        group.push(node as HTMLElement);
+      });
+      flush();
+      return out;
+    };
+
+    const render = () => {
+      const slide = $('lp-slide');
+      const total = slides.length;
+      if (!slide || !total) return;
+      index = Math.max(0, Math.min(index, total - 1));
+      slide.innerHTML = slides[index];
+      slide.scrollTop = 0;
+      const counter = $('lp-counter');
+      if (counter) counter.textContent = `${index + 1} / ${total}`;
+      const progress = $('lp-progress');
+      if (progress) progress.style.width = `${((index + 1) / total) * 100}%`;
+    };
+
+    const go = (delta: number) => { index += delta; render(); };
+
+    const open = (body: HTMLElement, title: string, subtitle: string) => {
+      slides = buildSlides(body, title, subtitle);
+      index = 0;
+      const titleEl = $('lp-title');
+      if (titleEl) titleEl.textContent = title;
+      const p = $('lecture-presenter');
+      if (!p) return;
+      p.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      render();
+      p.requestFullscreen?.().catch(() => {});
+    };
+
+    const close = () => {
+      const p = $('lecture-presenter');
+      if (!p) return;
+      p.classList.add('hidden');
+      document.body.style.overflow = '';
+      if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    };
+
+    const isOpen = () => {
+      const p = $('lecture-presenter');
+      return p && !p.classList.contains('hidden');
+    };
+
+    // --- Delegated triggers (survive View Transitions) ---
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+
+      const presentBtn = target.closest('.lecture-present-btn');
+      if (presentBtn) {
+        const block = presentBtn.closest('.lecture-block') as HTMLElement | null;
+        const bodyEl = block?.querySelector('.lecture-body') as HTMLElement | null;
+        if (block && bodyEl) {
+          open(bodyEl, block.dataset.lectureTitle || document.title, block.dataset.lectureSubtitle || '');
+        }
+        return;
+      }
+
+      const printBtn = target.closest('.lecture-print-btn');
+      if (printBtn) {
+        const block = printBtn.closest('.lecture-block') as HTMLElement | null;
+        if (!block) return;
+        document.body.classList.add('printing-lecture');
+        block.classList.add('print-target');
+        const cleanup = () => {
+          document.body.classList.remove('printing-lecture');
+          block.classList.remove('print-target');
+          window.removeEventListener('afterprint', cleanup);
+        };
+        window.addEventListener('afterprint', cleanup);
+        window.print();
+        return;
+      }
+
+      if (!isOpen()) return;
+      if (target.closest('#lp-exit')) return close();
+      if (target.closest('#lp-next') || target.closest('#lp-zone-next')) return go(1);
+      if (target.closest('#lp-prev') || target.closest('#lp-zone-prev')) return go(-1);
+      if (target.closest('#lp-fs')) {
+        const p = $('lecture-presenter');
+        if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+        else p?.requestFullscreen?.().catch(() => {});
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!isOpen()) return;
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'PageDown':
+        case ' ':
+          e.preventDefault(); go(1); break;
+        case 'ArrowLeft':
+        case 'PageUp':
+          e.preventDefault(); go(-1); break;
+        case 'Home':
+          e.preventDefault(); index = 0; render(); break;
+        case 'End':
+          e.preventDefault(); index = slides.length - 1; render(); break;
+        case 'Escape':
+          e.preventDefault(); close(); break;
+        case 'f':
+        case 'F':
+          e.preventDefault();
+          if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+          else $('lecture-presenter')?.requestFullscreen?.().catch(() => {});
+          break;
+      }
+    });
+  };
+
+  initLecturePresenter();
+  document.addEventListener('astro:page-load', initLecturePresenter);
+</script>
