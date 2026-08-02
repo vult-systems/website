@@ -70,7 +70,7 @@
 
   /* --- Presenter slide layout & typography --- */
   #lecture-presenter #lp-slide {
-    padding: clamp(1.75rem, 5cqh, 3rem) clamp(1.25rem, 2.5cqw, 2.5rem);
+    padding: clamp(2rem, 5cqh, 3rem) clamp(2rem, 4cqw, 4rem);
     display: flex;
     flex-direction: column;
     justify-content: safe center;
@@ -98,23 +98,24 @@
     text-align: center;
     gap: 0.75rem;
   }
-  /* Slide header (Title + optional subtitle) */
+  /* Slide header (Title + subtle divider) */
   #lecture-presenter #lp-slide .lp-head {
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid hsl(var(--foreground-secondary) / 0.15);
+    margin-bottom: clamp(1.25rem, 2.5cqh, 2rem);
+    padding-bottom: clamp(0.6rem, 1.2cqh, 1rem);
+    border-bottom: 1px solid hsl(var(--foreground-secondary) / 0.18);
   }
   #lecture-presenter #lp-slide .lp-title-main {
-    line-height: 1.1;
-    font-size: clamp(1.9rem, 4vw, 3.25rem);
+    line-height: 1.08;
+    font-size: clamp(2.1rem, 4.6vw, 3.75rem);
     font-weight: 400;
   }
   #lecture-presenter #lp-slide .lp-title-slide .lp-title-main {
-    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-size: clamp(2.75rem, 6.5vw, 5.5rem);
   }
   #lecture-presenter #lp-slide .lp-title-sub {
-    opacity: 0.7;
-    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    opacity: 0.65;
+    font-size: clamp(1.15rem, 2.1vw, 1.7rem);
+    margin-top: 0.25rem;
   }
   /* Body */
   #lecture-presenter #lp-slide :is(h2, h3) { line-height: 1.15; }
@@ -138,6 +139,29 @@
   }
   #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
   #lecture-presenter #lp-slide strong { font-weight: 700; }
+
+  /* Image alignment (figure[data-align]) */
+  #lecture-presenter #lp-slide figure[data-align='left'] { margin-inline: 0 auto; max-width: 70%; }
+  #lecture-presenter #lp-slide figure[data-align='right'] { margin-inline: auto 0; max-width: 70%; }
+  #lecture-presenter #lp-slide figure[data-align='center'] { margin-inline: auto; }
+  #lecture-presenter #lp-slide figure[data-align='full'] { max-width: none; }
+  #lecture-presenter #lp-slide figure[data-align='full'] img,
+  #lecture-presenter #lp-slide figure[data-align='full'] video { max-height: 70cqh; }
+
+  /* Layout presets */
+  #lecture-presenter #lp-slide .lp-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 3cqw, 3rem);
+    align-items: center;
+  }
+  #lecture-presenter #lp-slide .lp-cols.image-right .lp-col-media { order: 2; }
+  #lecture-presenter #lp-slide .lp-cols .lp-col-media figure { margin: 0; max-width: none; }
+  #lecture-presenter #lp-slide .lp-cols .lp-col-media img,
+  #lecture-presenter #lp-slide .lp-cols .lp-col-media video { max-height: 66cqh; }
+  #lecture-presenter #lp-slide .lp-two-col { column-count: 2; column-gap: clamp(1.75rem, 3cqw, 3rem); }
+  #lecture-presenter #lp-slide .lp-two-col :is(h2, h3) { column-span: all; }
+  #lecture-presenter #lp-slide .lp-body-center { text-align: center; }
 </style>
 
 <script>
@@ -157,7 +181,7 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 
-    type Group = { title: string; subtitle: string; nodes: HTMLElement[] };
+    type Group = { title: string; subtitle: string; layout: string; nodes: HTMLElement[] };
 
     const titleSlide = (title: string, subtitle: string) =>
       `<div class="lp-deck lp-title-slide">` +
@@ -166,9 +190,6 @@
       `</div>`;
 
     const contentSlide = (g: Group) => {
-      const bodyWrap = document.createElement('div');
-      bodyWrap.className = 'lp-body';
-      g.nodes.forEach((n) => bodyWrap.appendChild(n.cloneNode(true)));
       const head =
         g.title || g.subtitle
           ? `<div class="lp-head">` +
@@ -176,7 +197,49 @@
               (g.subtitle ? `<p class="lp-title-sub">${esc(g.subtitle)}</p>` : '') +
             `</div>`
           : '';
-      return `<div class="lp-deck lp-content-slide">${head}${bodyWrap.outerHTML}</div>`;
+
+      const cloneHtml = (nodes: HTMLElement[]) => {
+        const wrap = document.createElement('div');
+        nodes.forEach((n) => wrap.appendChild(n.cloneNode(true)));
+        return wrap.innerHTML;
+      };
+
+      // Section: large centered title (+ optional centered body).
+      if (g.layout === 'section') {
+        const body = cloneHtml(g.nodes);
+        return (
+          `<div class="lp-deck lp-title-slide">` +
+            (g.title ? `<h1 class="lp-title-main">${esc(g.title)}</h1>` : '') +
+            (g.subtitle ? `<p class="lp-title-sub">${esc(g.subtitle)}</p>` : '') +
+            (body ? `<div class="lp-body lp-body-center">${body}</div>` : '') +
+          `</div>`
+        );
+      }
+
+      // Image on one side, text on the other.
+      if (g.layout === 'image-left' || g.layout === 'image-right') {
+        const media = g.nodes.find(
+          (n) => n.tagName === 'FIGURE' || !!n.querySelector?.('img, video')
+        );
+        const rest = g.nodes.filter((n) => n !== media);
+        const mediaHtml = media ? (media.cloneNode(true) as HTMLElement).outerHTML : '';
+        return (
+          `<div class="lp-deck lp-content-slide">${head}` +
+            `<div class="lp-cols ${g.layout}">` +
+              `<div class="lp-col-media">${mediaHtml}</div>` +
+              `<div class="lp-col-text lp-body">${cloneHtml(rest)}</div>` +
+            `</div>` +
+          `</div>`
+        );
+      }
+
+      // Two-column body.
+      if (g.layout === 'two-col') {
+        return `<div class="lp-deck lp-content-slide">${head}<div class="lp-body lp-two-col">${cloneHtml(g.nodes)}</div></div>`;
+      }
+
+      // Default: title + divider + stacked body.
+      return `<div class="lp-deck lp-content-slide">${head}<div class="lp-body">${cloneHtml(g.nodes)}</div></div>`;
     };
 
     const buildSlides = (body: HTMLElement, title: string, subtitle: string): string[] => {
@@ -188,8 +251,8 @@
 
       const groups: Group[] = [];
       let cur: Group | null = null;
-      const startGroup = (t: string, s: string): Group => {
-        const g: Group = { title: t || '', subtitle: s || '', nodes: [] };
+      const startGroup = (t: string, s: string, layout: string): Group => {
+        const g: Group = { title: t || '', subtitle: s || '', layout: layout || 'default', nodes: [] };
         groups.push(g);
         cur = g;
         return g;
@@ -198,17 +261,21 @@
       children.forEach((node) => {
         if (hasManualBreaks) {
           if (node.hasAttribute('data-slide-break')) {
-            startGroup(node.dataset.slideTitle || '', node.dataset.slideSubtitle || '');
+            startGroup(
+              node.dataset.slideTitle || '',
+              node.dataset.slideSubtitle || '',
+              node.dataset.slideLayout || 'default'
+            );
             return; // the marker itself is not rendered
           }
         } else {
           const tag = node.tagName;
           if (tag === 'H1' || tag === 'H2' || tag === 'H3') {
-            startGroup(node.textContent || '', ''); // heading becomes the slide title
+            startGroup(node.textContent || '', '', 'default'); // heading becomes the slide title
             return; // exclude the heading from the body
           }
         }
-        (cur ?? startGroup('', '')).nodes.push(node);
+        (cur ?? startGroup('', '', 'default')).nodes.push(node);
       });
 
       groups.forEach((g) => {

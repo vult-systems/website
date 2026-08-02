@@ -56,6 +56,21 @@ export const blockContentType = defineType({
       fields: [
         { name: 'alt', type: 'string', title: 'Alt text' },
         { name: 'caption', type: 'string', title: 'Caption' },
+        {
+          name: 'align',
+          type: 'string',
+          title: 'Alignment',
+          options: {
+            list: [
+              { title: 'Center', value: 'center' },
+              { title: 'Left', value: 'left' },
+              { title: 'Right', value: 'right' },
+              { title: 'Full width', value: 'full' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'center',
+        },
       ],
     }),
     defineArrayMember({
@@ -137,6 +152,22 @@ export const blockContentType = defineType({
           name: 'subtitle',
           type: 'string',
           title: 'Slide subtitle (optional)',
+        },
+        {
+          name: 'layout',
+          type: 'string',
+          title: 'Slide layout',
+          options: {
+            list: [
+              { title: 'Default (title + body)', value: 'default' },
+              { title: 'Section title (large, centered)', value: 'section' },
+              { title: 'Image left, text right', value: 'image-left' },
+              { title: 'Image right, text left', value: 'image-right' },
+              { title: 'Two columns', value: 'two-col' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'default',
         },
         {
           name: 'label',

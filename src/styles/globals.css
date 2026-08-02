@@ -145,6 +145,12 @@
     display: none;
   }
 
+  /* Figure alignment (also honored by the lecture presenter). */
+  .prose figure[data-align='left'] { margin-inline: 0 auto; max-width: 70%; }
+  .prose figure[data-align='right'] { margin-inline: auto 0; max-width: 70%; }
+  .prose figure[data-align='center'] { margin-inline: auto; }
+  .prose figure[data-align='full'] { max-width: none; }
+
   .prose {
     --reading-font: 'Besley', ui-serif, Georgia, serif;
     --reading-size: 1.1875rem;     /* 19px */

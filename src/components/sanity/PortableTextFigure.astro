@@ -12,9 +12,11 @@ const full = urlFor(node).width(3840).auto('format').url();
 const dims = (node?.asset?._ref as string | undefined)?.match(/-(\d+)x(\d+)-/);
 const width = dims ? Number(dims[1]) : undefined;
 const height = dims ? Number(dims[2]) : undefined;
+
+const align = node?.align ?? 'center';
 ---
 
-<figure class="my-8">
+<figure class="my-8" data-align={align}>
   <img
     src={src}
     srcset={`${src} 1200w, ${src2x} 2400w`}
