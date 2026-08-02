@@ -112,27 +112,6 @@ import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
   }
   #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
   #lecture-presenter #lp-slide strong { font-weight: 700; }
-
-  /* --- Print to PDF: show only the active lecture --- */
-  @media print {
-    body.printing-lecture #lecture-presenter,
-    body.printing-lecture .lecture-actions { display: none !important; }
-    body.printing-lecture * { visibility: hidden !important; }
-    body.printing-lecture .print-target,
-    body.printing-lecture .print-target * { visibility: visible !important; }
-    body.printing-lecture .print-target {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      color: #111 !important;
-      background: #fff !important;
-    }
-    body.printing-lecture .print-target :is(h1, h2, h3, h4, p, li, span, td, th, figcaption) {
-      color: #111 !important;
-    }
-    body.printing-lecture .print-target img { break-inside: avoid; }
-  }
 </style>
 
 <script>
@@ -272,22 +251,6 @@ import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
             block.dataset.lectureContext || ''
           );
         }
-        return;
-      }
-
-      const printBtn = target.closest('.lecture-print-btn');
-      if (printBtn) {
-        const block = printBtn.closest('.lecture-block') as HTMLElement | null;
-        if (!block) return;
-        document.body.classList.add('printing-lecture');
-        block.classList.add('print-target');
-        const cleanup = () => {
-          document.body.classList.remove('printing-lecture');
-          block.classList.remove('print-target');
-          window.removeEventListener('afterprint', cleanup);
-        };
-        window.addEventListener('afterprint', cleanup);
-        window.print();
         return;
       }
 
