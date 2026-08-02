@@ -24,8 +24,10 @@
       <!-- 16:9 slide frame, centered / letterboxed like a slide deck -->
       <div id="lp-frame" class="relative overflow-hidden rounded-lg">
         <div id="lp-slide" class="absolute inset-0 overflow-auto"></div>
-        <!-- Slide master: class tag (top-right) + logo mark (bottom-left) -->
-        <div id="lp-context" class="pointer-events-none absolute top-3 right-4 max-w-[55%] truncate text-[0.65rem] sm:text-xs uppercase tracking-[0.15em] text-foreground-secondary/45" style="font-family: 'Besley', serif !important;"></div>
+        <!-- Slide master: course code + name (top-right), project in accent, logo mark (bottom-left) -->
+        <div id="lp-context" class="pointer-events-none absolute top-3 right-4 max-w-[72%] truncate text-[0.65rem] sm:text-xs uppercase tracking-[0.15em]" style="font-family: 'Besley', serif !important;">
+          <span id="lp-ctx-course" class="text-foreground-secondary/45"></span><span id="lp-ctx-sep" class="text-foreground-secondary/30"> &middot; </span><span id="lp-ctx-project" class="text-accent/80"></span>
+        </div>
         <div class="pointer-events-none absolute bottom-3 left-4 opacity-60">
           <svg width="26" height="23" viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M46.5 59L0 86L49 0L46.5 59Z" fill="#E22B25"/>
@@ -68,7 +70,7 @@
 
   /* --- Presenter slide layout & typography --- */
   #lecture-presenter #lp-slide {
-    padding: clamp(1.25rem, 4cqw, 3.5rem);
+    padding: clamp(1.75rem, 5cqh, 3rem) clamp(1.25rem, 2.5cqw, 2.5rem);
     display: flex;
     flex-direction: column;
     justify-content: safe center;
@@ -79,9 +81,13 @@
   }
   #lecture-presenter #lp-slide .lp-deck {
     width: 100%;
-    max-width: 60rem;
+    max-width: none;
     margin-inline: auto;
   }
+  /* Thin, unobtrusive scrollbar so long slides don't clip the header */
+  #lecture-presenter #lp-slide { scrollbar-width: thin; scrollbar-color: hsl(var(--foreground-secondary) / 0.3) transparent; }
+  #lecture-presenter #lp-slide::-webkit-scrollbar { width: 8px; }
+  #lecture-presenter #lp-slide::-webkit-scrollbar-thumb { background: hsl(var(--foreground-secondary) / 0.3); border-radius: 4px; }
   /* Title slide: centered */
   #lecture-presenter #lp-slide .lp-title-slide {
     min-height: 100%;
@@ -112,11 +118,11 @@
   }
   /* Body */
   #lecture-presenter #lp-slide :is(h2, h3) { line-height: 1.15; }
-  #lecture-presenter #lp-slide h2 { font-size: clamp(1.6rem, 3.4vw, 2.6rem); margin: 1rem 0 0.75rem; }
-  #lecture-presenter #lp-slide h3 { font-size: clamp(1.3rem, 2.6vw, 2rem); margin: 0.75rem 0 0.5rem; }
+  #lecture-presenter #lp-slide h2 { font-size: clamp(1.5rem, 3vw, 2.3rem); margin: 0.75rem 0 0.6rem; }
+  #lecture-presenter #lp-slide h3 { font-size: clamp(1.2rem, 2.4vw, 1.75rem); margin: 0.6rem 0 0.4rem; }
   #lecture-presenter #lp-slide p,
-  #lecture-presenter #lp-slide li { font-size: clamp(1.05rem, 1.9vw, 1.65rem); line-height: 1.55; }
-  #lecture-presenter #lp-slide p { margin-block: 0.6em; }
+  #lecture-presenter #lp-slide li { font-size: clamp(1rem, 1.7vw, 1.45rem); line-height: 1.5; }
+  #lecture-presenter #lp-slide p { margin-block: 0.5em; }
   /* Restore list markers (Tailwind Preflight strips them) */
   #lecture-presenter #lp-slide .lp-body ul { list-style: disc outside; padding-left: 1.5em; margin-block: 0.6em; }
   #lecture-presenter #lp-slide .lp-body ol { list-style: decimal outside; padding-left: 1.5em; margin-block: 0.6em; }
@@ -227,13 +233,17 @@
 
     const go = (delta: number) => { index += delta; render(); };
 
-    const open = (body: HTMLElement, title: string, subtitle: string, context: string) => {
+    const open = (body: HTMLElement, title: string, subtitle: string, course: string, project: string) => {
       slides = buildSlides(body, title, subtitle);
       index = 0;
       const titleEl = $('lp-title');
       if (titleEl) titleEl.textContent = title;
-      const ctxEl = $('lp-context');
-      if (ctxEl) ctxEl.textContent = context || '';
+      const courseEl = $('lp-ctx-course');
+      if (courseEl) courseEl.textContent = course || '';
+      const projectEl = $('lp-ctx-project');
+      if (projectEl) projectEl.textContent = project || '';
+      const sepEl = $('lp-ctx-sep');
+      if (sepEl) sepEl.style.display = project ? '' : 'none';
       const p = $('lecture-presenter');
       if (!p) return;
       p.classList.remove('hidden');
@@ -268,7 +278,8 @@
             bodyEl,
             block.dataset.lectureTitle || document.title,
             block.dataset.lectureSubtitle || '',
-            block.dataset.lectureContext || ''
+            block.dataset.lectureContext || '',
+            block.dataset.lectureContextAccent || ''
           );
         }
         return;
