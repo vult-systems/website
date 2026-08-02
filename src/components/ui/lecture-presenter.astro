@@ -6,8 +6,6 @@
  * fullscreen, keyboard-driven slide deck for teaching in class, plus a
  * clean print-to-PDF of the same content. Mount once per page.
  */
-import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
-import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
 ---
 
 <div id="lecture-presenter" class="fixed inset-0 z-[9998] hidden bg-background text-foreground">
@@ -22,17 +20,23 @@ import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
     </div>
 
     <!-- Slide stage -->
-    <div class="relative flex-1 overflow-hidden">
-      <div id="lp-slide" class="absolute inset-0 overflow-auto px-6 sm:px-12 lg:px-24 pt-14 pb-16 flex flex-col"></div>
-      <!-- Slide master: class/project (top-right) + Vult mark (bottom-left) -->
-      <div id="lp-context" class="pointer-events-none absolute top-4 right-6 max-w-[55%] truncate text-xs sm:text-sm uppercase tracking-widest text-foreground-secondary" style="font-family: 'Besley', serif !important;"></div>
-      <div class="pointer-events-none absolute bottom-4 left-6 flex items-center opacity-70">
-        <img src={vultLogoBlk.src} alt="Vult" class="h-5 w-auto dark:hidden" data-no-lightbox />
-        <img src={vultLogoWht.src} alt="Vult" class="hidden h-5 w-auto dark:block" data-no-lightbox />
+    <div id="lp-stage" class="relative flex-1 overflow-hidden flex items-center justify-center p-4 sm:p-6">
+      <!-- 16:9 slide frame, centered / letterboxed like a slide deck -->
+      <div id="lp-frame" class="relative overflow-hidden rounded-lg">
+        <div id="lp-slide" class="absolute inset-0 overflow-auto"></div>
+        <!-- Slide master: class tag (top-right) + logo mark (bottom-left) -->
+        <div id="lp-context" class="pointer-events-none absolute top-3 right-4 max-w-[55%] truncate text-[0.65rem] sm:text-xs uppercase tracking-[0.15em] text-foreground-secondary/45" style="font-family: 'Besley', serif !important;"></div>
+        <div class="pointer-events-none absolute bottom-3 left-4 opacity-60">
+          <svg width="26" height="23" viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M46.5 59L0 86L49 0L46.5 59Z" fill="#E22B25"/>
+            <path d="M52 59L51.0004 1.99994L99.5002 86.5L52 59Z" fill="#2282DF"/>
+            <path d="M50.5 61.5L99.3297 89.0673L1.90061 88.8194L50.5 61.5Z" fill="#F2C923"/>
+          </svg>
+        </div>
+        <!-- Click zones (edges only, so video controls stay reachable) -->
+        <button id="lp-zone-prev" class="absolute left-0 top-0 h-full w-1/5 cursor-w-resize opacity-0" aria-label="Previous slide"></button>
+        <button id="lp-zone-next" class="absolute right-0 top-0 h-full w-2/5 cursor-e-resize opacity-0" aria-label="Next slide"></button>
       </div>
-      <!-- Click zones for prev/next (edges only, so video controls stay reachable) -->
-      <button id="lp-zone-prev" class="absolute left-0 top-14 bottom-16 w-1/5 cursor-w-resize opacity-0" aria-label="Previous slide"></button>
-      <button id="lp-zone-next" class="absolute right-0 top-14 bottom-16 w-2/5 cursor-e-resize opacity-0" aria-label="Next slide"></button>
     </div>
 
     <!-- Controls -->
@@ -52,14 +56,30 @@ import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
 </div>
 
 <style is:global>
+  /* --- 16:9 slide frame, centered in the stage (letterboxed like PowerPoint) --- */
+  #lecture-presenter #lp-stage { container-type: size; }
+  #lecture-presenter #lp-frame {
+    aspect-ratio: 16 / 9;
+    width: min(100cqw, calc(100cqh * 16 / 9));
+    max-height: 100cqh;
+    border: 1px solid hsl(var(--foreground-secondary) / 0.12);
+    background: hsl(var(--background));
+  }
+
   /* --- Presenter slide layout & typography --- */
+  #lecture-presenter #lp-slide {
+    padding: clamp(1.25rem, 4cqw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+  }
   #lecture-presenter #lp-slide,
   #lecture-presenter #lp-slide * {
     font-family: 'Besley', ui-serif, Georgia, serif; /* beat the global monospace default */
   }
   #lecture-presenter #lp-slide .lp-deck {
     width: 100%;
-    max-width: 72rem;
+    max-width: 60rem;
     margin-inline: auto;
   }
   /* Title slide: centered */
@@ -104,7 +124,7 @@ import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
   #lecture-presenter #lp-slide .lp-body :is(ul, ol) :is(ul, ol) { margin-block: 0.2em; }
   #lecture-presenter #lp-slide img,
   #lecture-presenter #lp-slide video {
-    max-height: 58vh;
+    max-height: 46cqh;
     width: auto;
     max-width: 100%;
     margin-inline: auto;

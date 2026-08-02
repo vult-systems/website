@@ -470,7 +470,7 @@ data-project={thread.slug}
 			</div>
 			) : topic.body ? (
 			<!-- Single-page topic (e.g. Glossary): render body directly, no threads -->
-			<div class="lecture-block" data-lecture-title={topic.title} data-lecture-subtitle={topic.description} data-lecture-context={topic.title}>
+			<div class="lecture-block" data-lecture-title={topic.title} data-lecture-subtitle={topic.description} data-lecture-context={topic.code ?? topic.title}>
 				<LectureActions />
 				<div class="prose prose-lg dark:prose-invert max-w-none lecture-body">
 					<PortableText value={topic.body} />
@@ -541,7 +541,7 @@ data-project={thread.slug}
 					))}
 				</div>
 			) : project.body ? (
-				<div class="lecture-block" data-lecture-title={project.title} data-lecture-subtitle={project.description} data-lecture-context={`${course.title}: ${project.title}`}>
+				<div class="lecture-block" data-lecture-title={project.title} data-lecture-subtitle={project.description} data-lecture-context={`${course.code}: ${project.title}`}>
 					<LectureActions />
 					<div class="prose prose-lg dark:prose-invert max-w-none lecture-body"><PortableText value={project.body} /></div>
 				</div>
@@ -561,7 +561,7 @@ data-project={thread.slug}
 			<div class="mb-6"><Badge variant="accent" size="sm">{topic.title}</Badge></div>
 			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
 			{thread.body ? (
-				<div class="lecture-block" data-lecture-title={thread.title} data-lecture-subtitle={thread.description} data-lecture-context={topic.title}>
+				<div class="lecture-block" data-lecture-title={thread.title} data-lecture-subtitle={thread.description} data-lecture-context={topic.code ?? topic.title}>
 					<LectureActions />
 					<div class="prose prose-lg dark:prose-invert max-w-3xl lecture-body"><PortableText value={thread.body} /></div>
 				</div>
@@ -594,7 +594,7 @@ data-project={thread.slug}
 			</div>
 			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
 			{thread.body ? (
-				<div class="lecture-block" data-lecture-title={thread.title} data-lecture-subtitle={thread.description} data-lecture-context={`${course.title}: ${project.title}`}>
+				<div class="lecture-block" data-lecture-title={thread.title} data-lecture-subtitle={thread.description} data-lecture-context={`${course.code}: ${project.title}`}>
 					<LectureActions />
 					<div class="prose prose-lg dark:prose-invert max-w-none lecture-body"><PortableText value={thread.body} /></div>
 				</div>
