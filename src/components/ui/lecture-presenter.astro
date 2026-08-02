@@ -6,6 +6,8 @@
  * fullscreen, keyboard-driven slide deck for teaching in class, plus a
  * clean print-to-PDF of the same content. Mount once per page.
  */
+import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
+import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
 ---
 
 <div id="lecture-presenter" class="fixed inset-0 z-[9998] hidden bg-background text-foreground">
@@ -21,10 +23,16 @@
 
     <!-- Slide stage -->
     <div class="relative flex-1 overflow-hidden">
-      <div id="lp-slide" class="absolute inset-0 overflow-auto px-6 sm:px-12 lg:px-24 py-10 flex flex-col justify-center"></div>
-      <!-- Click zones for prev/next -->
-      <button id="lp-zone-prev" class="absolute left-0 top-0 h-full w-1/4 cursor-w-resize opacity-0" aria-label="Previous slide"></button>
-      <button id="lp-zone-next" class="absolute right-0 top-0 h-full w-1/2 cursor-e-resize opacity-0" aria-label="Next slide"></button>
+      <div id="lp-slide" class="absolute inset-0 overflow-auto px-6 sm:px-12 lg:px-24 pt-14 pb-16 flex flex-col"></div>
+      <!-- Slide master: class/project (top-right) + Vult mark (bottom-left) -->
+      <div id="lp-context" class="pointer-events-none absolute top-4 right-6 max-w-[55%] truncate text-xs sm:text-sm uppercase tracking-widest text-foreground-secondary" style="font-family: 'Besley', serif !important;"></div>
+      <div class="pointer-events-none absolute bottom-4 left-6 flex items-center opacity-70">
+        <img src={vultLogoBlk.src} alt="Vult" class="h-5 w-auto dark:hidden" data-no-lightbox />
+        <img src={vultLogoWht.src} alt="Vult" class="hidden h-5 w-auto dark:block" data-no-lightbox />
+      </div>
+      <!-- Click zones for prev/next (edges only, so video controls stay reachable) -->
+      <button id="lp-zone-prev" class="absolute left-0 top-14 bottom-16 w-1/5 cursor-w-resize opacity-0" aria-label="Previous slide"></button>
+      <button id="lp-zone-next" class="absolute right-0 top-14 bottom-16 w-2/5 cursor-e-resize opacity-0" aria-label="Next slide"></button>
     </div>
 
     <!-- Controls -->
@@ -44,34 +52,66 @@
 </div>
 
 <style is:global>
-  /* --- Presenter slide typography --- */
+  /* --- Presenter slide layout & typography --- */
+  #lecture-presenter #lp-slide,
+  #lecture-presenter #lp-slide * {
+    font-family: 'Besley', ui-serif, Georgia, serif; /* beat the global monospace default */
+  }
   #lecture-presenter #lp-slide .lp-deck {
     width: 100%;
     max-width: 72rem;
     margin-inline: auto;
   }
-  #lecture-presenter #lp-slide :is(h1, h2, h3) {
-    font-family: 'Besley', serif !important;
-    line-height: 1.1;
+  /* Title slide: centered */
+  #lecture-presenter #lp-slide .lp-title-slide {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.75rem;
   }
-  #lecture-presenter #lp-slide h1 { font-size: clamp(2rem, 5vw, 4rem); }
-  #lecture-presenter #lp-slide h2 { font-size: clamp(1.75rem, 4vw, 3.25rem); margin-bottom: 1rem; }
-  #lecture-presenter #lp-slide h3 { font-size: clamp(1.35rem, 3vw, 2.25rem); }
+  /* Slide header (Title + optional subtitle) */
+  #lecture-presenter #lp-slide .lp-head {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid hsl(var(--foreground-secondary) / 0.15);
+  }
+  #lecture-presenter #lp-slide .lp-title-main {
+    line-height: 1.1;
+    font-size: clamp(1.9rem, 4vw, 3.25rem);
+    font-weight: 400;
+  }
+  #lecture-presenter #lp-slide .lp-title-slide .lp-title-main {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+  }
+  #lecture-presenter #lp-slide .lp-title-sub {
+    opacity: 0.7;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+  }
+  /* Body */
+  #lecture-presenter #lp-slide :is(h2, h3) { line-height: 1.15; }
+  #lecture-presenter #lp-slide h2 { font-size: clamp(1.6rem, 3.4vw, 2.6rem); margin: 1rem 0 0.75rem; }
+  #lecture-presenter #lp-slide h3 { font-size: clamp(1.3rem, 2.6vw, 2rem); margin: 0.75rem 0 0.5rem; }
   #lecture-presenter #lp-slide p,
-  #lecture-presenter #lp-slide li { font-size: clamp(1.05rem, 1.9vw, 1.7rem); line-height: 1.5; }
-  #lecture-presenter #lp-slide ul,
-  #lecture-presenter #lp-slide ol { padding-left: 1.5em; }
-  #lecture-presenter #lp-slide li { margin-block: 0.4em; }
+  #lecture-presenter #lp-slide li { font-size: clamp(1.05rem, 1.9vw, 1.65rem); line-height: 1.55; }
+  #lecture-presenter #lp-slide p { margin-block: 0.6em; }
+  /* Restore list markers (Tailwind Preflight strips them) */
+  #lecture-presenter #lp-slide .lp-body ul { list-style: disc outside; padding-left: 1.5em; margin-block: 0.6em; }
+  #lecture-presenter #lp-slide .lp-body ol { list-style: decimal outside; padding-left: 1.5em; margin-block: 0.6em; }
+  #lecture-presenter #lp-slide .lp-body li { display: list-item; margin-block: 0.4em; }
+  #lecture-presenter #lp-slide .lp-body :is(ul, ol) :is(ul, ol) { margin-block: 0.2em; }
   #lecture-presenter #lp-slide img,
   #lecture-presenter #lp-slide video {
-    max-height: 62vh;
+    max-height: 58vh;
     width: auto;
     max-width: 100%;
     margin-inline: auto;
     border-radius: 0.5rem;
   }
   #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
-  #lecture-presenter #lp-slide .lp-subtitle { font-size: clamp(1.1rem, 2vw, 1.6rem); opacity: 0.7; }
+  #lecture-presenter #lp-slide strong { font-weight: 700; }
 
   /* --- Print to PDF: show only the active lecture --- */
   @media print {
@@ -105,43 +145,71 @@
     let slides: string[] = [];
     let index = 0;
 
+    const esc = (s: string) =>
+      (s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+    type Group = { title: string; subtitle: string; nodes: HTMLElement[] };
+
+    const titleSlide = (title: string, subtitle: string) =>
+      `<div class="lp-deck lp-title-slide">` +
+        `<h1 class="lp-title-main">${esc(title || 'Lecture')}</h1>` +
+        (subtitle ? `<p class="lp-title-sub">${esc(subtitle)}</p>` : '') +
+      `</div>`;
+
+    const contentSlide = (g: Group) => {
+      const bodyWrap = document.createElement('div');
+      bodyWrap.className = 'lp-body';
+      g.nodes.forEach((n) => bodyWrap.appendChild(n.cloneNode(true)));
+      const head =
+        g.title || g.subtitle
+          ? `<div class="lp-head">` +
+              (g.title ? `<h2 class="lp-title-main">${esc(g.title)}</h2>` : '') +
+              (g.subtitle ? `<p class="lp-title-sub">${esc(g.subtitle)}</p>` : '') +
+            `</div>`
+          : '';
+      return `<div class="lp-deck lp-content-slide">${head}${bodyWrap.outerHTML}</div>`;
+    };
+
     const buildSlides = (body: HTMLElement, title: string, subtitle: string): string[] => {
-      const out: string[] = [];
-      // Title slide
-      out.push(
-        `<div class="lp-deck text-center flex flex-col items-center justify-center gap-4">` +
-          `<h1>${title || 'Lecture'}</h1>` +
-          (subtitle ? `<p class="lp-subtitle">${subtitle}</p>` : '') +
-        `</div>`
-      );
-      // Group remaining content into slides.
-      let group: HTMLElement[] = [];
-      const flush = () => {
-        if (!group.length) return;
-        const deck = document.createElement('div');
-        deck.className = 'lp-deck';
-        group.forEach((n) => deck.appendChild(n.cloneNode(true)));
-        out.push(deck.outerHTML);
-        group = [];
-      };
+      const out: string[] = [titleSlide(title, subtitle)];
+
       const children = Array.from(body.children) as HTMLElement[];
       // Author-controlled breaks take priority; otherwise auto-split by heading.
       const hasManualBreaks = children.some((n) => n.hasAttribute('data-slide-break'));
+
+      const groups: Group[] = [];
+      let cur: Group | null = null;
+      const startGroup = (t: string, s: string): Group => {
+        const g: Group = { title: t || '', subtitle: s || '', nodes: [] };
+        groups.push(g);
+        cur = g;
+        return g;
+      };
+
       children.forEach((node) => {
         if (hasManualBreaks) {
           if (node.hasAttribute('data-slide-break')) {
-            flush();
-            return; // don't render the marker itself
+            startGroup(node.dataset.slideTitle || '', node.dataset.slideSubtitle || '');
+            return; // the marker itself is not rendered
           }
         } else {
           const tag = node.tagName;
           if (tag === 'H1' || tag === 'H2' || tag === 'H3') {
-            flush();
+            startGroup(node.textContent || '', ''); // heading becomes the slide title
+            return; // exclude the heading from the body
           }
         }
-        group.push(node);
+        (cur ?? startGroup('', '')).nodes.push(node);
       });
-      flush();
+
+      groups.forEach((g) => {
+        if (!g.title && !g.subtitle && g.nodes.length === 0) return;
+        out.push(contentSlide(g));
+      });
       return out;
     };
 
@@ -160,11 +228,13 @@
 
     const go = (delta: number) => { index += delta; render(); };
 
-    const open = (body: HTMLElement, title: string, subtitle: string) => {
+    const open = (body: HTMLElement, title: string, subtitle: string, context: string) => {
       slides = buildSlides(body, title, subtitle);
       index = 0;
       const titleEl = $('lp-title');
       if (titleEl) titleEl.textContent = title;
+      const ctxEl = $('lp-context');
+      if (ctxEl) ctxEl.textContent = context || '';
       const p = $('lecture-presenter');
       if (!p) return;
       p.classList.remove('hidden');
@@ -195,7 +265,12 @@
         const block = presentBtn.closest('.lecture-block') as HTMLElement | null;
         const bodyEl = block?.querySelector('.lecture-body') as HTMLElement | null;
         if (block && bodyEl) {
-          open(bodyEl, block.dataset.lectureTitle || document.title, block.dataset.lectureSubtitle || '');
+          open(
+            bodyEl,
+            block.dataset.lectureTitle || document.title,
+            block.dataset.lectureSubtitle || '',
+            block.dataset.lectureContext || ''
+          );
         }
         return;
       }

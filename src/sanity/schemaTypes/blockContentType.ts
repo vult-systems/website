@@ -128,16 +128,31 @@ export const blockContentType = defineType({
         'Marks where a new slide starts in Present mode. Invisible on the page. If a lecture has any slide breaks, Present splits only at these points; otherwise it auto-splits by headings.',
       fields: [
         {
+          name: 'title',
+          type: 'string',
+          title: 'Slide title (optional)',
+          description: 'Shown as the heading of this slide in Present mode.',
+        },
+        {
+          name: 'subtitle',
+          type: 'string',
+          title: 'Slide subtitle (optional)',
+        },
+        {
           name: 'label',
           type: 'string',
-          title: 'Note (optional)',
+          title: 'Editor note (optional)',
           description: 'Only shown in the editor to help you find this break.',
         },
       ],
       preview: {
-        select: { label: 'label' },
-        prepare: ({ label }) => ({
-          title: label ? `Slide break \u2014 ${label}` : 'Slide break',
+        select: { title: 'title', label: 'label' },
+        prepare: ({ title, label }) => ({
+          title: title
+            ? `Slide break \u2014 ${title}`
+            : label
+              ? `Slide break \u2014 ${label}`
+              : 'Slide break',
         }),
       },
     }),

@@ -1,6 +1,13 @@
 ---
 // Presentation-only slide boundary; invisible in the reading view, read by the
-// lecture presenter to decide where slides split.
+// lecture presenter to decide where slides split and to title each slide.
+const { node } = Astro.props;
 ---
 
-<div class="lecture-slide-break" data-slide-break aria-hidden="true"></div>
+<div
+  class="lecture-slide-break"
+  data-slide-break
+  data-slide-title={node?.title}
+  data-slide-subtitle={node?.subtitle}
+  aria-hidden="true"
+></div>
