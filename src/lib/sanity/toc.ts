@@ -21,6 +21,19 @@ export function portableTextToPlain(block: any): string {
   return '';
 }
 
+/** Flatten a whole Portable Text body (blocks, tables) into searchable plain text. */
+export function bodyToPlainText(body: any): string {
+  if (!Array.isArray(body)) return '';
+  return body
+    .map((block: any) => {
+      if (block?._type === 'table' && Array.isArray(block.rows)) {
+        return block.rows.map((row: any) => (row?.cells ?? []).join(' ')).join(' ');
+      }
+      return portableTextToPlain(block);
+    })
+    .join(' ');
+}
+
 export interface TocHeading {
   id: string;
   text: string;

@@ -16,6 +16,7 @@ import { getLearnPageSEO } from '@/config/seo';
 import { sanityClient } from '@/lib/sanity/client';
 import { coursesQuery, pipelineQuery, learnPageQuery } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/image';
+import { bodyToPlainText } from '@/lib/sanity/toc';
 import PortableText from '@/components/sanity/PortableText.astro';
 
 // Read live from Sanity at request time (edits appear instantly).
@@ -147,6 +148,30 @@ const courseId = (code: string) => code.toLowerCase().replace(/\s+/g, '-');
 // Pipeline topics are taught as core class content; show this as their "course code".
 // Editable per-topic in Sanity (the topic's "Code / Label" field); this is the fallback default.
 const PIPELINE_CODE = 'ANGD Core';
+
+// Build the search haystack for a course/topic including full lecture body text,
+// so a search like "block-in" finds the lecture that mentions it — not just titles.
+const courseSearchData = (course: Course) =>
+	`${course.code} ${course.title} ${course.description ?? ''} ${course.outcomes ?? ''} ${(course.projects || [])
+		.map((project) =>
+			`${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)} ${(project.threads ?? [])
+				.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
+				.join(' ')}`
+		)
+		.join(' ')}`.toLowerCase();
+
+const projectSearchData = (course: Course, project: CourseProject) =>
+	`${course.code} ${course.title} ${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)} ${(project.threads ?? [])
+		.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
+		.join(' ')}`.toLowerCase();
+
+const topicSearchData = (topic: PipelineTopic) =>
+	`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.description ?? ''} ${bodyToPlainText(topic.body)} ${(topic.threads ?? [])
+		.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
+		.join(' ')}`.toLowerCase();
+
+const topicThreadSearchData = (topic: PipelineTopic, thread: CourseProjectThread) =>
+	`${topic.title} ${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.toLowerCase();
 ---
 
 
@@ -228,7 +253,7 @@ href={`#${courseId(course.code)}`}
 class="learn-nav-link block leading-snug group"
 data-slug={courseId(course.code)}
 data-course-nav="true"
-data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description} ${(project.threads ?? []).map((thread) => `${thread.title} ${thread.description ?? ''}`).join(' ')}`).join(' ')}`.toLowerCase()}
+data-course-search={courseSearchData(course)}
 >
 <span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{course.code}</span>
 <span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{course.title}</span>
@@ -281,7 +306,7 @@ href={`#${topic.slug}`}
 class="learn-nav-link block leading-snug group"
 data-slug={topic.slug}
 data-course-nav="true"
-data-course-search={`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.description} ${(topic.threads ?? []).map((thread) => `${thread.title} ${thread.description}`).join(' ')}`.toLowerCase()}
+data-course-search={topicSearchData(topic)}
 >
 <span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{topic.code ?? PIPELINE_CODE}</span>
 <span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{topic.title}</span>
@@ -317,7 +342,7 @@ data-project={thread.slug}
 		<button
 			class="course-card w-full text-left rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-5 group"
 			data-course={courseId(course.code)}
-			data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description} ${(project.threads ?? []).map((thread) => `${thread.title} ${thread.description ?? ''}`).join(' ')}`).join(' ')}`.toLowerCase()}
+			data-course-search={courseSearchData(course)}
 		>
 			<div class="flex items-start justify-between gap-4">
 				<div class="min-w-0">
@@ -344,7 +369,7 @@ data-project={thread.slug}
 		<div
 			id={`detail-${courseId(course.code)}`}
 			class="course-detail-content hidden"
-			data-course-search={`${course.code} ${course.title} ${course.description} ${course.outcomes ?? ''} ${(course.projects || []).map((project) => `${project.title} ${project.description} ${(project.threads ?? []).map((thread) => `${thread.title} ${thread.description ?? ''}`).join(' ')}`).join(' ')}`.toLowerCase()}
+			data-course-search={courseSearchData(course)}
 		>
 			<div class="mb-8">
 				<div class="flex items-center gap-3 mb-3">
@@ -388,7 +413,7 @@ data-project={thread.slug}
 						class="project-card w-full text-left rounded-lg border border-border bg-card overflow-hidden group transition-transform duration-300 hover:scale-[1.01]"
 						data-course={courseId(course.code)}
 						data-project={project.slug}
-						data-project-search={`${course.code} ${course.title} ${project.title} ${project.description} ${(project.threads ?? []).map((thread) => `${thread.title} ${thread.description ?? ''}`).join(' ')}`.toLowerCase()}
+						data-project-search={projectSearchData(course, project)}
 					>
 							<div class="flex items-stretch min-w-0">
 								<!-- Thumbnail -->
@@ -422,7 +447,7 @@ data-project={thread.slug}
 		<div
 			id={`detail-${topic.slug}`}
 			class="course-detail-content hidden"
-			data-course-search={`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.description} ${(topic.threads ?? []).map((thread) => `${thread.title} ${thread.description}`).join(' ')}`.toLowerCase()}
+			data-course-search={topicSearchData(topic)}
 		>
 			<div class="mb-8">
 				<div class="flex items-center gap-3 mb-3">
@@ -445,7 +470,7 @@ data-project={thread.slug}
 						class="project-card w-full text-left rounded-lg border border-border bg-card overflow-hidden group transition-transform duration-300 hover:scale-[1.01]"
 						data-course={topic.slug}
 						data-project={thread.slug}
-						data-project-search={`${topic.title} ${thread.title} ${thread.description}`.toLowerCase()}
+						data-project-search={topicThreadSearchData(topic, thread)}
 					>
 							<div class="flex items-stretch min-w-0">
 								<!-- Thumbnail -->
