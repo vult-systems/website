@@ -145,12 +145,10 @@
     display: none;
   }
 
-  /* Figure alignment for the reading view. Only the standard alignments apply
-     here; presenter-only layouts (left/right-bleed, background*, bottom) are
-     intentionally left as normal figures so Present styling never leaks in. */
-  .prose figure[data-align='left'] { margin-inline: 0 auto; max-width: 70%; }
-  .prose figure[data-align='right'] { margin-inline: auto 0; max-width: 70%; }
-  .prose figure[data-align='center'] { margin-inline: auto; }
+  /* Figure alignment is a presenter-only concept: on the page every figure
+     renders normally. Only `full` (a size, not a side alignment) is honored
+     here for the occasional full-width image; the presenter reads all the
+     alignments from its own styles. */
   .prose figure[data-align='full'] { max-width: none; }
 
   /* Divider under lecture headings, mirroring the Present view (no manual divider needed). */
