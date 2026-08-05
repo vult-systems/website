@@ -66,6 +66,7 @@ export const blockContentType = defineType({
               { title: 'Left', value: 'left' },
               { title: 'Right', value: 'right' },
               { title: 'Full width', value: 'full' },
+              { title: 'Bottom (full-bleed, for characters)', value: 'bottom' },
             ],
             layout: 'radio',
           },
@@ -161,6 +162,7 @@ export const blockContentType = defineType({
             list: [
               { title: 'Default (title + body)', value: 'default' },
               { title: 'Section title (large, centered)', value: 'section' },
+              { title: 'Section title (large, left)', value: 'section-left' },
               { title: 'Image left, text right', value: 'image-left' },
               { title: 'Image right, text left', value: 'image-right' },
               { title: 'Two columns', value: 'two-col' },

@@ -70,7 +70,9 @@
 
   /* --- Presenter slide layout & typography --- */
   #lecture-presenter #lp-slide {
-    padding: clamp(2.25rem, 5.5cqh, 3.5rem) clamp(2.75rem, 5cqw, 5.5rem);
+    --lp-px: clamp(2.75rem, 5cqw, 5.5rem);
+    --lp-py: clamp(2.25rem, 5.5cqh, 3.5rem);
+    padding: var(--lp-py) var(--lp-px);
     display: flex;
     flex-direction: column;
     justify-content: safe center;
@@ -97,6 +99,11 @@
     justify-content: center;
     text-align: center;
     gap: 0.75rem;
+  }
+  /* Left-aligned section variant: same vertical centering, full-width divider */
+  #lecture-presenter #lp-slide .lp-title-slide-left {
+    align-items: stretch;
+    text-align: left;
   }
   /* Slide header (Title + subtle divider) — uniform across every layout */
   #lecture-presenter #lp-slide .lp-head {
@@ -145,6 +152,35 @@
   #lecture-presenter #lp-slide figure[data-align='full'] { max-width: none; }
   #lecture-presenter #lp-slide figure[data-align='full'] img,
   #lecture-presenter #lp-slide figure[data-align='full'] video { max-height: 70cqh; }
+
+  /* Bottom full-bleed: pin the image to the slide's bottom edge (e.g. character busts). */
+  #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']) {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']) .lp-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+  }
+  #lecture-presenter #lp-slide figure[data-align='bottom'] {
+    margin: auto calc(-1 * var(--lp-px)) calc(-1 * var(--lp-py));
+    width: calc(100% + 2 * var(--lp-px));
+    max-width: none;
+    text-align: center;
+  }
+  #lecture-presenter #lp-slide figure[data-align='bottom'] img {
+    max-height: 84cqh;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    border-radius: 0;
+    margin-inline: auto;
+    display: block;
+  }
+  #lecture-presenter #lp-slide figure[data-align='bottom'] figcaption { display: none; }
 
   /* Layout presets */
   #lecture-presenter #lp-slide .lp-cols {
@@ -199,12 +235,14 @@
         return wrap.innerHTML;
       };
 
-      // Section: same title + divider, centered, with optional centered body.
-      if (g.layout === 'section') {
+      // Section: large title + divider, vertically centered. Centered or left.
+      if (g.layout === 'section' || g.layout === 'section-left') {
+        const centered = g.layout === 'section';
         const body = cloneHtml(g.nodes);
         return (
-          `<div class="lp-deck lp-title-slide">${headHtml(g.title, g.subtitle, true)}` +
-          (body ? `<div class="lp-body lp-body-center">${body}</div>` : '') +
+          `<div class="lp-deck lp-title-slide${centered ? '' : ' lp-title-slide-left'}">` +
+            headHtml(g.title, g.subtitle, centered) +
+            (body ? `<div class="lp-body${centered ? ' lp-body-center' : ''}">${body}</div>` : '') +
           `</div>`
         );
       }
