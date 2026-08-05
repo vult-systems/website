@@ -98,19 +98,17 @@
     text-align: center;
     gap: 0.75rem;
   }
-  /* Slide header (Title + subtle divider) */
+  /* Slide header (Title + subtle divider) — uniform across every layout */
   #lecture-presenter #lp-slide .lp-head {
     margin-bottom: clamp(1.25rem, 2.5cqh, 2rem);
     padding-bottom: clamp(0.6rem, 1.2cqh, 1rem);
     border-bottom: 1px solid hsl(var(--foreground-secondary) / 0.18);
   }
+  #lecture-presenter #lp-slide .lp-head-center { width: 100%; text-align: center; }
   #lecture-presenter #lp-slide .lp-title-main {
     line-height: 1.08;
-    font-size: clamp(2.1rem, 4.6vw, 3.75rem);
+    font-size: clamp(2.3rem, 4.8vw, 4.5rem);
     font-weight: 400;
-  }
-  #lecture-presenter #lp-slide .lp-title-slide .lp-title-main {
-    font-size: clamp(2.75rem, 6.5vw, 5.5rem);
   }
   #lecture-presenter #lp-slide .lp-title-sub {
     opacity: 0.65;
@@ -183,38 +181,35 @@
 
     type Group = { title: string; subtitle: string; layout: string; nodes: HTMLElement[] };
 
+    const headHtml = (title: string, subtitle: string, center: boolean) =>
+      title || subtitle
+        ? `<div class="lp-head${center ? ' lp-head-center' : ''}">` +
+            (title ? `<h2 class="lp-title-main">${esc(title)}</h2>` : '') +
+            (subtitle ? `<p class="lp-title-sub">${esc(subtitle)}</p>` : '') +
+          `</div>`
+        : '';
+
     const titleSlide = (title: string, subtitle: string) =>
-      `<div class="lp-deck lp-title-slide">` +
-        `<h1 class="lp-title-main">${esc(title || 'Lecture')}</h1>` +
-        (subtitle ? `<p class="lp-title-sub">${esc(subtitle)}</p>` : '') +
-      `</div>`;
+      `<div class="lp-deck lp-title-slide">${headHtml(title || 'Lecture', subtitle, true)}</div>`;
 
     const contentSlide = (g: Group) => {
-      const head =
-        g.title || g.subtitle
-          ? `<div class="lp-head">` +
-              (g.title ? `<h2 class="lp-title-main">${esc(g.title)}</h2>` : '') +
-              (g.subtitle ? `<p class="lp-title-sub">${esc(g.subtitle)}</p>` : '') +
-            `</div>`
-          : '';
-
       const cloneHtml = (nodes: HTMLElement[]) => {
         const wrap = document.createElement('div');
         nodes.forEach((n) => wrap.appendChild(n.cloneNode(true)));
         return wrap.innerHTML;
       };
 
-      // Section: large centered title (+ optional centered body).
+      // Section: same title + divider, centered, with optional centered body.
       if (g.layout === 'section') {
         const body = cloneHtml(g.nodes);
         return (
-          `<div class="lp-deck lp-title-slide">` +
-            (g.title ? `<h1 class="lp-title-main">${esc(g.title)}</h1>` : '') +
-            (g.subtitle ? `<p class="lp-title-sub">${esc(g.subtitle)}</p>` : '') +
-            (body ? `<div class="lp-body lp-body-center">${body}</div>` : '') +
+          `<div class="lp-deck lp-title-slide">${headHtml(g.title, g.subtitle, true)}` +
+          (body ? `<div class="lp-body lp-body-center">${body}</div>` : '') +
           `</div>`
         );
       }
+
+      const head = headHtml(g.title, g.subtitle, false);
 
       // Image on one side, text on the other.
       if (g.layout === 'image-left' || g.layout === 'image-right') {
