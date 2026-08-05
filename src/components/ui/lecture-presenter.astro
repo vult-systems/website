@@ -147,6 +147,16 @@
   #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
   #lecture-presenter #lp-slide strong { font-weight: 700; }
 
+  /* Smooth entrances so large photos don't pop in harshly while they load. */
+  @keyframes lp-fade-in { from { opacity: 0; } to { opacity: 1; } }
+  #lecture-presenter #lp-slide .lp-deck { animation: lp-fade-in 0.3s ease both; }
+  #lecture-presenter #lp-slide img { opacity: 0; transition: opacity 0.45s ease; }
+  #lecture-presenter #lp-slide img.lp-loaded { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    #lecture-presenter #lp-slide .lp-deck { animation: none; }
+    #lecture-presenter #lp-slide img { opacity: 1; transition: none; }
+  }
+
   /* Image alignment (figure[data-align]) */
   #lecture-presenter #lp-slide figure[data-align='left'] { margin-inline: 0 auto; max-width: 70%; }
   #lecture-presenter #lp-slide figure[data-align='right'] { margin-inline: auto 0; max-width: 70%; }
@@ -330,6 +340,23 @@
     let slides: string[] = [];
     let index = 0;
 
+    // Warm the browser cache with slide images so large photos are ready before
+    // you reach them (they download in the background while you talk).
+    const preloaded = new Set<string>();
+    const preload = (src: string) => {
+      if (!src || preloaded.has(src)) return;
+      preloaded.add(src);
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+    };
+    const preloadSlide = (i: number) => {
+      if (i < 0 || i >= slides.length) return;
+      const tmp = document.createElement('div');
+      tmp.innerHTML = slides[i];
+      tmp.querySelectorAll('img').forEach((im) => preload(im.getAttribute('src') || ''));
+    };
+
     const esc = (s: string) =>
       (s || '')
         .replace(/&/g, '&amp;')
@@ -492,6 +519,21 @@
       index = Math.max(0, Math.min(index, total - 1));
       slide.innerHTML = slides[index];
       slide.scrollTop = 0;
+      // Fade each image in as it decodes; already-cached images appear instantly.
+      slide.querySelectorAll('img').forEach((el) => {
+        const im = el as HTMLImageElement;
+        if (im.complete && im.naturalWidth > 0) {
+          im.classList.add('lp-loaded');
+        } else {
+          const done = () => im.classList.add('lp-loaded');
+          im.addEventListener('load', done, { once: true });
+          im.addEventListener('error', done, { once: true });
+        }
+      });
+      // Prioritise the slides you're about to see.
+      preloadSlide(index + 1);
+      preloadSlide(index + 2);
+      preloadSlide(index - 1);
       const counter = $('lp-counter');
       if (counter) counter.textContent = `${index + 1} / ${total}`;
       const progress = $('lp-progress');
@@ -516,6 +558,8 @@
       p.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
       render();
+      // Warm every slide's images shortly after opening so later slides are ready.
+      window.setTimeout(() => slides.forEach((_, i) => preloadSlide(i)), 700);
       p.requestFullscreen?.().catch(() => {});
     };
 
