@@ -116,20 +116,20 @@
   #lecture-presenter #lp-slide .lp-head-center { width: 100%; text-align: center; }
   #lecture-presenter #lp-slide .lp-title-main {
     line-height: 1.08;
-    font-size: max(2.3rem, 3.9cqw);
+    font-size: clamp(2.3rem, 4.8vw, 4.5rem);
     font-weight: 400;
   }
   #lecture-presenter #lp-slide .lp-title-sub {
     opacity: 0.65;
-    font-size: max(1.15rem, 1.5cqw);
+    font-size: clamp(1.15rem, 2.1vw, 1.7rem);
     margin-top: 0.25rem;
   }
   /* Body */
   #lecture-presenter #lp-slide :is(h2, h3) { line-height: 1.15; }
-  #lecture-presenter #lp-slide h2 { font-size: max(1.5rem, 2cqw); margin: 0.75rem 0 0.6rem; }
-  #lecture-presenter #lp-slide h3 { font-size: max(1.2rem, 1.55cqw); margin: 0.6rem 0 0.4rem; }
+  #lecture-presenter #lp-slide h2 { font-size: clamp(1.5rem, 3vw, 2.3rem); margin: 0.75rem 0 0.6rem; }
+  #lecture-presenter #lp-slide h3 { font-size: clamp(1.2rem, 2.4vw, 1.75rem); margin: 0.6rem 0 0.4rem; }
   #lecture-presenter #lp-slide p,
-  #lecture-presenter #lp-slide li { font-size: max(1rem, 1.25cqw); line-height: 1.5; }
+  #lecture-presenter #lp-slide li { font-size: clamp(1rem, 1.7vw, 1.45rem); line-height: 1.5; }
   #lecture-presenter #lp-slide p { margin-block: 0.5em; }
   /* Restore list markers (Tailwind Preflight strips them) */
   #lecture-presenter #lp-slide .lp-body ul { list-style: disc outside; padding-left: 1.5em; margin-block: 0.6em; }
@@ -169,19 +169,19 @@
     flex: 1 1 auto;
   }
   #lecture-presenter #lp-slide figure[data-align='bottom'] {
-    margin: auto calc(-1 * var(--lp-px)) calc(-1 * var(--lp-py));
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0.75rem calc(-1 * var(--lp-px)) calc(-1 * var(--lp-py));
     width: calc(100% + 2 * var(--lp-px));
     max-width: none;
-    text-align: center;
+    overflow: hidden;
   }
   #lecture-presenter #lp-slide figure[data-align='bottom'] img {
     width: 100%;
-    height: auto;
-    max-height: 88cqh;
-    object-fit: contain;
-    object-position: bottom center;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
     border-radius: 0;
-    margin-inline: auto;
     display: block;
   }
   #lecture-presenter #lp-slide figure[data-align='bottom'] figcaption { display: none; }
