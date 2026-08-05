@@ -158,6 +158,9 @@
     border-bottom: 1px solid hsl(var(--foreground-secondary) / 0.18);
   }
 
+  /* Learn page body copy uses the reading serif to match its headings/nav. */
+  .learn-body p { font-family: 'Besley', ui-serif, Georgia, serif; }
+
   .prose {
     --reading-font: 'Besley', ui-serif, Georgia, serif;
     --reading-size: 1.1875rem;     /* 19px */

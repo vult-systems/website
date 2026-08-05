@@ -241,6 +241,15 @@
       display: block;
       min-height: 0;
     }
+    /* Cover / title-only slide stays centered so it doesn't look blank */
+    #lecture-presenter #lp-slide .lp-title-slide:not(:has(.lp-body)) {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: calc(100dvh - 8.5rem);
+    }
     #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']) .lp-body { display: block; }
     #lecture-presenter #lp-slide figure[data-align='bottom'] {
       flex: none;
