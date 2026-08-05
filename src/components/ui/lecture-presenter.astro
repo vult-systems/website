@@ -419,6 +419,8 @@
       preloaded.add(src);
       const img = new Image();
       img.decoding = 'async';
+      // Background warming must never outrank the image you're actually viewing.
+      (img as any).fetchPriority = 'low';
       img.src = src;
     };
     const preloadSlide = (i: number) => {
@@ -426,6 +428,15 @@
       const tmp = document.createElement('div');
       tmp.innerHTML = slides[i];
       tmp.querySelectorAll('img').forEach((im) => preload(im.getAttribute('src') || ''));
+    };
+    // Reveal an image as soon as it's ready, with fallbacks so it can never stay hidden.
+    const revealImage = (im: HTMLImageElement) => {
+      const reveal = () => im.classList.add('lp-loaded');
+      if (im.complete && im.naturalWidth > 0) { reveal(); return; }
+      im.addEventListener('load', reveal, { once: true });
+      im.addEventListener('error', reveal, { once: true });
+      im.decode?.().then(reveal).catch(() => {});
+      window.setTimeout(reveal, 4000);
     };
 
     const esc = (s: string) =>
@@ -611,15 +622,10 @@
       // Fade each image in as it decodes; already-cached images appear instantly.
       slide.querySelectorAll('img').forEach((el) => {
         const im = el as HTMLImageElement;
-        if (im.complete && im.naturalWidth > 0) {
-          im.classList.add('lp-loaded');
-        } else {
-          const done = () => im.classList.add('lp-loaded');
-          im.addEventListener('load', done, { once: true });
-          im.addEventListener('error', done, { once: true });
-        }
+        im.setAttribute('fetchpriority', 'high');
+        revealImage(im);
       });
-      // Prioritise the slides you're about to see.
+      // Warm only the immediate neighbours so we never flood the connection pool.
       preloadSlide(index + 1);
       preloadSlide(index + 2);
       preloadSlide(index - 1);
@@ -647,8 +653,6 @@
       p.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
       render();
-      // Warm every slide's images shortly after opening so later slides are ready.
-      window.setTimeout(() => slides.forEach((_, i) => preloadSlide(i)), 700);
       p.requestFullscreen?.().catch(() => {});
     };
 
