@@ -219,6 +219,20 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 
+    // Present shows images large; swap in the high-res `data-full` source so they stay sharp.
+    const upgradeImages = (el: HTMLElement) => {
+      const imgs = el.tagName === 'IMG' ? [el as HTMLImageElement] : Array.from(el.querySelectorAll('img'));
+      imgs.forEach((img) => {
+        const full = img.getAttribute('data-full');
+        if (full) {
+          img.setAttribute('src', full);
+          img.removeAttribute('srcset');
+          img.removeAttribute('sizes');
+        }
+        img.setAttribute('loading', 'eager');
+      });
+    };
+
     type Group = { title: string; subtitle: string; layout: string; nodes: HTMLElement[] };
 
     const headHtml = (title: string, subtitle: string, center: boolean) =>
@@ -236,6 +250,7 @@
       const cloneHtml = (nodes: HTMLElement[]) => {
         const wrap = document.createElement('div');
         nodes.forEach((n) => wrap.appendChild(n.cloneNode(true)));
+        upgradeImages(wrap);
         return wrap.innerHTML;
       };
 
@@ -259,7 +274,9 @@
           (n) => n.tagName === 'FIGURE' || !!n.querySelector?.('img, video')
         );
         const rest = g.nodes.filter((n) => n !== media);
-        const mediaHtml = media ? (media.cloneNode(true) as HTMLElement).outerHTML : '';
+        const mediaEl = media ? (media.cloneNode(true) as HTMLElement) : null;
+        if (mediaEl) upgradeImages(mediaEl);
+        const mediaHtml = mediaEl ? mediaEl.outerHTML : '';
         return (
           `<div class="lp-deck lp-content-slide">${head}` +
             `<div class="lp-cols ${g.layout}">` +
