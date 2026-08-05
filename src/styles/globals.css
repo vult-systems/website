@@ -171,6 +171,8 @@
   .lecture-clr-gold { color: #c98a00; }
   .lecture-clr-green { color: #2e9e4f; }
   .lecture-clr-muted { color: hsl(var(--foreground-secondary)); }
+  /* Bold/italic/code inside a colored run keeps the color instead of resetting it. */
+  [class*='lecture-clr-'] :is(strong, em, code) { color: inherit; }
 
   .prose {
     --reading-font: 'Besley', ui-serif, Georgia, serif;
