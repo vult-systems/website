@@ -16,7 +16,7 @@ import { getLearnPageSEO } from '@/config/seo';
 import { sanityClient } from '@/lib/sanity/client';
 import { coursesQuery, pipelineQuery, learnPageQuery } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/image';
-import { bodyToPlainText } from '@/lib/sanity/toc';
+import { bodyToPlainText, slugify } from '@/lib/sanity/toc';
 import PortableText from '@/components/sanity/PortableText.astro';
 
 // Read live from Sanity at request time (edits appear instantly).
@@ -172,6 +172,41 @@ const topicSearchData = (topic: PipelineTopic) =>
 
 const topicThreadSearchData = (topic: PipelineTopic, thread: CourseProjectThread) =>
 	`${topic.title} ${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.toLowerCase();
+
+// Granular search index for the results view: one entry per lecture / glossary
+// term, keeping the original-case text so we can show a highlighted snippet.
+type SearchEntry = { kind: string; title: string; crumb: string; hash: string; text: string };
+const searchEntries: SearchEntry[] = [];
+for (const course of allCourses) {
+	const cid = courseId(course.code);
+	for (const project of course.projects ?? []) {
+		const projectText = `${project.description ?? ''} ${bodyToPlainText(project.body)}`.trim();
+		if (projectText) searchEntries.push({ kind: 'Project', title: project.title, crumb: course.code, hash: `${cid}/${project.slug}`, text: projectText });
+		for (const thread of project.threads ?? []) {
+			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: `${course.code} · ${project.title}`, hash: `${cid}/${project.slug}/${thread.slug}`, text: `${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim() });
+		}
+	}
+}
+for (const topic of pipeline) {
+	const table = (((topic.body as any[]) ?? []).find((b: any) => b?._type === 'table'));
+	if (table?.rows?.length) {
+		for (const row of table.rows) {
+			const cells = row?.cells ?? [];
+			const term = String(cells[0] ?? '').trim();
+			const def = String(cells[1] ?? '').trim();
+			if (!term || term.toLowerCase() === 'name') continue;
+			searchEntries.push({ kind: 'Glossary', title: term, crumb: topic.title, hash: `${topic.slug}/${slugify(term)}`, text: `${term} — ${def}` });
+		}
+	} else if ((topic.threads?.length ?? 0) > 0) {
+		for (const thread of topic.threads ?? []) {
+			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: topic.title, hash: `${topic.slug}/${thread.slug}`, text: `${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim() });
+		}
+	} else {
+		const topicText = bodyToPlainText(topic.body);
+		if (topicText) searchEntries.push({ kind: 'Topic', title: topic.title, crumb: 'Supplemental', hash: topic.slug, text: topicText });
+	}
+}
+const searchIndexJson = JSON.stringify(searchEntries).replace(/</g, '\\u003c');
 ---
 
 
@@ -335,6 +370,10 @@ data-project={thread.slug}
 
 <!-- Main Content -->
 <div class="flex-1 min-w-0">
+
+<!-- Search results (replaces the content area while searching) -->
+<div id="search-results" class="hidden"></div>
+<script id="learn-search-index" type="application/json" is:inline set:html={searchIndexJson}></script>
 
 <!-- Course list -->
 <div id="classes-list" class="space-y-3 hidden">
@@ -847,54 +886,76 @@ const initCourseSearch = () => {
 
 	const normalize = (value: string) => value.toLowerCase().trim();
 
+	// --- Full-text results with highlighted snippets ---
+	const searchIndexEl = document.getElementById('learn-search-index');
+	let searchEntries: Array<{ kind: string; title: string; crumb: string; hash: string; text: string }> = [];
+	try { searchEntries = JSON.parse(searchIndexEl?.textContent || '[]'); } catch { searchEntries = []; }
+	const resultsPanel = document.getElementById('search-results');
+	const escHtml = (s: string) =>
+		s.replace(/[&<>"']/g, (c) => (({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as Record<string, string>)[c]));
+	const buildSnippet = (text: string, q: string) => {
+		const i = text.toLowerCase().indexOf(q);
+		if (i < 0) return escHtml(text.slice(0, 150)) + (text.length > 150 ? '\u2026' : '');
+		const start = Math.max(0, i - 60);
+		const end = Math.min(text.length, i + q.length + 90);
+		return (
+			(start > 0 ? '\u2026' : '') +
+			escHtml(text.slice(start, i)) +
+			'<mark>' + escHtml(text.slice(i, i + q.length)) + '</mark>' +
+			escHtml(text.slice(i + q.length, end)) +
+			(end < text.length ? '\u2026' : '')
+		);
+	};
+	const renderResults = (q: string) => {
+		if (!resultsPanel) return;
+		const hits = searchEntries
+			.map((e) => {
+				const inTitle = e.title.toLowerCase().includes(q);
+				const inText = e.text.toLowerCase().includes(q);
+				return inTitle || inText ? { e, inTitle } : null;
+			})
+			.filter((x): x is { e: (typeof searchEntries)[number]; inTitle: boolean } => x !== null);
+		hits.sort((a, b) => Number(b.inTitle) - Number(a.inTitle));
+		if (!hits.length) {
+			resultsPanel.innerHTML = `<p class="mt-6 text-sm text-foreground-muted" style="font-family:'Besley',serif">No results for \u201c${escHtml(q)}\u201d.</p>`;
+			return;
+		}
+		resultsPanel.innerHTML =
+			`<p class="mb-4 text-xs uppercase tracking-widest text-foreground-muted" style="font-family:'Besley',serif">${hits.length} result${hits.length === 1 ? '' : 's'}</p>` +
+			`<div class="space-y-2">` +
+			hits.slice(0, 50).map(({ e }) =>
+				`<a href="#${escHtml(e.hash)}" class="search-result block rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4" data-hash="${escHtml(e.hash)}">` +
+					`<div class="flex items-center gap-2 mb-1"><span class="text-[0.65rem] uppercase tracking-wider text-accent" style="font-family:'Besley',serif">${escHtml(e.kind)}</span><span class="text-xs text-foreground-muted">${escHtml(e.crumb)}</span></div>` +
+					`<p class="text-base font-medium text-foreground mb-1" style="font-family:'Besley',serif">${escHtml(e.title)}</p>` +
+					`<p class="text-sm text-foreground-secondary leading-snug">${buildSnippet(e.text, q)}</p>` +
+				`</a>`
+			).join('') +
+			`</div>`;
+	};
+
 	applyCourseSearchFilters = () => {
 		const query = normalize(searchInput.value);
 		const hasQuery = query.length > 0;
 
-		const classLinks = Array.from(document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]'));
-		const classDetails = Array.from(document.querySelectorAll<HTMLElement>('.course-detail-content'));
-		let classMatches = 0;
-
-		classLinks.forEach((link) => {
+		// Narrow the sidebar nav to matching courses/topics.
+		document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]').forEach((link) => {
 			const haystack = link.dataset.courseSearch ?? '';
-			const match = !hasQuery || haystack.includes(query);
-			link.classList.toggle('hidden', !match);
+			link.classList.toggle('hidden', hasQuery && !haystack.includes(query));
 		});
 
-		classDetails.forEach((detail) => {
-			const haystack = detail.dataset.courseSearch ?? '';
-			const match = !hasQuery || haystack.includes(query);
-			detail.dataset.searchMatch = match ? 'true' : 'false';
-			if (match) classMatches += 1;
-
-			const projectCards = Array.from(detail.querySelectorAll<HTMLElement>('.project-card'));
-			let projectMatches = 0;
-			projectCards.forEach((card) => {
-				const projectHaystack = card.dataset.projectSearch ?? '';
-				const projectMatch = !hasQuery || projectHaystack.includes(query);
-				card.classList.toggle('hidden', !projectMatch);
-				if (projectMatch) projectMatches += 1;
-			});
-
-			const projectEmpty = detail.querySelector<HTMLElement>('.projects-search-empty');
-			if (projectEmpty) {
-				projectEmpty.classList.toggle('hidden', !hasQuery || projectMatches > 0 || !match);
-			}
-		});
-
-		const classesEmpty = document.getElementById('classes-search-empty');
-		if (classesEmpty) {
-			classesEmpty.classList.toggle('hidden', classMatches > 0);
-		}
-
-		const activeClassLink = document.querySelector<HTMLElement>('.learn-nav-link[data-course-nav="true"].active');
-		const activeSlug = activeClassLink?.dataset.slug;
-		const activeDetail = activeSlug ? document.getElementById(`detail-${activeSlug}`) as HTMLElement | null : null;
-		const activeMatches = activeDetail?.dataset.searchMatch === 'true';
-		const firstVisibleLink = classLinks.find((link) => !link.classList.contains('hidden'));
-
-		if (hasQuery && firstVisibleLink && !activeMatches) {
-			openCourseDetail(firstVisibleLink.dataset.slug!, false);
+		if (hasQuery) {
+			renderResults(query);
+			resultsPanel?.classList.remove('hidden');
+			document.getElementById('classes-list')?.classList.add('hidden');
+			document.getElementById('classes-detail')?.classList.add('hidden');
+			document.getElementById('project-detail')?.classList.add('hidden');
+			document.getElementById('thread-detail')?.classList.add('hidden');
+			document.getElementById('sidebar-project-chapters')?.classList.add('hidden');
+			document.getElementById('chapters-aside')?.classList.remove('chapters-visible');
+			document.getElementById('classes-search-empty')?.classList.add('hidden');
+		} else {
+			resultsPanel?.classList.add('hidden');
+			document.getElementById('classes-detail')?.classList.remove('hidden');
 		}
 	};
 
@@ -909,6 +970,18 @@ const initCourseSearch = () => {
 			sessionStorage.setItem('course-search', '');
 			applyCourseSearchFilters?.();
 		}
+	});
+
+	// Clicking a result clears the search and opens that lecture / glossary term.
+	resultsPanel?.addEventListener('click', (event) => {
+		const link = (event.target as HTMLElement).closest('.search-result') as HTMLElement | null;
+		if (!link) return;
+		event.preventDefault();
+		searchInput.value = '';
+		sessionStorage.setItem('course-search', '');
+		applyCourseSearchFilters();
+		history.pushState(null, '', `#${link.dataset.hash}`);
+		restoreFromHash();
 	});
 
 	applyCourseSearchFilters();
