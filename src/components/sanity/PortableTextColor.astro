@@ -1,0 +1,10 @@
+---
+// Preset text color (Sanity `textColor` annotation). Renders a class so the
+// same color applies in both the reading view and the lecture presenter.
+const { node } = Astro.props;
+const allowed = new Set(['accent', 'red', 'blue', 'gold', 'green', 'muted']);
+const value = node?.markDef?.value ?? 'accent';
+const cls = allowed.has(value) ? `lecture-clr-${value}` : 'lecture-clr-accent';
+---
+
+<span class={cls}><slot /></span>

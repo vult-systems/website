@@ -164,6 +164,14 @@
      matching the tabbed sub-item style in the Studio editor. */
   .prose ol ol { list-style-type: disc; }
 
+  /* Preset text colors (Sanity `textColor` annotation) — apply on the page and in Present. */
+  .lecture-clr-accent { color: hsl(var(--accent)); }
+  .lecture-clr-red { color: #d92d20; }
+  .lecture-clr-blue { color: #2f6fed; }
+  .lecture-clr-gold { color: #c98a00; }
+  .lecture-clr-green { color: #2e9e4f; }
+  .lecture-clr-muted { color: hsl(var(--foreground-secondary)); }
+
   .prose {
     --reading-font: 'Besley', ui-serif, Georgia, serif;
     --reading-size: 1.1875rem;     /* 19px */

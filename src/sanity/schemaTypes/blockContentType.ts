@@ -45,6 +45,37 @@ export const blockContentType = defineType({
               },
             ],
           },
+          {
+            title: 'Text color',
+            name: 'textColor',
+            type: 'object',
+            fields: [
+              {
+                title: 'Color',
+                name: 'value',
+                type: 'string',
+                options: {
+                  list: [
+                    { title: 'Accent', value: 'accent' },
+                    { title: 'Red', value: 'red' },
+                    { title: 'Blue', value: 'blue' },
+                    { title: 'Gold', value: 'gold' },
+                    { title: 'Green', value: 'green' },
+                    { title: 'Muted', value: 'muted' },
+                  ],
+                  layout: 'radio',
+                },
+                initialValue: 'accent',
+                validation: (Rule) => Rule.required(),
+              },
+            ],
+            preview: {
+              select: { value: 'value' },
+              prepare: ({ value }: { value?: string }) => ({
+                title: `Color: ${value || 'accent'}`,
+              }),
+            },
+          },
         ],
       },
     }),

@@ -4,6 +4,16 @@ module.exports = {
   content: [
     './src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
   ],
+  // Preset text colors are applied from CMS data via a template literal, so the
+  // scanner can't see them — keep them from being purged.
+  safelist: [
+    'lecture-clr-accent',
+    'lecture-clr-red',
+    'lecture-clr-blue',
+    'lecture-clr-gold',
+    'lecture-clr-green',
+    'lecture-clr-muted',
+  ],
   theme: {
   	container: {
   		center: true,
