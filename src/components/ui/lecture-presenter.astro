@@ -156,7 +156,7 @@
   #lecture-presenter #lp-slide figure[data-align='full'] video { max-height: 70cqh; }
 
   /* Bottom full-bleed: pin the image to the slide's bottom edge (e.g. character busts). */
-  #lecture-presenter #lp-slide:has(figure[data-align='bottom']) { overflow: hidden; }
+  #lecture-presenter #lp-slide:has(figure[data-align='bottom']) { overflow: hidden; padding-bottom: 0; }
   #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']) {
     min-height: 100%;
     display: flex;
@@ -171,14 +171,18 @@
   #lecture-presenter #lp-slide figure[data-align='bottom'] {
     flex: 1 1 auto;
     min-height: 0;
-    margin: 0.75rem calc(-1 * var(--lp-px)) calc(-1 * var(--lp-py));
+    display: flex;
+    flex-direction: column;
+    margin: 0.75rem calc(-1 * var(--lp-px)) 0;
     width: calc(100% + 2 * var(--lp-px));
     max-width: none;
     overflow: hidden;
   }
   #lecture-presenter #lp-slide figure[data-align='bottom'] img {
+    flex: 1 1 0;
+    min-height: 0;
     width: 100%;
-    height: 100%;
+    max-height: none;
     object-fit: cover;
     object-position: top center;
     border-radius: 0;
