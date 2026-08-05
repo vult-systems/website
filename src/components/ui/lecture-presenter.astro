@@ -204,6 +204,65 @@
   #lecture-presenter #lp-slide .lp-two-col { column-count: 2; column-gap: clamp(1.75rem, 3cqw, 3rem); }
   #lecture-presenter #lp-slide .lp-two-col :is(h2, h3) { column-span: all; }
   #lecture-presenter #lp-slide .lp-body-center { text-align: center; }
+
+  /* Small screens / heavy browser zoom-in: drop the fixed 16:9 frame and fall
+     back to a simple scrollable stacked view so nothing collapses or overlaps. */
+  @media (max-width: 720px), (max-height: 520px) {
+    #lecture-presenter #lp-stage { display: block; padding: 0; overflow-y: auto; }
+    #lecture-presenter #lp-frame {
+      aspect-ratio: auto;
+      width: 100%;
+      height: auto;
+      min-height: 100%;
+      border: 0;
+      border-radius: 0;
+      overflow: visible;
+    }
+    #lecture-presenter #lp-slide {
+      position: static;
+      inset: auto;
+      display: block;
+      overflow: visible;
+      min-height: 100%;
+      padding: 1.5rem 1.25rem 2rem;
+    }
+    #lecture-presenter #lp-zone-prev,
+    #lecture-presenter #lp-zone-next { display: none; }
+    #lecture-presenter #lp-context {
+      position: static;
+      max-width: none;
+      text-align: left;
+      margin-bottom: 0.75rem;
+    }
+    /* Un-flex the deck/body so the bottom image gets a real box instead of collapsing */
+    #lecture-presenter #lp-slide .lp-deck,
+    #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']),
+    #lecture-presenter #lp-slide .lp-title-slide {
+      display: block;
+      min-height: 0;
+    }
+    #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']) .lp-body { display: block; }
+    #lecture-presenter #lp-slide figure[data-align='bottom'] {
+      flex: none;
+      display: block;
+      aspect-ratio: 16 / 10;
+      width: 100%;
+      margin: 1rem 0 0;
+    }
+    #lecture-presenter #lp-slide figure[data-align='bottom'] img { height: 100%; }
+    /* Two-column and side-by-side collapse to one column */
+    #lecture-presenter #lp-slide .lp-cols { grid-template-columns: 1fr; }
+    #lecture-presenter #lp-slide .lp-two-col { column-count: 1; }
+    /* Compact, fixed type */
+    #lecture-presenter #lp-slide .lp-title-main { font-size: clamp(1.5rem, 6vw, 2.1rem); }
+    #lecture-presenter #lp-slide .lp-title-sub { font-size: 1.05rem; }
+    #lecture-presenter #lp-slide h2 { font-size: 1.5rem; }
+    #lecture-presenter #lp-slide h3 { font-size: 1.25rem; }
+    #lecture-presenter #lp-slide p,
+    #lecture-presenter #lp-slide li { font-size: 1rem; }
+    #lecture-presenter #lp-slide img,
+    #lecture-presenter #lp-slide video { max-height: none; }
+  }
 </style>
 
 <script>
