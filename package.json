@@ -23,12 +23,12 @@
     "@sanity/client": "^7.23.0",
     "@sanity/image-url": "^2.1.1",
     "@sanity/table": "^3.1.8",
-    "@sanity/vision": "^6.8.0",
+    "@sanity/vision": "^6.9.0",
     "astro": "^5.14.5",
     "astro-portabletext": "^0.13.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "sanity": "^6.8.0",
+    "sanity": "^6.9.0",
     "styled-components": "^6.4.3"
   },
   "devDependencies": {
