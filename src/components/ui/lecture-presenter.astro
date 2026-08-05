@@ -147,13 +147,24 @@
   #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
   #lecture-presenter #lp-slide strong { font-weight: 700; }
 
-  /* Smooth entrances so large photos don't pop in harshly while they load. */
-  @keyframes lp-fade-in { from { opacity: 0; } to { opacity: 1; } }
-  #lecture-presenter #lp-slide .lp-deck { animation: lp-fade-in 0.3s ease both; }
+  /* Smooth entrances: text eases up in a gentle stagger, photos fade in. */
+  @keyframes lp-rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  #lecture-presenter #lp-slide .lp-head,
+  #lecture-presenter #lp-slide .lp-body > :is(h2, h3, h4, p, ul, ol, blockquote, table, .lp-head) {
+    animation: lp-rise-in 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  #lecture-presenter #lp-slide .lp-head { animation-delay: 0.04s; }
+  #lecture-presenter #lp-slide .lp-body > *:nth-child(1) { animation-delay: 0.12s; }
+  #lecture-presenter #lp-slide .lp-body > *:nth-child(2) { animation-delay: 0.2s; }
+  #lecture-presenter #lp-slide .lp-body > *:nth-child(3) { animation-delay: 0.28s; }
+  #lecture-presenter #lp-slide .lp-body > *:nth-child(4) { animation-delay: 0.36s; }
+  #lecture-presenter #lp-slide .lp-body > *:nth-child(5) { animation-delay: 0.44s; }
+  #lecture-presenter #lp-slide .lp-body > *:nth-child(n + 6) { animation-delay: 0.52s; }
   #lecture-presenter #lp-slide img { opacity: 0; transition: opacity 0.45s ease; }
   #lecture-presenter #lp-slide img.lp-loaded { opacity: 1; }
   @media (prefers-reduced-motion: reduce) {
-    #lecture-presenter #lp-slide .lp-deck { animation: none; }
+    #lecture-presenter #lp-slide .lp-head,
+    #lecture-presenter #lp-slide .lp-body > * { animation: none; }
     #lecture-presenter #lp-slide img { opacity: 1; transition: none; }
   }
 
