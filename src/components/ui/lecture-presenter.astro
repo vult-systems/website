@@ -154,6 +154,7 @@
   #lecture-presenter #lp-slide figure[data-align='full'] video { max-height: 70cqh; }
 
   /* Bottom full-bleed: pin the image to the slide's bottom edge (e.g. character busts). */
+  #lecture-presenter #lp-slide:has(figure[data-align='bottom']) { overflow: hidden; }
   #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']) {
     min-height: 100%;
     display: flex;
@@ -171,9 +172,9 @@
     text-align: center;
   }
   #lecture-presenter #lp-slide figure[data-align='bottom'] img {
-    max-height: 84cqh;
-    width: auto;
-    max-width: 100%;
+    width: 100%;
+    height: auto;
+    max-height: 88cqh;
     object-fit: contain;
     object-position: bottom center;
     border-radius: 0;
