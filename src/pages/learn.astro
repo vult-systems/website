@@ -617,7 +617,7 @@ data-project={thread.slug}
 <div class="sticky top-32">
 <div id="sidebar-project-chapters" class="hidden">
 <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
-Chapters
+Sections
 </Text>
 <nav id="sidebar-project-chapters-nav" class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4"></nav>
 </div>
@@ -909,10 +909,10 @@ chaptersAside?.classList.remove('chapters-visible');
 return;
 }
 
-const setActiveChapter = (id: string) => {
+const setActiveChapter = (key: string) => {
 const chapterLinks = Array.from(chapterNav.querySelectorAll<HTMLElement>('.learn-nav-link'));
 chapterLinks.forEach((link) => {
-const isActive = link.dataset.slug === id;
+const isActive = link.dataset.key === key;
 link.classList.toggle('active', isActive);
 const title = link.querySelector<HTMLElement>('.learn-nav-title');
 if (!title) return;
@@ -921,13 +921,13 @@ title.classList.toggle('text-foreground-secondary', !isActive);
 });
 };
 
-sections.forEach((section) => {
-const id = section.id;
-const label = (section.textContent || id).trim();
+sections.forEach((section, i) => {
+const key = String(i);
+const label = (section.textContent || section.id).trim();
 const level = Number(section.tagName.slice(1)) || 2;
 const link = document.createElement('a');
-link.href = `#${id}`;
-link.dataset.slug = id;
+link.href = section.id ? `#${section.id}` : '#';
+link.dataset.key = key;
 link.className = 'learn-nav-link block leading-snug group';
 
 const title = document.createElement('span');
@@ -939,8 +939,9 @@ link.appendChild(title);
 
 link.addEventListener('click', (e) => {
 e.preventDefault();
-setActiveChapter(id);
-document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+setActiveChapter(key);
+// Scroll to the element itself so empty/duplicate heading ids can't break the jump.
+section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 chapterNav.appendChild(link);
 });
@@ -953,15 +954,12 @@ const visible = entries
 .filter((entry) => entry.isIntersecting)
 .sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top));
 if (!visible.length) return;
-const id = (visible[0].target as HTMLElement).id;
-setActiveChapter(id);
+const key = String(sections.indexOf(visible[0].target as HTMLElement));
+setActiveChapter(key);
 }, { rootMargin: '-18% 0px -70% 0px' });
 
 sections.forEach((section) => chapterObserver!.observe(section));
-if (sections[0]) {
-const firstId = sections[0].id;
-setActiveChapter(firstId);
-}
+if (sections[0]) setActiveChapter('0');
 };
 
 // --- Project drill-down ---

@@ -11,10 +11,14 @@ export function slugify(text: string): string {
     .replace(/^-|-$/g, '');
 }
 
-/** Flatten a Portable Text block's spans into plain text. */
+/** Flatten a Portable Text block's spans into plain text (handles annotated/nested spans). */
 export function portableTextToPlain(block: any): string {
-  if (!block?.children) return '';
-  return block.children.map((c: any) => c?.text ?? '').join('');
+  if (block == null) return '';
+  if (typeof block === 'string') return block;
+  if (Array.isArray(block)) return block.map(portableTextToPlain).join('');
+  if (typeof block.text === 'string') return block.text;
+  if (Array.isArray(block.children)) return block.children.map(portableTextToPlain).join('');
+  return '';
 }
 
 export interface TocHeading {
