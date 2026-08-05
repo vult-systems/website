@@ -23,7 +23,7 @@ import newtekLogoBlk from '@/assets/logos/newtek-logo-blk.png';
 
 // Import colored logos (used in both light and dark modes)
 import qualcommLogoClr from '@/assets/logos/qualcomm-logo-clr.png';
-import mergeVrLogoClr from '@/assets/logos/merge-vr-logo2-clr.png';
+import mergeVrLogoClr from '@/assets/logos/merge-vr-logo-clr.png';
 import usafaLogoClr from '@/assets/logos/usafa-logo-clr.png';
 import losAlamosLogoClr from '@/assets/logos/losalamos-logo-clr.png';
 
@@ -97,7 +97,9 @@ const {
     <div class="space-y-6">
       <!-- Top Row - 5 logos -->
       <div class="grid grid-cols-3 sm:grid-cols-5 gap-4 items-center">
-        {logos.slice(0, 5).map((logo, index) => (
+        {logos.slice(0, 5).map((logo, index) => {
+          const edge = index === 0 ? "object-left" : index === 4 ? "object-right" : "object-center";
+          return (
           <div class:list={[
             "flex items-center",
             index === 0 ? "justify-start" : index === 4 ? "justify-end" : "justify-center"
@@ -108,7 +110,8 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none dark:hidden",
-                sizeClass[logo.size ?? 'md']
+                sizeClass[logo.size ?? 'md'],
+                edge
               ]}
               loading="lazy"
             />
@@ -118,16 +121,20 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none hidden dark:block",
-                sizeClass[logo.size ?? 'md']
+                sizeClass[logo.size ?? 'md'],
+                edge
               ]}
               loading="lazy"
             />
           </div>
-        ))}
+          );
+        })}
       </div>
       <!-- Bottom Row - 5 columns (4 logos + empty) -->
       <div class="grid grid-cols-3 sm:grid-cols-5 gap-4 items-center">
-        {logos.slice(5).map((logo, index) => (
+        {logos.slice(5).map((logo, index) => {
+          const edge = index === 0 ? "object-left" : index === 4 ? "object-right" : "object-center";
+          return (
           <div class:list={[
             "flex items-center",
             index === 0 ? "justify-start" : index === 4 ? "justify-end" : "justify-center"
@@ -138,7 +145,8 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none dark:hidden",
-                sizeClass[logo.size ?? 'md']
+                sizeClass[logo.size ?? 'md'],
+                edge
               ]}
               loading="lazy"
             />
@@ -148,12 +156,14 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none hidden dark:block",
-                sizeClass[logo.size ?? 'md']
+                sizeClass[logo.size ?? 'md'],
+                edge
               ]}
               loading="lazy"
             />
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
 
