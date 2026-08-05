@@ -22,6 +22,7 @@ import disneyLogoBlk from '@/assets/logos/walt-disney-logo-blk.png';
 import newtekLogoBlk from '@/assets/logos/newtek-logo-blk.png';
 
 // Import colored logos (used in both light and dark modes)
+import qualcommLogoClr from '@/assets/logos/qualcomm-logo-clr.png';
 import mergeVrLogoClr from '@/assets/logos/merge-vr-logo2-clr.png';
 import usafaLogoClr from '@/assets/logos/usafa-logo-clr.png';
 import losAlamosLogoClr from '@/assets/logos/losalamos-logo-clr.png';
@@ -48,6 +49,7 @@ const defaultLogos: Logo[] = [
   { name: 'UIW 3D', imageLight: uiw3dLogoBlk, imageDark: uiw3dLogoWht, size: '2xl' },
   { name: 'Merge VR', imageLight: mergeVrLogoClr, imageDark: mergeVrLogoClr, size: 'md' },
   // Row 2
+  { name: 'Qualcomm', imageLight: qualcommLogoClr, imageDark: qualcommLogoClr, size: 'lg' },
   { name: 'Los Alamos', imageLight: losAlamosLogoClr, imageDark: losAlamosLogoClr, size: 'md' },
   { name: 'NewTek', imageLight: newtekLogoBlk, imageDark: newtekLogoWht, size: 'md' },
   { name: 'US Air Force Academy', imageLight: usafaLogoClr, imageDark: usafaLogoClr, size: 'md' },
@@ -128,7 +130,7 @@ const {
         {logos.slice(5).map((logo, index) => (
           <div class:list={[
             "flex items-center",
-            index === 0 ? "justify-start" : "justify-center"
+            index === 0 ? "justify-start" : index === 4 ? "justify-end" : "justify-center"
           ]}>
             {/* Light mode logo (black) */}
             <Image 
@@ -152,8 +154,6 @@ const {
             />
           </div>
         ))}
-        <!-- Empty 5th column -->
-        <div></div>
       </div>
     </div>
 
