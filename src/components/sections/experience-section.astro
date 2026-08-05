@@ -31,6 +31,7 @@ interface Logo {
   name: string;
   imageLight: ImageMetadata; // Black logo for light mode
   imageDark: ImageMetadata;  // White logo for dark mode
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
 interface Props {
@@ -42,18 +43,27 @@ interface Props {
 
 const defaultLogos: Logo[] = [
   // Row 1
-  { name: 'Vult Systems', imageLight: vultLogoBlk, imageDark: vultLogoWht },
-  { name: 'UIW 3D', imageLight: uiw3dLogoBlk, imageDark: uiw3dLogoWht },
-  { name: '343 Industries', imageLight: logo343iBlk, imageDark: logo343iWht },
-  { name: 'BioWare', imageLight: biowareLogoBlk, imageDark: biowareLogoWht },
-  { name: 'Qualcomm', imageLight: qualcommLogoClr, imageDark: qualcommLogoClr },
+  { name: '343 Industries', imageLight: logo343iBlk, imageDark: logo343iWht, size: 'md' },
+  { name: 'BioWare', imageLight: biowareLogoBlk, imageDark: biowareLogoWht, size: 'sm' },
+  { name: 'Walt Disney', imageLight: disneyLogoBlk, imageDark: disneyLogoWht, size: 'xl' },
+  { name: 'UIW 3D', imageLight: uiw3dLogoBlk, imageDark: uiw3dLogoWht, size: '2xl' },
+  { name: 'Qualcomm', imageLight: qualcommLogoClr, imageDark: qualcommLogoClr, size: 'lg' },
   // Row 2
-  { name: 'Walt Disney', imageLight: disneyLogoBlk, imageDark: disneyLogoWht },
-  { name: 'Merge VR', imageLight: mergeVrLogoClr, imageDark: mergeVrLogoClr },
-  { name: 'US Air Force Academy', imageLight: usafaLogoClr, imageDark: usafaLogoClr },
-  { name: 'NewTek', imageLight: newtekLogoBlk, imageDark: newtekLogoWht },
-  { name: 'Los Alamos', imageLight: losAlamosLogoClr, imageDark: losAlamosLogoClr },
+  { name: 'Los Alamos', imageLight: losAlamosLogoClr, imageDark: losAlamosLogoClr, size: 'md' },
+  { name: 'NewTek', imageLight: newtekLogoBlk, imageDark: newtekLogoWht, size: 'md' },
+  { name: 'Merge VR', imageLight: mergeVrLogoClr, imageDark: mergeVrLogoClr, size: 'md' },
+  { name: 'US Air Force Academy', imageLight: usafaLogoClr, imageDark: usafaLogoClr, size: 'md' },
+  { name: 'Vult Systems', imageLight: vultLogoBlk, imageDark: vultLogoWht, size: 'sm' },
 ];
+
+// Per-logo heights so reordering never mis-sizes a logo (esp. wordmarks like UIW).
+const sizeClass: Record<string, string> = {
+  sm: 'h-6 sm:h-8 md:h-10',
+  md: 'h-8 sm:h-10 md:h-12',
+  lg: 'h-10 sm:h-12 md:h-14',
+  xl: 'h-12 sm:h-14 md:h-16',
+  '2xl': 'h-16 sm:h-20 md:h-24',
+};
 
 const {
   title = "Studios I've Worked With",
@@ -98,9 +108,7 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none dark:hidden",
-                index === 0 || index === 3 ? "h-6 sm:h-8 md:h-10" :
-                index === 1 ? "h-16 sm:h-20 md:h-24" :
-                index === 4 ? "h-10 sm:h-12 md:h-14" : "h-8 sm:h-10 md:h-12"
+                sizeClass[logo.size ?? 'md']
               ]}
               loading="lazy"
             />
@@ -110,9 +118,7 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none hidden dark:block",
-                index === 0 || index === 3 ? "h-6 sm:h-8 md:h-10" :
-                index === 1 ? "h-16 sm:h-20 md:h-24" :
-                index === 4 ? "h-10 sm:h-12 md:h-14" : "h-8 sm:h-10 md:h-12"
+                sizeClass[logo.size ?? 'md']
               ]}
               loading="lazy"
             />
@@ -132,7 +138,7 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none dark:hidden",
-                index === 0 ? "h-12 sm:h-14 md:h-16" : "h-8 sm:h-10 md:h-12"
+                sizeClass[logo.size ?? 'md']
               ]}
               loading="lazy"
             />
@@ -142,7 +148,7 @@ const {
               alt={logo.name}
               class:list={[
                 "object-contain pointer-events-none select-none hidden dark:block",
-                index === 0 ? "h-12 sm:h-14 md:h-16" : "h-8 sm:h-10 md:h-12"
+                sizeClass[logo.size ?? 'md']
               ]}
               loading="lazy"
             />
