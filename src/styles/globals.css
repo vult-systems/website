@@ -151,6 +151,12 @@
   .prose figure[data-align='center'] { margin-inline: auto; }
   .prose figure[data-align='full'] { max-width: none; }
 
+  /* Divider under lecture headings, mirroring the Present view (no manual divider needed). */
+  .lecture-body h2 {
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid hsl(var(--foreground-secondary) / 0.18);
+  }
+
   .prose {
     --reading-font: 'Besley', ui-serif, Georgia, serif;
     --reading-size: 1.1875rem;     /* 19px */
