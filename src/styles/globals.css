@@ -150,6 +150,9 @@
   .prose figure[data-align='right'] { margin-inline: auto 0; max-width: 70%; }
   .prose figure[data-align='center'] { margin-inline: auto; }
   .prose figure[data-align='full'] { max-width: none; }
+  /* Full-bleed variants read as prominent full-width figures in the article view. */
+  .prose figure[data-align='left-bleed'],
+  .prose figure[data-align='right-bleed'] { max-width: none; }
   .prose figure[data-align='bottom'] { max-width: none; }
 
   /* Divider under lecture headings, mirroring the Present view (no manual divider needed). */

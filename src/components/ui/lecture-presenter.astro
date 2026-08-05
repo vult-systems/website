@@ -201,6 +201,41 @@
   #lecture-presenter #lp-slide .lp-cols .lp-col-media figure { margin: 0; max-width: none; }
   #lecture-presenter #lp-slide .lp-cols .lp-col-media img,
   #lecture-presenter #lp-slide .lp-cols .lp-col-media video { max-height: 66cqh; }
+
+  /* Full-bleed side image: the media runs edge-to-edge; text keeps its padding. */
+  #lecture-presenter #lp-slide:has(.lp-cols.bleed) { padding: 0; overflow: hidden; }
+  #lecture-presenter #lp-slide .lp-deck:has(.lp-cols.bleed) { height: 100%; min-height: 0; display: flex; }
+  #lecture-presenter #lp-slide .lp-cols.bleed { flex: 1; min-height: 0; gap: 0; align-items: stretch; }
+  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media { min-height: 0; }
+  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media figure { margin: 0; width: 100%; height: 100%; }
+  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media img,
+  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media video {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+    border-radius: 0;
+    display: block;
+  }
+  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    min-height: 0;
+    overflow-y: auto;
+    padding-block: var(--lp-py);
+    max-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--foreground-secondary) / 0.3) transparent;
+  }
+  #lecture-presenter #lp-slide .lp-cols.image-right.bleed .lp-col-text {
+    padding-left: var(--lp-px);
+    padding-right: clamp(1.5rem, 3cqw, 3rem);
+  }
+  #lecture-presenter #lp-slide .lp-cols.image-left.bleed .lp-col-text {
+    padding-right: var(--lp-px);
+    padding-left: clamp(1.5rem, 3cqw, 3rem);
+  }
   #lecture-presenter #lp-slide .lp-two-col { column-count: 2; column-gap: clamp(1.75rem, 3cqw, 3rem); }
   #lecture-presenter #lp-slide .lp-two-col :is(h2, h3) { column-span: all; }
   #lecture-presenter #lp-slide .lp-body-center { text-align: center; }
@@ -262,6 +297,17 @@
     /* Two-column and side-by-side collapse to one column */
     #lecture-presenter #lp-slide .lp-cols { grid-template-columns: 1fr; }
     #lecture-presenter #lp-slide .lp-two-col { column-count: 1; }
+    /* Bleed side image stacks under the text with a fixed ratio */
+    #lecture-presenter #lp-slide:has(.lp-cols.bleed) { padding: 1.5rem 1.25rem 2rem; overflow: visible; }
+    #lecture-presenter #lp-slide .lp-deck:has(.lp-cols.bleed) { display: block; height: auto; min-height: 0; }
+    #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-text {
+      display: block;
+      overflow: visible;
+      padding: 1.25rem 0 0;
+    }
+    #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media { aspect-ratio: 16 / 10; min-height: 0; }
+    #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media img,
+    #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media video { height: 100%; }
     /* Compact, fixed type */
     #lecture-presenter #lp-slide .lp-title-main { font-size: clamp(1.5rem, 6vw, 2.1rem); }
     #lecture-presenter #lp-slide .lp-title-sub { font-size: 1.05rem; }
@@ -340,20 +386,35 @@
 
       const head = headHtml(g.title, g.subtitle, false);
 
+      // The first image/figure in the group is the "media".
+      const media = g.nodes.find(
+        (n) => n.tagName === 'FIGURE' || !!n.querySelector?.('img, video')
+      );
+      const mediaAlign = (() => {
+        if (!media) return '';
+        const fig = media.tagName === 'FIGURE' ? media : media.querySelector?.('figure');
+        return fig?.getAttribute('data-align') || '';
+      })();
+      const bleed = mediaAlign === 'left-bleed' || mediaAlign === 'right-bleed';
+
+      // A bleed-aligned image turns any slide into a side-by-side where the
+      // image runs edge-to-edge; otherwise honor an explicit image layout.
+      let colLayout = g.layout === 'image-left' || g.layout === 'image-right' ? g.layout : '';
+      if (bleed && !colLayout) colLayout = mediaAlign === 'left-bleed' ? 'image-left' : 'image-right';
+
       // Image on one side, text on the other.
-      if (g.layout === 'image-left' || g.layout === 'image-right') {
-        const media = g.nodes.find(
-          (n) => n.tagName === 'FIGURE' || !!n.querySelector?.('img, video')
-        );
+      if (colLayout && media) {
         const rest = g.nodes.filter((n) => n !== media);
-        const mediaEl = media ? (media.cloneNode(true) as HTMLElement) : null;
-        if (mediaEl) upgradeImages(mediaEl);
-        const mediaHtml = mediaEl ? mediaEl.outerHTML : '';
+        const mediaEl = media.cloneNode(true) as HTMLElement;
+        upgradeImages(mediaEl);
+        const bleedCls = bleed ? ' bleed' : '';
+        // Bleed slides fill the frame, so the title sits inside the text column.
+        const textInner = (bleed ? head : '') + cloneHtml(rest);
         return (
-          `<div class="lp-deck lp-content-slide">${head}` +
-            `<div class="lp-cols ${g.layout}">` +
-              `<div class="lp-col-media">${mediaHtml}</div>` +
-              `<div class="lp-col-text lp-body">${cloneHtml(rest)}</div>` +
+          `<div class="lp-deck lp-content-slide">${bleed ? '' : head}` +
+            `<div class="lp-cols ${colLayout}${bleedCls}">` +
+              `<div class="lp-col-media">${mediaEl.outerHTML}</div>` +
+              `<div class="lp-col-text lp-body">${textInner}</div>` +
             `</div>` +
           `</div>`
         );
