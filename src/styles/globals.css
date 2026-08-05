@@ -145,19 +145,13 @@
     display: none;
   }
 
-  /* Figure alignment (also honored by the lecture presenter). */
+  /* Figure alignment for the reading view. Only the standard alignments apply
+     here; presenter-only layouts (left/right-bleed, background*, bottom) are
+     intentionally left as normal figures so Present styling never leaks in. */
   .prose figure[data-align='left'] { margin-inline: 0 auto; max-width: 70%; }
   .prose figure[data-align='right'] { margin-inline: auto 0; max-width: 70%; }
   .prose figure[data-align='center'] { margin-inline: auto; }
   .prose figure[data-align='full'] { max-width: none; }
-  /* Full-bleed variants read as prominent full-width figures in the article view. */
-  .prose figure[data-align='left-bleed'],
-  .prose figure[data-align='right-bleed'],
-  .prose figure[data-align='background'] { max-width: none; }
-  /* Side-anchored backgrounds are a presenter-only layout; show them centered here. */
-  .prose figure[data-align='background-left'],
-  .prose figure[data-align='background-right'] { margin-inline: auto; }
-  .prose figure[data-align='bottom'] { max-width: none; }
 
   /* Divider under lecture headings, mirroring the Present view (no manual divider needed). */
   .lecture-body h2 {
