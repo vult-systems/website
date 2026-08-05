@@ -13,10 +13,7 @@
     <!-- Top bar -->
     <div class="flex items-center justify-between gap-4 px-6 py-3 border-b border-foreground-secondary/10">
       <span id="lp-title" class="truncate text-sm text-foreground-secondary" style="font-family: 'Besley', serif !important;"></span>
-      <div class="flex items-center gap-2">
-        <button id="lp-fs" class="rounded-md border border-foreground/20 bg-background/90 px-3 h-9 text-xs text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" style="font-family: 'Besley', serif !important;">Fullscreen</button>
-        <button id="lp-exit" class="rounded-md border border-foreground/20 bg-background/90 px-3 h-9 text-xs text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" style="font-family: 'Besley', serif !important;">Exit&nbsp;(Esc)</button>
-      </div>
+      <button id="lp-exit" class="rounded-md border border-foreground/20 bg-background/90 px-3 h-9 text-xs text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" style="font-family: 'Besley', serif !important;">Exit&nbsp;(Esc)</button>
     </div>
 
     <!-- Slide stage -->
@@ -70,7 +67,7 @@
 
   /* --- Presenter slide layout & typography --- */
   #lecture-presenter #lp-slide {
-    --lp-px: clamp(2.75rem, 5cqw, 5.5rem);
+    --lp-px: clamp(3.25rem, 6cqw, 6.5rem);
     --lp-py: clamp(2.25rem, 5.5cqh, 3.5rem);
     padding: var(--lp-py) var(--lp-px);
     display: flex;
@@ -86,6 +83,11 @@
     max-width: none;
     margin-inline: auto;
   }
+  /* Comfortable text measure; figures/images stay full width. */
+  #lecture-presenter #lp-slide .lp-head,
+  #lecture-presenter #lp-slide .lp-body > :is(p, ul, ol, blockquote, table) { max-width: 66rem; }
+  #lecture-presenter #lp-slide .lp-head-center,
+  #lecture-presenter #lp-slide .lp-body-center > :is(p, ul, ol, blockquote) { margin-inline: auto; }
   /* Thin, unobtrusive scrollbar so long slides don't clip the header */
   #lecture-presenter #lp-slide { scrollbar-width: thin; scrollbar-color: hsl(var(--foreground-secondary) / 0.3) transparent; }
   #lecture-presenter #lp-slide::-webkit-scrollbar { width: 8px; }
@@ -403,11 +405,11 @@
       if (target.closest('#lp-exit')) return close();
       if (target.closest('#lp-next') || target.closest('#lp-zone-next')) return go(1);
       if (target.closest('#lp-prev') || target.closest('#lp-zone-prev')) return go(-1);
-      if (target.closest('#lp-fs')) {
-        const p = $('lecture-presenter');
-        if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
-        else p?.requestFullscreen?.().catch(() => {});
-      }
+    });
+
+    // Fullscreen is the default; leaving it (Esc or otherwise) closes the presenter.
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && isOpen()) close();
     });
 
     document.addEventListener('keydown', (e) => {
@@ -426,12 +428,6 @@
           e.preventDefault(); index = slides.length - 1; render(); break;
         case 'Escape':
           e.preventDefault(); close(); break;
-        case 'f':
-        case 'F':
-          e.preventDefault();
-          if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
-          else $('lecture-presenter')?.requestFullscreen?.().catch(() => {});
-          break;
       }
     });
   };
