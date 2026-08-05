@@ -290,6 +290,22 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--foreground-secondary) / 0.3) transparent;
   }
+  /* Side-anchored background: image keeps its aspect (no zoom) and hugs that edge. */
+  #lecture-presenter #lp-slide .lp-bg-slide.bg-right .lp-bg-media img,
+  #lecture-presenter #lp-slide .lp-bg-slide.bg-right .lp-bg-media video {
+    object-fit: contain;
+    object-position: right center;
+  }
+  #lecture-presenter #lp-slide .lp-bg-slide.bg-left .lp-bg-media img,
+  #lecture-presenter #lp-slide .lp-bg-slide.bg-left .lp-bg-media video {
+    object-fit: contain;
+    object-position: left center;
+  }
+  #lecture-presenter #lp-slide .lp-bg-slide.bg-left .lp-bg-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
 
   #lecture-presenter #lp-slide .lp-two-col { column-count: 2; column-gap: clamp(1.75rem, 3cqw, 3rem); }
   #lecture-presenter #lp-slide .lp-two-col :is(h2, h3) { column-span: all; }
@@ -479,13 +495,18 @@
       })();
       const bleed = mediaAlign === 'left-bleed' || mediaAlign === 'right-bleed';
 
-      // Full-bleed background image with the slide text laid over it.
-      if (mediaAlign === 'background' && media) {
+      // Full-bleed background image with the slide text laid over it. `background`
+      // fills the slide; the side variants hug one edge at their natural aspect.
+      const bgPos =
+        mediaAlign === 'background' ? ' ' :
+        mediaAlign === 'background-right' ? ' bg-right' :
+        mediaAlign === 'background-left' ? ' bg-left' : '';
+      if (bgPos && media) {
         const rest = g.nodes.filter((n) => n !== media);
         const mediaEl = media.cloneNode(true) as HTMLElement;
         upgradeImages(mediaEl);
         return (
-          `<div class="lp-deck lp-content-slide lp-bg-slide">` +
+          `<div class="lp-deck lp-content-slide lp-bg-slide${bgPos.trimEnd()}">` +
             `<div class="lp-bg-media">${mediaEl.outerHTML}</div>` +
             `<div class="lp-bg-content">${head}<div class="lp-body">${cloneHtml(rest)}</div></div>` +
           `</div>`

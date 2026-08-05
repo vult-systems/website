@@ -154,6 +154,9 @@
   .prose figure[data-align='left-bleed'],
   .prose figure[data-align='right-bleed'],
   .prose figure[data-align='background'] { max-width: none; }
+  /* Side-anchored backgrounds read as a tidy side figure in the article view. */
+  .prose figure[data-align='background-left'] { margin-inline: 0 auto; max-width: 70%; }
+  .prose figure[data-align='background-right'] { margin-inline: auto 0; max-width: 70%; }
   .prose figure[data-align='bottom'] { max-width: none; }
 
   /* Divider under lecture headings, mirroring the Present view (no manual divider needed). */
