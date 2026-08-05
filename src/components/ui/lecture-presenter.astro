@@ -257,6 +257,40 @@
     padding-right: var(--lp-px);
     padding-left: clamp(1.5rem, 3cqw, 3rem);
   }
+
+  /* Full-bleed background image with the text laid over it. */
+  #lecture-presenter #lp-slide:has(.lp-bg-slide) { padding: 0; overflow: hidden; }
+  #lecture-presenter #lp-slide .lp-bg-slide {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--lp-py) var(--lp-px);
+    overflow: hidden;
+  }
+  #lecture-presenter #lp-slide .lp-bg-media { position: absolute; inset: 0; z-index: 0; }
+  #lecture-presenter #lp-slide .lp-bg-media figure { margin: 0; width: 100%; height: 100%; }
+  #lecture-presenter #lp-slide .lp-bg-media img,
+  #lecture-presenter #lp-slide .lp-bg-media video {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+    border-radius: 0;
+    display: block;
+  }
+  #lecture-presenter #lp-slide .lp-bg-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--foreground-secondary) / 0.3) transparent;
+  }
+
   #lecture-presenter #lp-slide .lp-two-col { column-count: 2; column-gap: clamp(1.75rem, 3cqw, 3rem); }
   #lecture-presenter #lp-slide .lp-two-col :is(h2, h3) { column-span: all; }
   #lecture-presenter #lp-slide .lp-body-center { text-align: center; }
@@ -329,6 +363,16 @@
     #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media { aspect-ratio: 16 / 10; min-height: 0; }
     #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media img,
     #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media video { height: 100%; }
+    /* Background image keeps covering the slide with text over it */
+    #lecture-presenter #lp-slide:has(.lp-bg-slide) { padding: 0; overflow: visible; }
+    #lecture-presenter #lp-slide .lp-bg-slide {
+      display: flex;
+      height: auto;
+      min-height: calc(100dvh - 7rem);
+      padding: 1.5rem 1.25rem;
+    }
+    #lecture-presenter #lp-slide .lp-bg-media { position: absolute; }
+    #lecture-presenter #lp-slide .lp-bg-content { max-height: none; overflow: visible; }
     /* Compact, fixed type */
     #lecture-presenter #lp-slide .lp-title-main { font-size: clamp(1.5rem, 6vw, 2.1rem); }
     #lecture-presenter #lp-slide .lp-title-sub { font-size: 1.05rem; }
@@ -434,6 +478,19 @@
         return fig?.getAttribute('data-align') || '';
       })();
       const bleed = mediaAlign === 'left-bleed' || mediaAlign === 'right-bleed';
+
+      // Full-bleed background image with the slide text laid over it.
+      if (mediaAlign === 'background' && media) {
+        const rest = g.nodes.filter((n) => n !== media);
+        const mediaEl = media.cloneNode(true) as HTMLElement;
+        upgradeImages(mediaEl);
+        return (
+          `<div class="lp-deck lp-content-slide lp-bg-slide">` +
+            `<div class="lp-bg-media">${mediaEl.outerHTML}</div>` +
+            `<div class="lp-bg-content">${head}<div class="lp-body">${cloneHtml(rest)}</div></div>` +
+          `</div>`
+        );
+      }
 
       // A bleed-aligned image turns any slide into a side-by-side where the
       // image runs edge-to-edge; otherwise honor an explicit image layout.

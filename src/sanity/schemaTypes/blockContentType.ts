@@ -67,6 +67,7 @@ export const blockContentType = defineType({
               { title: 'Right', value: 'right' },
               { title: 'Left (full-bleed, text right)', value: 'left-bleed' },
               { title: 'Right (full-bleed, text left)', value: 'right-bleed' },
+              { title: 'Background (full-bleed, text over image)', value: 'background' },
               { title: 'Full width', value: 'full' },
               { title: 'Bottom (full-bleed, for characters)', value: 'bottom' },
             ],
