@@ -30,22 +30,7 @@ import redshiftLogo from '@/assets/logos/software-redshift-logo.png';
 import sketchupLogo from '@/assets/logos/software-sketchup-logo.png';
 import substanceDesignerLogo from '@/assets/logos/software-substance-designer-logo.png';
 import vrayLogo from '@/assets/logos/software-vray-logo.png';
-import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
-import uiw3dLogoWht from '@/assets/logos/uiw3d-horiz-logo-wht.png';
-import logo343iWht from '@/assets/logos/343i-logo-wht.png';
-import biowareLogoWht from '@/assets/logos/bioware-logo-wht.png';
-import disneyLogoWht from '@/assets/logos/walt-disney-logo-wht.png';
-import newtekLogoWht from '@/assets/logos/newtek-logo-wht.png';
-import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
-import uiw3dLogoBlk from '@/assets/logos/uiw3d-horiz-logo-blk.png';
-import logo343iBlk from '@/assets/logos/343i-logo-blk.png';
-import biowareLogoBlk from '@/assets/logos/bioware-logo-blk.png';
-import disneyLogoBlk from '@/assets/logos/walt-disney-logo-blk.png';
-import newtekLogoBlk from '@/assets/logos/newtek-logo-blk.png';
-import qualcommLogoClr from '@/assets/logos/qualcomm-logo-clr.png';
-import mergeVrLogoClr from '@/assets/logos/merge-vr-logo-clr.png';
-import usafaLogoClr from '@/assets/logos/usafa-logo-clr.png';
-import losAlamosLogoClr from '@/assets/logos/losalamos-logo-clr.png';
+import StudioLogoGrid from '@/components/sections/studio-logo-grid.astro';
 
 const software = [
 	{ name: 'Maya', logo: mayaLogo },
@@ -64,19 +49,6 @@ const software = [
 	{ name: '3ds Max', logo: maxLogo },
 	{ name: 'SketchUp', logo: sketchupLogo },
 	{ name: 'Adobe Suite', logo: adobeLogo },
-];
-
-const experienceLogos = [
-	{ name: 'Vult Systems', imageLight: vultLogoBlk, imageDark: vultLogoWht },
-	{ name: 'UIW 3D', imageLight: uiw3dLogoBlk, imageDark: uiw3dLogoWht },
-	{ name: '343 Industries', imageLight: logo343iBlk, imageDark: logo343iWht },
-	{ name: 'BioWare', imageLight: biowareLogoBlk, imageDark: biowareLogoWht },
-	{ name: 'Qualcomm', imageLight: qualcommLogoClr, imageDark: qualcommLogoClr },
-	{ name: 'Walt Disney', imageLight: disneyLogoBlk, imageDark: disneyLogoWht },
-	{ name: 'Merge VR', imageLight: mergeVrLogoClr, imageDark: mergeVrLogoClr },
-	{ name: 'US Air Force Academy', imageLight: usafaLogoClr, imageDark: usafaLogoClr },
-	{ name: 'NewTek', imageLight: newtekLogoBlk, imageDark: newtekLogoWht },
-	{ name: 'Los Alamos', imageLight: losAlamosLogoClr, imageDark: losAlamosLogoClr },
 ];
 
 const seo = getAboutPageSEO();
@@ -165,14 +137,7 @@ const seo = getAboutPageSEO();
 						<!-- Experience Logos -->
 						<div>
 
-							<div class="grid grid-cols-5 gap-x-8 gap-y-6 items-center">
-								{experienceLogos.map(logo => (
-									<div class="flex items-center justify-center">
-										<Image src={logo.imageLight} alt={logo.name} width={240} height={96} class="h-8 w-auto object-contain dark:hidden" data-no-lightbox />
-										<Image src={logo.imageDark} alt={logo.name} width={240} height={96} class="h-8 w-auto object-contain hidden dark:block" data-no-lightbox />
-									</div>
-								))}
-							</div>
+							<StudioLogoGrid />
 						</div>
 
 						<!-- Resume -->

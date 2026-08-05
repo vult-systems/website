@@ -2,73 +2,18 @@
 import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
-import { Image } from 'astro:assets';
+import StudioLogoGrid from '@/components/sections/studio-logo-grid.astro';
 import { layout } from '@/config/design';
-
-// Import logo images - white versions (for dark mode)
-import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
-import uiw3dLogoWht from '@/assets/logos/uiw3d-horiz-logo-wht.png';
-import logo343iWht from '@/assets/logos/343i-logo-wht.png';
-import biowareLogoWht from '@/assets/logos/bioware-logo-wht.png';
-import disneyLogoWht from '@/assets/logos/walt-disney-logo-wht.png';
-import newtekLogoWht from '@/assets/logos/newtek-logo-wht.png';
-
-// Import logo images - black versions (for light mode)
-import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
-import uiw3dLogoBlk from '@/assets/logos/uiw3d-horiz-logo-blk.png';
-import logo343iBlk from '@/assets/logos/343i-logo-blk.png';
-import biowareLogoBlk from '@/assets/logos/bioware-logo-blk.png';
-import disneyLogoBlk from '@/assets/logos/walt-disney-logo-blk.png';
-import newtekLogoBlk from '@/assets/logos/newtek-logo-blk.png';
-
-// Import colored logos (used in both light and dark modes)
-import qualcommLogoClr from '@/assets/logos/qualcomm-logo-clr.png';
-import mergeVrLogoClr from '@/assets/logos/merge-vr-logo-clr.png';
-import usafaLogoClr from '@/assets/logos/usafa-logo-clr.png';
-import losAlamosLogoClr from '@/assets/logos/losalamos-logo-clr.png';
-
-interface Logo {
-  name: string;
-  imageLight: ImageMetadata; // Black logo for light mode
-  imageDark: ImageMetadata;  // White logo for dark mode
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-}
 
 interface Props {
   title?: string;
   description?: string;
-  logos?: Logo[];
   class?: string;
 }
-
-const defaultLogos: Logo[] = [
-  // Row 1
-  { name: '343 Industries', imageLight: logo343iBlk, imageDark: logo343iWht, size: 'lg' },
-  { name: 'BioWare', imageLight: biowareLogoBlk, imageDark: biowareLogoWht, size: 'sm' },
-  { name: 'Walt Disney', imageLight: disneyLogoBlk, imageDark: disneyLogoWht, size: 'xl' },
-  { name: 'UIW 3D', imageLight: uiw3dLogoBlk, imageDark: uiw3dLogoWht, size: '2xl' },
-  { name: 'Merge VR', imageLight: mergeVrLogoClr, imageDark: mergeVrLogoClr, size: 'md' },
-  // Row 2
-  { name: 'Qualcomm', imageLight: qualcommLogoClr, imageDark: qualcommLogoClr, size: 'lg' },
-  { name: 'NewTek', imageLight: newtekLogoBlk, imageDark: newtekLogoWht, size: 'lg' },
-  { name: 'Los Alamos', imageLight: losAlamosLogoClr, imageDark: losAlamosLogoClr, size: 'md' },
-  { name: 'Vult Systems', imageLight: vultLogoBlk, imageDark: vultLogoWht, size: 'sm' },
-  { name: 'US Air Force Academy', imageLight: usafaLogoClr, imageDark: usafaLogoClr, size: 'lg' },
-];
-
-// Per-logo heights so reordering never mis-sizes a logo (esp. wordmarks like UIW).
-const sizeClass: Record<string, string> = {
-  sm: 'h-6 sm:h-8 md:h-10',
-  md: 'h-8 sm:h-10 md:h-12',
-  lg: 'h-10 sm:h-12 md:h-14',
-  xl: 'h-12 sm:h-14 md:h-16',
-  '2xl': 'h-16 sm:h-20 md:h-24',
-};
 
 const {
   title = "Studios I've Worked With",
   description = "Since beginning my professional journey in 2013, I've had the opportunity to work across a wide range of roles. From intern to art director, and many in between, it's been a rewarding path filled with opportunities to learn, grow, and collaborate with talented teams. Below are a few of the studios and creative partners I've had the pleasure of working with throughout my career.",
-  logos = defaultLogos,
   class: className = ''
 } = Astro.props;
 ---
@@ -93,63 +38,7 @@ const {
       </Link>
     </div>
 
-    <!-- Logo Grid -->
-    <div class="space-y-2">
-      <!-- Top Row - 5 logos -->
-      <div class="grid grid-cols-3 sm:grid-cols-5 gap-4 items-center">
-        {logos.slice(0, 5).map((logo) => (
-          <div class="flex items-center justify-center">
-            {/* Light mode logo (black) */}
-            <Image 
-              src={logo.imageLight} 
-              alt={logo.name}
-              class:list={[
-                "object-contain pointer-events-none select-none dark:hidden",
-                sizeClass[logo.size ?? 'md']
-              ]}
-              loading="lazy"
-            />
-            {/* Dark mode logo (white) */}
-            <Image 
-              src={logo.imageDark} 
-              alt={logo.name}
-              class:list={[
-                "object-contain pointer-events-none select-none hidden dark:block",
-                sizeClass[logo.size ?? 'md']
-              ]}
-              loading="lazy"
-            />
-          </div>
-        ))}
-      </div>
-      <!-- Bottom Row - 5 columns (4 logos + empty) -->
-      <div class="grid grid-cols-3 sm:grid-cols-5 gap-4 items-center">
-        {logos.slice(5).map((logo) => (
-          <div class="flex items-center justify-center">
-            {/* Light mode logo (black) */}
-            <Image 
-              src={logo.imageLight} 
-              alt={logo.name}
-              class:list={[
-                "object-contain pointer-events-none select-none dark:hidden",
-                sizeClass[logo.size ?? 'md']
-              ]}
-              loading="lazy"
-            />
-            {/* Dark mode logo (white) */}
-            <Image 
-              src={logo.imageDark} 
-              alt={logo.name}
-              class:list={[
-                "object-contain pointer-events-none select-none hidden dark:block",
-                sizeClass[logo.size ?? 'md']
-              ]}
-              loading="lazy"
-            />
-          </div>
-        ))}
-      </div>
-    </div>
+    <StudioLogoGrid />
 
   </div>
 </section>
