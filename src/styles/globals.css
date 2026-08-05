@@ -160,6 +160,10 @@
   /* Learn page body copy uses the reading serif to match its headings/nav. */
   .learn-body p { font-family: 'Besley', ui-serif, Georgia, serif; }
 
+  /* Nested numbered lists show a bullet instead of restarting the numbering,
+     matching the tabbed sub-item style in the Studio editor. */
+  .prose ol ol { list-style-type: disc; }
+
   .prose {
     --reading-font: 'Besley', ui-serif, Georgia, serif;
     --reading-size: 1.1875rem;     /* 19px */
