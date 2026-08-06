@@ -144,7 +144,8 @@ const allCourses = ((coursesData ?? []) as Course[]).sort(
 		((a.order ?? 0) - (b.order ?? 0))
 );
 const pipeline = (pipelineData ?? []) as PipelineTopic[];
-const courseId = (code: string) => code.toLowerCase().replace(/\s+/g, '-');
+// Strips punctuation (e.g. the "·" in course codes) so anchor ids stay URL-safe.
+const courseId = (code: string) => slugify(code);
 // Pipeline topics are taught as core class content; show this as their "course code".
 // Editable per-topic in Sanity (the topic's "Code / Label" field); this is the fallback default.
 const PIPELINE_CODE = 'ANGD Core';

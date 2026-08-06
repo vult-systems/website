@@ -8,6 +8,18 @@ const YEARS = [
   'Senior',
 ];
 
+// Strips punctuation (e.g. the "·" separator in course codes) so slugs stay URL-safe.
+const slugify = (input: string) =>
+  input
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 96);
+
 /** A sub-thread inside a course project (e.g. Reference, Intro to ZBrush, Block Ins). */
 export const courseProjectThreadType = defineType({
   name: 'courseProjectThread',
@@ -22,7 +34,7 @@ export const courseProjectThreadType = defineType({
     defineField({
       name: 'slug',
       type: 'slug',
-      options: { source: 'title', maxLength: 96 },
+      options: { source: 'title', maxLength: 96, slugify },
       validation: (Rule) => Rule.required(),
     }),
     defineField({ name: 'description', type: 'text', rows: 2 }),
@@ -46,7 +58,7 @@ export const courseProjectType = defineType({
     defineField({
       name: 'slug',
       type: 'slug',
-      options: { source: 'title', maxLength: 96 },
+      options: { source: 'title', maxLength: 96, slugify },
       validation: (Rule) => Rule.required(),
     }),
     defineField({ name: 'description', type: 'text', rows: 2 }),
@@ -83,7 +95,7 @@ export const courseType = defineType({
     defineField({
       name: 'slug',
       type: 'slug',
-      options: { source: 'code', maxLength: 96 },
+      options: { source: 'code', maxLength: 96, slugify },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
