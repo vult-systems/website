@@ -262,16 +262,7 @@ const carouselPieces = artPieces;
     const FRICTION = 0.92;
     const MIN_VELOCITY = 0.05;
 
-    // Center the 343i / Grimghast card (index 1) on load so a sliver of Aurech
-    // shows on the left and Foundation Explorer on the right.
     let pos = 0;
-    const centerOnIndex = (i: number) => {
-      const items = track.querySelectorAll<HTMLElement>('.carousel-item');
-      if (items.length <= i) return;
-      const cRect = container.getBoundingClientRect();
-      const iRect = items[i].getBoundingClientRect();
-      pos += (cRect.left + cRect.width / 2) - (iRect.left + iRect.width / 2);
-    };
     let isDragging = false;
     let hasDragged = false;
     let dragStartX = 0;
@@ -312,7 +303,16 @@ const carouselPieces = artPieces;
       (container as any).__carouselRaf = rafId;
     };
 
-    centerOnIndex(1);
+    // Start centered on the second card (343i / Grimghast) using layout offsets
+    // (not the live transform) so re-inits are idempotent and don't jump. A sliver
+    // of Aurech shows on the left and Foundation Explorer on the right.
+    const centerItems = track.querySelectorAll<HTMLElement>('.carousel-item');
+    if (centerItems.length > 1) {
+      const padLeft = parseFloat(getComputedStyle(container).paddingLeft) || 0;
+      const item = centerItems[1];
+      const target = container.clientWidth / 2 - padLeft - (item.offsetLeft + item.offsetWidth / 2);
+      pos = target > 0 ? target - halfWidth() : target;
+    }
     wrap();
     track.style.transform = `translateX(${pos}px)`;
 
