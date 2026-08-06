@@ -79,11 +79,8 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		<meta name="generator" content={Astro.generator} />
 		<meta name="theme-color" content={SITE.theme.color} />
 		
-		<!-- Security Headers -->
-		<meta http-equiv="X-Content-Type-Options" content="nosniff" />
-		<meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+		<!-- Security: real headers are set in public/_headers; only the meta-valid one is kept here -->
 		<meta name="referrer" content="strict-origin-when-cross-origin" />
-		<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), interest-cohort=()" />
 		
 		<!-- Performance -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />

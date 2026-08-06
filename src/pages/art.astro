@@ -19,30 +19,27 @@ import { getArtPageSEO } from '@/config/seo';
 const artPieces = (await getCollection('art')).sort((a, b) => a.data.order - b.data.order);
 
 // Pre-generate optimized WebP thumbnails at build time
-const artData = await Promise.all(artPieces.map(async (piece, index) => {
-	let optimizedSrc: string | undefined;
-	if (piece.data.heroImage && typeof piece.data.heroImage === 'object') {
+const optimizeThumb = async (img: unknown): Promise<string | undefined> => {
+	if (img && typeof img === 'object') {
 		try {
-			const optimized = await getImage({
-				src: piece.data.heroImage,
-				width: 800,
-				height: 800,
-				format: 'webp',
-				quality: 82,
-				fit: 'cover',
-			});
-			optimizedSrc = optimized.src;
+			const optimized = await getImage({ src: img as any, width: 800, height: 800, format: 'webp', quality: 82, fit: 'cover' });
+			return optimized.src;
 		} catch {
-			optimizedSrc = typeof piece.data.heroImage === 'string' ? piece.data.heroImage : piece.data.heroImage?.src;
+			return (img as any)?.src;
 		}
-	} else {
-		optimizedSrc = typeof piece.data.heroImage === 'string' ? piece.data.heroImage : undefined;
 	}
+	return typeof img === 'string' ? img : undefined;
+};
+
+const artData = await Promise.all(artPieces.map(async (piece, index) => {
+	const optimizedSrc = await optimizeThumb(piece.data.heroImage);
+	const optimizedDarkSrc = await optimizeThumb(piece.data.heroImageDark);
 	return {
 		slug: piece.slug,
 		title: piece.data.title,
 		description: piece.data.description,
 		heroImage: optimizedSrc,
+		heroImageDark: optimizedDarkSrc,
 		category: piece.data.category,
 		tags: piece.data.tags,
 		tools: piece.data.tools,
@@ -131,7 +128,20 @@ const seo = getArtPageSEO();
 									alt={piece.title}
 									width={800}
 									height={800}
-									class="art-img w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]"
+									class:list={["art-img w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]", piece.heroImageDark && "dark:hidden"]}
+									loading={piece.eager ? 'eager' : 'lazy'}
+									fetchpriority={piece.eager ? 'high' : 'auto'}
+									decoding="async"
+									data-no-lightbox
+								/>
+							)}
+							{piece.heroImageDark && (
+								<img
+									src={piece.heroImageDark}
+									alt={piece.title}
+									width={800}
+									height={800}
+									class="art-img hidden dark:block w-full h-full object-cover transition-all duration-500 dark:group-hover:brightness-[0.25]"
 									loading={piece.eager ? 'eager' : 'lazy'}
 									fetchpriority={piece.eager ? 'high' : 'auto'}
 									decoding="async"

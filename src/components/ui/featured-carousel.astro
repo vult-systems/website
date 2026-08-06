@@ -12,6 +12,7 @@ interface ArtPiece {
   title: string;
   description: string;
   heroImage: string | ImageMetadata | undefined;
+  heroImageDark?: string | ImageMetadata;
   category: string;
 }
 
@@ -85,6 +86,7 @@ const carouselPieces = artPieces;
                   quality={90}
                   fit="cover"
                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  data-no-lightbox
                   loading="eager"
                   fetchpriority="high"
                   decoding="async"
@@ -95,8 +97,25 @@ const carouselPieces = artPieces;
                   src={getImageSrc(piece.heroImage)}
                   alt={piece.title}
                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  data-no-lightbox
                   loading="eager"
                   fetchpriority="high"
+                  decoding="async"
+                  draggable="false"
+                />
+              )}
+              {piece.heroImageDark && typeof piece.heroImageDark === 'object' && (
+                <Image
+                  src={piece.heroImageDark}
+                  alt={piece.title}
+                  width={1500}
+                  height={1500}
+                  format="webp"
+                  quality={90}
+                  fit="cover"
+                  class="hidden dark:block absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  data-no-lightbox
+                  loading="eager"
                   decoding="async"
                   draggable="false"
                 />
@@ -122,6 +141,7 @@ const carouselPieces = artPieces;
                   quality={90}
                   fit="cover"
                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  data-no-lightbox
                   loading="lazy"
                   draggable="false"
                 />
@@ -130,7 +150,24 @@ const carouselPieces = artPieces;
                   src={getImageSrc(piece.heroImage)}
                   alt={piece.title}
                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  data-no-lightbox
                   loading="lazy"
+                  draggable="false"
+                />
+              )}
+              {piece.heroImageDark && typeof piece.heroImageDark === 'object' && (
+                <Image
+                  src={piece.heroImageDark}
+                  alt={piece.title}
+                  width={1500}
+                  height={1500}
+                  format="webp"
+                  quality={90}
+                  fit="cover"
+                  class="hidden dark:block absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  data-no-lightbox
+                  loading="lazy"
+                  decoding="async"
                   draggable="false"
                 />
               )}
@@ -225,8 +262,16 @@ const carouselPieces = artPieces;
     const FRICTION = 0.92;
     const MIN_VELOCITY = 0.05;
 
-    // Start with Halo Infinite (index 0) visible on load
+    // Center the 343i / Grimghast card (index 1) on load so a sliver of Aurech
+    // shows on the left and Foundation Explorer on the right.
     let pos = 0;
+    const centerOnIndex = (i: number) => {
+      const items = track.querySelectorAll<HTMLElement>('.carousel-item');
+      if (items.length <= i) return;
+      const cRect = container.getBoundingClientRect();
+      const iRect = items[i].getBoundingClientRect();
+      pos += (cRect.left + cRect.width / 2) - (iRect.left + iRect.width / 2);
+    };
     let isDragging = false;
     let hasDragged = false;
     let dragStartX = 0;
@@ -266,6 +311,10 @@ const carouselPieces = artPieces;
       rafId = requestAnimationFrame(tick);
       (container as any).__carouselRaf = rafId;
     };
+
+    centerOnIndex(1);
+    wrap();
+    track.style.transform = `translateX(${pos}px)`;
 
     rafId = requestAnimationFrame(tick);
     (container as any).__carouselRaf = rafId;

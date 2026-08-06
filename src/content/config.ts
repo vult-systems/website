@@ -7,6 +7,7 @@ const artCollection = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     heroImage: z.union([image(), z.string()]).optional(),
+    heroImageDark: z.union([image(), z.string()]).optional(),
     category: z.enum(['3d', 'character', 'environment', 'digital', 'concept', 'abstract']).default('3d'),
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),

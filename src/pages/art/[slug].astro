@@ -44,6 +44,7 @@ import vertexSchoolLogoWht from '@/assets/logos/vertex-school-logo-wht.png';
 import vertexSchoolLogoBlk from '@/assets/logos/vertex-school-logo-blk.png';
 import vultLogoWht from '@/assets/logos/vult-logo-wht.png';
 import vultLogoBlk from '@/assets/logos/vult-logo-blk.png';
+import monomythLogo from '@/assets/logos/Monomyth_Logo.png';
 
 const toolLogos: Record<string, string | { light: string; dark: string }> = {
   'Maya': mayaLogo.src,
@@ -76,6 +77,7 @@ const projectLogos: Record<string, { light: string; dark: string }> = {
   'Snapdragon': { light: snapdragonLogoBlk.src, dark: snapdragonLogoWht.src },
   'Star Wars: The Old Republic': { light: swtorLogo.src, dark: swtorLogo.src },
   'Beneath the Waves': { light: artstationLogo.src, dark: artstationLogo.src },
+  'Monomyth': { light: monomythLogo.src, dark: monomythLogo.src },
 };
 
 const clientLogoSizes: Record<string, string> = {
@@ -88,6 +90,7 @@ const projectLogoSizes: Record<string, string> = {
   'Halo Infinite': 'w-4/5',
   'Star Wars: The Old Republic': 'w-4/5',
   'Beneath the Waves': 'w-3/4',
+  'Monomyth': 'w-4/5',
 };
 
 export async function getStaticPaths() {
@@ -280,6 +283,7 @@ const formatDate = (date: Date) =>
   <!-- Prev/Next Art Navigation -->
   {prevArt && (
     <a
+      id="art-nav-prev"
       href={`/art/${prevArt.slug}`}
       class="fixed left-4 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 opacity-100 hover:opacity-100"
       aria-label={`Previous: ${prevArt.data.title}`}
@@ -292,6 +296,7 @@ const formatDate = (date: Date) =>
   )}
   {nextArt && (
     <a
+      id="art-nav-next"
       href={`/art/${nextArt.slug}`}
       class="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 opacity-100 hover:opacity-100"
       aria-label={`Next: ${nextArt.data.title}`}
@@ -302,5 +307,30 @@ const formatDate = (date: Date) =>
       </svg>
     </a>
   )}
+
+  <script>
+    import { navigate } from 'astro:transitions/client';
+    // Bind once for the session; the handler reads the current page's links live.
+    if (!(window as any).__artArrowNav) {
+      (window as any).__artArrowNav = true;
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+        const t = e.target as HTMLElement | null;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+        // Don't hijack arrows while the image lightbox is open.
+        const lb = document.getElementById('lightbox');
+        if (lb && lb.classList.contains('visible')) return;
+        const link = document.getElementById(
+          e.key === 'ArrowLeft' ? 'art-nav-prev' : 'art-nav-next'
+        ) as HTMLAnchorElement | null;
+        const href = link?.getAttribute('href');
+        if (href) {
+          e.preventDefault();
+          navigate(href);
+        }
+      });
+    }
+  </script>
 </BaseLayout>
 

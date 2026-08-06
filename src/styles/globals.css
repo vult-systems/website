@@ -173,6 +173,12 @@
     font-family: var(--font-ibm-plex);
   }
 
+  /* Footer text uses the reading serif to match the header/nav. */
+  .site-footer,
+  .site-footer * {
+    font-family: 'Besley', ui-serif, Georgia, serif;
+  }
+
   /* Nested numbered lists show a bullet instead of restarting the numbering,
      matching the tabbed sub-item style in the Studio editor. */
   .prose ol ol { list-style-type: disc; }

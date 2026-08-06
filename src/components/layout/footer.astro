@@ -3,32 +3,32 @@ import { layout } from '@/config/design';
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="relative z-10 w-full bg-background/80 backdrop-blur-md border-t border-border mt-16">
+<footer class="site-footer relative z-10 w-full bg-background/80 backdrop-blur-md border-t border-border mt-16" transition:persist>
     <div class:list={[layout.container, 'w-full py-8']}>
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <!-- Left side - Copyright -->
-            <div class="text-xl text-foreground-secondary">
+            <div class="text-base text-foreground-secondary">
                 © {currentYear} Carlos Garcia. All rights reserved.
             </div>
             
             <!-- Center - Navigation Links -->
             <nav class="flex flex-wrap items-center justify-center gap-6">
-                <a href="/art" class="text-xl inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
+                <a href="/art" class="text-base inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
                     Work
                 </a>
-                <a href="/learn" class="text-xl inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
+                <a href="/learn" class="text-base inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
                     Learn
                 </a>
-                <a href="/students" class="text-xl inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
+                <a href="/students" class="text-base inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
                     Students
                 </a>
-                <a href="/resources" class="text-xl inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
+                <a href="/resources" class="text-base inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
                     Resources
                 </a>
-                <a href="/log" class="text-xl inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
+                <a href="/log" class="text-base inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
                     Log
                 </a>
-                <a href="/about" class="text-xl inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
+                <a href="/about" class="text-base inline-block text-foreground-secondary hover:text-accent hover:scale-110 transition-all duration-200">
                     About
                 </a>
             </nav>

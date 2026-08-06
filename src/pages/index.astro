@@ -26,6 +26,7 @@ const featuredArt = artPieces
     title: piece.data.title,
     description: piece.data.description,
     heroImage: piece.data.heroImage,
+    heroImageDark: piece.data.heroImageDark,
     category: piece.data.category
   }));
 
@@ -65,7 +66,7 @@ const seo = getHomePageSEO();
 					<Heading level={2} size="4xl" class="mb-4">
 						Courses, Student Works, & Resources
 					</Heading>
-					<Text variant="secondary" size="base" class="mb-4 leading-relaxed !text-foreground-muted">
+					<Text variant="secondary" size="base" class="mb-4 leading-relaxed !text-foreground-secondary">
 						Supplemental materials from my 3D Animation and Game Design courses at the University of the Incarnate Word, made public for students and anyone interested in the craft. Browse class snippets, student work from the program, and resources.
 					</Text>
 					<Link variant="accent" href="/learn">
@@ -81,7 +82,7 @@ const seo = getHomePageSEO();
 						</div>
 						<div class="p-4 flex flex-col gap-1">
 							<p class="text-base font-medium text-foreground transition-colors">Courses</p>
-							<p class="text-base text-foreground-muted line-clamp-2">Learning materials and course content spanning organic modeling, character art, environment, and production tools used in my instruction at UIW.</p>
+							<p class="text-base text-foreground-secondary line-clamp-2">Learning materials and course content spanning organic modeling, character art, environment, and production tools used in my instruction at UIW.</p>
 						</div>
 					</a>
 
@@ -92,7 +93,7 @@ const seo = getHomePageSEO();
 						</div>
 						<div class="p-4 flex flex-col gap-1">
 							<p class="text-base font-medium text-foreground transition-colors">Student Work</p>
-							<p class="text-base text-foreground-muted line-clamp-2">Work produced by students throughout their time in my 3D Animation and Game Design classes at UIW.</p>
+							<p class="text-base text-foreground-secondary line-clamp-2">Work produced by students throughout their time in my 3D Animation and Game Design classes at UIW.</p>
 						</div>
 					</a>
 
@@ -103,7 +104,7 @@ const seo = getHomePageSEO();
 						</div>
 						<div class="p-4 flex flex-col gap-1">
 							<p class="text-base font-medium text-foreground transition-colors">Tools & Resources</p>
-							<p class="text-base text-foreground-muted line-clamp-2">Free downloads used directly in my courses, including ZBrush assets, Maya scripts, and pipeline tools.</p>
+							<p class="text-base text-foreground-secondary line-clamp-2">Free downloads used directly in my courses, including ZBrush assets, Maya scripts, and pipeline tools.</p>
 						</div>
 					</a>
 				</div>
@@ -125,14 +126,14 @@ const seo = getHomePageSEO();
 						</div>
 						<div class="p-4">
 							<p class="text-base font-medium text-foreground">Rethinking Rendering for Higher Education with Sony's OpenCue</p>
-							<p class="text-sm text-foreground-muted mt-1 line-clamp-2">Setting up Sony's OpenCue render farm for student film production at the University of the Incarnate Word.</p>
+							<p class="text-sm text-foreground-secondary mt-1 line-clamp-2">Setting up Sony's OpenCue render farm for student film production at the University of the Incarnate Word.</p>
 						</div>
 					</a>
 					<div class="flex-1 min-w-0">
 						<Heading level={2} size="4xl" class="mb-4">
 							Dev Journal
 						</Heading>
-						<Text variant="secondary" size="base" class="mb-4 leading-relaxed !text-foreground-muted">
+						<Text variant="secondary" size="base" class="mb-4 leading-relaxed !text-foreground-secondary">
 							An ongoing record of projects, experiments, and technical writeups from my work in production and education. Currently documenting the design and rollout of a Sony OpenCue render farm built for student film production at UIW, covering infrastructure decisions, lessons learned, and what works for us in our university lab environment.
 						</Text>
 						<Link variant="accent" href="/log">
