@@ -2,6 +2,14 @@
 import { ViewTransitions } from 'astro:transitions';
 import "@/styles/globals.css";
 import "@/styles/fonts.css";
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/600.css';
+import '@fontsource/ibm-plex-mono/700.css';
+import '@fontsource/ibm-plex-mono/400-italic.css';
+import besleyNormalUrl from '@fontsource-variable/besley/files/besley-latin-wght-normal.woff2';
+import besleyItalicUrl from '@fontsource-variable/besley/files/besley-latin-wght-italic.woff2';
+import ibmMono400Url from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2';
 import { getImage } from 'astro:assets';
 import logoSvg from '@/assets/brand/logo.svg';
 import Analytics from '@/components/analytics/Analytics.astro';
@@ -82,13 +90,14 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		<!-- Security: real headers are set in public/_headers; only the meta-valid one is kept here -->
 		<meta name="referrer" content="strict-origin-when-cross-origin" />
 		
-		<!-- Performance -->
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<!-- Load fonts async to avoid render-blocking -->
-		<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" />
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" media="print" onload="this.media='all'" />
-		<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400..900;1,400..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" /></noscript>
+		<!-- Performance: self-hosted fonts preloaded so text paints in Besley/IBM Plex Mono without a swap -->
+		<link rel="preload" as="font" type="font/woff2" href={besleyNormalUrl} crossorigin />
+		<link rel="preload" as="font" type="font/woff2" href={besleyItalicUrl} crossorigin />
+		<link rel="preload" as="font" type="font/woff2" href={ibmMono400Url} crossorigin />
+		<style is:global set:html={`
+			@font-face{font-family:'Besley';font-style:normal;font-weight:400 900;font-display:swap;src:url(${besleyNormalUrl}) format('woff2');}
+			@font-face{font-family:'Besley';font-style:italic;font-weight:400 900;font-display:swap;src:url(${besleyItalicUrl}) format('woff2');}
+		`}></style>
 		<link rel="dns-prefetch" href="https://images.unsplash.com" />
 		
 		<!-- Structured Data - Person Schema -->
