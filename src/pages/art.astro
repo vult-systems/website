@@ -86,11 +86,11 @@ const seo = getArtPageSEO();
 				<Image
 					src={heroBg}
 					alt=""
-					class="w-full h-full object-cover object-center !opacity-40"
+					class="w-full h-full object-cover object-center !opacity-60 dark:!opacity-[0.12]"
 					loading="eager"
 					widths={[800, 1200, 1920]}
 				/>
-				<div class="absolute inset-0 bg-white/92 dark:bg-black/95"></div>
+				<div class="absolute inset-0 bg-white/[0.82] dark:bg-black/[0.62]"></div>
 			</div>
 			<PageContainer>
 				<Heading level={1} size="4xl" class="mb-4">
@@ -120,7 +120,7 @@ const seo = getArtPageSEO();
 				</div>
 
 				<!-- Art Grid -->
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-1" id="art-grid">
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1" id="art-grid">
 					{artData.map((piece) => (
 						<div class="art-item" data-category={piece.category}>
 							<Card padding="none" interactive href={`/art/${piece.slug}`}>
