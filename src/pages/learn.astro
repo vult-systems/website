@@ -941,7 +941,7 @@ const initCourseSearch = () => {
 			`<div class="space-y-2">` +
 			hits.slice(0, 50).map(({ e }) =>
 				`<a href="#${escHtml(e.hash)}" class="search-result flex items-start gap-3 rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4" data-hash="${escHtml(e.hash)}">` +
-					(e.thumb ? `<img src="${escHtml(e.thumb)}" alt="" class="w-20 h-14 rounded object-cover shrink-0 border border-border" loading="lazy" />` : '') +
+					(e.thumb ? `<img src="${escHtml(e.thumb)}" alt="" class="w-20 h-14 rounded object-cover shrink-0 border border-border" decoding="async" />` : '') +
 					`<div class="min-w-0 flex-1">` +
 						`<div class="flex items-center gap-2 mb-1"><span class="text-[0.65rem] uppercase tracking-wider text-accent" style="font-family:'Besley',serif">${escHtml(e.kind)}</span><span class="text-xs text-foreground-muted truncate">${escHtml(e.crumb)}</span></div>` +
 						`<p class="text-base font-medium text-foreground mb-1" style="font-family:'Besley',serif">${escHtml(e.title)}</p>` +
