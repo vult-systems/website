@@ -181,6 +181,19 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		letter-spacing: 0.02em;
 	}
 
+	/* Readable content (paragraphs, list items, headings, quotes) uses the Besley
+	   reading serif so raw markup matches the Text/Heading components and prose.
+	   UI chrome (nav, buttons, badges) and code stay monospace via `body *`.
+	   Placed after `body *` so it wins at equal specificity; letter-spacing is
+	   left untouched so `tracking-*` utilities on labels still apply. */
+	p, li, blockquote, figcaption, dt, dd,
+	h1, h2, h3, h4, h5, h6 {
+		font-family: 'Besley', ui-serif, Georgia, serif;
+	}
+	/* Inline code and preformatted text remain monospace inside body copy. */
+	code, pre, kbd, samp {
+		font-family: var(--font-ibm-plex);
+	}
 
 
 	/* Custom view transition animations */
