@@ -12,6 +12,7 @@ Personal portfolio site for 3D art, studio work, teaching, and technical writing
 - [Sanity](https://www.sanity.io) — Headless CMS for Courses, Pipeline, and Log content
 - [Vercel](https://vercel.com) — SSR hosting (via `@astrojs/vercel`)
 - [MDX](https://mdxjs.com) — Markdown for Art content
+- [`<model-viewer>`](https://modelviewer.dev) + [three.js](https://threejs.org) — Interactive 3D models in Sanity content (bundled via npm)
 - [Partytown](https://partytown.builder.io/) — Analytics off the main thread
 - [Sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/) — Auto-generated sitemap
 
@@ -97,6 +98,13 @@ via `@sanity/client` (`src/lib/sanity/`) and render Portable Text with the compo
 
 Sanity schemas live in `src/sanity/schemaTypes/`; the Studio config is `sanity.config.ts`
 (themed via `src/sanity/theme.ts`).
+
+**3D models** — the `model3d` Portable Text block embeds an interactive `<model-viewer>` in any
+Sanity body (upload a GLB or link a URL). It supports presentation alignment, aspect presets, a
+start orientation, a camera-views gizmo, and optional **auto-labeling of named meshes** (great
+for anatomy) with per-mesh label/description overrides. Renderer: `src/components/sanity/PortableTextModel.astro`.
+Use **uncompressed GLB**, and note external model hosts must be allowed in `public/_headers`
+(`connect-src`). See `.github/copilot-instructions.md` for the coordinate-frame and loading caveats.
 
 Assets live in `src/assets/` (processed by Astro's image pipeline) and `public/` (served as-is).
 
