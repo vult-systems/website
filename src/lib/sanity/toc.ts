@@ -34,6 +34,14 @@ export function bodyToPlainText(body: any): string {
     .join(' ');
 }
 
+/** Figures/images/videos in a body that carry searchable alt or caption text. */
+export function extractMedia(body: any): any[] {
+  if (!Array.isArray(body)) return [];
+  return body.filter(
+    (b: any) => b && ['figure', 'image', 'video'].includes(b._type) && (b.alt || b.caption)
+  );
+}
+
 export interface TocHeading {
   id: string;
   text: string;
