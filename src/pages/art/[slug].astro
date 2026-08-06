@@ -332,5 +332,26 @@ const formatDate = (date: Date) =>
       });
     }
   </script>
+
+  <script>
+    // Lazy-load post videos: only load/play when scrolled into view (preload="none"
+    // on the markup means they don't download until play() is called).
+    let artVideoIO: IntersectionObserver | undefined;
+    const setupArtVideos = () => {
+      artVideoIO?.disconnect();
+      const vids = document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]');
+      if (!vids.length) return;
+      artVideoIO = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const v = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) v.play().catch(() => {});
+          else v.pause();
+        });
+      }, { threshold: 0.25, rootMargin: '200px 0px' });
+      vids.forEach((v) => artVideoIO!.observe(v));
+    };
+    setupArtVideos();
+    document.addEventListener('astro:page-load', setupArtVideos);
+  </script>
 </BaseLayout>
 

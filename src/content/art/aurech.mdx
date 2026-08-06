@@ -21,8 +21,8 @@ import teeth01 from '@/assets/monomyth/aurech/mm_aurech_mod_teeth_v04_0001.png';
 import teeth02 from '@/assets/monomyth/aurech/mm_aurech_mod_teeth_v04_0002.png';
 import clayFull from '@/assets/monomyth/aurech/mm_aurech_mod_clay_full_v02.mp4';
 import wiresFull from '@/assets/monomyth/aurech/mm_aurech_mod_wires_full_v02.mp4';
-import hairClay from '@/assets/monomyth/aurech/mm_aurech_mod_hair_v02_clay.mp4';
-import hairWires from '@/assets/monomyth/aurech/mm_aurech_mod_hair_v02_wires.mp4';
+import hairClay from '@/assets/monomyth/aurech/mm_aurech_mod_hair_v02_clay_compressed.mp4';
+import hairWires from '@/assets/monomyth/aurech/mm_aurech_mod_hair_v02_wires_compressed.mp4';
 
 <Heading level={2} size="4xl">Project Overview</Heading>
 
@@ -30,14 +30,15 @@ Aurech is the protagonist of an upcoming character vignette for *Monomyth*, an o
 
 The turntables below showcase the clay and wireframe passes, the hair model developed with grooming in mind, and the additional detail work completed for the teeth.
 
-<div class="video-lightbox-trigger group relative overflow-hidden cursor-pointer rounded-md my-8" data-video={hairClay}>
+<div class="video-lightbox-trigger group relative aspect-video overflow-hidden cursor-pointer rounded-md my-8" data-video={hairClay}>
   <video
     src={hairClay}
-    class="w-full h-auto block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
+    class="w-full h-full object-cover block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
     loop
     muted
     playsinline
-    autoplay
+    preload="none"
+    data-autoplay
   ></video>
   <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
     <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
@@ -46,14 +47,15 @@ The turntables below showcase the clay and wireframe passes, the hair model deve
   </div>
 </div>
 
-<div class="video-lightbox-trigger group relative overflow-hidden cursor-pointer rounded-md my-8" data-video={hairWires}>
+<div class="video-lightbox-trigger group relative aspect-video overflow-hidden cursor-pointer rounded-md my-8" data-video={hairWires}>
   <video
     src={hairWires}
-    class="w-full h-auto block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
+    class="w-full h-full object-cover block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
     loop
     muted
     playsinline
-    autoplay
+    preload="none"
+    data-autoplay
   ></video>
   <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
     <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
@@ -62,14 +64,15 @@ The turntables below showcase the clay and wireframe passes, the hair model deve
   </div>
 </div>
 
-<div class="video-lightbox-trigger group relative overflow-hidden cursor-pointer rounded-md my-8" data-video={clayFull}>
+<div class="video-lightbox-trigger group relative aspect-video overflow-hidden cursor-pointer rounded-md my-8" data-video={clayFull}>
   <video
     src={clayFull}
-    class="w-full h-auto block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
+    class="w-full h-full object-cover block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
     loop
     muted
     playsinline
-    autoplay
+    preload="none"
+    data-autoplay
   ></video>
   <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
     <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
@@ -78,14 +81,15 @@ The turntables below showcase the clay and wireframe passes, the hair model deve
   </div>
 </div>
 
-<div class="video-lightbox-trigger group relative overflow-hidden cursor-pointer rounded-md my-8" data-video={wiresFull}>
+<div class="video-lightbox-trigger group relative aspect-video overflow-hidden cursor-pointer rounded-md my-8" data-video={wiresFull}>
   <video
     src={wiresFull}
-    class="w-full h-auto block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
+    class="w-full h-full object-cover block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
     loop
     muted
     playsinline
-    autoplay
+    preload="none"
+    data-autoplay
   ></video>
   <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
     <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
