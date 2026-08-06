@@ -177,26 +177,25 @@ const topicThreadSearchData = (topic: PipelineTopic, thread: CourseProjectThread
 // term, keeping the original-case text so we can show a highlighted snippet.
 type SearchEntry = { kind: string; title: string; crumb: string; hash: string; text: string; thumb?: string };
 const searchEntries: SearchEntry[] = [];
+const thumbUrl = (src: any): string | undefined => {
+	try { return src?.asset ? urlFor(src).width(160).height(100).fit('crop').auto('format').url() : undefined; } catch { return undefined; }
+};
 const pushMedia = (body: any, crumb: string, hash: string) => {
 	for (const m of extractMedia(body)) {
 		const alt = String(m.alt ?? '').trim();
 		const caption = String(m.caption ?? '').trim();
 		const label = caption || alt;
 		const isVideo = m._type === 'video';
-		const thumbSource = isVideo ? m.poster : m;
-		let thumb: string | undefined;
-		try { if (thumbSource?.asset) thumb = urlFor(thumbSource).width(160).height(100).fit('crop').auto('format').url(); } catch { thumb = undefined; }
-		searchEntries.push({ kind: isVideo ? 'Video' : 'Image', title: label.length > 90 ? `${label.slice(0, 90)}\u2026` : label, crumb, hash, text: `${alt} ${caption}`.trim(), thumb });
+		searchEntries.push({ kind: isVideo ? 'Video' : 'Image', title: label.length > 90 ? `${label.slice(0, 90)}\u2026` : label, crumb, hash, text: `${alt} ${caption}`.trim(), thumb: thumbUrl(isVideo ? m.poster : m) });
 	}
 };
 for (const course of allCourses) {
 	const cid = courseId(course.code);
 	for (const project of course.projects ?? []) {
-		const projectText = `${project.description ?? ''} ${bodyToPlainText(project.body)}`.trim();
-		if (projectText) searchEntries.push({ kind: 'Project', title: project.title, crumb: course.code, hash: `${cid}/${project.slug}`, text: projectText });
+		searchEntries.push({ kind: 'Project', title: project.title, crumb: course.code, hash: `${cid}/${project.slug}`, text: `${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)}`.trim(), thumb: thumbUrl(project.thumbnail) });
 		pushMedia(project.body, `${course.code} · ${project.title}`, `${cid}/${project.slug}`);
 		for (const thread of project.threads ?? []) {
-			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: `${course.code} · ${project.title}`, hash: `${cid}/${project.slug}/${thread.slug}`, text: `${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim() });
+			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: `${course.code} · ${project.title}`, hash: `${cid}/${project.slug}/${thread.slug}`, text: `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim(), thumb: thumbUrl(thread.thumbnail) });
 			pushMedia(thread.body, `${course.code} · ${project.title} · ${thread.title}`, `${cid}/${project.slug}/${thread.slug}`);
 		}
 	}
@@ -213,7 +212,7 @@ for (const topic of pipeline) {
 		}
 	} else if ((topic.threads?.length ?? 0) > 0) {
 		for (const thread of topic.threads ?? []) {
-			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: topic.title, hash: `${topic.slug}/${thread.slug}`, text: `${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim() });
+			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: topic.title, hash: `${topic.slug}/${thread.slug}`, text: `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim(), thumb: thumbUrl(thread.thumbnail) });
 			pushMedia(thread.body, `${topic.title} · ${thread.title}`, `${topic.slug}/${thread.slug}`);
 		}
 	} else {
@@ -897,8 +896,9 @@ const initCourseSearch = () => {
 	const searchInput = document.getElementById('course-search') as HTMLInputElement | null;
 	if (!searchInput) return;
 
-	const savedQuery = sessionStorage.getItem('course-search') ?? '';
-	searchInput.value = savedQuery;
+	// Always start fresh on load / refresh (don't restore a previous search).
+	searchInput.value = '';
+	sessionStorage.removeItem('course-search');
 
 	const normalize = (value: string) => value.toLowerCase().trim();
 
