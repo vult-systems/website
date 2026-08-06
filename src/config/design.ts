@@ -158,7 +158,7 @@ export const components = {
   },
 
   text: {
-    base: '',
+    base: 'reading-copy',
     
     variants: {
       default: 'text-foreground',

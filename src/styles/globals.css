@@ -160,6 +160,19 @@
   /* Learn page body copy uses the reading serif to match its headings/nav. */
   .learn-body p { font-family: 'Besley', ui-serif, Georgia, serif; }
 
+  /* Body copy (Text component) uses the reading serif everywhere — page headers,
+     landing page, and cards — so it matches the headings and article prose.
+     Mirrors the `.prose` approach to beat the global `body *` monospace rule. */
+  .reading-copy,
+  .reading-copy * {
+    font-family: 'Besley', ui-serif, Georgia, serif;
+    letter-spacing: 0;
+  }
+  /* Inline code/technical bits inside body copy stay monospace. */
+  .reading-copy :where(code, pre, kbd, samp) {
+    font-family: var(--font-ibm-plex);
+  }
+
   /* Nested numbered lists show a bullet instead of restarting the numbering,
      matching the tabbed sub-item style in the Studio editor. */
   .prose ol ol { list-style-type: disc; }
