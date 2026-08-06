@@ -1,0 +1,290 @@
+---
+import { urlFor, fileUrlFor } from '@/lib/sanity/image';
+
+const { node } = Astro.props;
+
+// Prefer an uploaded Sanity file; fall back to an external direct-model URL.
+const src = fileUrlFor(node?.file?.asset?._ref) ?? node?.url;
+const poster = node?.poster
+  ? urlFor(node.poster).width(1600).auto('format').url()
+  : undefined;
+const alt = node?.alt ?? node?.caption ?? '3D model';
+const cameraControls = node?.cameraControls !== false;
+const aspect = node?.aspect ?? 'auto';
+const align = node?.align ?? 'center';
+const startOrbit = node?.startOrbit as string | undefined;
+
+const autoLabel = node?.autoLabelParts === true;
+// Spinning labels are hard to read, so auto-labelled models don't auto-rotate.
+const autoRotate = node?.autoRotate !== false && !autoLabel;
+
+interface LabelOverride {
+  mesh?: string;
+  label?: string;
+  description?: string;
+  hide?: boolean;
+}
+// Keyed by lowercase mesh name for the runtime labeller.
+const overrides: Record<string, { label?: string; description?: string; hide?: boolean }> = {};
+for (const o of (node?.labelOverrides ?? []) as LabelOverride[]) {
+  if (o?.mesh) overrides[o.mesh.trim().toLowerCase()] = { label: o.label, description: o.description, hide: o.hide };
+}
+const overridesJson = JSON.stringify(overrides);
+---
+
+{
+  src && (
+    <figure class="my-8" data-align={align}>
+      <model-viewer
+        src={src}
+        poster={poster}
+        alt={alt}
+        data-aspect={aspect}
+        data-autolabel={autoLabel ? '' : undefined}
+        data-overrides={autoLabel ? overridesJson : undefined}
+        camera-orbit={startOrbit}
+        camera-controls={cameraControls ? '' : undefined}
+        auto-rotate={autoRotate ? '' : undefined}
+        touch-action="pan-y"
+        loading="eager"
+        reveal="auto"
+        shadow-intensity="1"
+        exposure="1.1"
+        interaction-prompt="none"
+        class="model-viewer w-full rounded-lg bg-black/[0.04] dark:bg-white/[0.04]"
+      >
+        <div slot="poster" class="model-viewer-loading">Loading 3D model…</div>
+        <div class="mv-gizmo" role="group" aria-label="Camera views">
+          <button type="button" data-orbit="0deg 90deg auto">Front</button>
+          <button type="button" data-orbit="90deg 90deg auto">Right</button>
+          <button type="button" data-orbit="180deg 90deg auto">Back</button>
+          <button type="button" data-orbit="-90deg 90deg auto">Left</button>
+          <button type="button" data-orbit="0deg 8deg auto">Top</button>
+          <button type="button" data-orbit="45deg 75deg auto">3/4</button>
+        </div>
+      </model-viewer>
+      {node?.caption && (
+        <figcaption class="mt-3 text-sm text-foreground-secondary text-center">
+          {node.caption}
+        </figcaption>
+      )}
+    </figure>
+  )
+}
+
+<style>
+  /* Reading view: drive by height so tall models never blow up the page. */
+  .model-viewer {
+    display: block;
+    width: 100%;
+    margin-inline: auto;
+    --poster-color: transparent;
+  }
+  .model-viewer[data-aspect='auto'] {
+    height: min(70vh, 640px);
+  }
+  .model-viewer[data-aspect='square'] {
+    width: auto;
+    height: min(70vh, 560px);
+    aspect-ratio: 1 / 1;
+  }
+  .model-viewer[data-aspect='portrait'] {
+    width: auto;
+    height: min(80vh, 720px);
+    aspect-ratio: 3 / 4;
+  }
+  .model-viewer[data-aspect='wide'] {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+  .model-viewer-loading {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    font-size: 0.875rem;
+    color: var(--color-foreground-secondary, #888);
+  }
+
+  /* --- Orientation gizmo (camera view buttons) --- */
+  .mv-gizmo {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 172px;
+    justify-content: flex-end;
+  }
+  .mv-gizmo button {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    cursor: pointer;
+    backdrop-filter: blur(2px);
+  }
+  .mv-gizmo button:hover {
+    background: rgba(0, 0, 0, 0.78);
+  }
+
+  /* --- Anatomy callouts (dot at the point, leader line, name at the end) --- */
+  .mv-callout {
+    position: relative;
+    width: 0;
+    height: 0;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    font-family: inherit;
+    pointer-events: auto;
+    cursor: default;
+  }
+  .mv-callout__dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 50%;
+    background: #e11d48;
+    box-shadow: 0 0 0 2px #fff, 0 0 4px rgba(0, 0, 0, 0.6);
+  }
+  .mv-callout__leader {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 54px;
+    height: 0;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.9);
+    transform-origin: left center;
+    transform: rotate(-38deg);
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.65));
+    pointer-events: none;
+  }
+  .mv-callout__name {
+    position: absolute;
+    left: 44px;
+    top: -42px;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    background: rgba(17, 17, 17, 0.9);
+    color: #fff;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+  }
+</style>
+
+<script>
+  // Registers the <model-viewer> custom element (self-contained, no CDN).
+  import '@google/model-viewer';
+
+  // Orientation gizmo: snap the camera to a preset view.
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.mv-gizmo button');
+    if (!btn) return;
+    const mv = btn.closest('model-viewer') as any;
+    const orbit = btn.getAttribute('data-orbit');
+    if (mv && orbit) {
+      mv.cameraOrbit = orbit;
+      mv.jumpCameraToGoal?.();
+    }
+  });
+
+  // --- Runtime auto-labelling from the model's own named meshes ---
+  const SKIP = /^(scene|rootnode|armature|root|node\d*|mesh\d*|object\d*|group\d*|primitive\d*)$/i;
+  const clean = (n: string) => n.replace(/[_.]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+  // model-viewer keeps its three.js scene on a private symbol; find it.
+  function findScene(mv: any) {
+    for (const s of Object.getOwnPropertySymbols(mv)) {
+      const v = mv[s];
+      if (v && typeof v.forHotspots === 'function' && v.target) return v;
+    }
+    return null;
+  }
+
+  async function labelModel(mv: any) {
+    if (mv.dataset.autolabelled) return;
+    const scene = findScene(mv);
+    if (!scene?.target) return;
+    mv.dataset.autolabelled = '1';
+
+    // three is loaded lazily so it can never block model-viewer from loading.
+    const THREE = await import('three');
+    const target = scene.target;
+    target.updateWorldMatrix(true, true);
+    const inv = new THREE.Matrix4().copy(target.matrixWorld).invert();
+    const toLocal = (v: any) => v.clone().applyMatrix4(inv);
+    const center = toLocal(new THREE.Box3().setFromObject(target).getCenter(new THREE.Vector3()));
+
+    let overrides: Record<string, any> = {};
+    try {
+      overrides = JSON.parse(mv.dataset.overrides || '{}');
+    } catch {}
+
+    const seen = new Set<string>();
+    const parts: { name: string; c: any }[] = [];
+    target.traverse((obj: any) => {
+      const name = (obj.name || '').trim();
+      if (!name || SKIP.test(name) || seen.has(name)) return;
+      if (!obj.isMesh && !(obj.children || []).some((c: any) => c.isMesh)) return;
+      const box = new THREE.Box3().setFromObject(obj);
+      if (box.isEmpty()) return;
+      seen.add(name);
+      parts.push({ name, c: toLocal(box.getCenter(new THREE.Vector3())) });
+    });
+
+    let i = 0;
+    for (const p of parts.slice(0, 80)) {
+      const ov = overrides[p.name.toLowerCase()] || {};
+      if (ov.hide) continue;
+      i++;
+      const dx = p.c.x - center.x;
+      const dy = p.c.y - center.y;
+      const dz = p.c.z - center.z;
+      const len = Math.hypot(dx, dy, dz) || 1;
+      const btn = document.createElement('button');
+      btn.slot = `hotspot-auto-${i}`;
+      btn.className = 'mv-callout';
+      btn.dataset.position = `${p.c.x}m ${p.c.y}m ${p.c.z}m`;
+      btn.dataset.normal = `${dx / len} ${dy / len} ${dz / len}`;
+      const label = ov.label || clean(p.name);
+      if (ov.description) btn.title = ov.description;
+      btn.innerHTML =
+        '<span class="mv-callout__dot"></span><span class="mv-callout__leader"></span>' +
+        `<span class="mv-callout__name">${label}</span>`;
+      mv.appendChild(btn);
+    }
+  }
+
+  function wire(mv: any) {
+    if (mv.loaded) labelModel(mv);
+    else mv.addEventListener('load', () => labelModel(mv), { once: true });
+  }
+
+  document
+    .querySelectorAll('model-viewer[data-autolabel]')
+    .forEach((mv) => wire(mv));
+
+  // Present mode (and other dynamic inserts) clone model-viewers in later.
+  new MutationObserver((records) => {
+    for (const r of records) {
+      for (const n of r.addedNodes) {
+        if (!(n instanceof HTMLElement)) continue;
+        if (n.matches?.('model-viewer[data-autolabel]')) wire(n);
+        n.querySelectorAll?.('model-viewer[data-autolabel]').forEach((mv) => wire(mv));
+      }
+    }
+  }).observe(document.body, { childList: true, subtree: true });
+</script>
+</script>

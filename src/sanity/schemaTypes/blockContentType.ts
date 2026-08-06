@@ -168,6 +168,136 @@ export const blockContentType = defineType({
       },
     }),
     defineArrayMember({
+      type: 'object',
+      name: 'model3d',
+      title: '3D Model',
+      fields: [
+        {
+          name: 'file',
+          title: 'Model file (.glb / .gltf)',
+          type: 'file',
+          options: { accept: '.glb,.gltf,model/gltf-binary,model/gltf+json' },
+          description: 'Upload an uncompressed GLB (recommended) or glTF.',
+        },
+        {
+          name: 'url',
+          title: 'External URL',
+          type: 'url',
+          description:
+            'Optional. Direct .glb/.gltf URL. Used only when no file is uploaded above.',
+          validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
+        },
+        {
+          name: 'poster',
+          title: 'Poster image',
+          type: 'image',
+          options: { hotspot: true },
+          description: 'Optional. Shown before the model loads.',
+        },
+        {
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          description: 'Describe the model for screen readers.',
+        },
+        { name: 'caption', title: 'Caption', type: 'string' },
+        {
+          name: 'align',
+          title: 'Presentation alignment',
+          type: 'string',
+          description: 'How the viewer is placed on a slide in Present mode. The normal reading view always renders it inline.',
+          options: {
+            list: [
+              { title: 'Center', value: 'center' },
+              { title: 'Left', value: 'left' },
+              { title: 'Right', value: 'right' },
+              { title: 'Full width', value: 'full' },
+              { title: 'Left (side-by-side, text right)', value: 'left-bleed' },
+              { title: 'Right (side-by-side, text left)', value: 'right-bleed' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'center',
+        },
+        {
+          name: 'aspect',
+          title: 'Frame shape',
+          type: 'string',
+          description: 'Shape of the viewer stage. Portrait suits full-body characters; Wide suits environments/props.',
+          options: {
+            list: [
+              { title: 'Auto (tall stage)', value: 'auto' },
+              { title: 'Square (1:1)', value: 'square' },
+              { title: 'Portrait (3:4)', value: 'portrait' },
+              { title: 'Wide (16:9)', value: 'wide' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'auto',
+        },
+        {
+          name: 'autoRotate',
+          title: 'Auto-rotate',
+          type: 'boolean',
+          initialValue: true,
+        },
+        {
+          name: 'cameraControls',
+          title: 'Allow orbit / zoom',
+          type: 'boolean',
+          initialValue: true,
+        },
+        {
+          name: 'startOrbit',
+          title: 'Start orientation',
+          type: 'string',
+          description:
+            'Optional camera-orbit, e.g. "45deg 75deg auto" (theta phi radius). Leave blank for default framing.',
+        },
+        {
+          name: 'autoLabelParts',
+          title: 'Auto-label named parts',
+          type: 'boolean',
+          description:
+            'When on, the viewer places a label at each named mesh in the model (uses the model\u2019s part names). Great for anatomy.',
+          initialValue: false,
+        },
+        {
+          name: 'labelOverrides',
+          title: 'Label overrides',
+          type: 'array',
+          description:
+            'Optional. Rename, describe, or hide auto-labels. "Mesh name" must match the part name in the model.',
+          of: [
+            {
+              type: 'object',
+              name: 'labelOverride',
+              fields: [
+                { name: 'mesh', title: 'Mesh name (in the model)', type: 'string' },
+                { name: 'label', title: 'Show as', type: 'string' },
+                { name: 'description', title: 'Description', type: 'text', rows: 2 },
+                { name: 'hide', title: 'Hide this label', type: 'boolean' },
+              ],
+              preview: {
+                select: { title: 'label', subtitle: 'mesh' },
+                prepare: ({ title, subtitle }: { title?: string; subtitle?: string }) => ({
+                  title: title || subtitle || 'Override',
+                  subtitle: subtitle,
+                }),
+              },
+            },
+          ],
+        },
+      ],
+      preview: {
+        select: { title: 'caption', alt: 'alt', media: 'poster' },
+        prepare: ({ title, alt, media }: { title?: string; alt?: string; media?: unknown }) => ({
+          title: title || alt || '3D Model',
+          media,
+        }),
+      },
+    }),
+    defineArrayMember({
       type: 'table',
       name: 'table',
       title: 'Table',

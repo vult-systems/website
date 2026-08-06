@@ -155,6 +155,34 @@
     margin-inline: auto;
     border-radius: 0.5rem;
   }
+  /* 3D viewer: size to the slide frame (cqh) so it never overflows like it would with vh. */
+  #lecture-presenter #lp-slide model-viewer {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 58cqh;
+    margin-inline: auto;
+    border-radius: 0.5rem;
+    /* Sit above the invisible prev/next click zones so it stays interactive. */
+    position: relative;
+    z-index: 5;
+  }
+  #lecture-presenter #lp-slide model-viewer[data-aspect='square'] {
+    width: auto;
+    height: 58cqh;
+    aspect-ratio: 1 / 1;
+  }
+  #lecture-presenter #lp-slide model-viewer[data-aspect='portrait'] {
+    width: auto;
+    height: 66cqh;
+    aspect-ratio: 3 / 4;
+  }
+  #lecture-presenter #lp-slide model-viewer[data-aspect='wide'] {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    max-height: 58cqh;
+  }
   #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
   #lecture-presenter #lp-slide strong { font-weight: 700; }
 
@@ -186,6 +214,7 @@
   #lecture-presenter #lp-slide figure[data-align='full'] { max-width: none; }
   #lecture-presenter #lp-slide figure[data-align='full'] img,
   #lecture-presenter #lp-slide figure[data-align='full'] video { max-height: 70cqh; }
+  #lecture-presenter #lp-slide figure[data-align='full'] model-viewer { width: 100%; height: 70cqh; }
 
   /* Bottom full-bleed: pin the image to the slide's bottom edge (e.g. character busts). */
   #lecture-presenter #lp-slide:has(figure[data-align='bottom']) { overflow: hidden; padding-bottom: 0; }
@@ -233,6 +262,7 @@
   #lecture-presenter #lp-slide .lp-cols .lp-col-media figure { margin: 0; max-width: none; }
   #lecture-presenter #lp-slide .lp-cols .lp-col-media img,
   #lecture-presenter #lp-slide .lp-cols .lp-col-media video { max-height: 66cqh; }
+  #lecture-presenter #lp-slide .lp-cols .lp-col-media model-viewer { width: 100%; height: 66cqh; }
 
   /* Full-bleed side image: the media runs edge-to-edge; text keeps its padding. */
   #lecture-presenter #lp-slide:has(.lp-cols.bleed) { padding: 0; overflow: hidden; }
@@ -246,6 +276,13 @@
     height: 100%;
     max-height: none;
     object-fit: cover;
+    border-radius: 0;
+    display: block;
+  }
+  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media model-viewer {
+    width: 100%;
+    height: 100%;
+    max-height: none;
     border-radius: 0;
     display: block;
   }
