@@ -35,34 +35,41 @@ const overridesJson = JSON.stringify(overrides);
 {
   src && (
     <figure class="my-8" data-align={align}>
-      <model-viewer
-        src={src}
-        poster={poster}
-        alt={alt}
-        data-aspect={aspect}
-        data-autolabel={autoLabel ? '' : undefined}
-        data-overrides={autoLabel ? overridesJson : undefined}
-        camera-orbit={startOrbit}
-        camera-controls={cameraControls ? '' : undefined}
-        auto-rotate={autoRotate ? '' : undefined}
-        touch-action="pan-y"
-        loading="eager"
-        reveal="auto"
-        shadow-intensity="1"
-        exposure="1.1"
-        interaction-prompt="none"
-        class="model-viewer w-full rounded-lg bg-black/[0.04] dark:bg-white/[0.04]"
-      >
-        <div slot="poster" class="model-viewer-loading">Loading 3D model…</div>
-        <div class="mv-gizmo" role="group" aria-label="Camera views">
-          <button type="button" data-orbit="0deg 90deg auto">Front</button>
-          <button type="button" data-orbit="90deg 90deg auto">Right</button>
-          <button type="button" data-orbit="180deg 90deg auto">Back</button>
-          <button type="button" data-orbit="-90deg 90deg auto">Left</button>
-          <button type="button" data-orbit="0deg 8deg auto">Top</button>
-          <button type="button" data-orbit="45deg 75deg auto">3/4</button>
-        </div>
-      </model-viewer>
+      <div class="model-viewer-frame" data-aspect={aspect}>
+        <model-viewer
+          src={src}
+          poster={poster}
+          alt={alt}
+          data-autolabel={autoLabel ? '' : undefined}
+          data-overrides={autoLabel ? overridesJson : undefined}
+          camera-orbit={startOrbit}
+          camera-controls={cameraControls ? '' : undefined}
+          auto-rotate={autoRotate ? '' : undefined}
+          touch-action="pan-y"
+          loading="eager"
+          reveal="auto"
+          shadow-intensity="1"
+          exposure="1.1"
+          interaction-prompt="none"
+          class="model-viewer rounded-lg bg-black/[0.04] dark:bg-white/[0.04]"
+        >
+          <div slot="poster" class="model-viewer-loading">Loading 3D model…</div>
+          <div class="mv-cube" role="group" aria-label="Camera views">
+            <div class="mv-cube__box">
+              <button type="button" class="mv-cube__face mv-cube__face--front" data-orbit="0deg 90deg auto" aria-label="Front view">Front</button>
+              <button type="button" class="mv-cube__face mv-cube__face--back" data-orbit="180deg 90deg auto" aria-label="Back view">Back</button>
+              <button type="button" class="mv-cube__face mv-cube__face--right" data-orbit="90deg 90deg auto" aria-label="Right view">Right</button>
+              <button type="button" class="mv-cube__face mv-cube__face--left" data-orbit="-90deg 90deg auto" aria-label="Left view">Left</button>
+              <button type="button" class="mv-cube__face mv-cube__face--top" data-orbit="0deg 2deg auto" aria-label="Top view">Top</button>
+              <button type="button" class="mv-cube__face mv-cube__face--bottom" data-orbit="0deg 178deg auto" aria-label="Bottom view">Bottom</button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--fr" data-orbit="45deg 60deg auto" aria-label="Front-right-top view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--fl" data-orbit="-45deg 60deg auto" aria-label="Front-left-top view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--br" data-orbit="135deg 60deg auto" aria-label="Back-right-top view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--bl" data-orbit="-135deg 60deg auto" aria-label="Back-left-top view"></button>
+            </div>
+          </div>
+        </model-viewer>
+      </div>
       {node?.caption && (
         <figcaption class="mt-3 text-sm text-foreground-secondary text-center">
           {node.caption}
@@ -73,29 +80,48 @@ const overridesJson = JSON.stringify(overrides);
 }
 
 <style>
-  /* Reading view: drive by height so tall models never blow up the page. */
-  .model-viewer {
-    display: block;
+  /* Sizing frame: fills the full width of whatever column it's in ("edge to
+     edge") for every aspect, including square/portrait. Ratios are locked
+     with the padding-top trick rather than the CSS `aspect-ratio` property —
+     <model-viewer> is a custom element, and on it `aspect-ratio` only
+     resolves correctly when deriving *width* from an explicit height; going
+     the other way (explicit width, auto height) silently collapses to the
+     browser's ~150px replaced-element fallback instead of the real ratio.
+     Padding-top is plain percentage-of-width math, so it isn't affected. */
+  .model-viewer-frame {
+    position: relative;
     width: 100%;
-    margin-inline: auto;
-    --poster-color: transparent;
   }
-  .model-viewer[data-aspect='auto'] {
+  .model-viewer-frame[data-aspect='auto'] {
     height: min(70vh, 640px);
   }
-  .model-viewer[data-aspect='square'] {
-    width: auto;
-    height: min(70vh, 560px);
-    aspect-ratio: 1 / 1;
+  .model-viewer-frame[data-aspect='square'] {
+    height: 0;
+    padding-top: 100%;
+    max-height: 85vh;
   }
-  .model-viewer[data-aspect='portrait'] {
-    width: auto;
-    height: min(80vh, 720px);
-    aspect-ratio: 3 / 4;
+  .model-viewer-frame[data-aspect='portrait'] {
+    height: 0;
+    padding-top: 133.333%; /* 3:4 */
+    max-height: 85vh;
   }
-  .model-viewer[data-aspect='wide'] {
+  .model-viewer-frame[data-aspect='wide'] {
+    height: 0;
+    padding-top: 56.25%; /* 16:9 */
+  }
+  .model-viewer {
+    display: block;
+    --poster-color: transparent;
+  }
+  .model-viewer-frame[data-aspect='auto'] > .model-viewer {
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 100%;
+  }
+  .model-viewer-frame:not([data-aspect='auto']) > .model-viewer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
   .model-viewer-loading {
     display: grid;
@@ -105,31 +131,98 @@ const overridesJson = JSON.stringify(overrides);
     color: var(--color-foreground-secondary, #888);
   }
 
-  /* --- Orientation gizmo (camera view buttons) --- */
-  .mv-gizmo {
+  /* --- Orientation cube (Maya-style ViewCube): a real CSS-3D cube whose
+     rotation is kept in sync with the model's camera orbit (see the
+     camera-change listener in the script below), so it always shows which
+     side of the model you're looking at. Faces/corners set the camera on
+     click; the box itself is never the click target. --- */
+  .mv-cube {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 10px;
+    right: 10px;
     z-index: 2;
+    width: 64px;
+    height: 64px;
+    perspective: 280px;
+  }
+  .mv-cube__box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.1s linear;
+  }
+  .mv-cube__face {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 44px;
+    height: 44px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    max-width: 172px;
-    justify-content: flex-end;
-  }
-  .mv-gizmo button {
-    font-size: 0.68rem;
-    font-weight: 600;
-    padding: 3px 7px;
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(0, 0, 0, 0.5);
-    color: #fff;
+    align-items: center;
+    justify-content: center;
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: inherit;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(30, 30, 30, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.28);
     cursor: pointer;
-    backdrop-filter: blur(2px);
+    backface-visibility: hidden;
   }
-  .mv-gizmo button:hover {
-    background: rgba(0, 0, 0, 0.78);
+  .mv-cube__face:hover {
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.55);
+  }
+  .mv-cube__face--front {
+    transform: translateZ(22px);
+  }
+  .mv-cube__face--back {
+    transform: rotateY(180deg) translateZ(22px);
+  }
+  .mv-cube__face--right {
+    transform: rotateY(90deg) translateZ(22px);
+  }
+  .mv-cube__face--left {
+    transform: rotateY(-90deg) translateZ(22px);
+  }
+  .mv-cube__face--top {
+    transform: rotateX(90deg) translateZ(22px);
+  }
+  .mv-cube__face--bottom {
+    transform: rotateX(-90deg) translateZ(22px);
+  }
+  /* Top-corner shortcuts for quick 3/4 (isometric-ish) views. */
+  .mv-cube__corner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 11px;
+    height: 11px;
+    margin: -5.5px 0 0 -5.5px;
+    border-radius: 2px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.24);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+  }
+  .mv-cube__corner:hover {
+    background: rgba(255, 255, 255, 0.6);
+  }
+  .mv-cube__corner--fr {
+    transform: translate3d(22px, -22px, 22px);
+  }
+  .mv-cube__corner--fl {
+    transform: translate3d(-22px, -22px, 22px);
+  }
+  .mv-cube__corner--br {
+    transform: translate3d(22px, -22px, -22px);
+  }
+  .mv-cube__corner--bl {
+    transform: translate3d(-22px, -22px, -22px);
   }
 
   /* --- Anatomy callouts: a dot at the part's center, a leader line at
@@ -189,7 +282,7 @@ const overridesJson = JSON.stringify(overrides);
     flex-direction: column;
     align-items: flex-start;
     gap: 1px;
-    max-width: 180px;
+    max-width: 150px;
     background: rgba(17, 17, 17, 0.9);
     color: #fff;
     padding: 3px 9px;
@@ -223,9 +316,9 @@ const overridesJson = JSON.stringify(overrides);
   // Registers the <model-viewer> custom element (self-contained, no CDN).
   import '@google/model-viewer';
 
-  // Orientation gizmo: snap the camera to a preset view.
+  // Orientation cube: snap the camera to a preset view.
   document.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.mv-gizmo button');
+    const btn = (e.target as HTMLElement).closest('.mv-cube [data-orbit]');
     if (!btn) return;
     const mv = btn.closest('model-viewer') as any;
     const orbit = btn.getAttribute('data-orbit');
@@ -234,6 +327,27 @@ const overridesJson = JSON.stringify(overrides);
       mv.jumpCameraToGoal?.();
     }
   });
+
+  // Keep the cube's own rotation mirroring the model's camera orbit, so it
+  // always reads as "which side am I looking at" rather than a static icon.
+  function syncCube(mv: any) {
+    const box = mv.querySelector('.mv-cube__box') as HTMLElement | null;
+    if (!box || typeof mv.getCameraOrbit !== 'function') return;
+    const { theta, phi } = mv.getCameraOrbit();
+    const thetaDeg = (theta * 180) / Math.PI;
+    const phiDeg = (phi * 180) / Math.PI;
+    box.style.transform = `rotateX(${phiDeg - 90}deg) rotateY(${-thetaDeg}deg)`;
+  }
+
+  function wireCube(mv: any) {
+    if (mv.dataset.cubewired) return;
+    mv.dataset.cubewired = '1';
+    syncCube(mv);
+    mv.addEventListener('camera-change', () => syncCube(mv));
+    mv.addEventListener('load', () => syncCube(mv), { once: true });
+  }
+
+  document.querySelectorAll('model-viewer').forEach((mv) => wireCube(mv as any));
 
   // --- Runtime auto-labelling from the model's own named meshes ---
   const SKIP = /^(scene|rootnode|armature|root|node\d*|mesh\d*|object\d*|group\d*|primitive\d*)$/i;
@@ -336,7 +450,9 @@ const overridesJson = JSON.stringify(overrides);
       });
 
     const rect = mv.getBoundingClientRect();
-    const radius = Math.round(Math.max(60, Math.min(rect.width, rect.height) * 0.3));
+    // Leave room for the tag itself (~150px wide) plus the leader's own gap,
+    // so labels land inside the viewer instead of running off its edge.
+    const radius = Math.round(Math.max(40, Math.min(rect.width, rect.height) * 0.32 - 110));
 
     visible.forEach((p, idx) => {
       const dx = p.c.x - center.x;
@@ -382,8 +498,11 @@ const overridesJson = JSON.stringify(overrides);
     for (const r of records) {
       for (const n of r.addedNodes) {
         if (!(n instanceof HTMLElement)) continue;
-        if (n.matches?.('model-viewer[data-autolabel]')) wire(n);
-        n.querySelectorAll?.('model-viewer[data-autolabel]').forEach((mv) => wire(mv));
+        const added = n.matches?.('model-viewer') ? [n] : Array.from(n.querySelectorAll?.('model-viewer') ?? []);
+        for (const mv of added) {
+          if ((mv as HTMLElement).matches('[data-autolabel]')) wire(mv);
+          wireCube(mv);
+        }
       }
     }
   }).observe(document.body, { childList: true, subtree: true });
