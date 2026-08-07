@@ -627,10 +627,14 @@
         const mediaEl = media.cloneNode(true) as HTMLElement;
         upgradeImages(mediaEl);
         const bleedCls = bleed ? ' bleed' : '';
-        // Bleed slides fill the frame, so the title sits inside the text column.
-        const textInner = (bleed ? head : '') + cloneHtml(rest);
+        // The title lives in the text column with the body copy so the two
+        // vertically center together next to the image as one group —
+        // rendering it full-width above the columns (as a lone `.lp-head`
+        // row) left it stranded above the grid's own centering, with a
+        // gap over the now visibly-offset body text.
+        const textInner = head + cloneHtml(rest);
         return (
-          `<div class="lp-deck lp-content-slide">${bleed ? '' : head}` +
+          `<div class="lp-deck lp-content-slide">` +
             `<div class="lp-cols ${colLayout}${bleedCls}">` +
               `<div class="lp-col-media">${mediaEl.outerHTML}</div>` +
               `<div class="lp-col-text lp-body">${textInner}</div>` +
