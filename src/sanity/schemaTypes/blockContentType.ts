@@ -195,6 +195,14 @@ export const blockContentType = defineType({
           description: 'Optional. Shown before the model loads.',
         },
         {
+          name: 'environmentImage',
+          title: 'Environment lighting (HDR)',
+          type: 'file',
+          options: { accept: '.hdr' },
+          description:
+            'Optional. An equirectangular .hdr file used to light the model (image-based lighting) — this is how you get soft ambient/fill light in the viewer, since glTF has no concept of a hemisphere light. Only .hdr is supported (not .exr). Leave empty to use the default neutral studio lighting.',
+        },
+        {
           name: 'alt',
           title: 'Alt text',
           type: 'string',
@@ -270,6 +278,14 @@ export const blockContentType = defineType({
             layout: 'radio',
           },
           initialValue: 'off',
+        },
+        {
+          name: 'wireframeDefault',
+          title: 'Show wireframe by default',
+          type: 'boolean',
+          description:
+            'Overlays the mesh edges on top of the shaded model (not a flat wireframe-only view — the real material still shows through). Shows the topology as exported, regardless of the subdivision setting above. Visitors can toggle it off/on in the viewer either way; this only sets the starting state.',
+          initialValue: false,
         },
         {
           name: 'autoLabelParts',

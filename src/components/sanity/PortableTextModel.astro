@@ -22,6 +22,10 @@ const autoRotate = node?.autoRotate !== false && !autoLabel;
 const subdivRaw = node?.subdivisionLevel as string | undefined;
 const subdivLevel = subdivRaw && subdivRaw !== 'off' ? Number(subdivRaw) : 0;
 
+// glTF has no hemisphere-light concept; a custom HDR drives IBL instead.
+const envImage = fileUrlFor(node?.environmentImage?.asset?._ref);
+const wireframeDefault = node?.wireframeDefault === true;
+
 interface LabelOverride {
   mesh?: string;
   label?: string;
@@ -47,6 +51,7 @@ const overridesJson = JSON.stringify(overrides);
           data-autolabel={autoLabel ? '' : undefined}
           data-overrides={autoLabel ? overridesJson : undefined}
           data-subdiv={subdivLevel > 0 ? subdivLevel : undefined}
+          environment-image={envImage}
           camera-orbit={startOrbit}
           camera-controls={cameraControls ? '' : undefined}
           auto-rotate={autoRotate ? '' : undefined}
@@ -59,6 +64,18 @@ const overridesJson = JSON.stringify(overrides);
           class="model-viewer rounded-lg bg-black/[0.04] dark:bg-white/[0.04]"
         >
           <div slot="poster" class="model-viewer-loading">Loading 3D model…</div>
+          <button
+            type="button"
+            class="mv-wireframe-toggle"
+            aria-pressed={wireframeDefault ? 'true' : 'false'}
+            aria-label="Toggle wireframe overlay"
+            title="Toggle wireframe"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z" />
+              <path d="M12 2v20M3 7l9 5 9-5M3 17l9-5 9 5" />
+            </svg>
+          </button>
           <div class="mv-cube" role="group" aria-label="Camera views">
             <div class="mv-cube__box">
               <button type="button" class="mv-cube__face mv-cube__face--front" data-orbit="0deg 90deg auto" aria-label="Front view">Front</button>
@@ -230,6 +247,36 @@ const overridesJson = JSON.stringify(overrides);
     transform: translate3d(-22px, -22px, -22px);
   }
 
+  /* --- Wireframe toggle: mirrors the cube's corner (top-left instead of
+     top-right) so the two controls don't crowd each other. --- */
+  .mv-wireframe-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(30, 30, 30, 0.82);
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+  }
+  .mv-wireframe-toggle:hover {
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.55);
+  }
+  .mv-wireframe-toggle[aria-pressed='true'] {
+    background: rgba(225, 29, 72, 0.85);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #fff;
+  }
+
   /* --- Anatomy callouts: a dot at the part's center, a leader line at
      --mv-angle running out to length --mv-radius, and a name/description
      tag at the far end. Both custom properties are set per-hotspot in JS so
@@ -356,6 +403,60 @@ const overridesJson = JSON.stringify(overrides);
     mv.addEventListener('load', () => syncCube(mv), { once: true });
   }
 
+  // Wireframe overlay: edges drawn on top of the real, shaded material
+  // rather than replacing it. Toggle just flips visibility of the overlay
+  // meshes; building them happens once, in buildWireframeOverlay().
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.mv-wireframe-toggle');
+    if (!btn) return;
+    const mv = btn.closest('model-viewer') as any;
+    if (!mv) return;
+    const on = btn.getAttribute('aria-pressed') !== 'true';
+    btn.setAttribute('aria-pressed', String(on));
+    const scene = findScene(mv);
+    scene?.target?.traverse((obj: any) => {
+      if (obj.userData?.isWireframeOverlay) obj.visible = on;
+    });
+    scene?.queueRender?.();
+  });
+
+  // Built from each named mesh's geometry *before* subdivision runs, so the
+  // wireframe always shows the topology as exported — the actual thing
+  // worth seeing for teaching purposes — even when subdivision is smoothing
+  // the shaded surface on top of it.
+  async function buildWireframeOverlay(mv: any) {
+    if (mv.__wireframeBuilt) return;
+    const scene = findScene(mv);
+    if (!scene?.target) return;
+    mv.__wireframeBuilt = true; // instance property — see wireCube() comment
+
+    const toggle = mv.querySelector('.mv-wireframe-toggle');
+    const visible = toggle?.getAttribute('aria-pressed') === 'true';
+
+    const THREE = await import('three');
+    const meshes: any[] = [];
+    scene.target.traverse((obj: any) => {
+      if (obj.isMesh && obj.geometry && obj.name) meshes.push(obj);
+    });
+    for (const obj of meshes) {
+      const wireGeom = new THREE.WireframeGeometry(obj.geometry);
+      const wireMat = new THREE.LineBasicMaterial({
+        color: 0x000000,
+        transparent: true,
+        opacity: 0.4,
+        depthTest: true,
+      });
+      const overlay = new THREE.LineSegments(wireGeom, wireMat);
+      overlay.userData.isWireframeOverlay = true;
+      overlay.visible = visible;
+      // Nudged slightly larger than the surface it traces, so the lines
+      // don't z-fight with the shaded mesh underneath them.
+      overlay.scale.setScalar(1.002);
+      obj.add(overlay);
+    }
+    scene.queueRender?.();
+  }
+
   // --- Live subdivision smoothing (replaces pre-smoothing before export) ---
   async function applySubdivision(mv: any) {
     const level = parseInt(mv.dataset.subdiv || '0', 10);
@@ -473,10 +574,12 @@ const overridesJson = JSON.stringify(overrides);
 
     // Fan labels out to evenly-spaced slots around the model so nearby
     // parts never stack their tags on top of each other, assigning each
-    // part the free slot closest to its own natural direction.
+    // part the free slot closest to its own natural direction. Slots start
+    // at a fixed 45° rather than half a slot-width in: with an even part
+    // count (2, 4, ...) that half-width offset lands exactly on 90/270 —
+    // dead vertical leader lines. A 45° base keeps every line on a diagonal.
     const n = visible.length;
-    const slotOffset = 360 / n / 2;
-    const slots = Array.from({ length: n }, (_, i) => (360 / n) * i + slotOffset);
+    const slots = Array.from({ length: n }, (_, i) => 45 + (360 / n) * i);
     const slotUsed = new Array(n).fill(false);
     const finalAngle: number[] = new Array(n);
     visible
@@ -499,8 +602,10 @@ const overridesJson = JSON.stringify(overrides);
 
     const rect = mv.getBoundingClientRect();
     // Leave room for the tag itself (~150px wide) plus the leader's own gap,
-    // so labels land inside the viewer instead of running off its edge.
-    const radius = Math.round(Math.max(40, Math.min(rect.width, rect.height) * 0.32 - 110));
+    // so labels land inside the viewer instead of running off its edge —
+    // but otherwise push them out toward that edge rather than hugging the
+    // model, so lines read against open space instead of crossing it.
+    const radius = Math.round(Math.max(60, Math.min(rect.width, rect.height) * 0.38 - 90));
 
     visible.forEach((p, idx) => {
       const dx = p.c.x - center.x;
@@ -535,6 +640,10 @@ const overridesJson = JSON.stringify(overrides);
   // Subdivision runs first since labelling measures mesh bounding boxes —
   // keeping the order means labels land on the final, smoothed geometry.
   async function onModelLoad(mv: any) {
+    // Wireframe is built from whatever geometry is currently loaded, so it
+    // must run before subdivision replaces it — otherwise "as exported"
+    // topology would already be gone.
+    await buildWireframeOverlay(mv);
     await applySubdivision(mv);
     if (mv.matches('[data-autolabel]')) await labelModel(mv);
   }
