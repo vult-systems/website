@@ -337,6 +337,18 @@
     padding-right: var(--lp-px);
     padding-left: clamp(1.5rem, 3cqw, 3rem);
   }
+  /* Caption for a bleed or full-bleed-background image/video/model,
+     relocated here from the clipped media figure (see buildSlides) — reads
+     like a photo credit under the body copy rather than the figure's own
+     centered caption. */
+  #lecture-presenter #lp-slide .lp-media-caption {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid hsl(var(--foreground-secondary) / 0.18);
+    font-size: 0.85rem;
+    font-style: italic;
+    color: hsl(var(--foreground-secondary));
+  }
 
   /* Full-bleed background image with the text laid over it. */
   #lecture-presenter #lp-slide:has(.lp-bg-slide) { padding: 0; overflow: hidden; }
@@ -608,10 +620,19 @@
         const rest = g.nodes.filter((n) => n !== media);
         const mediaEl = media.cloneNode(true) as HTMLElement;
         upgradeImages(mediaEl);
+        // Same clipping problem as the bleed columns below: the background
+        // figure is pinned to 100% width/height with the slide's overflow
+        // hidden, so a caption inside it renders past the clipped edge.
+        let captionHtml = '';
+        const cap = mediaEl.querySelector('figcaption');
+        if (cap) {
+          captionHtml = `<p class="lp-media-caption">${cap.innerHTML}</p>`;
+          cap.remove();
+        }
         return (
           `<div class="lp-deck lp-content-slide lp-bg-slide${bgPos.trimEnd()}">` +
             `<div class="lp-bg-media">${mediaEl.outerHTML}</div>` +
-            `<div class="lp-bg-content">${head}<div class="lp-body">${cloneHtml(rest)}</div></div>` +
+            `<div class="lp-bg-content">${head}<div class="lp-body">${cloneHtml(rest)}${captionHtml}</div></div>` +
           `</div>`
         );
       }
@@ -627,12 +648,25 @@
         const mediaEl = media.cloneNode(true) as HTMLElement;
         upgradeImages(mediaEl);
         const bleedCls = bleed ? ' bleed' : '';
+        // A bleed media column is height-clamped with overflow hidden so
+        // the image/video/model fills it edge-to-edge — a caption left
+        // inside that figure renders just past the clipped bottom edge,
+        // invisible. Move it into the text column instead, where normal
+        // document flow actually shows it.
+        let captionHtml = '';
+        if (bleed) {
+          const cap = mediaEl.querySelector('figcaption');
+          if (cap) {
+            captionHtml = `<p class="lp-media-caption">${cap.innerHTML}</p>`;
+            cap.remove();
+          }
+        }
         // The title lives in the text column with the body copy so the two
         // vertically center together next to the image as one group —
         // rendering it full-width above the columns (as a lone `.lp-head`
         // row) left it stranded above the grid's own centering, with a
         // gap over the now visibly-offset body text.
-        const textInner = head + cloneHtml(rest);
+        const textInner = head + cloneHtml(rest) + captionHtml;
         return (
           `<div class="lp-deck lp-content-slide">` +
             `<div class="lp-cols ${colLayout}${bleedCls}">` +
