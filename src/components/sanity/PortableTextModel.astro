@@ -523,6 +523,14 @@ const overridesJson = JSON.stringify(overrides);
     font-family: inherit;
     pointer-events: auto;
     cursor: default;
+    /* Labels land ~1-2s after the model itself is already visible (they
+       need the model's final, subdivided geometry to measure against) —
+       fading them in reads as a soft reveal instead of a pop. */
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  :global(.mv-callout.mv-callout--visible) {
+    opacity: 1;
   }
   :global(.mv-callout__dot) {
     position: absolute;
@@ -920,6 +928,16 @@ const overridesJson = JSON.stringify(overrides);
         '</span>';
       mv.appendChild(btn);
     });
+
+    // Force a synchronous layout flush so the opacity:0 above is actually
+    // committed before this class flips it to 1 — otherwise the browser
+    // can coalesce both into one paint and skip the transition entirely.
+    // requestAnimationFrame would do the same thing on a visible tab, but
+    // it's paused outright on a hidden/backgrounded one (e.g. a presenter
+    // window that's briefly lost focus), which would leave labels stuck
+    // invisible; a forced reflow runs regardless of tab visibility.
+    void mv.offsetHeight;
+    mv.querySelectorAll('.mv-callout').forEach((el: Element) => el.classList.add('mv-callout--visible'));
   }
 
   // A comfort-padded version of model-viewer's own "auto" camera distance —
@@ -955,7 +973,13 @@ const overridesJson = JSON.stringify(overrides);
     }
     // Lets Present mode (see lecture-presenter.astro) hold its fade-in
     // until framing is settled, instead of racing model-viewer's own
-    // 'load' event.
+    // 'load' event. Fired here rather than at the end of this function —
+    // subdivision and labelling below take a further ~1-2s, and holding
+    // the whole model hidden until *that* finishes just traded a quick
+    // pop for a long blank wait followed by a bigger one. Annotation
+    // labels get their own fade-in (see labelModel) so their later
+    // arrival reads as a soft reveal rather than a pop, without stalling
+    // the model itself.
     mv.dispatchEvent(new CustomEvent('model-ready', { bubbles: true }));
 
     // Wireframe is built from whatever geometry is currently loaded, so it
