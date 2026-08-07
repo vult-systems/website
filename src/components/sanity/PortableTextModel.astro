@@ -61,7 +61,7 @@ const overridesJson = JSON.stringify(overrides);
 
 {
   src && (
-    <figure class="my-8" data-align={align}>
+    <figure id={node?._key ? `pt-${node._key}` : undefined} class="my-8" data-align={align}>
       <div class="model-viewer-frame" data-aspect={aspect}>
         <model-viewer
           src={src}

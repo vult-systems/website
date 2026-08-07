@@ -191,7 +191,10 @@ const pushMedia = (body: any, crumb: string, hash: string) => {
 		// Video and 3D model blocks carry their own poster image; a plain
 		// figure/image block's asset is the searchable image itself.
 		const kind = isModel ? '3D Model' : isVideo ? 'Video' : 'Image';
-		searchEntries.push({ kind, title: label.length > 90 ? `${label.slice(0, 90)}\u2026` : label, crumb, hash, text: `${alt} ${caption}`.trim(), thumb: thumbUrl(isVideo || isModel ? m.poster : m) });
+		// Append the block's own key so the result deep-links straight to it
+		// (see scrollToPanelMedia) instead of just the project/thread it's in.
+		const entryHash = m._key ? `${hash}/${m._key}` : hash;
+		searchEntries.push({ kind, title: label.length > 90 ? `${label.slice(0, 90)}\u2026` : label, crumb, hash: entryHash, text: `${alt} ${caption}`.trim(), thumb: thumbUrl(isVideo || isModel ? m.poster : m) });
 	}
 };
 for (const course of allCourses) {
@@ -759,7 +762,8 @@ Sections
 	font-family: 'Besley', serif;
 	pointer-events: none;
 }
-.glossary-term-highlight {
+.glossary-term-highlight,
+.pt-scroll-highlight {
 	animation: glossary-flash 2.2s ease-out;
 }
 @keyframes glossary-flash {
@@ -790,15 +794,23 @@ if (location.hash !== hash) history.pushState(null, '', hash);
 const restoreFromHash = (): boolean => {
 const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
 if (!raw) return false;
-const [courseSlug, projectSlug, threadSlug] = raw.split('/');
+// A trailing segment (from a media search result — see pushMedia in the
+// frontmatter) points at one figure/video/model3d block, identified by
+// its Portable Text _key, within either a thread or a project's own
+// body — whichever the media actually lives in.
+const [courseSlug, projectSlug, threadSlug, threadMediaKey] = raw.split('/');
 if (!courseSlug || !document.getElementById(`detail-${courseSlug}`)) return false;
 openCourseDetail(courseSlug, false);
 if (projectSlug) {
 if (threadSlug && document.getElementById(`thread-${courseSlug}-${projectSlug}-${threadSlug}`)) {
 openProjectDetail(courseSlug, projectSlug, false);
 openThreadDetail(courseSlug, projectSlug, threadSlug, false);
+if (threadMediaKey) scrollToPanelMedia(`thread-${courseSlug}-${projectSlug}-${threadSlug}`, threadMediaKey);
 } else if (document.getElementById(`project-${courseSlug}-${projectSlug}`)) {
 openProjectDetail(courseSlug, projectSlug, false);
+// No real thread matched, so a 3rd segment here is a media key
+// scoped to the project's own body instead.
+if (threadSlug) scrollToPanelMedia(`project-${courseSlug}-${projectSlug}`, threadSlug);
 } else {
 scrollToGlossaryTerm(courseSlug, projectSlug);
 }
@@ -815,6 +827,21 @@ requestAnimationFrame(() => {
 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 target.classList.add('glossary-term-highlight');
 window.setTimeout(() => target.classList.remove('glossary-term-highlight'), 2200);
+});
+};
+
+// Scroll to a specific figure/video/model3d block within an open
+// project/thread panel — each carries a `pt-<blockKey>` id (see
+// PortableTextFigure/Video/Model), reached from a media search result's
+// trailing hash segment.
+const scrollToPanelMedia = (panelId: string, mediaKey: string) => {
+const panel = document.getElementById(panelId);
+const target = panel?.querySelector<HTMLElement>(`[id="pt-${mediaKey}"]`);
+if (!target) return;
+requestAnimationFrame(() => {
+target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+target.classList.add('pt-scroll-highlight');
+window.setTimeout(() => target.classList.remove('pt-scroll-highlight'), 2200);
 });
 };
 

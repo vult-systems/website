@@ -24,7 +24,7 @@ const mime =
 
 {
   src && (
-    <figure class="my-8">
+    <figure id={node?._key ? `pt-${node._key}` : undefined} class="my-8">
       <video
         poster={poster}
         controls
