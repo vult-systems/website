@@ -938,22 +938,31 @@ const overridesJson = JSON.stringify(overrides);
   // Subdivision runs first since labelling measures mesh bounding boxes —
   // keeping the order means labels land on the final, smoothed geometry.
   async function onModelLoad(mv: any) {
-    // Wireframe is built from whatever geometry is currently loaded, so it
-    // must run before subdivision replaces it — otherwise "as exported"
-    // topology would already be gone.
-    await buildWireframeOverlay(mv);
-    await applySubdivision(mv);
-
-    // Re-frame the model's starting pose with the same padded radius the
-    // orientation cube uses, so the initial view and every snap point share
-    // one consistent, comfortable distance instead of the bare "auto" fit.
+    // Re-frame with the padded radius immediately, before anything async
+    // runs — model-viewer's own reveal fade hasn't happened yet at this
+    // point, so the corrected framing is what fades in. Doing this later
+    // (e.g. after the subdivision delay below) meant the model would
+    // already be visible at the bare "auto" framing and then visibly snap
+    // to the padded one — the "weird snap and pop" the padding itself was
+    // supposed to fix. The pre-subdivision bounding sphere is close enough
+    // to the post-subdivision one (smoothing only pulls vertices slightly
+    // inward) that computing it this early doesn't cost any accuracy.
     mv.__snapRadius = computeSnapRadius(mv);
     if (mv.__snapRadius) {
       const { theta, phi } = mv.getCameraOrbit();
       mv.cameraOrbit = `${(theta * 180) / Math.PI}deg ${(phi * 180) / Math.PI}deg ${mv.__snapRadius}m`;
       mv.jumpCameraToGoal?.();
     }
+    // Lets Present mode (see lecture-presenter.astro) hold its fade-in
+    // until framing is settled, instead of racing model-viewer's own
+    // 'load' event.
+    mv.dispatchEvent(new CustomEvent('model-ready', { bubbles: true }));
 
+    // Wireframe is built from whatever geometry is currently loaded, so it
+    // must run before subdivision replaces it — otherwise "as exported"
+    // topology would already be gone.
+    await buildWireframeOverlay(mv);
+    await applySubdivision(mv);
     if (mv.matches('[data-autolabel]')) await labelModel(mv);
   }
 
