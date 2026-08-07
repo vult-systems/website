@@ -72,6 +72,7 @@ const overridesJson = JSON.stringify(overrides);
           data-subdiv={subdivLevel > 0 ? subdivLevel : undefined}
           environment-image={envImage}
           camera-orbit={startOrbit}
+          max-camera-orbit="auto auto 300%"
           camera-controls={cameraControls ? '' : undefined}
           auto-rotate={autoRotate ? '' : undefined}
           touch-action="pan-y"
@@ -97,26 +98,36 @@ const overridesJson = JSON.stringify(overrides);
             </svg>
           </button>
           <div class="mv-hdri-control">
-            <input
-              type="range"
-              class="mv-hdri-exposure"
-              min="0"
-              max="2"
-              step="0.05"
-              value="1.1"
-              title="Environment light intensity"
-              aria-label="Environment light intensity"
-            />
-            <input
-              type="range"
-              class="mv-hdri-rotation"
-              min="0"
-              max="360"
-              step="1"
-              value="0"
-              title="Environment rotation"
-              aria-label="Environment rotation"
-            />
+            <label class="mv-hdri-row" title="Environment light intensity">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+              </svg>
+              <input
+                type="range"
+                class="mv-hdri-exposure"
+                min="0"
+                max="2"
+                step="0.05"
+                value="1.1"
+                aria-label="Environment light intensity"
+              />
+            </label>
+            <label class="mv-hdri-row" title="Environment rotation">
+              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 1 3.5 7.14" />
+                <path d="M3 5v6h6" />
+              </svg>
+              <input
+                type="range"
+                class="mv-hdri-rotation"
+                min="0"
+                max="360"
+                step="1"
+                value="0"
+                aria-label="Environment rotation"
+              />
+            </label>
           </div>
           <div class="mv-cube" role="group" aria-label="Camera views">
             <div class="mv-cube__box">
@@ -290,12 +301,15 @@ const overridesJson = JSON.stringify(overrides);
     margin: -5px 0 0 -5px;
     border-radius: 2px;
     padding: 0;
-    background: rgba(255, 255, 255, 0.24);
-    border: 1px solid rgba(255, 255, 255, 0.45);
+    /* Same dark-chip treatment as the faces, not translucent white — white
+       on white/light backgrounds (light mode canvas) was nearly invisible. */
+    background: rgba(30, 30, 30, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.55);
     cursor: pointer;
   }
   .mv-cube__corner:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.9);
+    border-color: #fff;
   }
   .mv-cube__corner--fr {
     transform: translate3d(22px, -22px, 22px);
@@ -375,20 +389,67 @@ const overridesJson = JSON.stringify(overrides);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 3px;
+    gap: 4px;
     height: 26px;
-    padding: 0 8px;
+    padding: 0 7px;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: rgba(30, 30, 30, 0.82);
   }
+  .mv-hdri-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: rgba(255, 255, 255, 0.65);
+    cursor: pointer;
+  }
+  .mv-hdri-row svg {
+    flex: none;
+  }
+  /* Fully custom track + thumb rather than relying on accent-color, which
+     only recolors the browser's default thumb — on most platforms that
+     default is quite large and looked out of place in this compact chip. */
   .mv-hdri-exposure,
   .mv-hdri-rotation {
+    -webkit-appearance: none;
+    appearance: none;
     display: block;
-    width: 64px;
-    height: 8px;
+    width: 56px;
+    height: 9px;
     margin: 0;
-    accent-color: rgba(255, 255, 255, 0.85);
+    background: transparent;
+    cursor: pointer;
+  }
+  .mv-hdri-exposure::-webkit-slider-runnable-track,
+  .mv-hdri-rotation::-webkit-slider-runnable-track {
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .mv-hdri-exposure::-moz-range-track,
+  .mv-hdri-rotation::-moz-range-track {
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .mv-hdri-exposure::-webkit-slider-thumb,
+  .mv-hdri-rotation::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 9px;
+    height: 9px;
+    margin-top: -3px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+  }
+  .mv-hdri-exposure::-moz-range-thumb,
+  .mv-hdri-rotation::-moz-range-thumb {
+    width: 9px;
+    height: 9px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
     cursor: pointer;
   }
 
@@ -810,7 +871,7 @@ const overridesJson = JSON.stringify(overrides);
     // (overflow: hidden), so "off its edge" means genuinely cut off, not
     // just visually crowded. Otherwise push labels out toward that edge
     // rather than hugging the model, so lines read against open space.
-    const radius = Math.round(Math.max(70, Math.min(rect.width, rect.height) * 0.4 - 80));
+    const radius = Math.round(Math.max(65, Math.min(rect.width, rect.height) * 0.36 - 85));
 
     visible.forEach((p, idx) => {
       const dx = p.c.x - center.x;
