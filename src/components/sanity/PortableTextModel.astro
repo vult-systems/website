@@ -96,15 +96,26 @@ const overridesJson = JSON.stringify(overrides);
               <path d="M12 2v20M3 7l9 5 9-5M3 17l9-5 9 5" />
             </svg>
           </button>
-          <div class="mv-hdri-control" title="Environment light intensity">
+          <div class="mv-hdri-control">
             <input
               type="range"
-              class="mv-hdri-slider"
+              class="mv-hdri-exposure"
               min="0"
               max="2"
               step="0.05"
               value="1.1"
+              title="Environment light intensity"
               aria-label="Environment light intensity"
+            />
+            <input
+              type="range"
+              class="mv-hdri-rotation"
+              min="0"
+              max="360"
+              step="1"
+              value="0"
+              title="Environment rotation"
+              aria-label="Environment rotation"
             />
           </div>
           <div class="mv-cube" role="group" aria-label="Camera views">
@@ -348,28 +359,34 @@ const overridesJson = JSON.stringify(overrides);
     border-color: rgba(255, 255, 255, 0.55);
   }
   .mv-wireframe-toggle[aria-pressed='true'] {
-    background: rgba(225, 29, 72, 0.85);
-    border-color: rgba(255, 255, 255, 0.6);
+    background: hsl(var(--accent));
+    border-color: hsl(var(--accent));
     color: #fff;
   }
 
-  /* --- HDRI intensity slider, sitting right next to the wireframe toggle --- */
+  /* --- HDRI controls (intensity + rotation), sitting right next to the
+     wireframe toggle. Two stacked rows instead of one, now that there are
+     two sliders. --- */
   .mv-hdri-control {
     position: absolute;
     top: 10px;
     left: 44px;
     z-index: 2;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
     height: 26px;
     padding: 0 8px;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: rgba(30, 30, 30, 0.82);
   }
-  .mv-hdri-slider {
+  .mv-hdri-exposure,
+  .mv-hdri-rotation {
+    display: block;
     width: 64px;
-    height: 14px;
+    height: 8px;
     margin: 0;
     accent-color: rgba(255, 255, 255, 0.85);
     cursor: pointer;
@@ -564,11 +581,24 @@ const overridesJson = JSON.stringify(overrides);
   // HDRI intensity slider: exposure is a plain model-viewer property, so
   // this needs no scene access at all.
   document.addEventListener('input', (e) => {
-    const slider = (e.target as HTMLElement).closest('.mv-hdri-slider') as HTMLInputElement | null;
+    const slider = (e.target as HTMLElement).closest('.mv-hdri-exposure') as HTMLInputElement | null;
     if (!slider) return;
     const mv = slider.closest('model-viewer') as any;
     if (!mv) return;
     mv.exposure = parseFloat(slider.value);
+  });
+
+  // HDRI rotation slider: unlike exposure, rotating the environment isn't a
+  // model-viewer attribute — it's set directly on the underlying three.js
+  // scene (a real Euler, in radians; the slider works in degrees).
+  document.addEventListener('input', (e) => {
+    const slider = (e.target as HTMLElement).closest('.mv-hdri-rotation') as HTMLInputElement | null;
+    if (!slider) return;
+    const mv = slider.closest('model-viewer') as any;
+    const scene = mv && findScene(mv);
+    if (!scene?.environmentRotation) return;
+    scene.environmentRotation.y = (parseFloat(slider.value) * Math.PI) / 180;
+    scene.queueRender?.();
   });
 
   // Fullscreen toggle: model-viewer resizes itself via its own internal
@@ -776,9 +806,11 @@ const overridesJson = JSON.stringify(overrides);
     const rect = mv.getBoundingClientRect();
     // Leave room for the tag itself (~150px wide) plus the leader's own gap,
     // so labels land inside the viewer instead of running off its edge —
-    // but otherwise push them out toward that edge rather than hugging the
-    // model, so lines read against open space instead of crossing it.
-    const radius = Math.round(Math.max(80, Math.min(rect.width, rect.height) * 0.48 - 60));
+    // model-viewer's shadow root clips anything outside its own box
+    // (overflow: hidden), so "off its edge" means genuinely cut off, not
+    // just visually crowded. Otherwise push labels out toward that edge
+    // rather than hugging the model, so lines read against open space.
+    const radius = Math.round(Math.max(70, Math.min(rect.width, rect.height) * 0.4 - 80));
 
     visible.forEach((p, idx) => {
       const dx = p.c.x - center.x;
