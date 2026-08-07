@@ -225,17 +225,13 @@
   #lecture-presenter #lp-slide .lp-body > *:nth-child(n + 6) { animation-delay: 0.52s; }
   #lecture-presenter #lp-slide img { opacity: 0; transition: opacity 0.45s ease; }
   #lecture-presenter #lp-slide img.lp-loaded { opacity: 1; }
-  /* 3D models settle their camera framing asynchronously (see model-ready
-     in PortableTextModel.astro); hold them invisible until then so what
-     fades in is already correctly framed, instead of visibly snapping
-     into place after appearing. */
-  #lecture-presenter #lp-slide .model-viewer-frame { opacity: 0; transition: opacity 0.45s ease; }
-  #lecture-presenter #lp-slide .model-viewer-frame.lp-loaded { opacity: 1; }
+  /* 3D models pop straight in once loaded rather than fading — the fade
+     kept fighting the heavy subdivision work that has to re-run every
+     time a slide is shown, and looked laggy rather than smooth. */
   @media (prefers-reduced-motion: reduce) {
     #lecture-presenter #lp-slide .lp-head,
     #lecture-presenter #lp-slide .lp-body > * { animation: none; }
     #lecture-presenter #lp-slide img { opacity: 1; transition: none; }
-    #lecture-presenter #lp-slide .model-viewer-frame { opacity: 1; transition: none; }
   }
 
   /* Image alignment (figure[data-align]) */
@@ -530,18 +526,6 @@
       im.decode?.().then(reveal).catch(() => {});
       window.setTimeout(reveal, 4000);
     };
-    // Same idea for 3D models: PortableTextModel.astro fires 'model-ready'
-    // once it has finished loading *and* settled its camera framing, so
-    // the reveal never shows the "auto"-framed pose right before it snaps
-    // to the padded one.
-    const revealModel = (mv: HTMLElement) => {
-      const frame = mv.closest('.model-viewer-frame');
-      if (!frame) return;
-      const reveal = () => frame.classList.add('lp-loaded');
-      mv.addEventListener('model-ready', reveal, { once: true });
-      mv.addEventListener('error', reveal, { once: true });
-      window.setTimeout(reveal, 4000);
-    };
 
     const esc = (s: string) =>
       (s || '')
@@ -755,8 +739,6 @@
         im.setAttribute('fetchpriority', 'high');
         revealImage(im);
       });
-      // Same fade-in treatment for embedded 3D models.
-      slide.querySelectorAll('model-viewer').forEach((el) => revealModel(el as HTMLElement));
       // Warm only the immediate neighbours so we never flood the connection pool.
       preloadSlide(index + 1);
       preloadSlide(index + 2);

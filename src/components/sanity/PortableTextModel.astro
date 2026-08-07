@@ -523,14 +523,6 @@ const overridesJson = JSON.stringify(overrides);
     font-family: inherit;
     pointer-events: auto;
     cursor: default;
-    /* Labels land ~1-2s after the model itself is already visible (they
-       need the model's final, subdivided geometry to measure against) —
-       fading them in reads as a soft reveal instead of a pop. */
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-  :global(.mv-callout.mv-callout--visible) {
-    opacity: 1;
   }
   :global(.mv-callout__dot) {
     position: absolute;
@@ -928,8 +920,6 @@ const overridesJson = JSON.stringify(overrides);
         '</span>';
       mv.appendChild(btn);
     });
-
-    revealCallouts(mv);
   }
 
   // A comfort-padded version of model-viewer's own "auto" camera distance —
@@ -945,49 +935,9 @@ const overridesJson = JSON.stringify(overrides);
     return ideal * 1.15;
   }
 
-  // Reveals freshly-created callouts (opacity:0 is their first-ever
-  // resolved style, from labelModel below appending them). A forced
-  // reflow between insertion and adding the visible class is enough here
-  // — the transition is a genuine 0-to-1, not a round trip.
-  function revealCallouts(mv: any) {
-    const callouts = mv.querySelectorAll('.mv-callout');
-    void mv.offsetHeight;
-    callouts.forEach((el: Element) => el.classList.add('mv-callout--visible'));
-  }
-
-  // Re-fades callouts that were already visible and just got reset back to
-  // hidden (see onModelLoad) — Present mode builds its slide deck by
-  // cloning the *live* on-page markup (see buildSlides in
-  // lecture-presenter.astro), so if the page's own model had already
-  // finished labelling by the time the user opened Present mode, the
-  // clone arrives with its callouts already at opacity 1. Unlike
-  // revealCallouts above, a synchronous forced reflow doesn't help here:
-  // removing the class and re-adding it in the same script turn round-
-  // trips opacity back to its starting value with zero elapsed time, and
-  // browsers coalesce that into no transition at all (confirmed live —
-  // this was the actual cause of the reported "snap"). A real gap is
-  // needed, which double rAF gives on a visible tab; the timeout fallback
-  // covers a hidden/backgrounded one, where rAF is paused outright and
-  // would otherwise leave the labels stuck invisible forever.
-  function refadeCallouts(mv: any) {
-    let done = false;
-    const reveal = () => {
-      if (done) return;
-      done = true;
-      mv.querySelectorAll('.mv-callout').forEach((el: Element) => el.classList.add('mv-callout--visible'));
-    };
-    requestAnimationFrame(() => requestAnimationFrame(reveal));
-    setTimeout(reveal, 1000);
-  }
-
   // Subdivision runs first since labelling measures mesh bounding boxes —
   // keeping the order means labels land on the final, smoothed geometry.
   async function onModelLoad(mv: any) {
-    // Reset any callouts cloned in already-visible (see revealCallouts)
-    // so the reveal below has an actual opacity:0 state to transition
-    // from instead of a no-op class re-add.
-    mv.querySelectorAll('.mv-callout').forEach((el: Element) => el.classList.remove('mv-callout--visible'));
-
     // Re-frame with the padded radius immediately, before anything async
     // runs — model-viewer's own reveal fade hasn't happened yet at this
     // point, so the corrected framing is what fades in. Doing this later
@@ -1003,21 +953,6 @@ const overridesJson = JSON.stringify(overrides);
       mv.cameraOrbit = `${(theta * 180) / Math.PI}deg ${(phi * 180) / Math.PI}deg ${mv.__snapRadius}m`;
       mv.jumpCameraToGoal?.();
     }
-    // Any callouts already present at this point were cloned in from an
-    // already-labelled source (labelModel below will no-op for them via
-    // its own dataset.autolabelled guard) — re-fade them in now, in sync
-    // with the model itself, rather than leaving them reset-but-unrevealed.
-    refadeCallouts(mv);
-    // Lets Present mode (see lecture-presenter.astro) hold its fade-in
-    // until framing is settled, instead of racing model-viewer's own
-    // 'load' event. Fired here rather than at the end of this function —
-    // subdivision and labelling below take a further ~1-2s, and holding
-    // the whole model hidden until *that* finishes just traded a quick
-    // pop for a long blank wait followed by a bigger one. Freshly-created
-    // annotation labels get their own fade-in (see labelModel) so their
-    // later arrival reads as a soft reveal rather than a pop, without
-    // stalling the model itself.
-    mv.dispatchEvent(new CustomEvent('model-ready', { bubbles: true }));
 
     // Wireframe is built from whatever geometry is currently loaded, so it
     // must run before subdivision replaces it — otherwise "as exported"
