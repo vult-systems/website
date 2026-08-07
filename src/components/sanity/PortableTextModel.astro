@@ -99,9 +99,9 @@ const overridesJson = JSON.stringify(overrides);
           </button>
           <div class="mv-hdri-control">
             <label class="mv-hdri-row" title="Environment light intensity">
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                 <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                <path d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77" />
               </svg>
               <input
                 type="range"
@@ -113,8 +113,9 @@ const overridesJson = JSON.stringify(overrides);
                 aria-label="Environment light intensity"
               />
             </label>
+            <span class="mv-hdri-divider"></span>
             <label class="mv-hdri-row" title="Environment rotation">
-              <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 12a9 9 0 1 1 3.5 7.14" />
                 <path d="M3 5v6h6" />
               </svg>
@@ -379,19 +380,20 @@ const overridesJson = JSON.stringify(overrides);
   }
 
   /* --- HDRI controls (intensity + rotation), sitting right next to the
-     wireframe toggle. Two stacked rows instead of one, now that there are
-     two sliders. --- */
+     wireframe toggle. Side-by-side in one row rather than stacked — that
+     gave each control so little width the icon and thumb had to be tiny
+     to fit; one row trades unused vertical space for room to size both
+     properly. --- */
   .mv-hdri-control {
     position: absolute;
     top: 10px;
     left: 44px;
     z-index: 2;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
+    align-items: center;
+    gap: 7px;
     height: 26px;
-    padding: 0 7px;
+    padding: 0 9px;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: rgba(30, 30, 30, 0.82);
@@ -399,12 +401,17 @@ const overridesJson = JSON.stringify(overrides);
   .mv-hdri-row {
     display: flex;
     align-items: center;
-    gap: 5px;
-    color: rgba(255, 255, 255, 0.65);
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
   }
   .mv-hdri-row svg {
     flex: none;
+  }
+  .mv-hdri-divider {
+    width: 1px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.22);
   }
   /* Fully custom track + thumb rather than relying on accent-color, which
      only recolors the browser's default thumb — on most platforms that
@@ -414,8 +421,8 @@ const overridesJson = JSON.stringify(overrides);
     -webkit-appearance: none;
     appearance: none;
     display: block;
-    width: 56px;
-    height: 9px;
+    width: 44px;
+    height: 10px;
     margin: 0;
     background: transparent;
     cursor: pointer;
@@ -436,20 +443,23 @@ const overridesJson = JSON.stringify(overrides);
   .mv-hdri-rotation::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 9px;
-    height: 9px;
-    margin-top: -3px;
+    width: 10px;
+    height: 10px;
+    margin-top: -3.5px;
     border-radius: 50%;
     background: #fff;
+    border: 1.5px solid rgba(0, 0, 0, 0.45);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     cursor: pointer;
   }
   .mv-hdri-exposure::-moz-range-thumb,
   .mv-hdri-rotation::-moz-range-thumb {
-    width: 9px;
-    height: 9px;
-    border: none;
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid rgba(0, 0, 0, 0.45);
     border-radius: 50%;
     background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     cursor: pointer;
   }
 
