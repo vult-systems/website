@@ -255,6 +255,23 @@ export const blockContentType = defineType({
             'Optional camera-orbit, e.g. "45deg 75deg auto" (theta phi radius). Leave blank for default framing.',
         },
         {
+          name: 'subdivisionLevel',
+          title: 'Smooth mesh (subdivision)',
+          type: 'string',
+          description:
+            'Applies live Loop-subdivision smoothing in the viewer, so you don’t need to pre-smooth the mesh before exporting. Higher levels look smoother but cost more to render — skipped automatically on meshes that are already very dense.',
+          options: {
+            list: [
+              { title: 'Off (use mesh as exported)', value: 'off' },
+              { title: 'Light (1 pass)', value: '1' },
+              { title: 'Medium (2 passes)', value: '2' },
+              { title: 'Heavy (3 passes)', value: '3' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'off',
+        },
+        {
           name: 'autoLabelParts',
           title: 'Auto-label named parts',
           type: 'boolean',

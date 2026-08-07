@@ -18,6 +18,10 @@ const autoLabel = node?.autoLabelParts === true;
 // Spinning labels are hard to read, so auto-labelled models don't auto-rotate.
 const autoRotate = node?.autoRotate !== false && !autoLabel;
 
+// Live Loop-subdivision smoothing, in place of pre-smoothing before export.
+const subdivRaw = node?.subdivisionLevel as string | undefined;
+const subdivLevel = subdivRaw && subdivRaw !== 'off' ? Number(subdivRaw) : 0;
+
 interface LabelOverride {
   mesh?: string;
   label?: string;
@@ -42,6 +46,7 @@ const overridesJson = JSON.stringify(overrides);
           alt={alt}
           data-autolabel={autoLabel ? '' : undefined}
           data-overrides={autoLabel ? overridesJson : undefined}
+          data-subdiv={subdivLevel > 0 ? subdivLevel : undefined}
           camera-orbit={startOrbit}
           camera-controls={cameraControls ? '' : undefined}
           auto-rotate={autoRotate ? '' : undefined}
@@ -340,14 +345,57 @@ const overridesJson = JSON.stringify(overrides);
   }
 
   function wireCube(mv: any) {
-    if (mv.dataset.cubewired) return;
-    mv.dataset.cubewired = '1';
+    // A plain JS property, not a dataset attribute: Present mode clones
+    // model-viewers with cloneNode(), which copies attributes but never
+    // live event listeners — a dataset flag would wrongly tell a fresh
+    // clone "already wired" and leave its cube dead with no camera sync.
+    if (mv.__cubeWired) return;
+    mv.__cubeWired = true;
     syncCube(mv);
     mv.addEventListener('camera-change', () => syncCube(mv));
     mv.addEventListener('load', () => syncCube(mv), { once: true });
   }
 
-  document.querySelectorAll('model-viewer').forEach((mv) => wireCube(mv as any));
+  // --- Live subdivision smoothing (replaces pre-smoothing before export) ---
+  async function applySubdivision(mv: any) {
+    const level = parseInt(mv.dataset.subdiv || '0', 10);
+    if (!level || mv.__subdivided) return;
+    const scene = findScene(mv);
+    if (!scene?.target) return;
+    // Instance property, not a dataset attribute — see the comment in
+    // wireCube(). A cloned model-viewer loads its own fresh (unsubdivided)
+    // Three.js scene and must go through this again independently.
+    mv.__subdivided = true;
+
+    // model-viewer finishes assigning each material's real color slightly
+    // after the public 'load' event fires; swapping geometry before that
+    // settles can leave the mesh stuck on an interim neutral-grey material.
+    // Two animation frames reliably clears that window without a guessed
+    // fixed delay.
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    const { LoopSubdivision } = await import('three-subdivide');
+    scene.target.traverse((obj: any) => {
+      // model-viewer's own internal helpers (shadow catcher, camera gizmo)
+      // live as unnamed siblings of the actual glTF scene under `target`;
+      // real exported meshes are essentially always named, so skip anonymous
+      // ones rather than subdividing engine internals.
+      if (!obj.isMesh || !obj.geometry || !obj.name) return;
+      try {
+        const smoothed = LoopSubdivision.modify(obj.geometry, level, {
+          split: true,
+          // Skip meshes that are already dense (e.g. a raw sculpt export)
+          // rather than exploding into millions of triangles.
+          maxTriangles: 20000,
+        });
+        obj.geometry.dispose();
+        obj.geometry = smoothed;
+      } catch {
+        // Leave this mesh's original geometry if subdivision fails on it.
+      }
+    });
+    scene.queueRender?.();
+  }
 
   // --- Runtime auto-labelling from the model's own named meshes ---
   const SKIP = /^(scene|rootnode|armature|root|node\d*|mesh\d*|object\d*|group\d*|primitive\d*)$/i;
@@ -484,14 +532,22 @@ const overridesJson = JSON.stringify(overrides);
     });
   }
 
-  function wire(mv: any) {
-    if (mv.loaded) labelModel(mv);
-    else mv.addEventListener('load', () => labelModel(mv), { once: true });
+  // Subdivision runs first since labelling measures mesh bounding boxes —
+  // keeping the order means labels land on the final, smoothed geometry.
+  async function onModelLoad(mv: any) {
+    await applySubdivision(mv);
+    if (mv.matches('[data-autolabel]')) await labelModel(mv);
   }
 
-  document
-    .querySelectorAll('model-viewer[data-autolabel]')
-    .forEach((mv) => wire(mv));
+  function wireModel(mv: any) {
+    if (mv.__modelWired) return;
+    mv.__modelWired = true;
+    wireCube(mv);
+    if (mv.loaded) onModelLoad(mv);
+    else mv.addEventListener('load', () => onModelLoad(mv), { once: true });
+  }
+
+  document.querySelectorAll('model-viewer').forEach((mv) => wireModel(mv as any));
 
   // Present mode (and other dynamic inserts) clone model-viewers in later.
   new MutationObserver((records) => {
@@ -499,10 +555,7 @@ const overridesJson = JSON.stringify(overrides);
       for (const n of r.addedNodes) {
         if (!(n instanceof HTMLElement)) continue;
         const added = n.matches?.('model-viewer') ? [n] : Array.from(n.querySelectorAll?.('model-viewer') ?? []);
-        for (const mv of added) {
-          if ((mv as HTMLElement).matches('[data-autolabel]')) wire(mv);
-          wireCube(mv);
-        }
+        for (const mv of added) wireModel(mv);
       }
     }
   }).observe(document.body, { childList: true, subtree: true });
