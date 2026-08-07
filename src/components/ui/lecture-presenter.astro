@@ -199,6 +199,16 @@
   #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
   #lecture-presenter #lp-slide strong { font-weight: 700; }
 
+  /* The wireframe toggle and camera cube are positioned relative to
+     model-viewer itself (top: 10px), which in a full/bleed layout can sit
+     flush with the top of the slide — right where #lp-context (top: 12px)
+     runs. Push both down clear of it here rather than in the component,
+     since only Present mode has that context bar to clip. */
+  #lecture-presenter #lp-slide .mv-cube,
+  #lecture-presenter #lp-slide .mv-wireframe-toggle {
+    top: 40px;
+  }
+
   /* Smooth entrances: text eases up in a gentle stagger, photos fade in. */
   @keyframes lp-rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   #lecture-presenter #lp-slide .lp-head,
