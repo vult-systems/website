@@ -187,7 +187,11 @@ const pushMedia = (body: any, crumb: string, hash: string) => {
 		const caption = String(m.caption ?? '').trim();
 		const label = caption || alt;
 		const isVideo = m._type === 'video';
-		searchEntries.push({ kind: isVideo ? 'Video' : 'Image', title: label.length > 90 ? `${label.slice(0, 90)}\u2026` : label, crumb, hash, text: `${alt} ${caption}`.trim(), thumb: thumbUrl(isVideo ? m.poster : m) });
+		const isModel = m._type === 'model3d';
+		// Video and 3D model blocks carry their own poster image; a plain
+		// figure/image block's asset is the searchable image itself.
+		const kind = isModel ? '3D Model' : isVideo ? 'Video' : 'Image';
+		searchEntries.push({ kind, title: label.length > 90 ? `${label.slice(0, 90)}\u2026` : label, crumb, hash, text: `${alt} ${caption}`.trim(), thumb: thumbUrl(isVideo || isModel ? m.poster : m) });
 	}
 };
 for (const course of allCourses) {

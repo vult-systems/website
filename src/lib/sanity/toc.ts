@@ -34,11 +34,11 @@ export function bodyToPlainText(body: any): string {
     .join(' ');
 }
 
-/** Figures/images/videos in a body that carry searchable alt or caption text. */
+/** Figures/images/videos/3D models in a body that carry searchable alt or caption text. */
 export function extractMedia(body: any): any[] {
   if (!Array.isArray(body)) return [];
   return body.filter(
-    (b: any) => b && ['figure', 'image', 'video'].includes(b._type) && (b.alt || b.caption)
+    (b: any) => b && ['figure', 'image', 'video', 'model3d'].includes(b._type) && (b.alt || b.caption)
   );
 }
 
