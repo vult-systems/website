@@ -604,7 +604,16 @@ const overridesJson = JSON.stringify(overrides);
     const mv = btn.closest('model-viewer') as any;
     const orbit = btn.getAttribute('data-orbit');
     if (mv && orbit) {
-      mv.cameraOrbit = orbit;
+      // "auto" radius is model-viewer's bare-minimum bounding-sphere fit —
+      // exactly snug at the model's single worst-case viewing angle, with
+      // only whatever margin happens to fall out at every other angle. For
+      // an asymmetric model (tall neurocranium + narrow splanchnocranium,
+      // say) that worst case can be a plain front/back/top view, so those
+      // snap points look noticeably tighter than others. Swap in our own
+      // pre-measured, comfort-padded radius (see computeSnapRadius) so every
+      // snap point gets the same breathing room, regardless of model shape.
+      const radius = mv.__snapRadius ? `${mv.__snapRadius}m` : 'auto';
+      mv.cameraOrbit = orbit.replace(/auto$/, radius);
       mv.jumpCameraToGoal?.();
     }
   });
@@ -913,6 +922,19 @@ const overridesJson = JSON.stringify(overrides);
     });
   }
 
+  // A comfort-padded version of model-viewer's own "auto" camera distance —
+  // see the click handler above for why plain "auto" isn't enough on its
+  // own. Reads the model's *current* bounding sphere (post-subdivision), so
+  // it scales correctly for whatever size a given imported model turns out
+  // to be, rather than a distance tuned for one specific export.
+  function computeSnapRadius(mv: any): number | null {
+    const scene = findScene(mv);
+    if (!scene?.boundingSphere || !scene.framedFoVDeg) return null;
+    const halfFovRad = ((scene.framedFoVDeg / 2) * Math.PI) / 180;
+    const ideal = scene.boundingSphere.radius / Math.sin(halfFovRad);
+    return ideal * 1.15;
+  }
+
   // Subdivision runs first since labelling measures mesh bounding boxes —
   // keeping the order means labels land on the final, smoothed geometry.
   async function onModelLoad(mv: any) {
@@ -921,6 +943,17 @@ const overridesJson = JSON.stringify(overrides);
     // topology would already be gone.
     await buildWireframeOverlay(mv);
     await applySubdivision(mv);
+
+    // Re-frame the model's starting pose with the same padded radius the
+    // orientation cube uses, so the initial view and every snap point share
+    // one consistent, comfortable distance instead of the bare "auto" fit.
+    mv.__snapRadius = computeSnapRadius(mv);
+    if (mv.__snapRadius) {
+      const { theta, phi } = mv.getCameraOrbit();
+      mv.cameraOrbit = `${(theta * 180) / Math.PI}deg ${(phi * 180) / Math.PI}deg ${mv.__snapRadius}m`;
+      mv.jumpCameraToGoal?.();
+    }
+
     if (mv.matches('[data-autolabel]')) await labelModel(mv);
   }
 
