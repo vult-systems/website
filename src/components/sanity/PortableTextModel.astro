@@ -33,6 +33,18 @@ const subdivLevel = subdivRaw && subdivRaw !== 'off' ? Number(subdivRaw) : 0;
 const envImage = fileUrlFor(node?.environmentImage?.asset?._ref);
 const wireframeDefault = node?.wireframeDefault === true;
 
+// Matches the rich-text editor's color palette (src/styles/globals.css
+// .lecture-clr-*) so callouts read as part of the same color system.
+const CALLOUT_COLORS: Record<string, string> = {
+  accent: 'hsl(var(--accent))',
+  blue: '#2f6fed',
+  red: '#d92d20',
+  gold: '#c98a00',
+  green: '#2e9e4f',
+  muted: 'hsl(var(--foreground-secondary))',
+};
+const calloutColor = CALLOUT_COLORS[node?.calloutColor as string] ?? CALLOUT_COLORS.blue;
+
 interface LabelOverride {
   mesh?: string;
   label?: string;
@@ -69,6 +81,7 @@ const overridesJson = JSON.stringify(overrides);
           exposure="1.1"
           interaction-prompt="none"
           class="model-viewer rounded-lg bg-black/[0.04] dark:bg-white/[0.04]"
+          style={`--mv-callout-color:${calloutColor}`}
         >
           <div slot="poster" class="model-viewer-loading">Loading 3D model…</div>
           <button
@@ -83,6 +96,17 @@ const overridesJson = JSON.stringify(overrides);
               <path d="M12 2v20M3 7l9 5 9-5M3 17l9-5 9 5" />
             </svg>
           </button>
+          <div class="mv-hdri-control" title="Environment light intensity">
+            <input
+              type="range"
+              class="mv-hdri-slider"
+              min="0"
+              max="2"
+              step="0.05"
+              value="1.1"
+              aria-label="Environment light intensity"
+            />
+          </div>
           <div class="mv-cube" role="group" aria-label="Camera views">
             <div class="mv-cube__box">
               <button type="button" class="mv-cube__face mv-cube__face--front" data-orbit="0deg 90deg auto" aria-label="Front view">Front</button>
@@ -91,12 +115,33 @@ const overridesJson = JSON.stringify(overrides);
               <button type="button" class="mv-cube__face mv-cube__face--left" data-orbit="-90deg 90deg auto" aria-label="Left view">Left</button>
               <button type="button" class="mv-cube__face mv-cube__face--top" data-orbit="0deg 2deg auto" aria-label="Top view">Top</button>
               <button type="button" class="mv-cube__face mv-cube__face--bottom" data-orbit="0deg 178deg auto" aria-label="Bottom view">Bottom</button>
-              <button type="button" class="mv-cube__corner mv-cube__corner--fr" data-orbit="45deg 60deg auto" aria-label="Front-right-top view"></button>
-              <button type="button" class="mv-cube__corner mv-cube__corner--fl" data-orbit="-45deg 60deg auto" aria-label="Front-left-top view"></button>
-              <button type="button" class="mv-cube__corner mv-cube__corner--br" data-orbit="135deg 60deg auto" aria-label="Back-right-top view"></button>
-              <button type="button" class="mv-cube__corner mv-cube__corner--bl" data-orbit="-135deg 60deg auto" aria-label="Back-left-top view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--fr" data-orbit="45deg 60deg auto" aria-label="Front-right, upper view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--fl" data-orbit="-45deg 60deg auto" aria-label="Front-left, upper view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--br" data-orbit="135deg 60deg auto" aria-label="Back-right, upper view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--bl" data-orbit="-135deg 60deg auto" aria-label="Back-left, upper view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--fr-mid" data-orbit="45deg 90deg auto" aria-label="Front-right view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--fl-mid" data-orbit="-45deg 90deg auto" aria-label="Front-left view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--br-mid" data-orbit="135deg 90deg auto" aria-label="Back-right view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--bl-mid" data-orbit="-135deg 90deg auto" aria-label="Back-left view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--fr-bot" data-orbit="45deg 120deg auto" aria-label="Front-right, lower view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--fl-bot" data-orbit="-45deg 120deg auto" aria-label="Front-left, lower view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--br-bot" data-orbit="135deg 120deg auto" aria-label="Back-right, lower view"></button>
+              <button type="button" class="mv-cube__corner mv-cube__corner--bl-bot" data-orbit="-135deg 120deg auto" aria-label="Back-left, lower view"></button>
             </div>
           </div>
+          <svg class="mv-logo" width="26" height="23" viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M46.5 59L0 86L49 0L46.5 59Z" fill="#E22B25" />
+            <path d="M52 59L51.0004 1.99994L99.5002 86.5L52 59Z" fill="#2282DF" />
+            <path d="M50.5 61.5L99.3297 89.0673L1.90061 88.8194L50.5 61.5Z" fill="#F2C923" />
+          </svg>
+          <button type="button" class="mv-fullscreen-toggle" aria-pressed="false" aria-label="Toggle fullscreen" title="Fullscreen">
+            <svg class="mv-fs-icon-expand" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3" />
+            </svg>
+            <svg class="mv-fs-icon-compress" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M9 3v3a2 2 0 0 1-2 2H4M15 3v3a2 2 0 0 0 2 2h3M21 15h-3a2 2 0 0 0-2 2v3M3 15h3a2 2 0 0 1 2 2v3" />
+            </svg>
+          </button>
         </model-viewer>
       </div>
       {node?.caption && (
@@ -223,14 +268,15 @@ const overridesJson = JSON.stringify(overrides);
   .mv-cube__face--bottom {
     transform: rotateX(-90deg) translateZ(22px);
   }
-  /* Top-corner shortcuts for quick 3/4 (isometric-ish) views. */
+  /* Corner/edge shortcuts: 4 upper, 4 mid-height, 4 lower — a fuller ring of
+     3/4 views around the cube than just the top corners. */
   .mv-cube__corner {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 11px;
-    height: 11px;
-    margin: -5.5px 0 0 -5.5px;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
     border-radius: 2px;
     padding: 0;
     background: rgba(255, 255, 255, 0.24);
@@ -251,6 +297,30 @@ const overridesJson = JSON.stringify(overrides);
   }
   .mv-cube__corner--bl {
     transform: translate3d(-22px, -22px, -22px);
+  }
+  .mv-cube__corner--fr-mid {
+    transform: translate3d(22px, 0, 22px);
+  }
+  .mv-cube__corner--fl-mid {
+    transform: translate3d(-22px, 0, 22px);
+  }
+  .mv-cube__corner--br-mid {
+    transform: translate3d(22px, 0, -22px);
+  }
+  .mv-cube__corner--bl-mid {
+    transform: translate3d(-22px, 0, -22px);
+  }
+  .mv-cube__corner--fr-bot {
+    transform: translate3d(22px, 22px, 22px);
+  }
+  .mv-cube__corner--fl-bot {
+    transform: translate3d(-22px, 22px, 22px);
+  }
+  .mv-cube__corner--br-bot {
+    transform: translate3d(22px, 22px, -22px);
+  }
+  .mv-cube__corner--bl-bot {
+    transform: translate3d(-22px, 22px, -22px);
   }
 
   /* --- Wireframe toggle: mirrors the cube's corner (top-left instead of
@@ -283,6 +353,71 @@ const overridesJson = JSON.stringify(overrides);
     color: #fff;
   }
 
+  /* --- HDRI intensity slider, sitting right next to the wireframe toggle --- */
+  .mv-hdri-control {
+    position: absolute;
+    top: 10px;
+    left: 44px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(30, 30, 30, 0.82);
+  }
+  .mv-hdri-slider {
+    width: 64px;
+    height: 14px;
+    margin: 0;
+    accent-color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+  }
+
+  /* --- Brand mark, bottom-left (matches the Present-mode slide master) --- */
+  .mv-logo {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 2;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* --- Fullscreen toggle, bottom-right --- */
+  .mv-fullscreen-toggle {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(30, 30, 30, 0.82);
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+  }
+  .mv-fullscreen-toggle:hover {
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.55);
+  }
+  .mv-fullscreen-toggle .mv-fs-icon-compress {
+    display: none;
+  }
+  .mv-fullscreen-toggle[aria-pressed='true'] .mv-fs-icon-expand {
+    display: none;
+  }
+  .mv-fullscreen-toggle[aria-pressed='true'] .mv-fs-icon-compress {
+    display: block;
+  }
+
   /* --- Anatomy callouts: a dot at the part's center, a leader line at
      --mv-angle running out to length --mv-radius, and a name/description
      tag at the far end. Both custom properties are set per-hotspot in JS so
@@ -309,7 +444,7 @@ const overridesJson = JSON.stringify(overrides);
     height: 12px;
     margin: -6px 0 0 -6px;
     border-radius: 50%;
-    background: #38bdf8;
+    background: var(--mv-callout-color, #2f6fed);
     box-shadow: 0 0 0 2px #fff, 0 0 4px rgba(0, 0, 0, 0.6);
     z-index: 1;
   }
@@ -319,7 +454,7 @@ const overridesJson = JSON.stringify(overrides);
     top: 0;
     width: var(--mv-radius, 80px);
     height: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.9);
+    border-top: 1px solid var(--mv-callout-color, #2f6fed);
     transform-origin: left center;
     transform: rotate(var(--mv-angle, -38deg));
     filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.65));
@@ -424,6 +559,35 @@ const overridesJson = JSON.stringify(overrides);
       if (obj.userData?.isWireframeOverlay) obj.visible = on;
     });
     scene?.queueRender?.();
+  });
+
+  // HDRI intensity slider: exposure is a plain model-viewer property, so
+  // this needs no scene access at all.
+  document.addEventListener('input', (e) => {
+    const slider = (e.target as HTMLElement).closest('.mv-hdri-slider') as HTMLInputElement | null;
+    if (!slider) return;
+    const mv = slider.closest('model-viewer') as any;
+    if (!mv) return;
+    mv.exposure = parseFloat(slider.value);
+  });
+
+  // Fullscreen toggle: model-viewer resizes itself via its own internal
+  // ResizeObserver, so entering/exiting fullscreen needs nothing from us
+  // beyond calling the standard Fullscreen API on the element itself —
+  // that keeps the cube/toggles/logo (all its light-DOM children) visible.
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.mv-fullscreen-toggle');
+    if (!btn) return;
+    const mv = btn.closest('model-viewer') as any;
+    if (!mv) return;
+    if (document.fullscreenElement === mv) document.exitFullscreen?.();
+    else mv.requestFullscreen?.();
+  });
+  document.addEventListener('fullscreenchange', () => {
+    document.querySelectorAll('.mv-fullscreen-toggle').forEach((btn) => {
+      const mv = btn.closest('model-viewer');
+      btn.setAttribute('aria-pressed', String(document.fullscreenElement === mv));
+    });
   });
 
   // Built from each named mesh's geometry *before* subdivision runs, so the
@@ -614,7 +778,7 @@ const overridesJson = JSON.stringify(overrides);
     // so labels land inside the viewer instead of running off its edge —
     // but otherwise push them out toward that edge rather than hugging the
     // model, so lines read against open space instead of crossing it.
-    const radius = Math.round(Math.max(60, Math.min(rect.width, rect.height) * 0.38 - 90));
+    const radius = Math.round(Math.max(80, Math.min(rect.width, rect.height) * 0.48 - 60));
 
     visible.forEach((p, idx) => {
       const dx = p.c.x - center.x;

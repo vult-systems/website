@@ -305,6 +305,25 @@ export const blockContentType = defineType({
           initialValue: false,
         },
         {
+          name: 'calloutColor',
+          title: 'Annotation dot & line color',
+          type: 'string',
+          description:
+            'Color of the anatomy-callout dots and leader lines. Matches the color palette used for colored text in the rich-text editor.',
+          options: {
+            list: [
+              { title: 'Blue', value: 'blue' },
+              { title: 'Accent', value: 'accent' },
+              { title: 'Red', value: 'red' },
+              { title: 'Gold', value: 'gold' },
+              { title: 'Green', value: 'green' },
+              { title: 'Muted', value: 'muted' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'blue',
+        },
+        {
           name: 'autoLabelParts',
           title: 'Auto-label named parts',
           type: 'boolean',
