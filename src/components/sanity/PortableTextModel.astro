@@ -132,8 +132,14 @@ const overridesJson = JSON.stringify(overrides);
     background: rgba(0, 0, 0, 0.78);
   }
 
-  /* --- Anatomy callouts (dot at the point, leader line, name at the end) --- */
-  .mv-callout {
+  /* --- Anatomy callouts: a dot at the part's center, a leader line at
+     --mv-angle running out to length --mv-radius, and a name/description
+     tag at the far end. Both custom properties are set per-hotspot in JS so
+     labels fan out around the model instead of overlapping.
+     :global() because these elements are created by the client script
+     (document.createElement), so they never carry Astro's scoping
+     attribute and a scoped selector would silently never match them. --- */
+  :global(.mv-callout) {
     position: relative;
     width: 0;
     height: 0;
@@ -144,7 +150,7 @@ const overridesJson = JSON.stringify(overrides);
     pointer-events: auto;
     cursor: default;
   }
-  .mv-callout__dot {
+  :global(.mv-callout__dot) {
     position: absolute;
     left: 0;
     top: 0;
@@ -154,33 +160,62 @@ const overridesJson = JSON.stringify(overrides);
     border-radius: 50%;
     background: #e11d48;
     box-shadow: 0 0 0 2px #fff, 0 0 4px rgba(0, 0, 0, 0.6);
+    z-index: 1;
   }
-  .mv-callout__leader {
+  :global(.mv-callout__leader) {
     position: absolute;
     left: 0;
     top: 0;
-    width: 54px;
+    width: var(--mv-radius, 80px);
     height: 0;
     border-top: 1.5px solid rgba(255, 255, 255, 0.9);
     transform-origin: left center;
-    transform: rotate(-38deg);
+    transform: rotate(var(--mv-angle, -38deg));
     filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.65));
     pointer-events: none;
   }
-  .mv-callout__name {
+  /* Positioned by rotating to --mv-angle, translating out along that ray,
+     then un-rotating — moves the tag to the leader's endpoint while keeping
+     its own text upright. The trailing translateY(-50%) centers it on that
+     point regardless of angle. */
+  :global(.mv-callout__tag) {
     position: absolute;
-    left: 44px;
-    top: -42px;
-    transform: translateY(-50%);
-    white-space: nowrap;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+    transform: rotate(var(--mv-angle, -38deg)) translate(calc(var(--mv-radius, 80px) + 8px))
+      rotate(calc(-1 * var(--mv-angle, -38deg))) translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    max-width: 180px;
     background: rgba(17, 17, 17, 0.9);
     color: #fff;
     padding: 3px 9px;
     border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+  }
+  /* Labels on the model's left half anchor from their right edge so they
+     read away from the leader line instead of running back over it. */
+  :global(.mv-callout[data-side='left'] .mv-callout__tag) {
+    align-items: flex-end;
+    text-align: right;
+    transform: rotate(var(--mv-angle, -38deg)) translate(calc(var(--mv-radius, 80px) + 8px))
+      rotate(calc(-1 * var(--mv-angle, -38deg))) translate(-100%, -50%);
+  }
+  :global(.mv-callout__name) {
+    white-space: nowrap;
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.01em;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+  }
+  :global(.mv-callout__desc) {
+    white-space: normal;
+    font-size: 0.68rem;
+    font-weight: 400;
+    line-height: 1.3;
+    opacity: 0.8;
   }
 </style>
 
@@ -203,6 +238,8 @@ const overridesJson = JSON.stringify(overrides);
   // --- Runtime auto-labelling from the model's own named meshes ---
   const SKIP = /^(scene|rootnode|armature|root|node\d*|mesh\d*|object\d*|group\d*|primitive\d*)$/i;
   const clean = (n: string) => n.replace(/[_.]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const esc = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   // model-viewer keeps its three.js scene on a private symbol; find it.
   function findScene(mv: any) {
@@ -235,36 +272,100 @@ const overridesJson = JSON.stringify(overrides);
     const seen = new Set<string>();
     const parts: { name: string; c: any }[] = [];
     target.traverse((obj: any) => {
+      if (obj === target) return;
       const name = (obj.name || '').trim();
       if (!name || SKIP.test(name) || seen.has(name)) return;
-      if (!obj.isMesh && !(obj.children || []).some((c: any) => c.isMesh)) return;
+      const meshyChildren = (obj.children || []).filter(
+        (c: any) => c.isMesh || (c.children || []).some((g: any) => g.isMesh)
+      );
+      if (!obj.isMesh && meshyChildren.length === 0) return; // no mesh content at all
+      // A group wrapping several independent meshy children is an umbrella
+      // (e.g. the exporter's own root node) rather than a single named part.
+      if (!obj.isMesh && meshyChildren.length > 1) return;
       const box = new THREE.Box3().setFromObject(obj);
       if (box.isEmpty()) return;
       seen.add(name);
       parts.push({ name, c: toLocal(box.getCenter(new THREE.Vector3())) });
     });
 
-    let i = 0;
-    for (const p of parts.slice(0, 80)) {
-      const ov = overrides[p.name.toLowerCase()] || {};
-      if (ov.hide) continue;
-      i++;
+    const visible = parts
+      .slice(0, 80)
+      .map((p) => ({ ...p, ov: overrides[p.name.toLowerCase()] || {} }))
+      .filter((p) => !p.ov.hide);
+    if (!visible.length) return;
+
+    // Direction from the model's center to each part, flattened to screen
+    // space (3D up is screen -y; depth is dropped). Auto-labelled models
+    // hold a fixed camera angle instead of auto-rotating, so this is a
+    // reasonable stand-in for a true camera-space projection.
+    const angleOf = (p: (typeof visible)[number]) => {
+      const dx = p.c.x - center.x;
+      const dy = p.c.y - center.y;
+      const a = (Math.atan2(-dy, dx) * 180) / Math.PI;
+      return a < 0 ? a + 360 : a;
+    };
+    const angDist = (a: number, b: number) => {
+      const d = Math.abs(a - b) % 360;
+      return d > 180 ? 360 - d : d;
+    };
+
+    // Fan labels out to evenly-spaced slots around the model so nearby
+    // parts never stack their tags on top of each other, assigning each
+    // part the free slot closest to its own natural direction.
+    const n = visible.length;
+    const slotOffset = 360 / n / 2;
+    const slots = Array.from({ length: n }, (_, i) => (360 / n) * i + slotOffset);
+    const slotUsed = new Array(n).fill(false);
+    const finalAngle: number[] = new Array(n);
+    visible
+      .map((p, idx) => ({ idx, angle: angleOf(p) }))
+      .sort((a, b) => a.angle - b.angle)
+      .forEach(({ idx, angle }) => {
+        let best = 0;
+        let bestDist = Infinity;
+        for (let s = 0; s < n; s++) {
+          if (slotUsed[s]) continue;
+          const d = angDist(angle, slots[s]);
+          if (d < bestDist) {
+            bestDist = d;
+            best = s;
+          }
+        }
+        slotUsed[best] = true;
+        finalAngle[idx] = slots[best];
+      });
+
+    const rect = mv.getBoundingClientRect();
+    const radius = Math.round(Math.max(60, Math.min(rect.width, rect.height) * 0.3));
+
+    visible.forEach((p, idx) => {
       const dx = p.c.x - center.x;
       const dy = p.c.y - center.y;
       const dz = p.c.z - center.z;
       const len = Math.hypot(dx, dy, dz) || 1;
+      const angle = finalAngle[idx];
+      const side = Math.cos((angle * Math.PI) / 180) >= 0 ? 'right' : 'left';
+
       const btn = document.createElement('button');
-      btn.slot = `hotspot-auto-${i}`;
+      btn.slot = `hotspot-auto-${idx + 1}`;
       btn.className = 'mv-callout';
+      btn.dataset.side = side;
+      btn.style.setProperty('--mv-angle', `${angle}deg`);
+      btn.style.setProperty('--mv-radius', `${radius}px`);
       btn.dataset.position = `${p.c.x}m ${p.c.y}m ${p.c.z}m`;
       btn.dataset.normal = `${dx / len} ${dy / len} ${dz / len}`;
-      const label = ov.label || clean(p.name);
-      if (ov.description) btn.title = ov.description;
+
+      const label = esc(p.ov.label || clean(p.name));
+      const desc = p.ov.description ? esc(p.ov.description) : '';
+      if (p.ov.description) btn.title = p.ov.description;
       btn.innerHTML =
         '<span class="mv-callout__dot"></span><span class="mv-callout__leader"></span>' +
-        `<span class="mv-callout__name">${label}</span>`;
+        '<span class="mv-callout__tag">' +
+        `<span class="mv-callout__name">${label}</span>` +
+        (desc ? `<span class="mv-callout__desc">${desc}</span>` : '') +
+        '</span>';
       mv.appendChild(btn);
-    }
+    });
   }
 
   function wire(mv: any) {
@@ -286,5 +387,4 @@ const overridesJson = JSON.stringify(overrides);
       }
     }
   }).observe(document.body, { childList: true, subtree: true });
-</script>
 </script>
