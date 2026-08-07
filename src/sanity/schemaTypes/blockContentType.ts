@@ -260,7 +260,24 @@ export const blockContentType = defineType({
           title: 'Start orientation',
           type: 'string',
           description:
-            'Optional camera-orbit, e.g. "45deg 75deg auto" (theta phi radius). Leave blank for default framing.',
+            'Which way the camera faces when the model first loads. Matches the faces/corners on the in-viewer orientation cube, so "Front" here starts the model exactly where the cube’s Front button would put it.',
+          options: {
+            list: [
+              { title: 'Default (model’s own framing)', value: '' },
+              { title: 'Front', value: '0deg 90deg auto' },
+              { title: 'Back', value: '180deg 90deg auto' },
+              { title: 'Left', value: '-90deg 90deg auto' },
+              { title: 'Right', value: '90deg 90deg auto' },
+              { title: 'Top', value: '0deg 2deg auto' },
+              { title: 'Bottom', value: '0deg 178deg auto' },
+              { title: 'Front-Right (3/4)', value: '45deg 60deg auto' },
+              { title: 'Front-Left (3/4)', value: '-45deg 60deg auto' },
+              { title: 'Back-Right (3/4)', value: '135deg 60deg auto' },
+              { title: 'Back-Left (3/4)', value: '-135deg 60deg auto' },
+            ],
+            layout: 'dropdown',
+          },
+          initialValue: '',
         },
         {
           name: 'subdivisionLevel',
