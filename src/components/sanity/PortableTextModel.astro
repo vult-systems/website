@@ -25,10 +25,6 @@ const autoLabel = node?.autoLabelParts === true;
 // Spinning labels are hard to read, so auto-labelled models don't auto-rotate.
 const autoRotate = node?.autoRotate !== false && !autoLabel;
 
-// Live Loop-subdivision smoothing, in place of pre-smoothing before export.
-const subdivRaw = node?.subdivisionLevel as string | undefined;
-const subdivLevel = subdivRaw && subdivRaw !== 'off' ? Number(subdivRaw) : 0;
-
 // glTF has no hemisphere-light concept; a custom HDR drives IBL instead.
 const envImage = fileUrlFor(node?.environmentImage?.asset?._ref);
 const wireframeDefault = node?.wireframeDefault === true;
@@ -69,7 +65,6 @@ const overridesJson = JSON.stringify(overrides);
           alt={alt}
           data-autolabel={autoLabel ? '' : undefined}
           data-overrides={autoLabel ? overridesJson : undefined}
-          data-subdiv={subdivLevel > 0 ? subdivLevel : undefined}
           environment-image={envImage}
           camera-orbit={startOrbit}
           max-camera-orbit="auto auto 300%"
@@ -81,7 +76,7 @@ const overridesJson = JSON.stringify(overrides);
           shadow-intensity="1"
           exposure="1.1"
           interaction-prompt="none"
-          class="model-viewer rounded-lg bg-black/[0.04] dark:bg-white/[0.04]"
+          class="model-viewer rounded-lg bg-background"
           style={`--mv-callout-color:${calloutColor}`}
         >
           <div slot="poster" class="model-viewer-loading">Loading 3D model…</div>
@@ -240,6 +235,15 @@ const overridesJson = JSON.stringify(overrides);
     width: 64px;
     height: 64px;
     perspective: 280px;
+    /* Hidden until syncCube() has real camera data to draw (see the script
+       below) — otherwise it flashes its default, meaningless orientation
+       for however long the model takes to load before snapping to the
+       real one, which reads as a glitch rather than a load state. */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .mv-cube--ready {
+    opacity: 1;
   }
   .mv-cube__box {
     position: relative;
@@ -627,6 +631,11 @@ const overridesJson = JSON.stringify(overrides);
     const thetaDeg = (theta * 180) / Math.PI;
     const phiDeg = (phi * 180) / Math.PI;
     box.style.transform = `rotateX(${phiDeg - 90}deg) rotateY(${-thetaDeg}deg)`;
+    // model-viewer fires 'camera-change' as soon as its controller
+    // initializes — well before the actual glTF (and this model's real
+    // starting orbit) has loaded — so only reveal once there's a loaded
+    // model for the pose to actually correspond to.
+    if (mv.loaded) mv.querySelector('.mv-cube')?.classList.add('mv-cube--ready');
   }
 
   function wireCube(mv: any) {
@@ -636,7 +645,12 @@ const overridesJson = JSON.stringify(overrides);
     // clone "already wired" and leave its cube dead with no camera sync.
     if (mv.__cubeWired) return;
     mv.__cubeWired = true;
-    syncCube(mv);
+    // No eager syncCube() call here — getCameraOrbit() returns model-viewer's
+    // generic idle default before the model has actually loaded, which isn't
+    // this model's real starting angle. Drawing that default immediately just
+    // shows a wrong pose that then visibly jumps once 'load' supplies the
+    // real one; staying hidden (see .mv-cube's opacity in the style block)
+    // until one of these listeners fires with real data avoids that.
     mv.addEventListener('camera-change', () => syncCube(mv));
     mv.addEventListener('load', () => syncCube(mv), { once: true });
   }
@@ -700,10 +714,8 @@ const overridesJson = JSON.stringify(overrides);
     });
   });
 
-  // Built from each named mesh's geometry *before* subdivision runs, so the
-  // wireframe always shows the topology as exported — the actual thing
-  // worth seeing for teaching purposes — even when subdivision is smoothing
-  // the shaded surface on top of it.
+  // Built from each named mesh's geometry, so it always shows the topology
+  // as exported — the actual thing worth seeing for teaching purposes.
   async function buildWireframeOverlay(mv: any) {
     if (mv.__wireframeBuilt) return;
     const scene = findScene(mv);
@@ -734,50 +746,6 @@ const overridesJson = JSON.stringify(overrides);
       overlay.scale.setScalar(1.002);
       obj.add(overlay);
     }
-    scene.queueRender?.();
-  }
-
-  // --- Live subdivision smoothing (replaces pre-smoothing before export) ---
-  async function applySubdivision(mv: any) {
-    const level = parseInt(mv.dataset.subdiv || '0', 10);
-    if (!level || mv.__subdivided) return;
-    const scene = findScene(mv);
-    if (!scene?.target) return;
-    // Instance property, not a dataset attribute — see the comment in
-    // wireCube(). A cloned model-viewer loads its own fresh (unsubdivided)
-    // Three.js scene and must go through this again independently.
-    mv.__subdivided = true;
-
-    // model-viewer finishes assigning each material's real color slightly
-    // after the public 'load' event fires; swapping geometry before that
-    // settles can leave the mesh stuck on an interim neutral-grey material.
-    // A couple of animation frames was enough in isolation, but not once
-    // subdivision is competing with the wireframe build and labelling on
-    // the same load (e.g. a Present-mode clone) — model-viewer's own source
-    // hits this same class of race and falls back to a flat 500ms wait, so
-    // match that rather than re-guess a frame count.
-    await new Promise((r) => setTimeout(r, 500));
-
-    const { LoopSubdivision } = await import('three-subdivide');
-    scene.target.traverse((obj: any) => {
-      // model-viewer's own internal helpers (shadow catcher, camera gizmo)
-      // live as unnamed siblings of the actual glTF scene under `target`;
-      // real exported meshes are essentially always named, so skip anonymous
-      // ones rather than subdividing engine internals.
-      if (!obj.isMesh || !obj.geometry || !obj.name) return;
-      try {
-        const smoothed = LoopSubdivision.modify(obj.geometry, level, {
-          split: true,
-          // Skip meshes that are already dense (e.g. a raw sculpt export)
-          // rather than exploding into millions of triangles.
-          maxTriangles: 20000,
-        });
-        obj.geometry.dispose();
-        obj.geometry = smoothed;
-      } catch {
-        // Leave this mesh's original geometry if subdivision fails on it.
-      }
-    });
     scene.queueRender?.();
   }
 
@@ -924,9 +892,9 @@ const overridesJson = JSON.stringify(overrides);
 
   // A comfort-padded version of model-viewer's own "auto" camera distance —
   // see the click handler above for why plain "auto" isn't enough on its
-  // own. Reads the model's *current* bounding sphere (post-subdivision), so
-  // it scales correctly for whatever size a given imported model turns out
-  // to be, rather than a distance tuned for one specific export.
+  // own. Reads the model's current bounding sphere, so it scales correctly
+  // for whatever size a given imported model turns out to be, rather than
+  // a distance tuned for one specific export.
   function computeSnapRadius(mv: any): number | null {
     const scene = findScene(mv);
     if (!scene?.boundingSphere || !scene.framedFoVDeg) return null;
@@ -935,18 +903,13 @@ const overridesJson = JSON.stringify(overrides);
     return ideal * 1.15;
   }
 
-  // Subdivision runs first since labelling measures mesh bounding boxes —
-  // keeping the order means labels land on the final, smoothed geometry.
   async function onModelLoad(mv: any) {
     // Re-frame with the padded radius immediately, before anything async
     // runs — model-viewer's own reveal fade hasn't happened yet at this
     // point, so the corrected framing is what fades in. Doing this later
-    // (e.g. after the subdivision delay below) meant the model would
-    // already be visible at the bare "auto" framing and then visibly snap
-    // to the padded one — the "weird snap and pop" the padding itself was
-    // supposed to fix. The pre-subdivision bounding sphere is close enough
-    // to the post-subdivision one (smoothing only pulls vertices slightly
-    // inward) that computing it this early doesn't cost any accuracy.
+    // meant the model would already be visible at the bare "auto" framing
+    // and then visibly snap to the padded one — the "weird snap and pop"
+    // the padding itself was supposed to fix.
     mv.__snapRadius = computeSnapRadius(mv);
     if (mv.__snapRadius) {
       const { theta, phi } = mv.getCameraOrbit();
@@ -954,11 +917,7 @@ const overridesJson = JSON.stringify(overrides);
       mv.jumpCameraToGoal?.();
     }
 
-    // Wireframe is built from whatever geometry is currently loaded, so it
-    // must run before subdivision replaces it — otherwise "as exported"
-    // topology would already be gone.
     await buildWireframeOverlay(mv);
-    await applySubdivision(mv);
     if (mv.matches('[data-autolabel]')) await labelModel(mv);
   }
 

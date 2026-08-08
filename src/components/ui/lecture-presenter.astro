@@ -21,11 +21,14 @@
       <!-- 16:9 slide frame, centered / letterboxed like a slide deck -->
       <div id="lp-frame" class="relative overflow-hidden rounded-lg">
         <div id="lp-slide" class="absolute inset-0 overflow-auto"></div>
-        <!-- Slide master: course code + name (top-right), project in accent, logo mark (bottom-left) -->
-        <div id="lp-context" class="pointer-events-none absolute top-3 right-4 max-w-[72%] truncate text-[0.65rem] sm:text-xs uppercase tracking-[0.15em]" style="font-family: 'Besley', serif !important;">
+        <!-- Slide master: course code + name (top-right), project in accent, logo mark (bottom-left).
+             z-10 keeps both above .model-viewer-frame's own z-index: 5 (see its
+             comment) — without it, a model that bleeds to the slide edge sits
+             in front of this chrome instead of under it. -->
+        <div id="lp-context" class="pointer-events-none absolute top-3 right-4 z-10 max-w-[72%] truncate text-[0.65rem] sm:text-xs uppercase tracking-[0.15em]" style="font-family: 'Besley', serif !important;">
           <span id="lp-ctx-course" class="text-foreground-secondary/45"></span><span id="lp-ctx-sep" class="text-foreground-secondary/30"> &middot; </span><span id="lp-ctx-project" class="text-accent/80"></span>
         </div>
-        <div class="pointer-events-none absolute bottom-3 left-4 opacity-60">
+        <div class="pointer-events-none absolute bottom-3 left-4 z-10 opacity-60">
           <svg width="26" height="23" viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M46.5 59L0 86L49 0L46.5 59Z" fill="#E22B25"/>
             <path d="M52 59L51.0004 1.99994L99.5002 86.5L52 59Z" fill="#2282DF"/>
@@ -52,6 +55,11 @@
       </button>
     </div>
   </div>
+  <!-- Off-screen models for upcoming/nearby slides (see preloadModel in the
+       script below): real <model-viewer> instances, not just a byte fetch,
+       so the library's own decoded-scene cache is warm by the time the
+       visible slide clones the same src. -->
+  <div id="lp-model-preload" class="lp-model-preload" aria-hidden="true"></div>
 </div>
 
 <style is:global>
@@ -63,6 +71,16 @@
     max-height: 100cqh;
     border: 1px solid hsl(var(--foreground-secondary) / 0.12);
     background: hsl(var(--background));
+  }
+  #lecture-presenter .lp-model-preload {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* --- Presenter slide layout & typography --- */
@@ -225,9 +243,7 @@
   #lecture-presenter #lp-slide .lp-body > *:nth-child(n + 6) { animation-delay: 0.52s; }
   #lecture-presenter #lp-slide img { opacity: 0; transition: opacity 0.45s ease; }
   #lecture-presenter #lp-slide img.lp-loaded { opacity: 1; }
-  /* 3D models pop straight in once loaded rather than fading — the fade
-     kept fighting the heavy subdivision work that has to re-run every
-     time a slide is shown, and looked laggy rather than smooth. */
+  /* 3D models pop straight in once loaded rather than fading. */
   @media (prefers-reduced-motion: reduce) {
     #lecture-presenter #lp-slide .lp-head,
     #lecture-presenter #lp-slide .lp-body > * { animation: none; }
@@ -511,11 +527,58 @@
       (img as any).fetchPriority = 'low';
       img.src = src;
     };
+    // Same idea for 3D models, but a byte fetch alone isn't enough — model-
+    // viewer keeps its own cache of decoded/parsed glTF scenes keyed by src,
+    // shared across every <model-viewer> instance on the page. Spinning up a
+    // real (but off-screen) instance now means the visible slide's own
+    // instance, created later from the same src, skips straight to that
+    // warm cache instead of redoing the network fetch and glTF parse live.
+    // Capped and LRU-evicted so a long deck with many distinct models never
+    // piles up hidden WebGL contexts behind the scenes.
+    const modelPreloads = new Map<string, HTMLElement>();
+    const MAX_MODEL_PRELOADS = 2;
+    const preloadModel = (src: string) => {
+      if (!src || modelPreloads.has(src)) return;
+      const container = $('lp-model-preload');
+      if (!container) return;
+      const mv = document.createElement('model-viewer');
+      mv.setAttribute('src', src);
+      mv.setAttribute('loading', 'eager');
+      container.appendChild(mv);
+      modelPreloads.set(src, mv);
+      if (modelPreloads.size > MAX_MODEL_PRELOADS) {
+        const oldestSrc = modelPreloads.keys().next().value as string;
+        modelPreloads.get(oldestSrc)?.remove();
+        modelPreloads.delete(oldestSrc);
+      }
+    };
     const preloadSlide = (i: number) => {
       if (i < 0 || i >= slides.length) return;
       const tmp = document.createElement('div');
       tmp.innerHTML = slides[i];
       tmp.querySelectorAll('img').forEach((im) => preload(im.getAttribute('src') || ''));
+      tmp.querySelectorAll('model-viewer').forEach((mv) => preloadModel(mv.getAttribute('src') || ''));
+    };
+    // preloadSlide only warms the 1-2 slides around wherever you currently
+    // are, so a model more than a couple of slides out only starts fetching
+    // once you're nearly on top of it — fine at a normal presenting pace,
+    // not fine if you click through fast. This instead kicks off a plain
+    // byte fetch (not a full model-viewer instance — cheap, no WebGL
+    // context) for every model in the whole deck the moment Present opens,
+    // so even the last slide's model has the entire presentation's worth of
+    // lead time to land in the HTTP cache. preloadSlide's later, heavier
+    // per-instance warm-up then finds the bytes already local.
+    const preloadAllModelBytes = () => {
+      for (const html of slides) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        tmp.querySelectorAll('model-viewer').forEach((mv) => {
+          const src = mv.getAttribute('src');
+          if (!src || preloaded.has(src)) return;
+          preloaded.add(src);
+          fetch(src, { priority: 'low' } as RequestInit).catch(() => {});
+        });
+      }
     };
     // Reveal an image as soon as it's ready, with fallbacks so it can never stay hidden.
     const revealImage = (im: HTMLImageElement) => {
@@ -753,6 +816,7 @@
 
     const open = (body: HTMLElement, title: string, subtitle: string, course: string, project: string) => {
       slides = buildSlides(body, title, subtitle);
+      preloadAllModelBytes();
       index = 0;
       const titleEl = $('lp-title');
       if (titleEl) titleEl.textContent = title;
@@ -776,6 +840,10 @@
       p.classList.add('hidden');
       document.body.style.overflow = '';
       if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+      // Release the hidden preload models' WebGL contexts once we're not
+      // presenting — no reason to keep them warm while the deck is closed.
+      modelPreloads.forEach((el) => el.remove());
+      modelPreloads.clear();
     };
 
     const isOpen = () => {
