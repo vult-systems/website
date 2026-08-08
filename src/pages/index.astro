@@ -76,35 +76,41 @@ const seo = getHomePageSEO();
 
 				<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					<!-- Classes -->
-					<a href="/learn" class="group rounded-md border border-border bg-card overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-border-hover flex flex-col">
-						<div class="overflow-hidden bg-foreground/5 aspect-square">
-							<Image src={alienBustThumb} alt="Classes" data-no-lightbox class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
-						</div>
-						<div class="p-4 flex flex-col gap-1">
-							<p class="text-base font-medium text-foreground transition-colors">Courses</p>
-							<p class="text-base text-foreground-secondary line-clamp-2">Learning materials and course content spanning organic modeling, character art, environment, and production tools used in my instruction at UIW.</p>
+					<a href="/learn" class="spotlight-card group relative block">
+						<div class="spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02] flex flex-col h-full">
+							<div class="overflow-hidden bg-foreground/5 aspect-square">
+								<Image src={alienBustThumb} alt="Classes" data-no-lightbox class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
+							</div>
+							<div class="p-4 flex flex-col gap-1">
+								<p class="text-base font-medium text-foreground transition-colors">Courses</p>
+								<p class="text-base text-foreground-secondary line-clamp-2">Learning materials and course content spanning organic modeling, character art, environment, and production tools used in my instruction at UIW.</p>
+							</div>
 						</div>
 					</a>
 
 					<!-- Student Work -->
-					<a href="/students" class="group rounded-md border border-border bg-card overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-border-hover flex flex-col">
-						<div class="overflow-hidden bg-foreground/5 aspect-square">
-						<img src="/student-work/samantha-olivas-witch-thumb.webp" alt="Student Work" data-no-lightbox class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" loading="lazy" />
-						</div>
-						<div class="p-4 flex flex-col gap-1">
-							<p class="text-base font-medium text-foreground transition-colors">Student Work</p>
-							<p class="text-base text-foreground-secondary line-clamp-2">Work produced by students throughout their time in my 3D Animation and Game Design classes at UIW.</p>
+					<a href="/students" class="spotlight-card group relative block">
+						<div class="spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02] flex flex-col h-full">
+							<div class="overflow-hidden bg-foreground/5 aspect-square">
+							<img src="/student-work/samantha-olivas-witch-thumb.webp" alt="Student Work" data-no-lightbox class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" loading="lazy" />
+							</div>
+							<div class="p-4 flex flex-col gap-1">
+								<p class="text-base font-medium text-foreground transition-colors">Student Work</p>
+								<p class="text-base text-foreground-secondary line-clamp-2">Work produced by students throughout their time in my 3D Animation and Game Design classes at UIW.</p>
+							</div>
 						</div>
 					</a>
 
 					<!-- Tools & Resources -->
-					<a href="/resources" class="group rounded-md border border-border bg-card overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-border-hover flex flex-col">
-						<div class="overflow-hidden bg-foreground/5 aspect-square">
-							<Image src={zbrushMenusThumb} alt="Tools & Resources" data-no-lightbox class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
-						</div>
-						<div class="p-4 flex flex-col gap-1">
-							<p class="text-base font-medium text-foreground transition-colors">Tools & Resources</p>
-							<p class="text-base text-foreground-secondary line-clamp-2">Free downloads used directly in my courses, including ZBrush assets, Maya scripts, and pipeline tools.</p>
+					<a href="/resources" class="spotlight-card group relative block">
+						<div class="spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02] flex flex-col h-full">
+							<div class="overflow-hidden bg-foreground/5 aspect-square">
+								<Image src={zbrushMenusThumb} alt="Tools & Resources" data-no-lightbox class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
+							</div>
+							<div class="p-4 flex flex-col gap-1">
+								<p class="text-base font-medium text-foreground transition-colors">Tools & Resources</p>
+								<p class="text-base text-foreground-secondary line-clamp-2">Free downloads used directly in my courses, including ZBrush assets, Maya scripts, and pipeline tools.</p>
+							</div>
 						</div>
 					</a>
 				</div>
@@ -120,13 +126,15 @@ const seo = getHomePageSEO();
 		<section class="relative z-10 py-16 sm:py-20">
 			<div class={layout.container}>
 				<div class="flex flex-col sm:flex-row gap-8 items-start">
-					<a href="/log" class="group rounded-md border border-border bg-card overflow-hidden block sm:max-w-md w-full flex-shrink-0 transition-all duration-300 hover:scale-[1.02] hover:border-border-hover">
-						<div class="aspect-video overflow-hidden bg-foreground/5">
-							<Image src={opencueThumb} alt="OpenCue render farm" data-no-lightbox class="w-full h-full object-cover" />
-						</div>
-						<div class="p-4">
-							<p class="text-base font-medium text-foreground">Rethinking Rendering for Higher Education with Sony's OpenCue</p>
-							<p class="text-sm text-foreground-secondary mt-1 line-clamp-2">Setting up Sony's OpenCue render farm for student film production at the University of the Incarnate Word.</p>
+					<a href="/log" class="spotlight-card group relative block sm:max-w-md w-full flex-shrink-0">
+						<div class="spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
+							<div class="aspect-video overflow-hidden bg-foreground/5">
+								<Image src={opencueThumb} alt="OpenCue render farm" data-no-lightbox class="w-full h-full object-cover" />
+							</div>
+							<div class="p-4">
+								<p class="text-base font-medium text-foreground">Rethinking Rendering for Higher Education with Sony's OpenCue</p>
+								<p class="text-sm text-foreground-secondary mt-1 line-clamp-2">Setting up Sony's OpenCue render farm for student film production at the University of the Incarnate Word.</p>
+							</div>
 						</div>
 					</a>
 					<div class="flex-1 min-w-0">
@@ -179,6 +187,10 @@ const seo = getHomePageSEO();
   .scroll-hint-btn {
     animation: scroll-hint-pulse 2s ease-in-out infinite;
   }
+
+  /* .spotlight-card / .spotlight-inner glow now lives in src/styles/globals.css
+     (shared across index.astro, students.astro, art.astro, resources.astro
+     instead of duplicated per page). */
 </style>
 
 <script>

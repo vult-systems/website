@@ -10,7 +10,6 @@ import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Link from '@/components/ui/link.astro';
 import Badge from '@/components/ui/badge.astro';
-import Card from '@/components/ui/card.astro';
 import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
@@ -119,8 +118,8 @@ const seo = getArtPageSEO();
 				<!-- Art Grid -->
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1" id="art-grid">
 					{artData.map((piece) => (
-						<div class="art-item" data-category={piece.category}>
-							<Card padding="none" interactive href={`/art/${piece.slug}`}>
+						<a href={`/art/${piece.slug}`} class="art-item spotlight-card group relative block" data-category={piece.category}>
+							<div class="spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
 				<div class="relative aspect-square overflow-hidden rounded-sm bg-card shimmer">
 							{piece.heroImage && (
 								<img
@@ -154,8 +153,8 @@ const seo = getArtPageSEO();
 										{piece.description && <p class="text-foreground-secondary dark:text-white/70 text-base line-clamp-1 leading-tight">{piece.description}</p>}
 									</div>
 								</div>
-							</Card>
-						</div>
+							</div>
+							</a>
 					))}
 				</div>
 

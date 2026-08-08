@@ -307,12 +307,13 @@ data-slug={resourceId(group.category)}
 				<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 					{sub.items.filter(item => !item.hidden).map((item) => (
 					<div
-						class="resource-card cursor-pointer flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.03]"
+						class="resource-card spotlight-card group relative cursor-pointer"
 						data-name={item.name}
 						data-description={item.description}
 						data-download={item.download ?? ''}
 						data-resource-search={`${group.category} ${sub.label} ${item.name} ${item.description ?? ''}`.toLowerCase()}
 					>
+						<div class="spotlight-inner rounded-md overflow-hidden flex flex-col justify-between gap-3 transition-all duration-300 group-hover:scale-[1.03]">
 						{item.thumbnail ? (
 							<div class="aspect-square bg-foreground/5 overflow-hidden flex items-center justify-center">
 								<Image src={item.thumbnail} alt={item.name} class="w-full h-full object-cover" data-no-lightbox />
@@ -351,6 +352,7 @@ data-slug={resourceId(group.category)}
 							</a>
 						)}
 						</div>
+						</div>
 					</div>
 					))}
 				</div>
@@ -361,12 +363,13 @@ data-slug={resourceId(group.category)}
 	<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 	{(group.items ?? []).filter(item => !item.hidden).map((item) => (
 	<div
-		class="resource-card cursor-pointer flex flex-col justify-between gap-3 rounded-md border border-border bg-card overflow-hidden transition-transform duration-300 hover:scale-[1.03]"
+		class="resource-card spotlight-card group relative cursor-pointer"
 		data-name={item.name}
 		data-description={item.description}
 		data-download={item.download ?? ''}
 		data-resource-search={`${group.category} ${item.name} ${item.description ?? ''}`.toLowerCase()}
 	>
+		<div class="spotlight-inner rounded-md overflow-hidden flex flex-col justify-between gap-3 transition-all duration-300 group-hover:scale-[1.03]">
 		{item.thumbnail ? (
 			<div class="aspect-square bg-foreground/5 overflow-hidden flex items-center justify-center">
 				<Image src={item.thumbnail} alt={item.name} class="w-full h-full object-cover" data-no-lightbox />
@@ -404,6 +407,7 @@ data-slug={resourceId(group.category)}
 				Download
 			</a>
 		)}
+		</div>
 		</div>
 	</div>
 	))}

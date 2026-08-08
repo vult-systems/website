@@ -156,13 +156,13 @@ data-slug={studentId(piece)}
 <div class="flex flex-col lg:flex-row gap-4" id="student-grid">
 {studentWork.map((piece) => (
 <div
-class="student-item w-full"
+class="student-item spotlight-card group w-full relative"
 data-year={piece.year}
 data-student={piece.student}
 data-pin={piece.pin ?? ''}
 id={studentId(piece)}
 >
-<div class="rounded-lg border border-border bg-card overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-border-hover">
+<div class="spotlight-inner rounded-lg overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
 {piece.video ? (
 <div class="video-lightbox-trigger relative bg-foreground/5 overflow-hidden cursor-pointer" data-video={piece.video} style={piece.aspectratio ? `aspect-ratio:${piece.aspectratio}` : undefined}>
 <video

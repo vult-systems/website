@@ -246,3 +246,128 @@
     border-inline-start-color: hsl(var(--accent));
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Spotlight card: animated glow living in the border of image+text preview
+ * cards (landing page Courses/Student Work/Resources; also used on the
+ * students gallery, work/portfolio grid, and resources cards). Originally
+ * built and iterated on in src/pages/index.astro, then centralized here once
+ * it needed to be reused across pages rather than duplicated per-page.
+ *
+ * Structure every consuming card needs:
+ *   <a/div class="spotlight-card group relative block">
+ *     <div class="spotlight-inner rounded-md overflow-hidden ...">
+ *       ...image, text, whatever the card normally contains...
+ *     </div>
+ *   </a/div>
+ * The visible card (rounded corners, overflow-hidden, border, background) is
+ * the INNER element, not .spotlight-card itself — .spotlight-card must stay
+ * unclipped (no overflow-hidden) so the ::after shadow can bleed a few
+ * pixels past its edges instead of being cut off.
+ *
+ * Color: one Vult brand-mark color (src/assets/brand/logo.svg) per card,
+ * cycling red/blue/gold via nth-child(3n+1/2/3) so it repeats sensibly
+ * across lists of any length, not just groups of exactly three.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  @property --spin-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+  .spotlight-card {
+    position: relative;
+    isolation: isolate;
+  }
+  /* Cards scale up slightly on hover (see .spotlight-inner below), which can
+     overlap neighboring cards in tight grids — without this, whichever card
+     comes LATER in DOM order wins the overlap regardless of which one is
+     actually being hovered (both sit at the same default stacking level).
+     Raising z-index on :hover makes the hovered card always render on top of
+     its neighbors, however they're ordered. */
+  .spotlight-card:hover {
+    z-index: 10;
+  }
+  .spotlight-card:nth-child(3n+1) { --glow-rgb: 226 43 37; }   /* red  #E22B25 */
+  .spotlight-card:nth-child(3n+2) { --glow-rgb: 34 130 223; }  /* blue #2282DF */
+  .spotlight-card:nth-child(3n+3) { --glow-rgb: 242 201 35; }  /* gold #F2C923 */
+  .spotlight-inner {
+    border: 3px solid transparent;
+    /* A bare color (e.g. `hsl(var(--card-bg)) padding-box`) is only legal in
+       the LAST layer of a multi-layer background shorthand — putting one in
+       the first layer makes the whole declaration invalid and silently
+       drops it (computed background-image comes out "none"). Both non-last
+       layers here are flat two-stop gradients instead, which are legal
+       <image> values anywhere in the stack.
+       The resting border color matches the page background (not --border)
+       on purpose — the 3px border is there but invisible until hover reveals
+       the glow, so the card reads as borderless/blending into the page until
+       you interact with it. */
+    background:
+      linear-gradient(hsl(var(--card-bg)), hsl(var(--card-bg))) padding-box,
+      linear-gradient(hsl(var(--background)), hsl(var(--background))) border-box;
+    /* background is deliberately NOT in this transition — it swaps between
+       two structurally different multi-layer values (flat fill vs.
+       fill + conic-gradient) on hover, which browsers can't cleanly
+       interpolate. Bundling that non-interpolable swap into the same
+       shorthand as the scale transform dragged the transform's own
+       smoothness down with it, which read as the scale "popping" card to
+       card. Border-color just cuts over instantly (same as the shadow's own
+       opacity fades independently below); transform is the only thing that
+       actually needs to ease. */
+    transition: transform 0.3s ease;
+  }
+  .spotlight-card:hover .spotlight-inner {
+    background:
+      linear-gradient(hsl(var(--card-bg)), hsl(var(--card-bg))) padding-box,
+      conic-gradient(
+        from var(--spin-angle),
+        rgb(var(--glow-rgb)), rgb(var(--glow-rgb) / 0) 20%, rgb(var(--glow-rgb) / 0) 80%, rgb(var(--glow-rgb))
+      ) border-box;
+    animation: spotlight-spin 8s linear infinite;
+  }
+  @keyframes spotlight-spin {
+    to { --spin-angle: 360deg; }
+  }
+
+  /* Plain, static, dark drop shadow for depth — no gradient, no animation.
+     Fixed black rather than a theme color: hsl(var(--foreground)) flips to
+     near-white in dark mode (foreground IS the light text color there),
+     which would paint a light halo instead of a shadow on dark backgrounds.
+     A blurred layer this size also reads as roughly half its nominal
+     opacity once the blur spreads it out, hence 0.55 rather than something
+     like 0.2.
+     --shadow-alpha is theme-aware: the SAME absolute darkness reads as
+     appropriately subtle against dark mode's near-black page but much
+     heavier against light mode's near-white one, so light mode gets a
+     lower value here and dark mode is overridden back up. */
+  .spotlight-card::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    z-index: -2;
+    border-radius: 0.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+    --shadow-alpha: 0.3;
+    background: rgb(0 0 0 / var(--shadow-alpha));
+    filter: blur(14px);
+  }
+  .dark .spotlight-card::after {
+    --shadow-alpha: 0.55;
+  }
+  .spotlight-card:hover::after {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spotlight-inner,
+    .spotlight-card::after {
+      transition: none;
+    }
+    .spotlight-card:hover .spotlight-inner {
+      animation: none !important;
+    }
+  }
+}
