@@ -241,20 +241,68 @@ window.__pinnedStudents = pinnedStudents;
 const initStudentWork = () => {
 
 // --- Video autoplay via IntersectionObserver ---
+// Pre-warm each video's data well before it's actually visible (600px
+// lead), so by the time the play-trigger observer below fires, the browser
+// already has data buffered instead of cold-starting a fetch + decode right
+// at the exact scroll position it crosses into view. That cold start —
+// especially with several videos crossing the threshold in the same scroll
+// gesture, in this 2-column layout — is what reads as scroll jank on this
+// page. preload stays "none" in the markup (so a page you never scroll
+// through doesn't fetch video data it'll never need); this only upgrades it
+// to "auto" once a video is about to matter.
+const videoPreloadObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    const video = entry.target as HTMLVideoElement;
+    video.preload = 'auto';
+    videoPreloadObserver.unobserve(video);
+  });
+}, { rootMargin: '600px 0px', threshold: 0 });
+
+// Chromium syncs page compositing to a playing video's own frame rate
+// (these are all 30fps sources) rather than the display's 60Hz while that
+// video is actively decoding — regardless of its resolution. Confirmed via
+// profiling: forcing all videos to stay paused during a scroll took the
+// page from a hard 30fps ceiling back to ~60fps. So instead of just
+// play/pause on visibility, also pause everything mid-scroll and resume
+// once the scroll gesture settles — visible videos keep autoplaying at
+// rest, they just don't fight the scroll compositor while it matters most.
+const visibleVideos = new Set<HTMLVideoElement>();
+let isScrolling = false;
+
 const videoObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     const video = entry.target as HTMLVideoElement;
     if (entry.isIntersecting) {
-      video.play().catch(() => {});
+      visibleVideos.add(video);
+      if (!isScrolling) video.play().catch(() => {});
     } else {
+      visibleVideos.delete(video);
       video.pause();
     }
   });
 }, { threshold: 0.25 });
 
 document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]').forEach((video) => {
+  videoPreloadObserver.observe(video);
   videoObserver.observe(video);
 });
+
+const scrollAbort = new AbortController();
+let scrollEndTimer: ReturnType<typeof setTimeout> | null = null;
+window.addEventListener('scroll', () => {
+  if (!isScrolling) {
+    isScrolling = true;
+    visibleVideos.forEach((video) => video.pause());
+  }
+  if (scrollEndTimer) clearTimeout(scrollEndTimer);
+  scrollEndTimer = setTimeout(() => {
+    isScrolling = false;
+    visibleVideos.forEach((video) => video.play().catch(() => {}));
+  }, 150);
+}, { passive: true, signal: scrollAbort.signal });
+
+document.addEventListener('astro:before-swap', () => scrollAbort.abort(), { once: true });
 
 // --- Image lightbox triggers ---
 document.querySelectorAll('.learn-lightbox-trigger').forEach((trigger) => {

@@ -4,7 +4,6 @@ import Text from './text.astro';
 import Link from './link.astro';
 import { layout } from '@/config/design';
 import Badge from './badge.astro';
-import Card from './card.astro';
 import type { ImageMetadata } from 'astro';
 
 interface ArtPiece {
@@ -72,8 +71,8 @@ const carouselPieces = artPieces;
     <div class="carousel-track" id="carouselTrack">
       <!-- First set of cards -->
       {carouselPieces.map((piece) => (
-        <div class="carousel-item">
-          <Card padding="none" interactive href={`/art/${piece.slug}`}>
+        <a href={`/art/${piece.slug}`} class="carousel-item spotlight-card group relative block">
+          <div class="spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
             <!-- Image -->
             <div class="relative aspect-square overflow-hidden">
               {typeof piece.heroImage === 'object' && piece.heroImage ? (
@@ -121,14 +120,14 @@ const carouselPieces = artPieces;
                 />
               )}
             </div>
-          </Card>
-        </div>
+          </div>
+        </a>
       ))}
       <!-- Duplicate set for seamless loop -->
 
       {carouselPieces.map((piece) => (
-        <div class="carousel-item">
-          <Card padding="none" interactive href={`/art/${piece.slug}`}>
+        <a href={`/art/${piece.slug}`} class="carousel-item spotlight-card group relative block">
+          <div class="spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
             <!-- Image -->
             <div class="relative aspect-square overflow-hidden">
               {typeof piece.heroImage === 'object' && piece.heroImage ? (
@@ -172,8 +171,8 @@ const carouselPieces = artPieces;
                 />
               )}
             </div>
-          </Card>
-        </div>
+          </div>
+        </a>
       ))}
     </div>
   </div>
@@ -182,8 +181,26 @@ const carouselPieces = artPieces;
 <style>
   .carousel-container {
     width: 100%;
+    /* overflow-x: hidden paired with overflow-y: visible doesn't actually
+       stay "visible" — per spec, browsers coerce it to auto whenever the
+       other axis isn't visible too, which still clips (just with a
+       scrollbar instead of a hard cut). So: plain overflow: hidden on both
+       axes as before (still needed horizontally, to hide the looping
+       duplicate set), but with vertical padding added as headroom for the
+       hover-scale glow effect (group-hover:scale-[1.02]) to grow into
+       without touching the clip boundary, offset by an equal negative
+       margin so that headroom doesn't push the rest of the page down. */
     overflow: hidden;
-    padding: 0 0.75rem;
+    /* padding-top/bottom (headroom for the hover-scale glow, offset by the
+       matching negative margin below) set separately from left/right so
+       the responsive breakpoints changing horizontal padding, further
+       down, never touch it — using the `padding` shorthand there would
+       reset these back to 0 at each breakpoint. */
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    margin-block: -20px;
     cursor: grab;
     user-select: none;
   }
@@ -194,19 +211,22 @@ const carouselPieces = artPieces;
 
   @media (min-width: 640px) {
     .carousel-container {
-      padding: 0 1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
   }
 
   @media (min-width: 768px) {
     .carousel-container {
-      padding: 0 1.5rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .carousel-container {
-      padding: 0 2rem;
+      padding-left: 2rem;
+      padding-right: 2rem;
     }
   }
 
