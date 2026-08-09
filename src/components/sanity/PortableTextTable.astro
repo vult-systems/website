@@ -15,11 +15,12 @@ const bodyRows = rows.slice(1);
       <table class="w-full table-fixed border-collapse text-left text-sm">
         {headerRow && (
           <thead>
-            <tr>
+            <tr class="border-b border-border">
+              <th class="w-10 px-2 py-2.5 font-normal text-foreground-muted" style="font-family: 'Besley', serif;" />
               {(headerRow.cells ?? []).map((cell, i) => (
                 <th
                   class:list={[
-                    'border border-border bg-foreground/[0.04] px-4 py-2 font-medium text-foreground align-top break-words',
+                    'px-4 py-2.5 font-medium text-foreground align-top break-words',
                     i === 0 && 'w-40 sm:w-48',
                   ]}
                   style="font-family: 'Besley', serif;"
@@ -31,16 +32,22 @@ const bodyRows = rows.slice(1);
           </thead>
         )}
         <tbody>
-          {bodyRows.map((row) => {
+          {bodyRows.map((row, rowIndex) => {
             const cells = row.cells ?? [];
             const termSlug = cells[0] ? slugify(cells[0]) : '';
             return (
-              <tr class="glossary-term-row">
+              <tr class="glossary-term-row border-b border-border/60 last:border-b-0">
+                <td
+                  class="w-10 px-2 py-3 align-top text-xs text-foreground-muted/70 tabular-nums"
+                  style="font-family: var(--font-ibm-plex);"
+                >
+                  {String(rowIndex + 1).padStart(2, '0')}
+                </td>
                 {cells.map((cell, i) =>
                   i === 0 ? (
                     <td
                       id={termSlug || undefined}
-                      class="group/term relative w-40 border border-border px-4 py-2 align-top font-medium text-foreground scroll-mt-28 break-words sm:w-48"
+                      class="group/term relative w-40 px-4 py-3 align-top font-medium text-foreground scroll-mt-28 break-words sm:w-48"
                     >
                       <span>{cell}</span>
                       {termSlug && (
@@ -59,7 +66,7 @@ const bodyRows = rows.slice(1);
                       )}
                     </td>
                   ) : (
-                    <td class="border border-border px-4 py-2 align-top break-words text-foreground-secondary">
+                    <td class="px-4 py-3 align-top break-words text-foreground-secondary">
                       {cell}
                     </td>
                   )

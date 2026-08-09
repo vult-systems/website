@@ -10,6 +10,7 @@ import PortableTextColor from './PortableTextColor.astro';
 import PortableTextDivider from './PortableTextDivider.astro';
 import PortableTextHeading from './PortableTextHeading.astro';
 import PortableTextTable from './PortableTextTable.astro';
+import PortableTextCode from './PortableTextCode.astro';
 
 interface Props {
   value: any;
@@ -27,6 +28,7 @@ const components = {
     slideBreak: PortableTextSlideBreak,
     divider: PortableTextDivider,
     table: PortableTextTable,
+    codeBlock: PortableTextCode,
   },
   block: {
     h2: PortableTextHeading,

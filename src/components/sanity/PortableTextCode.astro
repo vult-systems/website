@@ -1,0 +1,61 @@
+---
+// Renders a `codeBlock` (@sanity/code-input's `code` field type):
+// { _type: 'code', code, language, filename, highlightedLines }
+// Syntax highlighting via Astro's own built-in <Code> (Shiki under the
+// hood) — server-rendered, no client-side highlighter shipped to the
+// browser, matches this site's SSR-heavy approach everywhere else.
+import { Code } from 'astro:components';
+
+const { node } = Astro.props;
+const code = (node?.code as string) || '';
+const language = (node?.language as string) || 'text';
+const filename = node?.filename as string | undefined;
+
+const languageLabels: Record<string, string> = {
+  text: 'Plain text',
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  python: 'Python',
+  csharp: 'C#',
+  golang: 'Go',
+  json: 'JSON',
+  html: 'HTML',
+  css: 'CSS',
+  scss: 'SCSS',
+  sh: 'Shell',
+  yaml: 'YAML',
+  sql: 'SQL',
+  markdown: 'Markdown',
+};
+---
+
+{
+  code && (
+    <figure class="pt-code my-8 not-prose overflow-hidden rounded-[var(--radius)] border border-border bg-card-bg">
+      <div class="flex items-center justify-between gap-3 border-b border-border px-4 py-2">
+        <span class="truncate text-xs text-foreground-muted" style="font-family: var(--font-ibm-plex);">
+          {filename || languageLabels[language] || language}
+        </span>
+        {filename && (
+          <span class="shrink-0 text-[0.65rem] uppercase tracking-widest text-foreground-muted/70" style="font-family: var(--font-ibm-plex);">
+            {languageLabels[language] || language}
+          </span>
+        )}
+      </div>
+      <div class="pt-code-scroll overflow-x-auto text-sm leading-relaxed">
+        <Code code={code} lang={language as any} themes={{ light: 'github-light', dark: 'github-dark' }} wrap={false} />
+      </div>
+    </figure>
+  )
+}
+
+<style>
+  .pt-code-scroll :global(pre) {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    background: transparent !important;
+  }
+  .pt-code-scroll :global(code) {
+    font-family: var(--font-ibm-plex);
+  }
+</style>

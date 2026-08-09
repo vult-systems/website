@@ -245,6 +245,21 @@
     color: hsl(var(--foreground-secondary));
     border-inline-start-color: hsl(var(--accent));
   }
+
+  /* Sanity's block editor has no "soft line break" for a styled block —
+     pressing Enter inside a quote always starts a new block, so a
+     multi-paragraph quote is authored as several consecutive
+     blockquote-style blocks. astro-portabletext wraps every block in its
+     own <blockquote> independently (see Block.astro upstream), so without
+     this those render as multiple separate bordered boxes with a gap
+     between them instead of one continuous quote. Collapsing the gap and
+     re-closing the border across the seam merges them into one visual
+     block while leaving the underlying markup (and Portable Text's own
+     per-block model) untouched. */
+  .prose :where(blockquote) + :where(blockquote) {
+    margin-block-start: -1em;
+    padding-block-start: 0;
+  }
 }
 
 /* ---------------------------------------------------------------------------
