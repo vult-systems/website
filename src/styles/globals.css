@@ -183,12 +183,22 @@
      matching the tabbed sub-item style in the Studio editor. */
   .prose ol ol { list-style-type: disc; }
 
-  /* Preset text colors (Sanity `textColor` annotation) — apply on the page and in Present. */
+  /* Preset text colors (Sanity `textColor` annotation) — apply on the page
+     and in Present. Red/blue/gold take their hue straight from the brand
+     mark (src/assets/brand/logo.svg: #E22B25 / #2282DF / #F2C923 — hsl(2
+     77% 52%) / hsl(210 75% 50%) / hsl(48 89% 54%)), darkened and
+     desaturated to a shared ~60% saturation / ~38-42% lightness band —
+     the raw brand colors are tuned to pop as flat logo shapes, not to sit
+     legibly inside a paragraph of body text. Green isn't in the logo, so
+     it's picked to land in that same band rather than derived from it.
+     Muted and accent are intentionally left alone: muted is a deliberate
+     de-emphasis option rather than a "color" to tone-match, and accent is
+     the site's own separate brand color, not one of the mark's three. */
   .lecture-clr-accent { color: hsl(var(--accent)); }
-  .lecture-clr-red { color: #d92d20; }
-  .lecture-clr-blue { color: #2f6fed; }
-  .lecture-clr-gold { color: #c98a00; }
-  .lecture-clr-green { color: #2e9e4f; }
+  .lecture-clr-red { color: hsl(2 60% 40%); }
+  .lecture-clr-blue { color: hsl(210 60% 42%); }
+  .lecture-clr-gold { color: hsl(48 62% 36%); }
+  .lecture-clr-green { color: hsl(150 45% 36%); }
   .lecture-clr-muted { color: hsl(var(--foreground-secondary)); }
   /* Bold/italic/code inside a colored run keeps the color instead of resetting it. */
   [class*='lecture-clr-'] :is(strong, em, code) { color: inherit; }

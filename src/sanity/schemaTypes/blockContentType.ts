@@ -1,4 +1,5 @@
 import { defineType, defineArrayMember } from 'sanity';
+import { DropIcon } from '@sanity/icons/Drop';
 
 /**
  * Rich text ("Portable Text") used by Log entries, Course projects, and
@@ -49,6 +50,7 @@ export const blockContentType = defineType({
             title: 'Text color',
             name: 'textColor',
             type: 'object',
+            icon: DropIcon,
             fields: [
               {
                 title: 'Color',
