@@ -125,6 +125,20 @@
     align-items: stretch;
     text-align: left;
   }
+  /* A generator dropped into a "Section title" slide (large title,
+     vertically centered — meant for simple divider/chapter-title moments,
+     not dense widget content) still sizes itself exactly the same as it
+     does in a normal content slide (its grid rows are content-driven, not
+     stretched by an ancestor either way — confirmed identical column/row
+     tracks in both contexts) — what differs is that .lp-title-slide's
+     justify-content: center then centers that same-sized card inside a
+     much taller slide with nothing telling it to grow, leaving large dead
+     margins above and below. Reads as "squished" even though nothing
+     actually overflows. Pack it against the top instead, same as a normal
+     content slide, whenever a generator is present. */
+  #lecture-presenter #lp-slide .lp-title-slide:has(.pt-generator) {
+    justify-content: flex-start;
+  }
   /* Slide header (Title + subtle divider) — uniform across every layout */
   #lecture-presenter #lp-slide .lp-head {
     margin-bottom: clamp(1.25rem, 2.5cqh, 2rem);
