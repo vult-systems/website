@@ -1,0 +1,443 @@
+---
+// TEMPORARY test page — not linked in nav, delete once a sound is picked.
+import BaseLayout from '@/layouts/base-layout.astro';
+
+const variants = [
+	{ id: 'a', name: 'A — Current (noise tick + downward triangle sweep)', ambient: '1', ambientName: 'Warm Pad' },
+	{ id: 'b', name: 'B — Sub thump (deeper, weightier, slower decay)', ambient: '2', ambientName: 'Deep Drone' },
+	{ id: 'c', name: 'C — Metallic ping (square wave, brighter/edgier)', ambient: '1', ambientName: 'Warm Pad' },
+	{ id: 'd', name: 'D — Static click (pure noise, no tonal body)', ambient: '3', ambientName: 'Tape Hiss' },
+	{ id: 'e', name: 'E — Two-tone confirm (quick ascending mini-chime)', ambient: '1', ambientName: 'Warm Pad' },
+	{ id: 'f', name: 'F — CRT zap (resonant bandpass sweep)', ambient: '2', ambientName: 'Deep Drone' },
+	{ id: 'g', name: 'G — D, brighter/snappier (higher filter, shorter)', ambient: '1', ambientName: 'Warm Pad (song)' },
+	{ id: 'h', name: 'H — D, warmer/rounder (lower filter, slightly longer)', ambient: '2', ambientName: 'Deep Drone (song)' },
+	{ id: 'i', name: 'I — D + a hint of sub underneath (subtle, not deep)', ambient: '1', ambientName: 'Warm Pad (song)' },
+	{ id: 'j', name: 'J — D, double-tap (two quick ticks, like switch bounce)', ambient: '2', ambientName: 'Deep Drone (song)' },
+];
+---
+
+<BaseLayout title="Sound Test (temporary)">
+	<main class="min-h-screen bg-background text-foreground px-6 sm:px-12 py-16">
+		<div class="max-w-3xl mx-auto">
+			<h1 class="text-3xl mb-2" style="font-family: 'Besley', serif;">Hover Sound Test</h1>
+			<p class="text-foreground-secondary mb-1">
+				Click anywhere on this page once first (browsers block audio until you do). Hovering
+				anywhere in a row's box plays that row's background ambience (synthesized, not a real
+				track — just to test the pattern and volume balance); hovering one of the 3 cards inside
+				also plays the click sound on top.
+			</p>
+			<p class="text-foreground-secondary mb-10 text-sm">This page is temporary and not linked anywhere.</p>
+
+			{variants.map((v) => (
+				<div class="border border-border rounded-lg p-6 mb-8" data-ambient={v.ambient}>
+					<div class="flex items-baseline justify-between gap-4 mb-4">
+						<h2 class="text-sm uppercase tracking-widest text-foreground-muted" style="font-family: var(--font-ibm-plex);">
+							{v.name}
+						</h2>
+						<span class="text-[0.65rem] uppercase tracking-widest text-foreground-muted/60 shrink-0" style="font-family: var(--font-ibm-plex);">
+							bg: {v.ambientName}
+						</span>
+					</div>
+					<div class="grid grid-cols-3 gap-4">
+						{[1, 2, 3].map((n) => (
+							<div class="spotlight-card group relative" data-sound={v.id} tabindex="0">
+								<div class="spotlight-inner rounded-lg overflow-hidden transition-all duration-300 group-hover:scale-[1.02] h-24 flex items-center justify-center">
+									<span class="text-xs text-foreground-muted" style="font-family: var(--font-ibm-plex);">Card {n}</span>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			))}
+		</div>
+	</main>
+</BaseLayout>
+
+<script>
+	let audioCtx: AudioContext | null = null;
+	let audioUnlocked = false;
+
+	const ensureAudioContext = () => {
+		if (!audioCtx) {
+			const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+			audioCtx = new Ctx();
+		}
+		if (audioCtx.state === 'suspended') audioCtx.resume();
+		audioUnlocked = true;
+	};
+	document.addEventListener('pointerdown', ensureAudioContext, { once: true });
+
+	const playNoiseTick = (now: number, durationSec: number, peakGain: number, filterType: BiquadFilterType, filterHz: number, q = 1) => {
+		if (!audioCtx) return;
+		const bufferSize = Math.max(1, Math.floor(audioCtx.sampleRate * durationSec));
+		const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+		const data = buffer.getChannelData(0);
+		for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+		const noise = audioCtx.createBufferSource();
+		noise.buffer = buffer;
+		const filter = audioCtx.createBiquadFilter();
+		filter.type = filterType;
+		filter.frequency.value = filterHz;
+		filter.Q.value = q;
+		const gain = audioCtx.createGain();
+		gain.gain.setValueAtTime(peakGain, now);
+		gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+		noise.connect(filter).connect(gain).connect(audioCtx.destination);
+		noise.start(now);
+	};
+
+	const playSubThump = (now: number, peakGain: number, startHz: number, endHz: number, durationSec: number) => {
+		if (!audioCtx) return;
+		const osc = audioCtx.createOscillator();
+		osc.type = 'sine';
+		osc.frequency.setValueAtTime(startHz, now);
+		osc.frequency.exponentialRampToValueAtTime(endHz, now + durationSec);
+		const gain = audioCtx.createGain();
+		gain.gain.setValueAtTime(0, now);
+		gain.gain.linearRampToValueAtTime(peakGain, now + 0.006);
+		gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+		osc.connect(gain).connect(audioCtx.destination);
+		osc.start(now);
+		osc.stop(now + durationSec + 0.02);
+	};
+
+	// A — current: noise tick + downward triangle sweep
+	const playA = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.015, 0.035, 'highpass', 5000);
+		const osc = audioCtx.createOscillator();
+		osc.type = 'triangle';
+		osc.frequency.setValueAtTime(380, now);
+		osc.frequency.exponentialRampToValueAtTime(190, now + 0.08);
+		const filter = audioCtx.createBiquadFilter();
+		filter.type = 'lowpass';
+		filter.Q.value = 3;
+		filter.frequency.setValueAtTime(1800, now);
+		filter.frequency.exponentialRampToValueAtTime(500, now + 0.08);
+		const gain = audioCtx.createGain();
+		gain.gain.setValueAtTime(0, now);
+		gain.gain.linearRampToValueAtTime(0.07, now + 0.005);
+		gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+		osc.connect(filter).connect(gain).connect(audioCtx.destination);
+		osc.start(now);
+		osc.stop(now + 0.11);
+	};
+
+	// B — sub thump: low sine sweep, longer decay, more weight
+	const playB = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.012, 0.03, 'highpass', 4000);
+		playSubThump(now, 0.11, 160, 70, 0.18);
+	};
+
+	// C — metallic ping: square wave, brighter/edgier, quick upward-then-down blip
+	const playC = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.01, 0.03, 'highpass', 6000);
+		const osc = audioCtx.createOscillator();
+		osc.type = 'square';
+		osc.frequency.setValueAtTime(1400, now);
+		osc.frequency.exponentialRampToValueAtTime(700, now + 0.06);
+		const filter = audioCtx.createBiquadFilter();
+		filter.type = 'lowpass';
+		filter.Q.value = 6;
+		filter.frequency.setValueAtTime(3200, now);
+		filter.frequency.exponentialRampToValueAtTime(900, now + 0.07);
+		const gain = audioCtx.createGain();
+		gain.gain.setValueAtTime(0, now);
+		gain.gain.linearRampToValueAtTime(0.035, now + 0.004);
+		gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+		osc.connect(filter).connect(gain).connect(audioCtx.destination);
+		osc.start(now);
+		osc.stop(now + 0.09);
+	};
+
+	// D — static click: pure filtered noise, no tonal body at all
+	const playD = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.022, 0.09, 'bandpass', 3800);
+	};
+
+	// E — two-tone confirm: quick ascending mini-chime
+	const playE = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.012, 0.025, 'highpass', 5000);
+		[520, 780].forEach((freq, i) => {
+			const delay = i * 0.045;
+			const osc = audioCtx!.createOscillator();
+			osc.type = 'triangle';
+			osc.frequency.setValueAtTime(freq, now + delay);
+			const gain = audioCtx!.createGain();
+			gain.gain.setValueAtTime(0, now + delay);
+			gain.gain.linearRampToValueAtTime(0.06, now + delay + 0.005);
+			gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.09);
+			osc.connect(gain).connect(audioCtx!.destination);
+			osc.start(now + delay);
+			osc.stop(now + delay + 0.1);
+		});
+	};
+
+	// F — CRT zap: resonant bandpass noise sweeping upward, electric character
+	const playF = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		const durationSec = 0.09;
+		const bufferSize = Math.floor(audioCtx.sampleRate * durationSec);
+		const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+		const data = buffer.getChannelData(0);
+		for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+		const noise = audioCtx.createBufferSource();
+		noise.buffer = buffer;
+		const filter = audioCtx.createBiquadFilter();
+		filter.type = 'bandpass';
+		filter.Q.value = 12;
+		filter.frequency.setValueAtTime(800, now);
+		filter.frequency.exponentialRampToValueAtTime(5000, now + durationSec);
+		const gain = audioCtx.createGain();
+		gain.gain.setValueAtTime(0.08, now);
+		gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+		noise.connect(filter).connect(gain).connect(audioCtx.destination);
+		noise.start(now);
+	};
+
+	// G — D, but brighter and snappier: higher filter center, shorter decay.
+	// Same pure-noise-click DNA as D, no added low end.
+	const playG = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.017, 0.09, 'bandpass', 5000, 1.5);
+	};
+
+	// H — D, but warmer and rounder: lower filter center, a touch longer.
+	// Still a click, not a thump — just less bright than D/G.
+	const playH = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.026, 0.09, 'bandpass', 2600, 1.5);
+	};
+
+	// I — D with just a hint of low end underneath, not a full sub sweep —
+	// this is the "closer to D but keep a little of B's depth" option.
+	const playI = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.022, 0.09, 'bandpass', 3800);
+		playSubThump(now, 0.02, 130, 90, 0.05);
+	};
+
+	// J — D as a double-tap: two quick pure noise ticks, second one quieter
+	// and a hair lower — mimics a switch's key-down + bottom-out contact
+	// bounce without adding any bass body.
+	const playJ = () => {
+		if (!audioCtx) return;
+		const now = audioCtx.currentTime;
+		playNoiseTick(now, 0.014, 0.08, 'bandpass', 4000, 1.5);
+		playNoiseTick(now + 0.035, 0.02, 0.06, 'bandpass', 3200, 1.5);
+	};
+
+	const players: Record<string, () => void> = {
+		a: playA, b: playB, c: playC, d: playD, e: playE, f: playF,
+		g: playG, h: playH, i: playI, j: playJ,
+	};
+
+	document.querySelectorAll<HTMLElement>('[data-sound]').forEach((card) => {
+		card.addEventListener('mouseenter', () => {
+			if (!audioUnlocked) return;
+			players[card.dataset.sound || '']?.();
+		});
+	});
+
+	// --- Ambient background beds (synthesized stand-ins, not real tracks —
+	// just to test the "hover a section, it breathes" interaction pattern
+	// and volume balance before sourcing licensed music). ---
+	type AmbientHandle = { stop: () => void };
+
+	// Shared chord-progression scheduler: rather than one static held chord,
+	// this cycles through a short loop of chords with a soft swell envelope
+	// per chord (fade up, hold, fade down) so it actually moves like a loop
+	// instead of just droning on a single note. Each chord's oscillators are
+	// created fresh and torn down after their swell — cheap enough at this
+	// tempo and avoids ever-growing note-stacking if a hover runs long.
+	const startChordLoop = (
+		chords: number[][],
+		chordDurationSec: number,
+		voiceType: OscillatorType,
+		peakGain: number,
+		filterHz: number,
+		filterQ: number,
+		lfoRate: number,
+		lfoDepth: number
+	): AmbientHandle => {
+		if (!audioCtx) return { stop() {} };
+		const ctx = audioCtx;
+		const startedAt = ctx.currentTime;
+		const master = ctx.createGain();
+		master.gain.setValueAtTime(0, startedAt);
+		master.gain.linearRampToValueAtTime(peakGain, startedAt + 0.6);
+
+		const filter = ctx.createBiquadFilter();
+		filter.type = 'lowpass';
+		filter.frequency.value = filterHz;
+		filter.Q.value = filterQ;
+		filter.connect(master).connect(ctx.destination);
+
+		const lfo = ctx.createOscillator();
+		lfo.frequency.value = lfoRate;
+		const lfoGain = ctx.createGain();
+		lfoGain.gain.value = lfoDepth;
+		lfo.connect(lfoGain).connect(filter.frequency);
+		lfo.start(startedAt);
+
+		let stopped = false;
+		let timeoutId: ReturnType<typeof setTimeout> | null = null;
+		let chordIndex = 0;
+		const liveNodes = new Set<OscillatorNode | GainNode>();
+
+		const playChord = (freqs: number[]) => {
+			const now = ctx.currentTime;
+			const chordGain = ctx.createGain();
+			chordGain.gain.setValueAtTime(0, now);
+			chordGain.gain.linearRampToValueAtTime(1, now + chordDurationSec * 0.2);
+			chordGain.gain.linearRampToValueAtTime(0, now + chordDurationSec);
+			chordGain.connect(filter);
+			liveNodes.add(chordGain);
+			freqs.forEach((f) => {
+				const osc = ctx.createOscillator();
+				osc.type = voiceType;
+				osc.frequency.value = f;
+				osc.connect(chordGain);
+				osc.start(now);
+				osc.stop(now + chordDurationSec + 0.05);
+				liveNodes.add(osc);
+				osc.addEventListener('ended', () => liveNodes.delete(osc));
+			});
+			setTimeout(() => liveNodes.delete(chordGain), (chordDurationSec + 0.1) * 1000);
+		};
+
+		const scheduleNext = () => {
+			if (stopped) return;
+			playChord(chords[chordIndex % chords.length]);
+			chordIndex++;
+			timeoutId = setTimeout(scheduleNext, chordDurationSec * 1000 * 0.85);
+		};
+		scheduleNext();
+
+		return {
+			stop() {
+				stopped = true;
+				if (timeoutId) clearTimeout(timeoutId);
+				const t = ctx.currentTime;
+				master.gain.cancelScheduledValues(t);
+				master.gain.setValueAtTime(master.gain.value, t);
+				master.gain.linearRampToValueAtTime(0, t + 0.4);
+				lfo.stop(t + 0.5);
+				liveNodes.forEach((n) => {
+					if (n instanceof OscillatorNode) {
+						try {
+							n.stop(t + 0.45);
+						} catch {}
+					}
+				});
+			},
+		};
+	};
+
+	// Warm Pad: a soft ii–V–I–vi-ish loop (Dm7 – G7 – Cmaj7 – Am7), the kind
+	// of gentle jazzy movement common in lofi loops, low in the mix.
+	const startWarmPad = (): AmbientHandle =>
+		startChordLoop(
+			[
+				[146.83, 174.61, 220.0, 261.63], // Dm7
+				[98.0, 123.47, 146.83, 174.61], // G7
+				[130.81, 164.81, 196.0, 246.94], // Cmaj7
+				[110.0, 130.81, 164.81, 196.0], // Am7
+			],
+			2.2,
+			'triangle',
+			0.02,
+			900,
+			0.8,
+			0.1,
+			200
+		);
+
+	// Deep Drone: a slower, lower bass-note progression (root notes only,
+	// sine) — movement without ever leaving sub/low-mid territory.
+	const startDeepDrone = (): AmbientHandle =>
+		startChordLoop(
+			[
+				[65.41], // C2
+				[51.91], // Ab1
+				[87.31], // F2
+				[98.0], // G2
+			],
+			3,
+			'sine',
+			0.024,
+			380,
+			1,
+			0.06,
+			100
+		);
+
+	const startTapeHiss = (): AmbientHandle => {
+		if (!audioCtx) return { stop() {} };
+		const ctx = audioCtx;
+		const now = ctx.currentTime;
+		const bufferSize = ctx.sampleRate * 2;
+		const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+		const data = buffer.getChannelData(0);
+		for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+		const noise = ctx.createBufferSource();
+		noise.buffer = buffer;
+		noise.loop = true;
+
+		const filter = ctx.createBiquadFilter();
+		filter.type = 'bandpass';
+		filter.frequency.value = 4500;
+		filter.Q.value = 0.6;
+
+		const master = ctx.createGain();
+		master.gain.setValueAtTime(0, now);
+		master.gain.linearRampToValueAtTime(0.014, now + 0.5);
+
+		noise.connect(filter).connect(master).connect(ctx.destination);
+		noise.start(now);
+
+		return {
+			stop() {
+				const t = ctx.currentTime;
+				master.gain.cancelScheduledValues(t);
+				master.gain.setValueAtTime(master.gain.value, t);
+				master.gain.linearRampToValueAtTime(0, t + 0.3);
+				noise.stop(t + 0.35);
+			},
+		};
+	};
+
+	const ambientStarters: Record<string, () => AmbientHandle> = {
+		'1': startWarmPad,
+		'2': startDeepDrone,
+		'3': startTapeHiss,
+	};
+	const activeAmbient = new Map<HTMLElement, AmbientHandle>();
+
+	document.querySelectorAll<HTMLElement>('[data-ambient]').forEach((container) => {
+		container.addEventListener('mouseenter', () => {
+			if (!audioUnlocked) return;
+			const starter = ambientStarters[container.dataset.ambient || ''];
+			if (!starter) return;
+			activeAmbient.get(container)?.stop();
+			activeAmbient.set(container, starter());
+		});
+		container.addEventListener('mouseleave', () => {
+			activeAmbient.get(container)?.stop();
+			activeAmbient.delete(container);
+		});
+	});
+</script>

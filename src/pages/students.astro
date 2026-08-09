@@ -135,9 +135,27 @@ widths={[800, 1200, 1920]}
 <div class="absolute inset-0 bg-white/[0.82] dark:bg-black/[0.62]"></div>
 </div>
 <PageContainer>
-<Heading level={1} size="4xl" class="mb-4">
+<div class="flex items-start justify-between gap-4 mb-4">
+<Heading level={1} size="4xl" class="mb-0">
 Student Work
 </Heading>
+<button
+id="sound-toggle"
+class="border border-border rounded-md w-10 h-10 flex items-center justify-center bg-transparent transition-colors hover:bg-card shrink-0"
+aria-label="Toggle hover sound"
+title="Toggle hover sound"
+>
+<svg id="sound-on-icon" class="h-4 w-4 text-foreground-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5L6 9H2v6h4l5 4V5z" />
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.5 8.5a5 5 0 010 7" />
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.5 5.5a9 9 0 010 13" />
+</svg>
+<svg id="sound-off-icon" class="h-4 w-4 text-foreground-secondary hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5L6 9H2v6h4l5 4V5z" />
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 9l6 6M22 9l-6 6" />
+</svg>
+</button>
+</div>
 <Text size="lg" variant="secondary" class="mb-4">
 One of the most rewarding parts of teaching is watching students grow as artists. This page highlights a selection of work created across a variety of courses over the years. It is by no means a complete archive, but rather a small snapshot of the projects, experiments, and portfolio pieces students have created along the way.
 </Text>
@@ -316,13 +334,121 @@ window.__pinnedStudents = pinnedStudents;
 </style>
 
 <script>
-// --- Preloader prototype (this page only) ---
+// --- Hover sound prototype (this page only) ---
+// A synthesized "blip" via Web Audio API rather than an audio file — keeps
+// this dependency-free and easy to re-tune. Browsers block audio until the
+// visitor has made a real gesture (click/keydown/touch — hover doesn't
+// count), so nothing plays until the first click anywhere on the page;
+// that's a platform restriction, not a bug here.
+let audioCtx: AudioContext | null = null;
+let audioUnlocked = false;
+
+const ensureAudioContext = () => {
+  if (!audioCtx) {
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    audioCtx = new Ctx();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  audioUnlocked = true;
+};
+document.addEventListener('pointerdown', ensureAudioContext, { once: true });
+
+const isSoundMuted = () => localStorage.getItem('ui-sound-muted') === '1';
+
+// A short filtered-noise burst run through this page's shared AudioContext —
+// the "digital tick" transient layered under both the hover blip and the
+// preloader's boot confirm below, standing in for a HUD/terminal click
+// rather than anything musical.
+const playNoiseTick = (now: number, durationSec: number, peakGain: number, filterHz: number) => {
+  if (!audioCtx) return;
+  const bufferSize = Math.max(1, Math.floor(audioCtx.sampleRate * durationSec));
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'highpass';
+  filter.frequency.value = filterHz;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(peakGain, now);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+  noise.connect(filter).connect(gain).connect(audioCtx.destination);
+  noise.start(now);
+};
+
+// Hover cue: a filtered noise tick plus a resonant lowpass-swept triangle
+// dropping in pitch — reads as a mechanical HUD "select" rather than a
+// musical chime. Deliberately understated; it's a hover, not a confirm.
+const playHoverBlip = () => {
+  if (!audioUnlocked || !audioCtx || isSoundMuted()) return;
+  const now = audioCtx.currentTime;
+
+  playNoiseTick(now, 0.015, 0.035, 5000);
+
+  const osc = audioCtx.createOscillator();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(380, now);
+  osc.frequency.exponentialRampToValueAtTime(190, now + 0.08);
+
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.Q.value = 3;
+  filter.frequency.setValueAtTime(1800, now);
+  filter.frequency.exponentialRampToValueAtTime(500, now + 0.08);
+
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.07, now + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+
+  osc.connect(filter).connect(gain).connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.11);
+};
+
+// Preloader "boot confirm": the same noise-tick + swept-triangle DNA as the
+// hover cue, but a beat longer and layered with a second, lower voice a
+// fifth below — a small interval rather than a single tone reads as a
+// "systems online" confirm instead of a UI click.
+const playBootConfirm = () => {
+  if (!audioUnlocked || !audioCtx || isSoundMuted()) return;
+  const now = audioCtx.currentTime;
+
+  playNoiseTick(now, 0.03, 0.05, 3500);
+
+  [220, 220 * 1.5].forEach((freq, i) => {
+    const osc = audioCtx!.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq * 1.9, now);
+    osc.frequency.exponentialRampToValueAtTime(freq, now + 0.16);
+
+    const filter = audioCtx!.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.Q.value = 2.5;
+    filter.frequency.setValueAtTime(2400, now);
+    filter.frequency.exponentialRampToValueAtTime(700, now + 0.2);
+
+    const gain = audioCtx!.createGain();
+    const delay = i * 0.03;
+    gain.gain.setValueAtTime(0, now + delay);
+    gain.gain.linearRampToValueAtTime(0.06, now + delay + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.28);
+
+    osc.connect(filter).connect(gain).connect(audioCtx!.destination);
+    osc.start(now + delay);
+    osc.stop(now + delay + 0.3);
+  });
+};
+
 const initPreloader = () => {
   const pre = document.getElementById('preloader');
   if (!pre || pre.dataset.wired) return;
   pre.dataset.wired = '1';
   const enter = () => {
     if (pre.classList.contains('preloader-exit')) return;
+    ensureAudioContext();
+    playBootConfirm();
     pre.classList.add('preloader-exit');
     setTimeout(() => {
       (pre as HTMLElement).style.display = 'none';
@@ -338,8 +464,32 @@ const initPreloader = () => {
   );
 };
 
+const initSoundToggle = () => {
+  const btn = document.getElementById('sound-toggle');
+  if (!btn) return;
+  const fresh = btn.cloneNode(true) as HTMLElement;
+  btn.parentNode?.replaceChild(fresh, btn);
+  const freshOn = document.getElementById('sound-on-icon');
+  const freshOff = document.getElementById('sound-off-icon');
+  const updateIcon = () => {
+    const muted = isSoundMuted();
+    freshOn?.classList.toggle('hidden', muted);
+    freshOff?.classList.toggle('hidden', !muted);
+  };
+  updateIcon();
+  fresh.addEventListener('click', () => {
+    ensureAudioContext();
+    localStorage.setItem('ui-sound-muted', isSoundMuted() ? '0' : '1');
+    updateIcon();
+  });
+};
+
 const initStudentWork = () => {
 initPreloader();
+initSoundToggle();
+document.querySelectorAll<HTMLElement>('.spotlight-card').forEach((card) => {
+  card.addEventListener('mouseenter', playHoverBlip);
+});
 
 // --- Video autoplay via IntersectionObserver ---
 // Pre-warm each video's data well before it's actually visible (600px
