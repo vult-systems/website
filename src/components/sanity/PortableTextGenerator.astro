@@ -254,7 +254,7 @@ const rowCategories = categories
     position: absolute;
     inset: 0;
   }
-  /* "No signal" / "Finding reference…" / error states all share this same
+  /* "No signal" / "Decoding species…" / error states all share this same
      class (see PortableTextGenerator's script — the latter two are set via
      innerHTML at runtime, hence :global() same as img/a above), styled as
      a dead CRT screen: animated grain (feTurbulence noise drifting on
@@ -568,7 +568,7 @@ const rowCategories = categories
   };
 
   // Preloads off-DOM and only swaps the markup in once the photo has
-  // actually decoded, so the CRT "Finding reference…" static stays on
+  // actually decoded, so the CRT "Decoding species…" static stays on
   // screen for the full wait instead of the loading state vanishing the
   // instant this is called and leaving a blank box behind while the
   // network fetch is still in flight (this matters for curated images
@@ -665,7 +665,7 @@ const rowCategories = categories
         if (valueEl) scrambleReveal(valueEl, item.name || '');
         if (traitsEl) scrambleReveal(traitsEl, (item.traits || []).join(' · '));
         if (imageEl) {
-          imageEl.innerHTML = '<div class="pt-gen-loading">Finding reference…</div>';
+          imageEl.innerHTML = '<div class="pt-gen-loading">Decoding species…</div>';
           const curated = item.curatedImages;
           if (curated?.length) {
             const choice = pick(curated);
