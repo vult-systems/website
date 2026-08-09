@@ -364,6 +364,161 @@ export const blockContentType = defineType({
     }),
     defineArrayMember({
       type: 'object',
+      name: 'generator',
+      title: 'Generator',
+      description:
+        'An interactive "roll a random constraint" widget (e.g. the Alien Bust project: roll an Earth-insect analog + a personality + a shape language). Reusable across projects — each generator defines its own categories and items.',
+      fields: [
+        {
+          name: 'resultLabel',
+          title: 'Result label',
+          type: 'string',
+          description: 'Label above the generated name, e.g. "Your Alien".',
+          initialValue: 'Your Result',
+        },
+        {
+          name: 'generateIdentity',
+          title: 'Generate a name + specimen ID',
+          type: 'boolean',
+          description: 'Shows a randomly generated name, specimen ID, and file-naming example above the categories.',
+          initialValue: true,
+        },
+        {
+          name: 'specimenPrefix',
+          title: 'Specimen ID prefix',
+          type: 'string',
+          initialValue: 'XENO',
+          hidden: ({ parent }) => !parent?.generateIdentity,
+        },
+        {
+          name: 'categories',
+          title: 'Categories',
+          description: 'The "formula" columns (e.g. Creature Reference + Personality + Shape Language). Keep each category\'s items the same kind as the category itself.',
+          type: 'array',
+          validation: (Rule) => Rule.min(1).max(5),
+          of: [
+            {
+              type: 'object',
+              name: 'category',
+              fields: [
+                { name: 'label', title: 'Label', type: 'string', validation: (Rule) => Rule.required() },
+                {
+                  name: 'kind',
+                  title: 'Item kind',
+                  type: 'string',
+                  options: {
+                    list: [
+                      { title: 'Image (searches Wikimedia Commons)', value: 'image' },
+                      { title: 'Word / phrase', value: 'word' },
+                      { title: 'Shape icon', value: 'shape' },
+                    ],
+                    layout: 'radio',
+                  },
+                  validation: (Rule) => Rule.required(),
+                },
+                {
+                  name: 'imageAspect',
+                  title: 'Reference photo shape',
+                  type: 'string',
+                  description: 'Only used when Item kind is Image.',
+                  options: {
+                    list: [
+                      { title: 'Standard (4:3)', value: 'standard' },
+                      { title: 'Wide (16:9)', value: 'wide' },
+                    ],
+                    layout: 'radio',
+                  },
+                  initialValue: 'wide',
+                  hidden: ({ parent }) => parent?.kind !== 'image',
+                },
+                {
+                  name: 'items',
+                  title: 'Items',
+                  type: 'array',
+                  validation: (Rule) => Rule.min(1),
+                  of: [
+                    {
+                      type: 'object',
+                      name: 'imageItem',
+                      title: 'Image item',
+                      fields: [
+                        { name: 'name', title: 'Display name', type: 'string', validation: (Rule) => Rule.required() },
+                        {
+                          name: 'searchQuery',
+                          title: 'Wikimedia search query',
+                          type: 'string',
+                          description: 'What to search Wikimedia Commons for (usually the scientific name for accuracy). Falls back to the display name if left empty.',
+                        },
+                        {
+                          name: 'traits',
+                          title: 'Reference traits',
+                          type: 'array',
+                          of: [{ type: 'string' }],
+                        },
+                      ],
+                      preview: { select: { title: 'name' } },
+                    },
+                    {
+                      type: 'object',
+                      name: 'wordItem',
+                      title: 'Word item',
+                      fields: [
+                        { name: 'label', title: 'Word / phrase', type: 'string', validation: (Rule) => Rule.required() },
+                        { name: 'description', title: 'Description', type: 'text', rows: 2 },
+                      ],
+                      preview: { select: { title: 'label', subtitle: 'description' } },
+                    },
+                    {
+                      type: 'object',
+                      name: 'shapeItem',
+                      title: 'Shape item',
+                      fields: [
+                        { name: 'label', title: 'Label', type: 'string', validation: (Rule) => Rule.required() },
+                        { name: 'description', title: 'Description', type: 'text', rows: 2 },
+                        {
+                          name: 'shape',
+                          title: 'Icon',
+                          type: 'string',
+                          options: {
+                            list: [
+                              { title: 'Circle', value: 'circle' },
+                              { title: 'Square', value: 'square' },
+                              { title: 'Triangle', value: 'triangle' },
+                              { title: 'Circle + Square', value: 'circleSquare' },
+                              { title: 'Circle + Triangle', value: 'circleTriangle' },
+                              { title: 'Square + Triangle', value: 'squareTriangle' },
+                            ],
+                            layout: 'dropdown',
+                          },
+                          validation: (Rule) => Rule.required(),
+                        },
+                      ],
+                      preview: { select: { title: 'label', subtitle: 'shape' } },
+                    },
+                  ],
+                },
+              ],
+              preview: {
+                select: { title: 'label', kind: 'kind', items: 'items' },
+                prepare: ({ title, kind, items }: { title?: string; kind?: string; items?: unknown[] }) => ({
+                  title: title || 'Category',
+                  subtitle: `${kind || 'word'} · ${items?.length ?? 0} item${items?.length === 1 ? '' : 's'}`,
+                }),
+              },
+            },
+          ],
+        },
+      ],
+      preview: {
+        select: { resultLabel: 'resultLabel', categories: 'categories' },
+        prepare: ({ resultLabel, categories }: { resultLabel?: string; categories?: unknown[] }) => ({
+          title: resultLabel ? `Generator (${resultLabel})` : 'Generator',
+          subtitle: `${categories?.length ?? 0} categor${categories?.length === 1 ? 'y' : 'ies'}`,
+        }),
+      },
+    }),
+    defineArrayMember({
+      type: 'object',
       name: 'slideBreak',
       title: 'Slide break',
       description:

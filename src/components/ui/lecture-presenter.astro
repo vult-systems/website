@@ -270,6 +270,174 @@
   }
   #lecture-presenter #lp-slide .spotlight-card::after { display: none !important; }
 
+  /* Generator block: a completely different arrangement from the reading
+     page — image left (roughly half width, vertical), identity + Generate
+     button along the top right, trait cards and the result stacked below
+     that. Same markup/area-names as the default layout (see
+     PortableTextGenerator's .pt-gen-grid comment); only the area MAP and
+     per-piece sizing change here. */
+  /* Right column (identity/traits/result) keeps normal, consistent gaps
+     between its own cards — no artificial stretching to hit a target
+     height, which was creating uneven dead space between them. The image
+     (right below) just matches whatever height that naturally-packed
+     stack comes out to, via the flex-fill chain, so .pt-generator itself
+     is NOT given an explicit height either — it sizes to its content. */
+  /* Everything below sizes off cqh (the stage's own height), not fixed
+     rem/px — a title+subtitle slide can leave anywhere from ~40% to ~75%
+     of the 16:9 stage for the body depending on viewport size (the head
+     scales with vw, not cqh, and a browser chrome's fixed-px overhead eats
+     a much bigger share of a short window than a tall one), so a card
+     tuned to look right at one window size silently overflowed the slide
+     at another (measured: fit at 1920x1080, 36px over at 1440x900, 258px
+     over — Shape Language/Design Direction fully cut off — at 1280x720).
+     cqh-based sizing keeps the same proportions across all of them. */
+  #lecture-presenter #lp-slide .pt-generator { overflow: hidden; }
+  #lecture-presenter #lp-slide .pt-gen-grid {
+    row-gap: clamp(0.35rem, 1.2cqh, 0.6rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* minmax(0, auto), not bare auto — .pt-gen-heroes spans all 3 rows, and
+       a spanning item's own min-content size otherwise inflates each auto
+       track it crosses well past what identity/traits/result actually
+       need (a known CSS Grid behavior with row-spanning items). minmax(0,
+       auto) tells the tracks to size from content as normal but drop that
+       extra contribution, so identity's card stops rendering with a huge
+       gap above its text. */
+    grid-template-rows: minmax(0, auto) minmax(0, auto) minmax(0, auto);
+    grid-template-areas:
+      'image identity'
+      'image traits'
+      'image result';
+    column-gap: 1rem;
+  }
+  #lecture-presenter #lp-slide .pt-gen-identity-row {
+    margin: clamp(0.35rem, 1.2cqh, 0.6rem) 0 0;
+    padding: clamp(0.4rem, 1.3cqh, 0.85rem) clamp(0.6rem, 1.6cqw, 1rem);
+    gap: clamp(0.5rem, 1.6cqw, 1rem);
+  }
+  #lecture-presenter #lp-slide .pt-gen-name { font-size: clamp(0.95rem, 2.6cqh, 1.2rem); }
+  #lecture-presenter #lp-slide .pt-gen-specimen { margin-top: clamp(0.2rem, 0.6cqh, 0.35rem); }
+  /* The Generate button sits under the invisible #lp-zone-next click zone
+     (right 2/5 of the slide, used for click-to-advance) — without its own
+     stacking order it's unreachable, same issue and same fix as
+     .model-viewer-frame's z-index: 5 below for orbit-drag on 3D models. */
+  #lecture-presenter #lp-slide .pt-gen-button-wrap {
+    position: relative;
+    z-index: 5;
+  }
+  #lecture-presenter #lp-slide .pt-gen-kicker {
+    margin-bottom: clamp(0.2rem, 0.7cqh, 0.4rem);
+    font-size: clamp(0.55rem, 1.3cqh, 0.65rem);
+  }
+  /* The image fills whatever height the right column's stacked content
+     (identity + traits + result) naturally comes out to — a flex chain
+     rather than a guessed cqh number, so it stays correct regardless of
+     content length or whether the slide has a title.
+     min-height: 0 on .pt-gen-heroes is load-bearing, not decorative: grid
+     items default to min-height: auto, which — for an item spanning
+     multiple rows — lets its content's automatic minimum size feed back
+     into sizing the auto row tracks it spans, the same "spanning item
+     inflates its tracks" issue minmax(0, auto) above was added to stop.
+     minmax(0, auto) only excludes the spanning item from *max-content*
+     track sizing; it doesn't zero out this automatic minimum. Once a real
+     (as opposed to the placeholder) Wikimedia photo loads, its intrinsic
+     aspect ratio becomes exactly this kind of content minimum and reflates
+     every row — measured: all three row tracks jumping from ~92/218/121px
+     to 154/242/184px the moment a 960x1024 portrait photo loaded in. */
+  #lecture-presenter #lp-slide .pt-gen-heroes {
+    grid-area: image;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    gap: clamp(0.25rem, 0.8cqh, 0.4rem);
+  }
+  #lecture-presenter #lp-slide .pt-gen-hero {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  #lecture-presenter #lp-slide .pt-gen-image {
+    order: 2;
+    flex: 1 1 auto;
+    min-height: 0;
+    aspect-ratio: unset;
+    max-height: none;
+    width: 100%;
+  }
+  /* The generic img sizing rule elsewhere in this file (max-height: 46cqh;
+     width: auto) is meant for a plain content figure and wins on
+     specificity (it's ID-scoped) against the component's own scoped
+     styles — override it back to fill the generator's own box instead of
+     shrinking to an arbitrary height and centering at its intrinsic width.
+     position: absolute (on top of .pt-gen-image's own position: relative,
+     inherited from the base styles) takes the img fully out of flow — not
+     just visual belt-and-suspenders alongside the min-height: 0 fixes
+     above, but the actual fix for the root issue: an in-flow img, even
+     sized to width/height: 100%, still contributes its own intrinsic
+     aspect ratio to the flex item's and the row-spanning grid item's
+     automatic minimum size (that's what was still inflating the card after
+     a real, differently-proportioned Wikimedia photo loaded in, even with
+     min-height: 0 several layers up the chain). An out-of-flow img can't
+     contribute to any ancestor's size at all, however tall or narrow the
+     fetched photo turns out to be. */
+  /* opacity: 1 !important overrides this file's own generic Present-mode
+     reveal fade (img{opacity:0} / img.lp-loaded{opacity:1} below) — that
+     fade is applied once, by render(), to whatever <img> tags exist in the
+     slide's HTML at the moment it's set. This image is injected later, by
+     PortableTextGenerator's own async Wikimedia fetch, so render() never
+     sees it and it never gets .lp-loaded — it would otherwise stay
+     invisible forever. It doesn't need that fade anyway: the surrounding
+     .pt-gen-loading placeholder already covers the loading state. */
+  #lecture-presenter #lp-slide .pt-gen-image img {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin-inline: 0 !important;
+    border-radius: 0 !important;
+    object-fit: cover;
+    opacity: 1 !important;
+  }
+  /* Caption (Creature Reference / Giraffe Weevil) above the photo, not below —
+     .pt-gen-hero is the flex-column set up above, so this is a pure order
+     swap, no markup change. */
+  #lecture-presenter #lp-slide .pt-gen-hero .pt-gen-card-body {
+    order: 1;
+    flex: 0 0 auto;
+    padding: clamp(0.3rem, 1cqh, 0.5rem) clamp(0.5rem, 1.4cqw, 0.7rem);
+  }
+  #lecture-presenter #lp-slide .pt-gen-hero .pt-gen-value { font-size: clamp(0.85rem, 2.2cqh, 1.05rem); }
+  #lecture-presenter #lp-slide .pt-gen-traits { display: none; }
+  /* Personality / Shape Language / Design Direction stacked vertically
+     rather than the first two side by side — requested explicitly, reads
+     more like a sequence than a 2-then-1 grid. */
+  #lecture-presenter #lp-slide .pt-gen-row {
+    grid-template-columns: 1fr;
+    padding: 0;
+    gap: clamp(0.25rem, 0.8cqh, 0.4rem);
+  }
+  #lecture-presenter #lp-slide .pt-gen-row .pt-gen-card-body {
+    padding: clamp(0.3rem, 0.9cqh, 0.45rem) clamp(0.45rem, 1.3cqw, 0.65rem);
+  }
+  #lecture-presenter #lp-slide .pt-gen-value { font-size: clamp(0.85rem, 2cqh, 1rem); }
+  #lecture-presenter #lp-slide .pt-gen-sub {
+    margin-top: clamp(0.2rem, 0.6cqh, 0.3rem);
+    font-size: clamp(0.62rem, 1.5cqh, 0.72rem);
+  }
+  #lecture-presenter #lp-slide .pt-gen-shape-mark {
+    height: clamp(24px, 5cqh, 40px);
+    margin-bottom: clamp(0.25rem, 0.8cqh, 0.5rem);
+  }
+  #lecture-presenter #lp-slide .pt-gen-shape-mark :global(svg) { width: auto; height: 100%; }
+  #lecture-presenter #lp-slide .pt-gen-result {
+    margin: clamp(0.25rem, 0.8cqh, 0.4rem) 0 0;
+    padding: clamp(0.3rem, 0.9cqh, 0.45rem) clamp(0.5rem, 1.4cqw, 0.7rem);
+  }
+  #lecture-presenter #lp-slide .pt-gen-result p { font-size: clamp(0.68rem, 1.6cqh, 0.78rem); }
+
   /* Image alignment (figure[data-align]) */
   #lecture-presenter #lp-slide figure[data-align='left'] { margin-inline: 0 auto; max-width: 70%; }
   #lecture-presenter #lp-slide figure[data-align='right'] { margin-inline: auto 0; max-width: 70%; }

@@ -1,0 +1,512 @@
+---
+import Button from '@/components/ui/button.astro';
+
+const { node } = Astro.props;
+
+const resultLabel = node?.resultLabel || 'Your Result';
+const generateIdentity = node?.generateIdentity !== false;
+const specimenPrefix = node?.specimenPrefix || 'XENO';
+const categories = (node?.categories ?? []) as Array<{
+  _key?: string;
+  label: string;
+  kind: 'image' | 'word' | 'shape';
+  items: Array<Record<string, unknown>>;
+}>;
+
+// Stable-ish per-instance id from the Sanity block key, sanitized for use
+// as a DOM id/selector (falls back to a random one if a block somehow has
+// no _key, e.g. hand-authored test data).
+const instanceId = `gen-${(node?._key || Math.random().toString(36).slice(2)).replace(/[^a-zA-Z0-9_-]/g, '')}`;
+
+const categoriesJson = JSON.stringify(categories);
+
+// Image categories become full-width hero banners at the top; everything
+// else sits in a row below that reflows by *available space* (auto-fit),
+// not a viewport breakpoint — the real constraint is the narrow prose
+// column this renders inside, not the browser width, so a media query
+// alone can't tell when it's actually cramped.
+const heroCategories = categories
+  .map((cat, i) => ({ cat, i }))
+  .filter(({ cat }) => cat.kind === 'image');
+const rowCategories = categories
+  .map((cat, i) => ({ cat, i }))
+  .filter(({ cat }) => cat.kind !== 'image');
+---
+
+{categories.length > 0 && (
+  <div
+    class="pt-generator my-8"
+    id={instanceId}
+    data-categories={categoriesJson}
+    data-generate-identity={generateIdentity ? '1' : '0'}
+    data-specimen-prefix={specimenPrefix}
+  >
+    <div class="pt-gen-grid">
+      <div class="pt-gen-identity-row">
+        {generateIdentity && (
+          <div class="pt-gen-identity">
+            <div class="pt-gen-kicker">{resultLabel}</div>
+            <div class="pt-gen-name">—</div>
+            <div class="pt-gen-specimen">—</div>
+          </div>
+        )}
+        <div class="pt-gen-button-wrap">
+          <Button variant="primary" size="sm" type="button" class="pt-gen-button">Generate</Button>
+        </div>
+      </div>
+
+      {heroCategories.length > 0 && (
+        <div class="pt-gen-heroes">
+          {heroCategories.map(({ cat, i }) => (
+            <article class="pt-gen-card pt-gen-hero" data-category-index={i} data-kind={cat.kind}>
+              <div class="pt-gen-image" data-role="image" data-aspect={cat.imageAspect === 'standard' ? 'standard' : 'wide'}>
+                <div class="pt-gen-loading">—</div>
+              </div>
+              <div class="pt-gen-card-body">
+                <div class="pt-gen-kicker">{cat.label}</div>
+                <div class="pt-gen-value" data-role="value">—</div>
+                <div class="pt-gen-traits">
+                  <div class="pt-gen-kicker">Reference traits</div>
+                  <p data-role="traits">—</p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {rowCategories.length > 0 && (
+        <div class="pt-gen-row">
+          {rowCategories.map(({ cat, i }) => (
+            <article class="pt-gen-card" data-category-index={i} data-kind={cat.kind}>
+              <div class="pt-gen-card-body">
+                <div class="pt-gen-kicker">{cat.label}</div>
+                {cat.kind === 'shape' && <div class="pt-gen-shape-mark" data-role="shape"></div>}
+                <div class="pt-gen-value" data-role="value">—</div>
+                <div class="pt-gen-sub" data-role="sub"></div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      <div class="pt-gen-result">
+        <div class="pt-gen-kicker">Design Direction</div>
+        <p data-role="direction">—</p>
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .pt-generator {
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    background: hsl(var(--card-bg));
+  }
+  /* Every section (identity+button row, hero image, trait row, result) is
+     a direct grid item so it can be freely rearranged per context — the
+     reading-page layout below, and a completely different Present-mode
+     layout (see lecture-presenter.astro) — by only changing
+     grid-template-areas, never the markup. Area names stay identical
+     across both layouts; only where each name sits in the map changes.
+     There's no separate title/intro here on purpose — that's the
+     surrounding lecture thread's own title/description (or the slide's
+     title in Present mode), not something this block repeats. */
+  .pt-gen-grid {
+    display: grid;
+    grid-template-areas:
+      'identity'
+      'image'
+      'traits'
+      'result';
+  }
+  /* Identity text and the Generate button share one flex row (rather than
+     being separate grid cells with their own, easily-mismatched vertical
+     alignment) so they align on the same line by construction. Styled as
+     its own card — same border/background/radius as .pt-gen-card — so it
+     reads as one of the set rather than a differently-treated header. */
+  .pt-gen-identity-row {
+    grid-area: identity;
+    margin: 1.25rem 1.25rem 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) - 2px);
+    background: hsl(var(--background));
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .pt-gen-button-wrap {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .pt-gen-kicker {
+    margin-bottom: 0.4rem;
+    font-family: var(--font-ibm-plex);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: hsl(var(--foreground-muted));
+  }
+  .pt-gen-name {
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: hsl(var(--foreground));
+  }
+  .pt-gen-specimen {
+    margin-top: 0.35rem;
+    font-family: var(--font-ibm-plex);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: hsl(var(--foreground-muted));
+  }
+  .pt-gen-heroes {
+    grid-area: image;
+    padding: 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  /* Reflows by actual available space, not a viewport breakpoint — this
+     renders inside a prose column that's already narrower than the
+     viewport (course nav + "on this page" sidebars eat the difference),
+     so a media query can't tell when it's genuinely cramped. */
+  .pt-gen-row {
+    grid-area: traits;
+    padding: 0 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  .pt-gen-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) - 2px);
+    background: hsl(var(--background));
+  }
+  .pt-gen-image {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(var(--card-bg));
+  }
+  .pt-gen-image[data-aspect='wide'] {
+    aspect-ratio: 16 / 9;
+  }
+  .pt-gen-image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .pt-gen-image :global(a) {
+    position: absolute;
+    inset: 0;
+  }
+  .pt-gen-image :global(.pt-gen-loading) {
+    height: 100%;
+    min-height: 90px;
+    display: grid;
+    place-items: center;
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.7rem;
+    color: hsl(var(--foreground-muted));
+  }
+  .pt-gen-card-body {
+    padding: 0.85rem;
+  }
+  .pt-gen-value {
+    font-size: 1rem;
+    line-height: 1.25;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: hsl(var(--foreground));
+  }
+  .pt-gen-hero .pt-gen-value {
+    font-size: 1.3rem;
+  }
+  .pt-gen-hero .pt-gen-card-body {
+    padding: 1rem 1.1rem;
+  }
+  .pt-gen-sub {
+    margin-top: 0.3rem;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: hsl(var(--foreground-muted));
+  }
+  .pt-gen-sub:empty {
+    display: none;
+  }
+  .pt-gen-traits {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid hsl(var(--border));
+  }
+  .pt-gen-traits p {
+    margin: 0;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    color: hsl(var(--foreground-muted));
+  }
+  .pt-gen-shape-mark {
+    height: 40px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    color: hsl(var(--foreground));
+  }
+  /* svg (and the image/loading elements below) are inserted at runtime via
+     innerHTML, so they never carry Astro's scoping attribute — a plain
+     scoped selector would silently never match them. Same issue and same
+     fix as PortableTextModel.astro's .mv-callout. */
+  .pt-gen-shape-mark :global(svg) {
+    width: 48px;
+    height: 40px;
+    overflow: visible;
+  }
+  .pt-gen-shape-mark :global(circle),
+  .pt-gen-shape-mark :global(rect),
+  .pt-gen-shape-mark :global(polygon) {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+  }
+  .pt-gen-result {
+    grid-area: result;
+    margin: 1rem 1.25rem 1.25rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) - 2px);
+  }
+  .pt-gen-result p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: hsl(var(--foreground-secondary));
+  }
+  .pt-gen-result :global(strong) {
+    color: hsl(var(--foreground));
+  }
+</style>
+
+<script>
+  const starts = ['Va', 'Xe', 'Kor', 'Tha', 'Oru', 'Vel', 'Ka', 'Ny', 'Sa', 'Ira', 'Zel', 'Mor', 'Ae', 'Ru', 'Tal', 'Vor', 'Eli', 'Sha', 'Ky', 'Dra'];
+  const mids = ['ra', 'lo', 'ki', 'ven', 'tha', 'ri', 'za', 'mon', 'shi', 'vek', 'nar', 'li', 'ro', 'sen', 'kai', 'mer'];
+  const ends = ['n', 'x', 's', 'r', 'th', 'k', 'a', 'is', 'on', 'ek', 'ar', 'en', 'ix', 'or', 'ai'];
+  const pick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+  const shapeSVG: Record<string, string> = {
+    circle: `<svg viewBox="0 0 48 40"><circle cx="20" cy="20" r="15"/></svg>`,
+    square: `<svg viewBox="0 0 48 40"><rect x="7" y="6" width="30" height="30" rx="2"/></svg>`,
+    triangle: `<svg viewBox="0 0 48 40"><polygon points="22,4 40,36 4,36"/></svg>`,
+    circleSquare: `<svg viewBox="0 0 48 40"><circle cx="14" cy="20" r="11"/><rect x="24" y="9" width="22" height="22" rx="2"/></svg>`,
+    circleTriangle: `<svg viewBox="0 0 48 40"><circle cx="14" cy="21" r="10"/><polygon points="34,7 46,33 22,33"/></svg>`,
+    squareTriangle: `<svg viewBox="0 0 48 40"><rect x="1" y="11" width="20" height="20" rx="2"/><polygon points="36,6 47,33 25,33"/></svg>`,
+  };
+
+  interface GenItem {
+    _type?: string;
+    name?: string;
+    searchQuery?: string;
+    traits?: string[];
+    label?: string;
+    description?: string;
+    shape?: string;
+  }
+  interface GenCategory {
+    label: string;
+    kind: 'image' | 'word' | 'shape';
+    items: GenItem[];
+  }
+
+  const makeName = () => {
+    const name = pick(starts) + pick(mids) + pick(ends);
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+  const makeSpecimenId = (prefix: string, name: string) => {
+    const letters = name.replace(/[^a-z]/gi, '').toUpperCase();
+    return `${prefix}-${letters.slice(0, 3).padEnd(3, 'X')}`;
+  };
+
+  async function fetchReferenceImage(el: HTMLElement, query: string) {
+    el.innerHTML = '<div class="pt-gen-loading">Finding reference…</div>';
+    const url = new URL('https://commons.wikimedia.org/w/api.php');
+    const params: Record<string, string> = {
+      action: 'query',
+      generator: 'search',
+      gsrsearch: `"${query}"`,
+      gsrnamespace: '6',
+      gsrlimit: '12',
+      prop: 'imageinfo',
+      iiprop: 'url|mime',
+      iiurlwidth: '800',
+      format: 'json',
+      origin: '*',
+    };
+    Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+    try {
+      const data = await fetch(url.toString()).then((r) => r.json());
+      const pages: any[] = Object.values(data.query?.pages || {}).filter((p: any) => {
+        const info = p.imageinfo?.[0];
+        return info?.thumburl && (info.mime || '').startsWith('image/') && !/svg/i.test(info.mime || '');
+      });
+      const page = pick(pages);
+      if (!page) throw new Error('no results');
+      const info = page.imageinfo[0];
+      el.innerHTML = `<img src="${info.thumburl}" alt="Reference" data-no-lightbox><a href="${info.descriptionurl}" target="_blank" rel="noopener" aria-label="Open image source"></a>`;
+      // In Present mode the hero image is flex-filled to match the right
+      // column, but a *real* photo's intrinsic aspect ratio still leaks
+      // into CSS Grid's automatic-minimum-size calc for the row-spanning
+      // hero column (see the min-height: 0 comment on .pt-gen-heroes in
+      // lecture-presenter.astro) — measured, this can still grow the card
+      // well past what fitPresentGenerator sized it for using only the
+      // pre-load placeholder. Re-fit once the real photo is decoded.
+      const img = el.querySelector('img');
+      const root = el.closest('.pt-generator') as HTMLElement | null;
+      if (img && root) img.addEventListener('load', () => fitPresentGenerator(root));
+    } catch {
+      el.innerHTML = '<div class="pt-gen-loading">Reference image unavailable.<br>Try generating again.</div>';
+    }
+  }
+
+  function generate(root: HTMLElement) {
+    let categories: GenCategory[] = [];
+    try {
+      categories = JSON.parse(root.dataset.categories || '[]');
+    } catch {
+      return;
+    }
+    const generateIdentity = root.dataset.generateIdentity === '1';
+    const specimenPrefix = root.dataset.specimenPrefix || 'XENO';
+
+    let name = '';
+    if (generateIdentity) {
+      name = makeName();
+      const specimenId = makeSpecimenId(specimenPrefix, name);
+      const nameEl = root.querySelector<HTMLElement>('.pt-gen-name');
+      const idEl = root.querySelector<HTMLElement>('.pt-gen-specimen');
+      if (nameEl) nameEl.textContent = name;
+      if (idEl) idEl.textContent = specimenId;
+    }
+
+    const picks: { label: string; item: GenItem }[] = [];
+    root.querySelectorAll<HTMLElement>('.pt-gen-card').forEach((card) => {
+      const idx = Number(card.dataset.categoryIndex);
+      const cat = categories[idx];
+      if (!cat || !cat.items?.length) return;
+      const item = pick(cat.items);
+      picks.push({ label: cat.label, item });
+
+      const valueEl = card.querySelector<HTMLElement>('[data-role="value"]');
+      const subEl = card.querySelector<HTMLElement>('[data-role="sub"]');
+      const traitsEl = card.querySelector<HTMLElement>('[data-role="traits"]');
+      const shapeEl = card.querySelector<HTMLElement>('[data-role="shape"]');
+      const imageEl = card.querySelector<HTMLElement>('[data-role="image"]');
+
+      if (cat.kind === 'image') {
+        if (valueEl) valueEl.textContent = item.name || '';
+        if (traitsEl) traitsEl.textContent = (item.traits || []).join(' · ');
+        if (imageEl) fetchReferenceImage(imageEl, item.searchQuery || item.name || '');
+      } else if (cat.kind === 'shape') {
+        if (valueEl) valueEl.textContent = item.label || '';
+        if (subEl) subEl.textContent = item.description || '';
+        if (shapeEl) shapeEl.innerHTML = shapeSVG[item.shape || 'circle'] || shapeSVG.circle;
+      } else {
+        if (valueEl) valueEl.textContent = item.label || '';
+        if (subEl) subEl.textContent = item.description || '';
+      }
+    });
+
+    const directionEl = root.querySelector<HTMLElement>('[data-role="direction"]');
+    if (directionEl && picks.length) {
+      const parts = picks.map(
+        (p, i) => `${i === 0 ? 'Combine' : 'with'} <strong>${p.item.name || p.item.label || ''}</strong> (${p.label})`
+      );
+      const subject = generateIdentity && name ? `<strong>${name}</strong>` : 'your design';
+      directionEl.innerHTML = `${parts.join(' ')} to shape ${subject}. Use these as a starting point, not a literal recipe.`;
+    }
+
+    fitPresentGenerator(root);
+  }
+
+  // Present mode's slide title/subtitle (shared, site-wide markup this
+  // block doesn't control) can eat anywhere from ~15% to ~60% of the 16:9
+  // slide's height depending on window size — it's sized off vw, while the
+  // slide itself is sized off cqh, so the two don't scale together. No
+  // fixed cqh clamp on the card's own fonts/padding can guarantee a fit at
+  // every window size (measured: fits at 1920x1080, overflows badly at
+  // 1280x720 even after cqh-tuning every size in this file). So instead:
+  // measure the card's actual rendered height against the actual space
+  // left in the slide, and only if it doesn't fit, zoom the whole card
+  // down until it does. `zoom` (not transform:scale) so the browser lays
+  // out at the reduced size directly — no manual width/margin
+  // compensation needed to stop the shrunk box leaving a gap below it.
+  function fitPresentGeneratorStep(root: HTMLElement, slide: HTMLElement, iteration: number) {
+    const style = root.style as unknown as { zoom: string };
+    const slideRect = slide.getBoundingClientRect();
+    const rootRect = root.getBoundingClientRect();
+    const available = slideRect.bottom - rootRect.top - 4;
+    const natural = rootRect.height;
+    if (available <= 0 || natural <= available || iteration >= 4) return;
+    // zoom reflows text at the new size (line-wraps can change), so the
+    // resulting height doesn't scale perfectly linearly with the zoom
+    // factor — iterate toward a fit rather than trusting one calculation.
+    const currentZoom = parseFloat(style.zoom) || 1;
+    const scale = Math.max(0.5, currentZoom * (available / natural));
+    style.zoom = String(scale);
+    requestAnimationFrame(() => fitPresentGeneratorStep(root, slide, iteration + 1));
+  }
+
+  function fitPresentGenerator(root: HTMLElement) {
+    const slide = root.closest('#lp-slide') as HTMLElement | null;
+    if (!slide) return;
+    (root.style as unknown as { zoom: string }).zoom = '';
+    requestAnimationFrame(() => fitPresentGeneratorStep(root, slide, 0));
+  }
+
+  function wireGenerator(root: HTMLElement) {
+    if (root.dataset.wired) return;
+    root.dataset.wired = '1';
+    const btn = root.querySelector('.pt-gen-button');
+    btn?.addEventListener('click', () => generate(root));
+    generate(root);
+  }
+
+  window.addEventListener('resize', () => {
+    document.querySelectorAll<HTMLElement>('#lp-slide .pt-generator').forEach(fitPresentGenerator);
+  });
+
+  document.querySelectorAll<HTMLElement>('.pt-generator').forEach(wireGenerator);
+
+  // Present mode clones lecture-body content into slides via cloneNode,
+  // which copies attributes/markup — including data-wired — but never live
+  // listeners. Clearing data-wired first forces wireGenerator to actually
+  // re-run for every fresh clone instead of silently no-op'ing on its own
+  // guard; without this, a Present-mode slide was frozen on whatever the
+  // reading-page instance happened to roll at page load (dead Generate
+  // button, and this block's own fitPresentGenerator never got a chance to
+  // run since generate() never fired for the clone).
+  new MutationObserver((records) => {
+    for (const r of records) {
+      for (const n of r.addedNodes) {
+        if (!(n instanceof HTMLElement)) continue;
+        const found = n.matches?.('.pt-generator') ? [n] : Array.from(n.querySelectorAll?.('.pt-generator') ?? []);
+        found.forEach((el) => {
+          delete (el as HTMLElement).dataset.wired;
+          wireGenerator(el as HTMLElement);
+        });
+      }
+    }
+  }).observe(document.body, { childList: true, subtree: true });
+</script>
