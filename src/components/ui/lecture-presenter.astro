@@ -291,7 +291,18 @@
      at another (measured: fit at 1920x1080, 36px over at 1440x900, 258px
      over — Shape Language/Design Direction fully cut off — at 1280x720).
      cqh-based sizing keeps the same proportions across all of them. */
-  #lecture-presenter #lp-slide .pt-generator { overflow: hidden; }
+  /* The card's actual surface (border/background) moved onto the shared
+     .spotlight-inner wrapper for the reading page's hover glow — which the
+     neutralization block above strips back to transparent/borderless here,
+     same as every other spotlight-card in a slide. Restoring a plain
+     static one on .pt-generator itself (never touched by that
+     neutralization) is what keeps the card visible at all in Present mode. */
+  #lecture-presenter #lp-slide .pt-generator {
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    background: hsl(var(--card-bg));
+  }
   #lecture-presenter #lp-slide .pt-gen-grid {
     row-gap: clamp(0.35rem, 1.2cqh, 0.6rem);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

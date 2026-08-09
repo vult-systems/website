@@ -43,12 +43,13 @@ const rowCategories = categories
 
 {categories.length > 0 && (
   <div
-    class="pt-generator pt-gen-idle my-8"
+    class="pt-generator pt-gen-idle spotlight-card group relative my-8"
     id={instanceId}
     data-categories={categoriesJson}
     data-generate-identity={generateIdentity ? '1' : '0'}
     data-specimen-prefix={specimenPrefix}
   >
+    <div class="spotlight-inner rounded-[var(--radius)] overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
     <div class="pt-gen-grid">
       <div class="pt-gen-identity-row">
         {generateIdentity && (
@@ -103,16 +104,22 @@ const rowCategories = categories
         <p data-role="direction">▒░▓▒ ░▓▒░ ▓▒░▒ ▒▓░░▒ ░▓▒▓ ▒░▓░▒ ▓▒░ ▒░▓▒░ ▓▒░▒ ▒▓░ ░▓▒▓▒░▓ ▒░▓▒.</p>
       </div>
     </div>
+    </div>
   </div>
 )}
 
 <style>
-  .pt-generator {
-    overflow: hidden;
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    background: hsl(var(--card-bg));
-  }
+  /* Card surface/border/background used to live directly on .pt-generator;
+     it's now the shared .spotlight-inner wrapper instead (see the
+     spotlight-card/spotlight-inner classes in the markup above), which is
+     what gets the site's hover glow ring + slight scale-up in the reading
+     page — the same effect used on Courses/Student Work/Log/etc cards.
+     Present mode neutralizes .spotlight-inner site-wide (so slide content
+     doesn't glow when there's no mouse to hover with) via the existing
+     #lecture-presenter #lp-slide .spotlight-inner rule in
+     lecture-presenter.astro; that rule strips exactly the border/background
+     this used to provide, which is why lecture-presenter.astro restores a
+     plain static one on .pt-generator itself for Present mode specifically. */
   /* Every section (identity+button row, hero image, trait row, result) is
      a direct grid item so it can be freely rearranged per context — the
      reading-page layout below, and a completely different Present-mode
@@ -308,9 +315,9 @@ const rowCategories = categories
   }
   /* Resting state before the first roll: dim + widen the glyph placeholders
      so they read as "untranslated transmission" rather than broken text.
-     Cleared (see the script's clearIdle()) the moment Generate is first
-     clicked — after that the card is always in its "online" state, even on
-     re-rolls. */
+     Cleared in generate()'s first line (root.classList.remove('pt-gen-idle'))
+     the moment Generate is first clicked — after that the card is always in
+     its "online" state, even on re-rolls. */
   .pt-gen-idle .pt-gen-name,
   .pt-gen-idle .pt-gen-specimen,
   .pt-gen-idle .pt-gen-value,
@@ -319,6 +326,38 @@ const rowCategories = categories
   .pt-gen-idle .pt-gen-result p {
     opacity: 0.4;
     letter-spacing: 0.06em;
+  }
+  /* Button affordance while idle: an accent-colored sheen sweeps across the
+     Generate button on a loop so it's obvious it's the thing to press,
+     rather than the card just sitting there inert. :global() because
+     .pt-gen-button is a class handed to <Button>, whose own template (not
+     this one) is what actually renders the <button> — Astro's scoping
+     hashes elements to whichever component authored the markup they
+     appear in, so a scoped .pt-gen-button selector here would never match
+     it (same reasoning as the innerHTML-inserted elements below). Stops
+     the instant Generate is clicked, same as the dimming above. */
+  .pt-gen-idle :global(.pt-gen-button) {
+    position: relative;
+    overflow: hidden;
+  }
+  .pt-gen-idle :global(.pt-gen-button)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 25%, hsl(var(--accent) / 0.55) 50%, transparent 75%);
+    transform: translateX(-120%);
+    animation: pt-gen-sheen 2.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes pt-gen-sheen {
+    0%, 15% { transform: translateX(-120%); }
+    55%, 100% { transform: translateX(120%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pt-gen-idle :global(.pt-gen-button)::after {
+      animation: none;
+      display: none;
+    }
   }
 </style>
 
@@ -357,6 +396,41 @@ const rowCategories = categories
       else opts.onComplete?.();
     };
     requestAnimationFrame(frame);
+  }
+
+  // Static/interference flicker for the idle glyph placeholders: every
+  // 0.7-1.6s, one random character in one random idle field blips to a
+  // different glyph for ~150ms then reverts — reads as "signal noise" on an
+  // untranslated transmission rather than the reveal's decode-and-lock
+  // motion. Self-terminates once the card leaves the idle state (first
+  // Generate click) or its node is gone (Present mode navigated away).
+  const IDLE_GLITCH_SELECTOR = '.pt-gen-name, .pt-gen-specimen, [data-role="value"], [data-role="sub"], [data-role="traits"], [data-role="direction"]';
+
+  function startIdleGlitch(root: HTMLElement) {
+    if (prefersReducedMotion()) return;
+    const tick = () => {
+      if (!root.isConnected || !root.classList.contains('pt-gen-idle')) return;
+      const els = Array.from(root.querySelectorAll<HTMLElement>(IDLE_GLITCH_SELECTOR));
+      const el = els[Math.floor(Math.random() * els.length)];
+      const original = el?.textContent ?? '';
+      if (el && original.length) {
+        const idx = Math.floor(Math.random() * original.length);
+        if (original[idx] !== ' ') {
+          const glyph = SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+          const glitched = original.slice(0, idx) + glyph + original.slice(idx + 1);
+          el.textContent = glitched;
+          // Only revert if nothing else touched this element in the
+          // meantime (e.g. Generate got clicked and scrambleReveal is now
+          // mid-decode on it) — an unconditional revert would stomp a real
+          // reveal frame back to the stale idle placeholder.
+          window.setTimeout(() => {
+            if (el.isConnected && el.textContent === glitched) el.textContent = original;
+          }, 120 + Math.random() * 80);
+        }
+      }
+      window.setTimeout(tick, 700 + Math.random() * 900);
+    };
+    window.setTimeout(tick, 700 + Math.random() * 900);
   }
 
   const shapeSVG: Record<string, string> = {
@@ -552,6 +626,7 @@ const rowCategories = categories
     // idle placeholder text has its own length/shape the card must size to
     // — generate() re-fits again once real content lands.
     fitPresentGenerator(root);
+    startIdleGlitch(root);
   }
 
   window.addEventListener('resize', () => {
