@@ -250,6 +250,26 @@
     #lecture-presenter #lp-slide img { opacity: 1; transition: none; }
   }
 
+  /* The spotlight hover glow (globals.css .spotlight-card/.spotlight-inner)
+     is meant for browsing cards, not a live slide deck — a hover-triggered
+     scale+glow would be a distraction mid-presentation and fights the
+     height-constrained figure layouts below (max-height/flex sizing on the
+     img/video itself). Neutralize it for anything rendered inside a slide. */
+  #lecture-presenter #lp-slide .spotlight-card { isolation: auto; }
+  #lecture-presenter #lp-slide .spotlight-card:hover { z-index: auto; }
+  #lecture-presenter #lp-slide .spotlight-inner {
+    border: 0 !important;
+    background-image: none !important;
+    background-color: transparent !important;
+    transform: none !important;
+  }
+  #lecture-presenter #lp-slide video.spotlight-inner { background-color: #000 !important; }
+  #lecture-presenter #lp-slide .spotlight-card:hover .spotlight-inner {
+    animation: none !important;
+    background-image: none !important;
+  }
+  #lecture-presenter #lp-slide .spotlight-card::after { display: none !important; }
+
   /* Image alignment (figure[data-align]) */
   #lecture-presenter #lp-slide figure[data-align='left'] { margin-inline: 0 auto; max-width: 70%; }
   #lecture-presenter #lp-slide figure[data-align='right'] { margin-inline: auto 0; max-width: 70%; }

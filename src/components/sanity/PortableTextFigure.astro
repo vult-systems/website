@@ -16,7 +16,7 @@ const height = dims ? Number(dims[2]) : undefined;
 const align = node?.align ?? 'center';
 ---
 
-<figure id={node?._key ? `pt-${node._key}` : undefined} class="my-8" data-align={align}>
+<figure id={node?._key ? `pt-${node._key}` : undefined} class="my-8 spotlight-card group relative" data-align={align}>
   <img
     src={src}
     srcset={`${src} 1200w, ${src2x} 2400w`}
@@ -25,7 +25,7 @@ const align = node?.align ?? 'center';
     height={height}
     data-full={full}
     alt={node?.alt ?? ''}
-    class="rounded-lg w-full"
+    class="spotlight-inner rounded-lg w-full transition-all duration-300 group-hover:scale-[1.02]"
     loading="lazy"
     decoding="async"
   />

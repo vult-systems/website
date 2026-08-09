@@ -147,14 +147,16 @@ const seo = getAboutPageSEO();
 						<div>
 							<Heading level={2} size="2xl" class="mb-4">Resume</Heading>
 							<div class="inline-block">
-								<div class="rounded-md border-2 border-border overflow-hidden">
-									<Image
-										src={resumeThumb}
-										alt="Carlos Garcia Resume"
-										width={1836}
-										height={2376}
-										class="w-full max-w-[420px] object-contain rounded-md"
-									/>
+								<div class="spotlight-card group relative">
+									<div class="spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
+										<Image
+											src={resumeThumb}
+											alt="Carlos Garcia Resume"
+											width={1836}
+											height={2376}
+											class="w-full max-w-[420px] object-contain"
+										/>
+									</div>
 								</div>
 								<div class="mt-2">
 									<a href="/CarlosGarcia_Resume_2026.pdf" download class="inline-flex items-center gap-1.5 text-sm text-foreground-secondary hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">

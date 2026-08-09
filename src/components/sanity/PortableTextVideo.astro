@@ -24,13 +24,13 @@ const mime =
 
 {
   src && (
-    <figure id={node?._key ? `pt-${node._key}` : undefined} class="my-8">
+    <figure id={node?._key ? `pt-${node._key}` : undefined} class="my-8 spotlight-card group relative">
       <video
         poster={poster}
         controls
         playsinline
         preload="none"
-        class="rounded-lg w-full bg-black"
+        class="spotlight-inner rounded-lg w-full bg-black transition-all duration-300 group-hover:scale-[1.02]"
       >
         <source src={src} type={mime} />
       </video>
