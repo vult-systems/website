@@ -541,22 +541,33 @@ const rowCategories = categories
     return `${prefix}-${letters.slice(0, 3).padEnd(3, 'X')}`;
   };
 
+  // Preloads off-DOM and only swaps the markup in once the photo has
+  // actually decoded, so the CRT "Finding reference…" static stays on
+  // screen for the full wait instead of the loading state vanishing the
+  // instant this is called and leaving a blank box behind while the
+  // network fetch is still in flight (this matters for curated images
+  // just as much as live-searched ones — neither is instant).
   function renderReferenceImage(el: HTMLElement, src: string, sourceUrl?: string) {
-    el.innerHTML = `<img src="${src}" alt="Reference" data-no-lightbox>${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener" aria-label="Open image source"></a>` : ''}`;
-    // In Present mode the hero image is flex-filled to match the right
-    // column, but a *real* photo's intrinsic aspect ratio still leaks
-    // into CSS Grid's automatic-minimum-size calc for the row-spanning
-    // hero column (see the min-height: 0 comment on .pt-gen-heroes in
-    // lecture-presenter.astro) — measured, this can still grow the card
-    // well past what fitPresentGenerator sized it for using only the
-    // pre-load placeholder. Re-fit once the real photo is decoded.
-    const img = el.querySelector('img');
-    const root = el.closest('.pt-generator') as HTMLElement | null;
-    if (img && root) img.addEventListener('load', () => fitPresentGenerator(root));
+    const preload = new Image();
+    preload.onload = () => {
+      el.innerHTML = `<img src="${src}" alt="Reference" data-no-lightbox>${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener" aria-label="Open image source"></a>` : ''}`;
+      // In Present mode the hero image is flex-filled to match the right
+      // column, but a *real* photo's intrinsic aspect ratio still leaks
+      // into CSS Grid's automatic-minimum-size calc for the row-spanning
+      // hero column (see the min-height: 0 comment on .pt-gen-heroes in
+      // lecture-presenter.astro) — measured, this can still grow the card
+      // well past what fitPresentGenerator sized it for using only the
+      // pre-load placeholder. Re-fit now that the real photo is in.
+      const root = el.closest('.pt-generator') as HTMLElement | null;
+      if (root) fitPresentGenerator(root);
+    };
+    preload.onerror = () => {
+      el.innerHTML = '<div class="pt-gen-loading">Reference image unavailable.<br>Try generating again.</div>';
+    };
+    preload.src = src;
   }
 
   async function fetchReferenceImage(el: HTMLElement, query: string) {
-    el.innerHTML = '<div class="pt-gen-loading">Finding reference…</div>';
     const url = new URL('https://commons.wikimedia.org/w/api.php');
     const params: Record<string, string> = {
       action: 'query',
@@ -628,6 +639,7 @@ const rowCategories = categories
         if (valueEl) scrambleReveal(valueEl, item.name || '');
         if (traitsEl) scrambleReveal(traitsEl, (item.traits || []).join(' · '));
         if (imageEl) {
+          imageEl.innerHTML = '<div class="pt-gen-loading">Finding reference…</div>';
           const curated = item.curatedImages;
           if (curated?.length) {
             const choice = pick(curated);
