@@ -14,6 +14,7 @@ import { sanityClient } from '@/lib/sanity/client';
 import { logListQuery } from '@/lib/sanity/queries';
 import PortableText from '@/components/sanity/PortableText.astro';
 import { getHeadings } from '@/lib/sanity/toc';
+import LinkPreviewCard from '@/components/ui/link-preview-card.astro';
 
 // Read live from Sanity at request time (instant edits, no rebuild).
 export const prerender = false;
@@ -146,6 +147,7 @@ const seo = getBlogPageSEO();
 		</div>
 	</PageMain>
 	<Footer />
+	<LinkPreviewCard />
 </BaseLayout>
 
 <style>
