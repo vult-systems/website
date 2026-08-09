@@ -111,11 +111,31 @@ export const generatorType = defineType({
                           type: 'object',
                           name: 'curatedImage',
                           fields: [
-                            { name: 'url', title: 'Image URL', type: 'url', validation: (Rule) => Rule.required().uri({ scheme: ['http', 'https'] }) },
+                            {
+                              name: 'image',
+                              title: 'Uploaded image',
+                              type: 'image',
+                              description: 'Preferred: an image hosted on our own Sanity CDN. Takes priority over Image URL below when both are set.',
+                            },
+                            {
+                              name: 'url',
+                              title: 'Image URL',
+                              type: 'url',
+                              description: 'Fallback / quick-add option: hotlink an external image (e.g. while scouting new references, before uploading one properly). Used only when Uploaded image above is empty.',
+                              validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
+                            },
                             { name: 'sourceUrl', title: 'Source page URL', type: 'url', description: 'Wikimedia Commons file page, for attribution.', validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }) },
                           ],
+                          validation: (Rule) =>
+                            Rule.custom((value: { image?: unknown; url?: string } | undefined) =>
+                              value?.image || value?.url ? true : 'Set either an uploaded image or an image URL.'
+                            ),
                           preview: {
-                            select: { title: 'url' },
+                            select: { media: 'image', url: 'url' },
+                            prepare: ({ media, url }: { media?: any; url?: string }) => ({
+                              title: media ? 'Uploaded image' : url || 'Curated image',
+                              media,
+                            }),
                           },
                         },
                       ],

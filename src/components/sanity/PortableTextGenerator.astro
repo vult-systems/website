@@ -1,5 +1,6 @@
 ---
 import Button from '@/components/ui/button.astro';
+import { urlFor } from '@/lib/sanity/image';
 
 const { node } = Astro.props;
 
@@ -14,12 +15,37 @@ const data = node?.ref ?? {};
 const resultLabel = data?.resultLabel || 'Your Result';
 const generateIdentity = data?.generateIdentity !== false;
 const specimenPrefix = data?.specimenPrefix || 'XENO';
-const categories = (data?.categories ?? []) as Array<{
+const rawCategories = (data?.categories ?? []) as Array<{
   _key?: string;
   label: string;
   kind: 'image' | 'word' | 'shape';
   items: Array<Record<string, unknown>>;
 }>;
+
+// curatedImage entries carry either an uploaded Sanity asset (preferred —
+// our own CDN) or a plain external URL (a quick-add fallback for scouting
+// new references before uploading one properly, see generatorType.ts).
+// The client-side script block below only knows how to point an img tag
+// at a resolved URL, so that choice is made once here, server-side, rather
+// than teaching the client to build Sanity CDN URLs itself.
+const categories = rawCategories.map((cat) => ({
+  ...cat,
+  items: cat.items.map((item) => {
+    const curatedImages = item.curatedImages as
+      | Array<{ image?: Record<string, unknown>; url?: string; sourceUrl?: string }>
+      | undefined;
+    if (!curatedImages?.length) return item;
+    return {
+      ...item,
+      curatedImages: curatedImages
+        .map((ci) => ({
+          url: ci.image ? urlFor(ci.image as any).width(1600).auto('format').url() : ci.url,
+          sourceUrl: ci.sourceUrl,
+        }))
+        .filter((ci) => ci.url),
+    };
+  }),
+}));
 
 // Stable-ish per-instance id from the Sanity block key, sanitized for use
 // as a DOM id/selector (falls back to a random one if a block somehow has
