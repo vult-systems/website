@@ -99,7 +99,26 @@ export const generatorType = defineType({
                       name: 'searchQuery',
                       title: 'Wikimedia search query',
                       type: 'string',
-                      description: 'What to search Wikimedia Commons for (usually the scientific name for accuracy). Falls back to the display name if left empty.',
+                      description: 'What to search Wikimedia Commons for (usually the scientific name for accuracy). Falls back to the display name if left empty. Ignored at render time once Curated images below has at least one entry.',
+                    },
+                    {
+                      name: 'curatedImages',
+                      title: 'Curated images',
+                      description: 'Hand-picked photos to use instead of a live Wikimedia Commons search. One is chosen at random per roll, same as the live search behavior. Leave empty to keep using the live search.',
+                      type: 'array',
+                      of: [
+                        {
+                          type: 'object',
+                          name: 'curatedImage',
+                          fields: [
+                            { name: 'url', title: 'Image URL', type: 'url', validation: (Rule) => Rule.required().uri({ scheme: ['http', 'https'] }) },
+                            { name: 'sourceUrl', title: 'Source page URL', type: 'url', description: 'Wikimedia Commons file page, for attribution.', validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }) },
+                          ],
+                          preview: {
+                            select: { title: 'url' },
+                          },
+                        },
+                      ],
                     },
                     {
                       name: 'traits',

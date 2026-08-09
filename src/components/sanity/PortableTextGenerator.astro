@@ -512,10 +512,15 @@ const rowCategories = categories
     squareTriangle: `<svg viewBox="0 0 48 40"><rect x="1" y="11" width="20" height="20" rx="2"/><polygon points="36,6 47,33 25,33"/></svg>`,
   };
 
+  interface CuratedImage {
+    url: string;
+    sourceUrl?: string;
+  }
   interface GenItem {
     _type?: string;
     name?: string;
     searchQuery?: string;
+    curatedImages?: CuratedImage[];
     traits?: string[];
     label?: string;
     description?: string;
@@ -535,6 +540,20 @@ const rowCategories = categories
     const letters = name.replace(/[^a-z]/gi, '').toUpperCase();
     return `${prefix}-${letters.slice(0, 3).padEnd(3, 'X')}`;
   };
+
+  function renderReferenceImage(el: HTMLElement, src: string, sourceUrl?: string) {
+    el.innerHTML = `<img src="${src}" alt="Reference" data-no-lightbox>${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener" aria-label="Open image source"></a>` : ''}`;
+    // In Present mode the hero image is flex-filled to match the right
+    // column, but a *real* photo's intrinsic aspect ratio still leaks
+    // into CSS Grid's automatic-minimum-size calc for the row-spanning
+    // hero column (see the min-height: 0 comment on .pt-gen-heroes in
+    // lecture-presenter.astro) — measured, this can still grow the card
+    // well past what fitPresentGenerator sized it for using only the
+    // pre-load placeholder. Re-fit once the real photo is decoded.
+    const img = el.querySelector('img');
+    const root = el.closest('.pt-generator') as HTMLElement | null;
+    if (img && root) img.addEventListener('load', () => fitPresentGenerator(root));
+  }
 
   async function fetchReferenceImage(el: HTMLElement, query: string) {
     el.innerHTML = '<div class="pt-gen-loading">Finding reference…</div>';
@@ -561,17 +580,7 @@ const rowCategories = categories
       const page = pick(pages);
       if (!page) throw new Error('no results');
       const info = page.imageinfo[0];
-      el.innerHTML = `<img src="${info.thumburl}" alt="Reference" data-no-lightbox><a href="${info.descriptionurl}" target="_blank" rel="noopener" aria-label="Open image source"></a>`;
-      // In Present mode the hero image is flex-filled to match the right
-      // column, but a *real* photo's intrinsic aspect ratio still leaks
-      // into CSS Grid's automatic-minimum-size calc for the row-spanning
-      // hero column (see the min-height: 0 comment on .pt-gen-heroes in
-      // lecture-presenter.astro) — measured, this can still grow the card
-      // well past what fitPresentGenerator sized it for using only the
-      // pre-load placeholder. Re-fit once the real photo is decoded.
-      const img = el.querySelector('img');
-      const root = el.closest('.pt-generator') as HTMLElement | null;
-      if (img && root) img.addEventListener('load', () => fitPresentGenerator(root));
+      renderReferenceImage(el, info.thumburl, info.descriptionurl);
     } catch {
       el.innerHTML = '<div class="pt-gen-loading">Reference image unavailable.<br>Try generating again.</div>';
     }
@@ -618,7 +627,15 @@ const rowCategories = categories
       if (cat.kind === 'image') {
         if (valueEl) scrambleReveal(valueEl, item.name || '');
         if (traitsEl) scrambleReveal(traitsEl, (item.traits || []).join(' · '));
-        if (imageEl) fetchReferenceImage(imageEl, item.searchQuery || item.name || '');
+        if (imageEl) {
+          const curated = item.curatedImages;
+          if (curated?.length) {
+            const choice = pick(curated);
+            renderReferenceImage(imageEl, choice.url, choice.sourceUrl);
+          } else {
+            fetchReferenceImage(imageEl, item.searchQuery || item.name || '');
+          }
+        }
       } else if (cat.kind === 'shape') {
         if (valueEl) scrambleReveal(valueEl, item.label || '');
         if (subEl) scrambleReveal(subEl, item.description || '');
