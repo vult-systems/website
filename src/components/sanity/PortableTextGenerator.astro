@@ -234,10 +234,9 @@ const rowCategories = categories
      a dead CRT screen: animated grain (feTurbulence noise drifting on
      stepped, not smooth, keyframes — a smooth drift reads as a slow pan,
      stepped reads as an old signal actually failing to lock), scanlines,
-     an occasional glitch band jumping to a random height, and a
-     red/cyan-fringed flicker on the label text itself. Background is a
-     fixed near-black regardless of site theme on purpose — "no signal" is
-     a dead screen, not a themed empty state. */
+     and an occasional glitch band jumping to a random height. Background
+     is a fixed near-black regardless of site theme on purpose — "no
+     signal" is a dead screen, not a themed empty state. */
   .pt-gen-image :global(.pt-gen-loading) {
     position: relative;
     overflow: hidden;
@@ -254,8 +253,6 @@ const rowCategories = categories
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: hsl(0 0% 88%);
-    text-shadow: 1px 0 rgba(255, 60, 100, 0.7), -1px 0 rgba(60, 220, 255, 0.7);
-    animation: pt-static-text-flicker 3.4s steps(1) infinite;
   }
   .pt-gen-image :global(.pt-gen-loading)::before {
     content: '';
@@ -303,20 +300,6 @@ const rowCategories = categories
     39%, 66% { opacity: 0; }
     67%, 70% { background-position: 0 22%, 0 0; opacity: 1; }
     71%, 100% { opacity: 0; }
-  }
-  @keyframes pt-static-text-flicker {
-    0%, 92%, 100% {
-      text-shadow: 1px 0 rgba(255, 60, 100, 0.7), -1px 0 rgba(60, 220, 255, 0.7);
-      opacity: 1;
-    }
-    93% {
-      text-shadow: 3px 0 rgba(255, 60, 100, 0.9), -3px 0 rgba(60, 220, 255, 0.9);
-      opacity: 0.6;
-    }
-    95% {
-      text-shadow: -2px 0 rgba(255, 60, 100, 0.85), 2px 0 rgba(60, 220, 255, 0.85);
-      opacity: 1;
-    }
   }
   @media (prefers-reduced-motion: reduce) {
     .pt-gen-image :global(.pt-gen-loading),

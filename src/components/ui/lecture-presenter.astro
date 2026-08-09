@@ -335,6 +335,19 @@
     flex: 1 1 auto;
     min-height: 0;
   }
+  /* Making .lp-body a flex container (above) for the height-fill also
+     changed how its child sizes horizontally: a plain block always fills
+     100% of its parent's width regardless of content, but a flex item's
+     width defaults to its own content's natural size instead — the
+     two-column (image + text) layout happened to still end up close to
+     full width since both columns' combined content-minimums added up to
+     roughly that anyway, but the single-column no-image layout doesn't
+     have a second column's content forcing that extra width, so it
+     visibly shrank to about half the card's available space. Needs
+     stating explicitly now that the parent is flex. */
+  #lecture-presenter #lp-slide .pt-generator {
+    width: 100%;
+  }
   #lecture-presenter #lp-slide .pt-generator .spotlight-inner {
     height: 100%;
     display: flex;
@@ -367,6 +380,21 @@
     flex: 1 1 auto;
     min-height: 0;
     align-content: stretch;
+  }
+  /* The two-column "image left, text right" layout only makes sense when
+     there's actually an image category to put in that column — a
+     generator authored with only word/shape categories has no
+     .pt-gen-heroes at all, but the grid above still reserved that whole
+     first column for it regardless, leaving identity/traits/result
+     squeezed into the right half with a dead empty column on the left.
+     Collapse to a single column, full width, whenever there's nothing to
+     put in the image slot. */
+  #lecture-presenter #lp-slide .pt-gen-grid:not(:has(.pt-gen-heroes)) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'identity'
+      'traits'
+      'result';
   }
   #lecture-presenter #lp-slide .pt-gen-identity-row {
     margin: clamp(0.35rem, 1.2cqh, 0.6rem) 0 0;
