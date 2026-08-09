@@ -1,5 +1,22 @@
 // GROQ queries (plain strings). No runtime dependency required.
 
+/**
+ * Portable Text body projection. Every generatorBlock only stores a
+ * reference to its Generator document (see generatorType.ts — the
+ * categories/items live there so Studio gives them a real full-page
+ * editor instead of nested array-of-objects dialogs), so the body fetch
+ * has to explicitly dereference it — a bare `body` would leave `ref` as
+ * just a { _ref } stub and PortableTextGenerator would have nothing to
+ * render.
+ */
+const BODY_PROJECTION = `body[]{
+    ...,
+    _type == "generatorBlock" => {
+      ...,
+      ref->
+    }
+  }`;
+
 /** Editable chrome for the /learn page (singleton settings document). */
 export const learnPageQuery = `
   *[_type == "learnPage"][0] {
@@ -35,7 +52,7 @@ export const logListQuery = `
     tags,
     category,
     heroImage,
-    body
+    ${BODY_PROJECTION}
   }
 `;
 
@@ -52,7 +69,7 @@ export const logBySlugQuery = `
     tags,
     category,
     heroImage,
-    body
+    ${BODY_PROJECTION}
   }
 `;
 
@@ -75,13 +92,13 @@ export const coursesQuery = `
       "slug": slug.current,
       description,
       thumbnail,
-      body,
+      ${BODY_PROJECTION},
       threads[]{
         title,
         "slug": slug.current,
         description,
         thumbnail,
-        body
+        ${BODY_PROJECTION}
       }
     }
   }
@@ -95,13 +112,13 @@ export const pipelineQuery = `
     "slug": slug.current,
     code,
     description,
-    body,
+    ${BODY_PROJECTION},
     threads[]{
       title,
       "slug": slug.current,
       description,
       thumbnail,
-      body
+      ${BODY_PROJECTION}
     }
   }
 `;

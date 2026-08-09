@@ -3,10 +3,18 @@ import Button from '@/components/ui/button.astro';
 
 const { node } = Astro.props;
 
-const resultLabel = node?.resultLabel || 'Your Result';
-const generateIdentity = node?.generateIdentity !== false;
-const specimenPrefix = node?.specimenPrefix || 'XENO';
-const categories = (node?.categories ?? []) as Array<{
+// The block itself only stores a reference (see generatorType.ts — the
+// categories/items live on their own document so Studio gives them a real
+// full-page editor instead of nested array-of-objects dialogs). The GROQ
+// queries dereference it (`ref->`) so `node.ref` normally arrives fully
+// resolved; `data` still falls back to {} for a broken/unset reference so
+// this renders nothing instead of throwing.
+const data = node?.ref ?? {};
+
+const resultLabel = data?.resultLabel || 'Your Result';
+const generateIdentity = data?.generateIdentity !== false;
+const specimenPrefix = data?.specimenPrefix || 'XENO';
+const categories = (data?.categories ?? []) as Array<{
   _key?: string;
   label: string;
   kind: 'image' | 'word' | 'shape';
