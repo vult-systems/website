@@ -269,14 +269,32 @@ const carouselPieces = artPieces;
 </style>
 
 <script>
+  // mousemove/mouseup below are bound to window (a drag can carry the
+  // pointer outside the container), which — unlike container itself —
+  // survives every navigation. Without unbinding the previous run's pair
+  // first, every homepage visit stacked another set of these permanently:
+  // stale listeners from earlier visits kept firing on every mouse move
+  // anywhere on the site, not just the homepage, for the rest of the
+  // session.
+  let currentMouseMove: ((e: MouseEvent) => void) | null = null;
+  let currentMouseUp: (() => void) | null = null;
+  // Same reasoning as above, for the tick() rAF loop: it was stored on the
+  // container element itself (container.__carouselRaf), but the container
+  // is a brand new element every navigation — a fresh element never has
+  // that property set, so the cancellation check always no-ops against the
+  // wrong (or no) previous loop. The truly previous loop, bound via closure
+  // to the old (now-detached) container/track, just kept running forever,
+  // one more requestAnimationFrame recursion added per homepage visit.
+  let currentRafId: number | null = null;
+
   function initCarousel() {
     const container = document.getElementById('carouselContainer') as HTMLElement;
     const track = document.getElementById('carouselTrack') as HTMLElement;
     if (!container || !track) return;
 
-    // Kill any previous loop attached to this container
-    const prevRaf = (container as any).__carouselRaf;
-    if (prevRaf) cancelAnimationFrame(prevRaf);
+    if (currentMouseMove) window.removeEventListener('mousemove', currentMouseMove);
+    if (currentMouseUp) window.removeEventListener('mouseup', currentMouseUp);
+    if (currentRafId !== null) cancelAnimationFrame(currentRafId);
 
     const AUTO_SPEED = 0.4;
     const FRICTION = 0.92;
@@ -323,7 +341,7 @@ const carouselPieces = artPieces;
         track.style.transform = `translateX(${pos}px)`;
       }
       rafId = requestAnimationFrame(tick);
-      (container as any).__carouselRaf = rafId;
+      currentRafId = rafId;
     };
 
     // Start centered on the second card (343i / Grimghast) using layout offsets
@@ -340,7 +358,7 @@ const carouselPieces = artPieces;
     track.style.transform = `translateX(${pos}px)`;
 
     rafId = requestAnimationFrame(tick);
-    (container as any).__carouselRaf = rafId;
+    currentRafId = rafId;
 
     container.addEventListener('dragstart', (e: DragEvent) => e.preventDefault());
 
@@ -389,6 +407,8 @@ const carouselPieces = artPieces;
     container.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
+    currentMouseMove = onMouseMove;
+    currentMouseUp = onMouseUp;
 
     // ── Touch ──
     container.addEventListener('touchstart', (e: TouchEvent) => {

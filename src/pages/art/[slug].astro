@@ -363,7 +363,13 @@ const articleJsonLd = {
 
   <script>
     // Lazy-load post videos: only load/play when scrolled into view (preload="none"
-    // on the markup means they don't download until play() is called).
+    // on the markup means they don't download until triggered).
+    //
+    // Elements inserted via Astro's View Transition swap (not the browser's
+    // own HTML parser) don't reliably run the media "resource selection"
+    // algorithm on their own — currentSrc stays empty and play() rejects
+    // with "no supported sources" even though the src attribute is right
+    // there. An explicit load() call (once per element) fixes it.
     let artVideoIO: IntersectionObserver | undefined;
     const setupArtVideos = () => {
       artVideoIO?.disconnect();
@@ -376,10 +382,21 @@ const articleJsonLd = {
           else v.pause();
         });
       }, { threshold: 0.25, rootMargin: '200px 0px' });
-      vids.forEach((v) => artVideoIO!.observe(v));
+      vids.forEach((v) => {
+        if (!v.currentSrc) v.load();
+        artVideoIO!.observe(v);
+      });
     };
-    setupArtVideos();
-    document.addEventListener('astro:page-load', setupArtVideos);
+    // Bound once for the session — re-registering this listener on every
+    // astro:page-load (which also fires on the very first load) would leave
+    // one stale setupArtVideos closure running per past navigation, each
+    // creating its own IntersectionObserver over the *current* page's videos
+    // and independently calling play()/pause() on them.
+    if (!(window as any).__artVideoInit) {
+      (window as any).__artVideoInit = true;
+      setupArtVideos();
+      document.addEventListener('astro:page-load', setupArtVideos);
+    }
   </script>
 
   <script>
