@@ -598,347 +598,372 @@ const overridesJson = JSON.stringify(overrides);
 </style>
 
 <script>
-  // Registers the <model-viewer> custom element (self-contained, no CDN).
-  import '@google/model-viewer';
+  // The <model-viewer> import pulls in three.js and does real WebGL/GPU
+  // work as soon as it registers the custom element — upgrading every
+  // model-viewer already in the DOM, even ones below the fold. Deferred
+  // behind an IntersectionObserver so it only loads once a model block is
+  // actually about to be seen, instead of on every page load that happens
+  // to contain one.
+  function initModelViewer() {
+    import('@google/model-viewer').then(() => {
 
-  // Orientation cube: snap the camera to a preset view.
-  document.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.mv-cube [data-orbit]');
-    if (!btn) return;
-    const mv = btn.closest('model-viewer') as any;
-    const orbit = btn.getAttribute('data-orbit');
-    if (mv && orbit) {
-      // "auto" radius is model-viewer's bare-minimum bounding-sphere fit —
-      // exactly snug at the model's single worst-case viewing angle, with
-      // only whatever margin happens to fall out at every other angle. For
-      // an asymmetric model (tall neurocranium + narrow splanchnocranium,
-      // say) that worst case can be a plain front/back/top view, so those
-      // snap points look noticeably tighter than others. Swap in our own
-      // pre-measured, comfort-padded radius (see computeSnapRadius) so every
-      // snap point gets the same breathing room, regardless of model shape.
-      const radius = mv.__snapRadius ? `${mv.__snapRadius}m` : 'auto';
-      mv.cameraOrbit = orbit.replace(/auto$/, radius);
-      mv.jumpCameraToGoal?.();
-    }
-  });
-
-  // Keep the cube's own rotation mirroring the model's camera orbit, so it
-  // always reads as "which side am I looking at" rather than a static icon.
-  function syncCube(mv: any) {
-    const box = mv.querySelector('.mv-cube__box') as HTMLElement | null;
-    if (!box || typeof mv.getCameraOrbit !== 'function') return;
-    const { theta, phi } = mv.getCameraOrbit();
-    const thetaDeg = (theta * 180) / Math.PI;
-    const phiDeg = (phi * 180) / Math.PI;
-    box.style.transform = `rotateX(${phiDeg - 90}deg) rotateY(${-thetaDeg}deg)`;
-    // model-viewer fires 'camera-change' as soon as its controller
-    // initializes — well before the actual glTF (and this model's real
-    // starting orbit) has loaded — so only reveal once there's a loaded
-    // model for the pose to actually correspond to.
-    if (mv.loaded) mv.querySelector('.mv-cube')?.classList.add('mv-cube--ready');
-  }
-
-  function wireCube(mv: any) {
-    // A plain JS property, not a dataset attribute: Present mode clones
-    // model-viewers with cloneNode(), which copies attributes but never
-    // live event listeners — a dataset flag would wrongly tell a fresh
-    // clone "already wired" and leave its cube dead with no camera sync.
-    if (mv.__cubeWired) return;
-    mv.__cubeWired = true;
-    // No eager syncCube() call here — getCameraOrbit() returns model-viewer's
-    // generic idle default before the model has actually loaded, which isn't
-    // this model's real starting angle. Drawing that default immediately just
-    // shows a wrong pose that then visibly jumps once 'load' supplies the
-    // real one; staying hidden (see .mv-cube's opacity in the style block)
-    // until one of these listeners fires with real data avoids that.
-    mv.addEventListener('camera-change', () => syncCube(mv));
-    mv.addEventListener('load', () => syncCube(mv), { once: true });
-  }
-
-  // Wireframe overlay: edges drawn on top of the real, shaded material
-  // rather than replacing it. Toggle just flips visibility of the overlay
-  // meshes; building them happens once, in buildWireframeOverlay().
-  document.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.mv-wireframe-toggle');
-    if (!btn) return;
-    const mv = btn.closest('model-viewer') as any;
-    if (!mv) return;
-    const on = btn.getAttribute('aria-pressed') !== 'true';
-    btn.setAttribute('aria-pressed', String(on));
-    const scene = findScene(mv);
-    scene?.target?.traverse((obj: any) => {
-      if (obj.userData?.isWireframeOverlay) obj.visible = on;
-    });
-    scene?.queueRender?.();
-  });
-
-  // HDRI intensity slider: exposure is a plain model-viewer property, so
-  // this needs no scene access at all.
-  document.addEventListener('input', (e) => {
-    const slider = (e.target as HTMLElement).closest('.mv-hdri-exposure') as HTMLInputElement | null;
-    if (!slider) return;
-    const mv = slider.closest('model-viewer') as any;
-    if (!mv) return;
-    mv.exposure = parseFloat(slider.value);
-  });
-
-  // HDRI rotation slider: unlike exposure, rotating the environment isn't a
-  // model-viewer attribute — it's set directly on the underlying three.js
-  // scene (a real Euler, in radians; the slider works in degrees).
-  document.addEventListener('input', (e) => {
-    const slider = (e.target as HTMLElement).closest('.mv-hdri-rotation') as HTMLInputElement | null;
-    if (!slider) return;
-    const mv = slider.closest('model-viewer') as any;
-    const scene = mv && findScene(mv);
-    if (!scene?.environmentRotation) return;
-    scene.environmentRotation.y = (parseFloat(slider.value) * Math.PI) / 180;
-    scene.queueRender?.();
-  });
-
-  // Fullscreen toggle: model-viewer resizes itself via its own internal
-  // ResizeObserver, so entering/exiting fullscreen needs nothing from us
-  // beyond calling the standard Fullscreen API on the element itself —
-  // that keeps the cube/toggles/logo (all its light-DOM children) visible.
-  document.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.mv-fullscreen-toggle');
-    if (!btn) return;
-    const mv = btn.closest('model-viewer') as any;
-    if (!mv) return;
-    if (document.fullscreenElement === mv) document.exitFullscreen?.();
-    else mv.requestFullscreen?.();
-  });
-  document.addEventListener('fullscreenchange', () => {
-    document.querySelectorAll('.mv-fullscreen-toggle').forEach((btn) => {
-      const mv = btn.closest('model-viewer');
-      btn.setAttribute('aria-pressed', String(document.fullscreenElement === mv));
-    });
-  });
-
-  // Built from each named mesh's geometry, so it always shows the topology
-  // as exported — the actual thing worth seeing for teaching purposes.
-  async function buildWireframeOverlay(mv: any) {
-    if (mv.__wireframeBuilt) return;
-    const scene = findScene(mv);
-    if (!scene?.target) return;
-    mv.__wireframeBuilt = true; // instance property — see wireCube() comment
-
-    const toggle = mv.querySelector('.mv-wireframe-toggle');
-    const visible = toggle?.getAttribute('aria-pressed') === 'true';
-
-    const THREE = await import('three');
-    const meshes: any[] = [];
-    scene.target.traverse((obj: any) => {
-      if (obj.isMesh && obj.geometry && obj.name) meshes.push(obj);
-    });
-    for (const obj of meshes) {
-      const wireGeom = new THREE.WireframeGeometry(obj.geometry);
-      const wireMat = new THREE.LineBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        opacity: 0.4,
-        depthTest: true,
-      });
-      const overlay = new THREE.LineSegments(wireGeom, wireMat);
-      overlay.userData.isWireframeOverlay = true;
-      overlay.visible = visible;
-      // Nudged slightly larger than the surface it traces, so the lines
-      // don't z-fight with the shaded mesh underneath them.
-      overlay.scale.setScalar(1.002);
-      obj.add(overlay);
-    }
-    scene.queueRender?.();
-  }
-
-  // --- Runtime auto-labelling from the model's own named meshes ---
-  const SKIP = /^(scene|rootnode|armature|root|node\d*|mesh\d*|object\d*|group\d*|primitive\d*)$/i;
-  const clean = (n: string) => n.replace(/[_.]+/g, ' ').replace(/\s+/g, ' ').trim();
-  const esc = (s: string) =>
-    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-  // model-viewer keeps its three.js scene on a private symbol; find it.
-  function findScene(mv: any) {
-    for (const s of Object.getOwnPropertySymbols(mv)) {
-      const v = mv[s];
-      if (v && typeof v.forHotspots === 'function' && v.target) return v;
-    }
-    return null;
-  }
-
-  async function labelModel(mv: any) {
-    if (mv.dataset.autolabelled) return;
-    const scene = findScene(mv);
-    if (!scene?.target) return;
-    mv.dataset.autolabelled = '1';
-
-    // three is loaded lazily so it can never block model-viewer from loading.
-    const THREE = await import('three');
-    const target = scene.target;
-    target.updateWorldMatrix(true, true);
-    const inv = new THREE.Matrix4().copy(target.matrixWorld).invert();
-    const toLocal = (v: any) => v.clone().applyMatrix4(inv);
-    const center = toLocal(new THREE.Box3().setFromObject(target).getCenter(new THREE.Vector3()));
-
-    let overrides: Record<string, any> = {};
-    try {
-      overrides = JSON.parse(mv.dataset.overrides || '{}');
-    } catch {}
-
-    const seen = new Set<string>();
-    const parts: { name: string; c: any }[] = [];
-    target.traverse((obj: any) => {
-      if (obj === target) return;
-      const name = (obj.name || '').trim();
-      if (!name || SKIP.test(name) || seen.has(name)) return;
-      const meshyChildren = (obj.children || []).filter(
-        (c: any) => c.isMesh || (c.children || []).some((g: any) => g.isMesh)
-      );
-      if (!obj.isMesh && meshyChildren.length === 0) return; // no mesh content at all
-      // A group wrapping several independent meshy children is an umbrella
-      // (e.g. the exporter's own root node) rather than a single named part.
-      if (!obj.isMesh && meshyChildren.length > 1) return;
-      const box = new THREE.Box3().setFromObject(obj);
-      if (box.isEmpty()) return;
-      seen.add(name);
-      parts.push({ name, c: toLocal(box.getCenter(new THREE.Vector3())) });
-    });
-
-    const visible = parts
-      .slice(0, 80)
-      .map((p) => ({ ...p, ov: overrides[p.name.toLowerCase()] || {} }))
-      .filter((p) => !p.ov.hide);
-    if (!visible.length) return;
-
-    // Direction from the model's center to each part, flattened to screen
-    // space (3D up is screen -y; depth is dropped). Auto-labelled models
-    // hold a fixed camera angle instead of auto-rotating, so this is a
-    // reasonable stand-in for a true camera-space projection.
-    const angleOf = (p: (typeof visible)[number]) => {
-      const dx = p.c.x - center.x;
-      const dy = p.c.y - center.y;
-      const a = (Math.atan2(-dy, dx) * 180) / Math.PI;
-      return a < 0 ? a + 360 : a;
-    };
-    const angDist = (a: number, b: number) => {
-      const d = Math.abs(a - b) % 360;
-      return d > 180 ? 360 - d : d;
-    };
-
-    // Fan labels out to evenly-spaced slots around the model so nearby
-    // parts never stack their tags on top of each other, assigning each
-    // part the free slot closest to its own natural direction. Slots start
-    // at a fixed 45° rather than half a slot-width in: with an even part
-    // count (2, 4, ...) that half-width offset lands exactly on 90/270 —
-    // dead vertical leader lines. A 45° base keeps every line on a diagonal.
-    const n = visible.length;
-    const slots = Array.from({ length: n }, (_, i) => 45 + (360 / n) * i);
-    const slotUsed = new Array(n).fill(false);
-    const finalAngle: number[] = new Array(n);
-    visible
-      .map((p, idx) => ({ idx, angle: angleOf(p) }))
-      .sort((a, b) => a.angle - b.angle)
-      .forEach(({ idx, angle }) => {
-        let best = 0;
-        let bestDist = Infinity;
-        for (let s = 0; s < n; s++) {
-          if (slotUsed[s]) continue;
-          const d = angDist(angle, slots[s]);
-          if (d < bestDist) {
-            bestDist = d;
-            best = s;
-          }
-        }
-        slotUsed[best] = true;
-        finalAngle[idx] = slots[best];
-      });
-
-    const rect = mv.getBoundingClientRect();
-    // Leave room for the tag itself (~150px wide) plus the leader's own gap,
-    // so labels land inside the viewer instead of running off its edge —
-    // model-viewer's shadow root clips anything outside its own box
-    // (overflow: hidden), so "off its edge" means genuinely cut off, not
-    // just visually crowded. Otherwise push labels out toward that edge
-    // rather than hugging the model, so lines read against open space.
-    const radius = Math.round(Math.max(65, Math.min(rect.width, rect.height) * 0.36 - 85));
-
-    visible.forEach((p, idx) => {
-      const dx = p.c.x - center.x;
-      const dy = p.c.y - center.y;
-      const dz = p.c.z - center.z;
-      const len = Math.hypot(dx, dy, dz) || 1;
-      const angle = finalAngle[idx];
-      const side = Math.cos((angle * Math.PI) / 180) >= 0 ? 'right' : 'left';
-
-      const btn = document.createElement('button');
-      btn.slot = `hotspot-auto-${idx + 1}`;
-      btn.className = 'mv-callout';
-      btn.dataset.side = side;
-      btn.style.setProperty('--mv-angle', `${angle}deg`);
-      btn.style.setProperty('--mv-radius', `${radius}px`);
-      btn.dataset.position = `${p.c.x}m ${p.c.y}m ${p.c.z}m`;
-      btn.dataset.normal = `${dx / len} ${dy / len} ${dz / len}`;
-
-      const label = esc(p.ov.label || clean(p.name));
-      const desc = p.ov.description ? esc(p.ov.description) : '';
-      if (p.ov.description) btn.title = p.ov.description;
-      btn.innerHTML =
-        '<span class="mv-callout__dot"></span><span class="mv-callout__leader"></span>' +
-        '<span class="mv-callout__tag">' +
-        `<span class="mv-callout__name">${label}</span>` +
-        (desc ? `<span class="mv-callout__desc">${desc}</span>` : '') +
-        '</span>';
-      mv.appendChild(btn);
-    });
-  }
-
-  // A comfort-padded version of model-viewer's own "auto" camera distance —
-  // see the click handler above for why plain "auto" isn't enough on its
-  // own. Reads the model's current bounding sphere, so it scales correctly
-  // for whatever size a given imported model turns out to be, rather than
-  // a distance tuned for one specific export.
-  function computeSnapRadius(mv: any): number | null {
-    const scene = findScene(mv);
-    if (!scene?.boundingSphere || !scene.framedFoVDeg) return null;
-    const halfFovRad = ((scene.framedFoVDeg / 2) * Math.PI) / 180;
-    const ideal = scene.boundingSphere.radius / Math.sin(halfFovRad);
-    return ideal * 1.15;
-  }
-
-  async function onModelLoad(mv: any) {
-    // Re-frame with the padded radius immediately, before anything async
-    // runs — model-viewer's own reveal fade hasn't happened yet at this
-    // point, so the corrected framing is what fades in. Doing this later
-    // meant the model would already be visible at the bare "auto" framing
-    // and then visibly snap to the padded one — the "weird snap and pop"
-    // the padding itself was supposed to fix.
-    mv.__snapRadius = computeSnapRadius(mv);
-    if (mv.__snapRadius) {
-      const { theta, phi } = mv.getCameraOrbit();
-      mv.cameraOrbit = `${(theta * 180) / Math.PI}deg ${(phi * 180) / Math.PI}deg ${mv.__snapRadius}m`;
-      mv.jumpCameraToGoal?.();
-    }
-
-    await buildWireframeOverlay(mv);
-    if (mv.matches('[data-autolabel]')) await labelModel(mv);
-  }
-
-  function wireModel(mv: any) {
-    if (mv.__modelWired) return;
-    mv.__modelWired = true;
-    wireCube(mv);
-    if (mv.loaded) onModelLoad(mv);
-    else mv.addEventListener('load', () => onModelLoad(mv), { once: true });
-  }
-
-  document.querySelectorAll('model-viewer').forEach((mv) => wireModel(mv as any));
-
-  // Present mode (and other dynamic inserts) clone model-viewers in later.
-  new MutationObserver((records) => {
-    for (const r of records) {
-      for (const n of r.addedNodes) {
-        if (!(n instanceof HTMLElement)) continue;
-        const added = n.matches?.('model-viewer') ? [n] : Array.from(n.querySelectorAll?.('model-viewer') ?? []);
-        for (const mv of added) wireModel(mv);
+    // Orientation cube: snap the camera to a preset view.
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.mv-cube [data-orbit]');
+      if (!btn) return;
+      const mv = btn.closest('model-viewer') as any;
+      const orbit = btn.getAttribute('data-orbit');
+      if (mv && orbit) {
+        // "auto" radius is model-viewer's bare-minimum bounding-sphere fit —
+        // exactly snug at the model's single worst-case viewing angle, with
+        // only whatever margin happens to fall out at every other angle. For
+        // an asymmetric model (tall neurocranium + narrow splanchnocranium,
+        // say) that worst case can be a plain front/back/top view, so those
+        // snap points look noticeably tighter than others. Swap in our own
+        // pre-measured, comfort-padded radius (see computeSnapRadius) so every
+        // snap point gets the same breathing room, regardless of model shape.
+        const radius = mv.__snapRadius ? `${mv.__snapRadius}m` : 'auto';
+        mv.cameraOrbit = orbit.replace(/auto$/, radius);
+        mv.jumpCameraToGoal?.();
       }
+    });
+
+    // Keep the cube's own rotation mirroring the model's camera orbit, so it
+    // always reads as "which side am I looking at" rather than a static icon.
+    function syncCube(mv: any) {
+      const box = mv.querySelector('.mv-cube__box') as HTMLElement | null;
+      if (!box || typeof mv.getCameraOrbit !== 'function') return;
+      const { theta, phi } = mv.getCameraOrbit();
+      const thetaDeg = (theta * 180) / Math.PI;
+      const phiDeg = (phi * 180) / Math.PI;
+      box.style.transform = `rotateX(${phiDeg - 90}deg) rotateY(${-thetaDeg}deg)`;
+      // model-viewer fires 'camera-change' as soon as its controller
+      // initializes — well before the actual glTF (and this model's real
+      // starting orbit) has loaded — so only reveal once there's a loaded
+      // model for the pose to actually correspond to.
+      if (mv.loaded) mv.querySelector('.mv-cube')?.classList.add('mv-cube--ready');
     }
-  }).observe(document.body, { childList: true, subtree: true });
+
+    function wireCube(mv: any) {
+      // A plain JS property, not a dataset attribute: Present mode clones
+      // model-viewers with cloneNode(), which copies attributes but never
+      // live event listeners — a dataset flag would wrongly tell a fresh
+      // clone "already wired" and leave its cube dead with no camera sync.
+      if (mv.__cubeWired) return;
+      mv.__cubeWired = true;
+      // No eager syncCube() call here — getCameraOrbit() returns model-viewer's
+      // generic idle default before the model has actually loaded, which isn't
+      // this model's real starting angle. Drawing that default immediately just
+      // shows a wrong pose that then visibly jumps once 'load' supplies the
+      // real one; staying hidden (see .mv-cube's opacity in the style block)
+      // until one of these listeners fires with real data avoids that.
+      mv.addEventListener('camera-change', () => syncCube(mv));
+      mv.addEventListener('load', () => syncCube(mv), { once: true });
+    }
+
+    // Wireframe overlay: edges drawn on top of the real, shaded material
+    // rather than replacing it. Toggle just flips visibility of the overlay
+    // meshes; building them happens once, in buildWireframeOverlay().
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.mv-wireframe-toggle');
+      if (!btn) return;
+      const mv = btn.closest('model-viewer') as any;
+      if (!mv) return;
+      const on = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', String(on));
+      const scene = findScene(mv);
+      scene?.target?.traverse((obj: any) => {
+        if (obj.userData?.isWireframeOverlay) obj.visible = on;
+      });
+      scene?.queueRender?.();
+    });
+
+    // HDRI intensity slider: exposure is a plain model-viewer property, so
+    // this needs no scene access at all.
+    document.addEventListener('input', (e) => {
+      const slider = (e.target as HTMLElement).closest('.mv-hdri-exposure') as HTMLInputElement | null;
+      if (!slider) return;
+      const mv = slider.closest('model-viewer') as any;
+      if (!mv) return;
+      mv.exposure = parseFloat(slider.value);
+    });
+
+    // HDRI rotation slider: unlike exposure, rotating the environment isn't a
+    // model-viewer attribute — it's set directly on the underlying three.js
+    // scene (a real Euler, in radians; the slider works in degrees).
+    document.addEventListener('input', (e) => {
+      const slider = (e.target as HTMLElement).closest('.mv-hdri-rotation') as HTMLInputElement | null;
+      if (!slider) return;
+      const mv = slider.closest('model-viewer') as any;
+      const scene = mv && findScene(mv);
+      if (!scene?.environmentRotation) return;
+      scene.environmentRotation.y = (parseFloat(slider.value) * Math.PI) / 180;
+      scene.queueRender?.();
+    });
+
+    // Fullscreen toggle: model-viewer resizes itself via its own internal
+    // ResizeObserver, so entering/exiting fullscreen needs nothing from us
+    // beyond calling the standard Fullscreen API on the element itself —
+    // that keeps the cube/toggles/logo (all its light-DOM children) visible.
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.mv-fullscreen-toggle');
+      if (!btn) return;
+      const mv = btn.closest('model-viewer') as any;
+      if (!mv) return;
+      if (document.fullscreenElement === mv) document.exitFullscreen?.();
+      else mv.requestFullscreen?.();
+    });
+    document.addEventListener('fullscreenchange', () => {
+      document.querySelectorAll('.mv-fullscreen-toggle').forEach((btn) => {
+        const mv = btn.closest('model-viewer');
+        btn.setAttribute('aria-pressed', String(document.fullscreenElement === mv));
+      });
+    });
+
+    // Built from each named mesh's geometry, so it always shows the topology
+    // as exported — the actual thing worth seeing for teaching purposes.
+    async function buildWireframeOverlay(mv: any) {
+      if (mv.__wireframeBuilt) return;
+      const scene = findScene(mv);
+      if (!scene?.target) return;
+      mv.__wireframeBuilt = true; // instance property — see wireCube() comment
+
+      const toggle = mv.querySelector('.mv-wireframe-toggle');
+      const visible = toggle?.getAttribute('aria-pressed') === 'true';
+
+      const THREE = await import('three');
+      const meshes: any[] = [];
+      scene.target.traverse((obj: any) => {
+        if (obj.isMesh && obj.geometry && obj.name) meshes.push(obj);
+      });
+      for (const obj of meshes) {
+        const wireGeom = new THREE.WireframeGeometry(obj.geometry);
+        const wireMat = new THREE.LineBasicMaterial({
+          color: 0x000000,
+          transparent: true,
+          opacity: 0.4,
+          depthTest: true,
+        });
+        const overlay = new THREE.LineSegments(wireGeom, wireMat);
+        overlay.userData.isWireframeOverlay = true;
+        overlay.visible = visible;
+        // Nudged slightly larger than the surface it traces, so the lines
+        // don't z-fight with the shaded mesh underneath them.
+        overlay.scale.setScalar(1.002);
+        obj.add(overlay);
+      }
+      scene.queueRender?.();
+    }
+
+    // --- Runtime auto-labelling from the model's own named meshes ---
+    const SKIP = /^(scene|rootnode|armature|root|node\d*|mesh\d*|object\d*|group\d*|primitive\d*)$/i;
+    const clean = (n: string) => n.replace(/[_.]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+    // model-viewer keeps its three.js scene on a private symbol; find it.
+    function findScene(mv: any) {
+      for (const s of Object.getOwnPropertySymbols(mv)) {
+        const v = mv[s];
+        if (v && typeof v.forHotspots === 'function' && v.target) return v;
+      }
+      return null;
+    }
+
+    async function labelModel(mv: any) {
+      if (mv.dataset.autolabelled) return;
+      const scene = findScene(mv);
+      if (!scene?.target) return;
+      mv.dataset.autolabelled = '1';
+
+      // three is loaded lazily so it can never block model-viewer from loading.
+      const THREE = await import('three');
+      const target = scene.target;
+      target.updateWorldMatrix(true, true);
+      const inv = new THREE.Matrix4().copy(target.matrixWorld).invert();
+      const toLocal = (v: any) => v.clone().applyMatrix4(inv);
+      const center = toLocal(new THREE.Box3().setFromObject(target).getCenter(new THREE.Vector3()));
+
+      let overrides: Record<string, any> = {};
+      try {
+        overrides = JSON.parse(mv.dataset.overrides || '{}');
+      } catch {}
+
+      const seen = new Set<string>();
+      const parts: { name: string; c: any }[] = [];
+      target.traverse((obj: any) => {
+        if (obj === target) return;
+        const name = (obj.name || '').trim();
+        if (!name || SKIP.test(name) || seen.has(name)) return;
+        const meshyChildren = (obj.children || []).filter(
+          (c: any) => c.isMesh || (c.children || []).some((g: any) => g.isMesh)
+        );
+        if (!obj.isMesh && meshyChildren.length === 0) return; // no mesh content at all
+        // A group wrapping several independent meshy children is an umbrella
+        // (e.g. the exporter's own root node) rather than a single named part.
+        if (!obj.isMesh && meshyChildren.length > 1) return;
+        const box = new THREE.Box3().setFromObject(obj);
+        if (box.isEmpty()) return;
+        seen.add(name);
+        parts.push({ name, c: toLocal(box.getCenter(new THREE.Vector3())) });
+      });
+
+      const visible = parts
+        .slice(0, 80)
+        .map((p) => ({ ...p, ov: overrides[p.name.toLowerCase()] || {} }))
+        .filter((p) => !p.ov.hide);
+      if (!visible.length) return;
+
+      // Direction from the model's center to each part, flattened to screen
+      // space (3D up is screen -y; depth is dropped). Auto-labelled models
+      // hold a fixed camera angle instead of auto-rotating, so this is a
+      // reasonable stand-in for a true camera-space projection.
+      const angleOf = (p: (typeof visible)[number]) => {
+        const dx = p.c.x - center.x;
+        const dy = p.c.y - center.y;
+        const a = (Math.atan2(-dy, dx) * 180) / Math.PI;
+        return a < 0 ? a + 360 : a;
+      };
+      const angDist = (a: number, b: number) => {
+        const d = Math.abs(a - b) % 360;
+        return d > 180 ? 360 - d : d;
+      };
+
+      // Fan labels out to evenly-spaced slots around the model so nearby
+      // parts never stack their tags on top of each other, assigning each
+      // part the free slot closest to its own natural direction. Slots start
+      // at a fixed 45° rather than half a slot-width in: with an even part
+      // count (2, 4, ...) that half-width offset lands exactly on 90/270 —
+      // dead vertical leader lines. A 45° base keeps every line on a diagonal.
+      const n = visible.length;
+      const slots = Array.from({ length: n }, (_, i) => 45 + (360 / n) * i);
+      const slotUsed = new Array(n).fill(false);
+      const finalAngle: number[] = new Array(n);
+      visible
+        .map((p, idx) => ({ idx, angle: angleOf(p) }))
+        .sort((a, b) => a.angle - b.angle)
+        .forEach(({ idx, angle }) => {
+          let best = 0;
+          let bestDist = Infinity;
+          for (let s = 0; s < n; s++) {
+            if (slotUsed[s]) continue;
+            const d = angDist(angle, slots[s]);
+            if (d < bestDist) {
+              bestDist = d;
+              best = s;
+            }
+          }
+          slotUsed[best] = true;
+          finalAngle[idx] = slots[best];
+        });
+
+      const rect = mv.getBoundingClientRect();
+      // Leave room for the tag itself (~150px wide) plus the leader's own gap,
+      // so labels land inside the viewer instead of running off its edge —
+      // model-viewer's shadow root clips anything outside its own box
+      // (overflow: hidden), so "off its edge" means genuinely cut off, not
+      // just visually crowded. Otherwise push labels out toward that edge
+      // rather than hugging the model, so lines read against open space.
+      const radius = Math.round(Math.max(65, Math.min(rect.width, rect.height) * 0.36 - 85));
+
+      visible.forEach((p, idx) => {
+        const dx = p.c.x - center.x;
+        const dy = p.c.y - center.y;
+        const dz = p.c.z - center.z;
+        const len = Math.hypot(dx, dy, dz) || 1;
+        const angle = finalAngle[idx];
+        const side = Math.cos((angle * Math.PI) / 180) >= 0 ? 'right' : 'left';
+
+        const btn = document.createElement('button');
+        btn.slot = `hotspot-auto-${idx + 1}`;
+        btn.className = 'mv-callout';
+        btn.dataset.side = side;
+        btn.style.setProperty('--mv-angle', `${angle}deg`);
+        btn.style.setProperty('--mv-radius', `${radius}px`);
+        btn.dataset.position = `${p.c.x}m ${p.c.y}m ${p.c.z}m`;
+        btn.dataset.normal = `${dx / len} ${dy / len} ${dz / len}`;
+
+        const label = esc(p.ov.label || clean(p.name));
+        const desc = p.ov.description ? esc(p.ov.description) : '';
+        if (p.ov.description) btn.title = p.ov.description;
+        btn.innerHTML =
+          '<span class="mv-callout__dot"></span><span class="mv-callout__leader"></span>' +
+          '<span class="mv-callout__tag">' +
+          `<span class="mv-callout__name">${label}</span>` +
+          (desc ? `<span class="mv-callout__desc">${desc}</span>` : '') +
+          '</span>';
+        mv.appendChild(btn);
+      });
+    }
+
+    // A comfort-padded version of model-viewer's own "auto" camera distance —
+    // see the click handler above for why plain "auto" isn't enough on its
+    // own. Reads the model's current bounding sphere, so it scales correctly
+    // for whatever size a given imported model turns out to be, rather than
+    // a distance tuned for one specific export.
+    function computeSnapRadius(mv: any): number | null {
+      const scene = findScene(mv);
+      if (!scene?.boundingSphere || !scene.framedFoVDeg) return null;
+      const halfFovRad = ((scene.framedFoVDeg / 2) * Math.PI) / 180;
+      const ideal = scene.boundingSphere.radius / Math.sin(halfFovRad);
+      return ideal * 1.15;
+    }
+
+    async function onModelLoad(mv: any) {
+      // Re-frame with the padded radius immediately, before anything async
+      // runs — model-viewer's own reveal fade hasn't happened yet at this
+      // point, so the corrected framing is what fades in. Doing this later
+      // meant the model would already be visible at the bare "auto" framing
+      // and then visibly snap to the padded one — the "weird snap and pop"
+      // the padding itself was supposed to fix.
+      mv.__snapRadius = computeSnapRadius(mv);
+      if (mv.__snapRadius) {
+        const { theta, phi } = mv.getCameraOrbit();
+        mv.cameraOrbit = `${(theta * 180) / Math.PI}deg ${(phi * 180) / Math.PI}deg ${mv.__snapRadius}m`;
+        mv.jumpCameraToGoal?.();
+      }
+
+      await buildWireframeOverlay(mv);
+      if (mv.matches('[data-autolabel]')) await labelModel(mv);
+    }
+
+    function wireModel(mv: any) {
+      if (mv.__modelWired) return;
+      mv.__modelWired = true;
+      wireCube(mv);
+      if (mv.loaded) onModelLoad(mv);
+      else mv.addEventListener('load', () => onModelLoad(mv), { once: true });
+    }
+
+    document.querySelectorAll('model-viewer').forEach((mv) => wireModel(mv as any));
+
+    // Present mode (and other dynamic inserts) clone model-viewers in later.
+    new MutationObserver((records) => {
+      for (const r of records) {
+        for (const n of r.addedNodes) {
+          if (!(n instanceof HTMLElement)) continue;
+          const added = n.matches?.('model-viewer') ? [n] : Array.from(n.querySelectorAll?.('model-viewer') ?? []);
+          for (const mv of added) wireModel(mv);
+        }
+      }
+    }).observe(document.body, { childList: true, subtree: true });
+    });
+  }
+
+  // IntersectionObserver fires its initial callback immediately for any
+  // target that's already in view when observation starts, so this alone
+  // correctly covers both "model is already visible on load" (no perceived
+  // delay) and "model is offscreen, in a collapsed section, etc." (stays
+  // dormant, unlike a plain getBoundingClientRect check which can't tell
+  // "already visible" apart from "hidden" — both report a zero-ish rect).
+  const frames = document.querySelectorAll<HTMLElement>('.model-viewer-frame');
+  if (frames.length) {
+    const io = new IntersectionObserver((entries, observer) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        observer.disconnect();
+        initModelViewer();
+      }
+    }, { rootMargin: '400px 0px' });
+    frames.forEach((f) => io.observe(f));
+  }
 </script>

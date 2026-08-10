@@ -8,22 +8,31 @@
 ---
 
 <!-- Lightbox Overlay -->
-<div id="lightbox" class="fixed inset-0 bg-background/95 backdrop-blur-md z-[9999] opacity-0 invisible transition-all duration-200 ease-out flex items-center justify-center p-8" role="dialog" aria-modal="true" aria-label="Media viewer">
+<!-- transition-opacity, not transition-all: with -all, the visibility:hidden
+     -> visible swap rides the same transition as opacity and doesn't
+     actually compute as visible until the transition resolves (~200ms
+     later) despite the class changing synchronously. That forced focus()
+     calls on open into a setTimeout to work at all, which broke the
+     browser's :focus-visible "was this a trusted click?" heuristic and
+     showed a focus ring even for mouse clicks. Scoping the transition to
+     opacity only makes visibility flip synchronously, like the spec says
+     it should for a hidden->visible transition. -->
+<div id="lightbox" class="fixed inset-0 bg-background/95 backdrop-blur-md z-[9999] opacity-0 invisible transition-opacity duration-200 ease-out flex items-center justify-center p-8" role="dialog" aria-modal="true" aria-label="Media viewer">
   <div id="lightbox-container" class="relative w-full h-full flex items-center justify-center">
     <!-- Close Button -->
-    <button id="close-btn" aria-label="Close" class="absolute top-4 right-4 z-[10] w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 flex items-center justify-center cursor-pointer">
+    <button id="close-btn" aria-label="Close" class="absolute top-4 right-4 z-[10] w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition duration-200 flex items-center justify-center cursor-pointer">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
 
     <!-- Zoom Controls (hidden for video) -->
     <div id="zoom-controls" class="absolute bottom-4 right-4 z-[10] flex gap-2">
-      <button id="zoom-out" aria-label="Zoom out" class="w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 flex items-center justify-center cursor-pointer">
+      <button id="zoom-out" aria-label="Zoom out" class="w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition duration-200 flex items-center justify-center cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
       </button>
-      <button id="zoom-reset" aria-label="Reset zoom" class="px-4 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 flex items-center justify-center cursor-pointer text-xs">
+      <button id="zoom-reset" aria-label="Reset zoom" class="px-4 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition duration-200 flex items-center justify-center cursor-pointer text-xs">
         Reset
       </button>
-      <button id="zoom-in" aria-label="Zoom in" class="w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition-all duration-200 flex items-center justify-center cursor-pointer">
+      <button id="zoom-in" aria-label="Zoom in" class="w-10 h-10 rounded border border-foreground/20 bg-background/90 backdrop-blur-sm text-foreground/60 hover:text-white hover:bg-accent hover:border-accent transition duration-200 flex items-center justify-center cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
       </button>
     </div>
@@ -32,7 +41,7 @@
          floating over the lightbox's own blurred backdrop. Sized off the
          img itself (max-w/h) rather than a fixed box, so there's no empty
          frame for a zoomed image to visibly spill past. -->
-    <div id="image-wrapper" class="w-full h-full flex items-center justify-center overflow-hidden opacity-0 scale-90 transition-all duration-200 ease-out">
+    <div id="image-wrapper" class="w-full h-full flex items-center justify-center overflow-hidden opacity-0 scale-90 transition duration-200 ease-out">
       <img
         id="lightbox-image"
         src=""
@@ -45,7 +54,7 @@
     </div>
 
     <!-- Video Container -->
-    <div id="video-wrapper" class="rounded-lg bg-black border-2 border-foreground-secondary/10 shadow-2xl max-w-full max-h-[calc(100vh-6rem)] flex items-center justify-center opacity-0 scale-90 transition-all duration-200 ease-out hidden">
+    <div id="video-wrapper" class="rounded-lg bg-black border-2 border-foreground-secondary/10 shadow-2xl max-w-full max-h-[calc(100vh-6rem)] flex items-center justify-center opacity-0 scale-90 transition duration-200 ease-out hidden">
       <video
         id="lightbox-video"
         src=""
@@ -57,6 +66,13 @@
     </div>
   </div>
 </div>
+
+<style>
+  /* See focusWithoutRing() in the script below for why this exists. */
+  .no-focus-ring:focus-visible {
+    outline: none;
+  }
+</style>
 
 <script>
   let scale = 1;
@@ -75,6 +91,22 @@
     return Array.from(
       container.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])')
     ).filter((el) => !el.closest('.hidden') && el.offsetParent !== null);
+  };
+
+  // Chromium's :focus-visible heuristic shows a ring for ANY script-driven
+  // focus() onto an element that wasn't itself the click/tap target —
+  // opening/closing the lightbox always moves focus to a DIFFERENT element
+  // (close-btn, or back to whatever triggered it) than what was actually
+  // clicked, so it always reads as focus-visible regardless of how the
+  // focus() call itself was scheduled. Suppress the ring for these specific
+  // programmatic moves via a scoped class rather than the global rule;
+  // real Tab navigation afterward is unaffected since it's a fresh focus
+  // event with its own (correct) heuristic result.
+  const focusWithoutRing = (el: HTMLElement | null) => {
+    if (!el) return;
+    el.classList.add('no-focus-ring');
+    el.focus();
+    el.addEventListener('blur', () => el.classList.remove('no-focus-ring'), { once: true });
   };
 
   const updateTransform = () => {
@@ -116,11 +148,7 @@
       iw.classList.remove('opacity-0', 'scale-90');
       iw.classList.add('opacity-100', 'scale-100');
     });
-    // #lightbox's visibility:hidden -> visible swap rides the same
-    // transition as its opacity, so the element isn't reliably focusable
-    // until that 200ms transition (see the matching duration-200 class)
-    // actually resolves — a same-frame/rAF focus() call silently no-ops.
-    setTimeout(() => document.getElementById('close-btn')?.focus(), 200);
+    focusWithoutRing(document.getElementById('close-btn'));
 
     document.body.style.overflow = 'hidden';
     resetZoom();
@@ -150,7 +178,7 @@
       vw.classList.add('opacity-100', 'scale-100');
       vid.play();
     });
-    setTimeout(() => document.getElementById('close-btn')?.focus(), 200);
+    focusWithoutRing(document.getElementById('close-btn'));
 
     document.body.style.overflow = 'hidden';
   };
@@ -181,7 +209,7 @@
     document.body.style.overflow = '';
     resetZoom();
 
-    lastFocusedElement?.focus();
+    focusWithoutRing(lastFocusedElement);
     lastFocusedElement = null;
   };
 
