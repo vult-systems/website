@@ -66,6 +66,10 @@ const badgeLabels: Record<string, string> = {
 };
 const usedCategories = [...new Set(artData.map(p => p.category))];
 
+// Temporarily disabled — not enough pieces across categories yet to justify
+// filter tabs. Flip back to true once the catalog has grown.
+const SHOW_ART_FILTERS = false;
+
 const seo = getArtPageSEO();
 ---
 
@@ -102,18 +106,20 @@ const seo = getArtPageSEO();
 			<PageContainer>
 
 				<!-- Tab Navigation -->
-				<div class="mb-10 overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
-					<div class="flex gap-6 border-b-2 border-foreground-secondary/10 whitespace-nowrap min-w-max sm:min-w-0">
-						<button class="art-tab pb-3 text-base text-accent border-b-2 border-accent -mb-[2px] transition-colors" data-filter="all" style="font-family: 'Besley', serif !important;">
-							All
-						</button>
-						{usedCategories.map((cat) => (
-							<button class="art-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-filter={cat} style="font-family: 'Besley', serif !important;">
-								{categoryLabels[cat] || cat}
+				{SHOW_ART_FILTERS && (
+					<div class="mb-10 overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
+						<div class="flex gap-6 border-b-2 border-foreground-secondary/10 whitespace-nowrap min-w-max sm:min-w-0">
+							<button class="art-tab pb-3 text-base text-accent border-b-2 border-accent -mb-[2px] transition-colors" data-filter="all" style="font-family: 'Besley', serif !important;">
+								All
 							</button>
-						))}
+							{usedCategories.map((cat) => (
+								<button class="art-tab pb-3 text-base text-foreground-secondary border-b-2 border-transparent -mb-[2px] hover:text-accent transition-colors" data-filter={cat} style="font-family: 'Besley', serif !important;">
+									{categoryLabels[cat] || cat}
+								</button>
+							))}
+						</div>
 					</div>
-				</div>
+				)}
 
 				<!-- Art Grid -->
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1" id="art-grid">

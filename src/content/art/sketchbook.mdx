@@ -3,7 +3,7 @@ title: "Sketchbook"
 description: "A running collection of quick sculpts, class demos, studies, and experiments."
 heroImage: "../../assets/sketchbook/cg_sketchbook_thumbnail_01.png"
 pubDate: 2026-08-09
-category: "digital"
+category: "character"
 tags: ["Sketchbook", "Studies", "ZBrush"]
 tools: ["ZBrush"]
 client: ["Vult", "UIW3D"]
@@ -76,8 +76,10 @@ A place for smaller and random art that doesn't belong to a larger project. Quic
 <div class="my-8 [container-type:inline-size]">
   <div class="grid grid-cols-1 sm:grid-cols-2 [grid-auto-flow:dense]" style={`gap: ${GAP_CQW}cqw; grid-auto-rows: ${ROW_CQW}cqw;`}>
     {sketches.map(({ img, alt, wide }) => (
-      <div class={`rounded-md overflow-hidden bg-card ${wide ? 'sm:col-span-2' : ''}`} style={`grid-row: span ${rowSpan(img, wide ? 2 : 1)}`}>
-        <img src={img.src} alt={alt} class="w-full h-full object-contain !my-0" />
+      <div class={`spotlight-card group relative ${wide ? 'sm:col-span-2' : ''}`} style={`grid-row: span ${rowSpan(img, wide ? 2 : 1)}`}>
+        <div class="spotlight-inner h-full rounded-md overflow-hidden bg-card transition-all duration-300 group-hover:scale-[1.02]">
+          <img src={img.src} alt={alt} class="w-full h-full object-contain !my-0" />
+        </div>
       </div>
     ))}
   </div>

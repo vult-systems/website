@@ -362,5 +362,31 @@ const formatDate = (date: Date) =>
     setupArtVideos();
     document.addEventListener('astro:page-load', setupArtVideos);
   </script>
+
+  <script>
+    // Wrap plain content images in the site's spotlight-card glow (see
+    // globals.css) so post breakdowns get the same hover treatment as the
+    // art grid cards, without hand-editing every post's markup. Skips images
+    // already wired up manually (e.g. the sketchbook bento grid) and video
+    // previews, which already have their own lightbox hover treatment.
+    const initArtSpotlightMedia = () => {
+      const prose = document.querySelector('.prose');
+      if (!prose) return;
+      const images = prose.querySelectorAll<HTMLImageElement>('img:not([data-no-lightbox])');
+      images.forEach((img) => {
+        if (img.closest('.spotlight-card')) return;
+        const card = document.createElement('div');
+        card.className = 'spotlight-card group relative block my-8';
+        const inner = document.createElement('div');
+        inner.className = 'spotlight-inner rounded-md overflow-hidden transition-all duration-300 group-hover:scale-[1.02]';
+        img.replaceWith(card);
+        card.appendChild(inner);
+        inner.appendChild(img);
+        img.classList.add('!my-0');
+      });
+    };
+    initArtSpotlightMedia();
+    document.addEventListener('astro:page-load', initArtSpotlightMedia);
+  </script>
 </BaseLayout>
 
