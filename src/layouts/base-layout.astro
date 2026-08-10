@@ -14,6 +14,7 @@ import { getImage } from 'astro:assets';
 import logoSvg from '@/assets/brand/logo.svg';
 import Analytics from '@/components/analytics/Analytics.astro';
 import VercelAnalytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { SITE, getKeywordsString } from '@/config/site';
 
@@ -146,6 +147,7 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		<!-- Analytics Integration -->
 		<Analytics />
 		<VercelAnalytics />
+		<SpeedInsights />
 		
 		<script is:inline>
 			// On page load or when changing themes, best to add inline in `head` to avoid FOUC

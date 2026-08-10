@@ -30,6 +30,7 @@
     "@sanity/table": "^3.1.8",
     "@sanity/vision": "^6.9.0",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "astro": "^5.14.5",
     "astro-portabletext": "^0.13.0",
     "react": "^19.2.7",
