@@ -6,7 +6,6 @@ import PageMain from '@/components/layout/page-main.astro';
 import PageContainer from '@/components/layout/page-container.astro';
 import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
-import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getResourcesPageSEO } from '@/config/seo';
@@ -455,7 +454,6 @@ data-slug={resourceId(group.category)}
 <script is:inline define:vars={{ resourceHowToMap }}>
 window.__resourceHowTo = resourceHowToMap;
 </script>
-<ImageLightbox />
 </BaseLayout>
 
 <style>

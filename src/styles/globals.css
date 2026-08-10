@@ -51,6 +51,14 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Sitewide baseline focus ring — nav links, cards, and buttons otherwise
+     rely on unstyled browser defaults (or none at all inside custom
+     components that reset outline). :focus-visible (not :focus) so mouse
+     clicks don't show a ring, only keyboard/programmatic focus does. */
+  :focus-visible {
+    outline: 2px solid hsl(var(--accent));
+    outline-offset: 2px;
+  }
 }
 
 /* View Transitions Animations */

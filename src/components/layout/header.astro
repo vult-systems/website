@@ -66,7 +66,7 @@ const currentPath = Astro.url.pathname;
             </nav>
 
             <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" class="md:hidden flex flex-col gap-[5px] items-center justify-center p-1 -mb-[2px]" aria-label="Toggle menu">
+            <button id="mobile-menu-btn" class="md:hidden flex flex-col gap-[5px] items-center justify-center p-1 -mb-[2px]" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
                 <span class="hamburger-line block w-5 h-[2px] bg-foreground transition-all duration-300"></span>
                 <span class="hamburger-line block w-5 h-[2px] bg-foreground transition-all duration-300"></span>
                 <span class="hamburger-line block w-5 h-[2px] bg-foreground transition-all duration-300"></span>
@@ -150,22 +150,42 @@ nav a.text-base {
         const fresh = btn.cloneNode(true) as HTMLElement;
         btn.parentNode?.replaceChild(fresh, btn);
 
+        const closeMenu = () => {
+            fresh.classList.remove('open');
+            menu.classList.add('hidden');
+            fresh.setAttribute('aria-expanded', 'false');
+        };
+
         fresh.addEventListener('click', () => {
-            fresh.classList.toggle('open');
+            const isOpen = fresh.classList.toggle('open');
             menu.classList.toggle('hidden');
+            fresh.setAttribute('aria-expanded', String(isOpen));
         });
 
         // Close on link click
         menu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                fresh.classList.remove('open');
-                menu.classList.add('hidden');
-            });
+            link.addEventListener('click', closeMenu);
         });
     };
 
     initMobileMenu();
     document.addEventListener('astro:after-swap', initMobileMenu);
+
+    // Close on Escape — bound once for the session; re-reads the current
+    // menu/button live so it stays correct across view-transition navigations
+    // instead of accumulating a new listener on every astro:after-swap.
+    if (!(window as any).__mobileMenuEscape) {
+        (window as any).__mobileMenuEscape = true;
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            const menu = document.getElementById('mobile-menu');
+            const btn = document.getElementById('mobile-menu-btn');
+            if (!menu || menu.classList.contains('hidden')) return;
+            menu.classList.add('hidden');
+            btn?.classList.remove('open');
+            btn?.setAttribute('aria-expanded', 'false');
+        });
+    }
 
     const updateActiveNav = () => {
         const path = window.location.pathname;

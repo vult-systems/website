@@ -9,7 +9,6 @@ import Heading from '@/components/ui/heading.astro';
 import Text from '@/components/ui/text.astro';
 import Badge from '@/components/ui/badge.astro';
 import Link from '@/components/ui/link.astro';
-import ImageLightbox from '@/components/ui/image-lightbox.astro';
 import { getArtPageSEO } from '@/config/seo';
 import mayaLogo from '@/assets/logos/software-autodesk-maya-logo-01.png';
 import zbrushLogo from '@/assets/logos/software-maxon-zbrush-logo-01.png';
@@ -287,7 +286,6 @@ const formatDate = (date: Date) =>
     </div>
   </PageMain>
   <Footer />
-  <ImageLightbox />
 
   <!-- Prev/Next Art Navigation -->
   {prevArt && (

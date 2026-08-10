@@ -281,6 +281,9 @@ const carouselPieces = artPieces;
     const AUTO_SPEED = 0.4;
     const FRICTION = 0.92;
     const MIN_VELOCITY = 0.05;
+    // Perpetual auto-scroll is exactly the kind of motion prefers-reduced-motion
+    // exists to suppress; user-initiated drag/momentum below is unaffected.
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     let pos = 0;
     let isDragging = false;
@@ -314,7 +317,7 @@ const carouselPieces = artPieces;
           isMomentum = false;
           velocity = 0;
         }
-      } else {
+      } else if (!reducedMotionQuery.matches) {
         pos -= AUTO_SPEED;
         wrap();
         track.style.transform = `translateX(${pos}px)`;
