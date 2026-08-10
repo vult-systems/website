@@ -36,8 +36,8 @@ import snapdragonLogoWht from '@/assets/logos/snapdragon_elite_gaming_badge-wht.
 import snapdragonLogoBlk from '@/assets/logos/snapdragon_elite_gaming_badge-blk.png';
 import biowareLogoWht from '@/assets/logos/bioware-logo-wht.png';
 import biowareLogoBlk from '@/assets/logos/bioware-logo-blk.png';
-import uiw3dLogoWht from '@/assets/logos/uiw3d-logo-wht.png';
-import uiw3dLogoBlk from '@/assets/logos/uiw3d-logo-blk.png';
+import uiw3dLogoWht from '@/assets/logos/uiw3d-horiz-logo-wht.png';
+import uiw3dLogoBlk from '@/assets/logos/uiw3d-horiz-logo-blk.png';
 import swtorLogo from '@/assets/logos/star-wars-the-old-republic-logo-hd-png.png';
 import artstationLogo from '@/assets/logos/artstation-logo-white.png';
 import vertexSchoolLogoWht from '@/assets/logos/vertex-school-logo-wht.png';
@@ -83,7 +83,8 @@ const projectLogos: Record<string, { light: string; dark: string }> = {
 const clientLogoSizes: Record<string, string> = {
   '343 Industries': 'w-1/2',
   'BioWare': 'w-3/5',
-  'UIW3D': 'w-2/5',
+  'UIW3D': 'w-full',
+  'Vult': 'w-2/5',
 };
 
 const projectLogoSizes: Record<string, string> = {
@@ -160,23 +161,31 @@ const formatDate = (date: Date) =>
               )}
 
               <!-- Company / Client -->
-              {art.data.client && clientLogos[art.data.client] && (
+              {art.data.client && (
                 <div>
                   <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-3 block" style="font-family: 'Besley', serif !important;">
                     Studio
                   </Text>
-                  <img
-                    src={clientLogos[art.data.client].light}
-                    alt={art.data.client}
-                    class={`${clientLogoSizes[art.data.client] ?? 'w-3/4'} h-auto object-contain opacity-80 dark:hidden`}
-                    data-no-lightbox
-                  />
-                  <img
-                    src={clientLogos[art.data.client].dark}
-                    alt={art.data.client}
-                    class={`${clientLogoSizes[art.data.client] ?? 'w-3/4'} h-auto object-contain opacity-80 hidden dark:block`}
-                    data-no-lightbox
-                  />
+                  <div class="flex flex-col gap-4">
+                    {(Array.isArray(art.data.client) ? art.data.client : [art.data.client])
+                      .filter((client) => clientLogos[client])
+                      .map((client) => (
+                        <div>
+                          <img
+                            src={clientLogos[client].light}
+                            alt={client}
+                            class={`${clientLogoSizes[client] ?? 'w-3/4'} h-auto object-contain opacity-80 dark:hidden`}
+                            data-no-lightbox
+                          />
+                          <img
+                            src={clientLogos[client].dark}
+                            alt={client}
+                            class={`${clientLogoSizes[client] ?? 'w-3/4'} h-auto object-contain opacity-80 hidden dark:block`}
+                            data-no-lightbox
+                          />
+                        </div>
+                      ))}
+                  </div>
                 </div>
               )}
 

@@ -12,7 +12,7 @@ const artCollection = defineCollection({
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     tools: z.array(z.string()).optional(),
-    client: z.string().optional(),
+    client: z.union([z.string(), z.array(z.string())]).optional(),
     project: z.string().optional(),
     role: z.string().optional(),
     order: z.number().default(999),

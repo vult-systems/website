@@ -1,0 +1,84 @@
+---
+title: "Sketchbook"
+description: "A running collection of quick sculpts, class demos, studies, and experiments."
+heroImage: "../../assets/sketchbook/cg_sketchbook_thumbnail_01.png"
+pubDate: 2026-08-09
+category: "digital"
+tags: ["Sketchbook", "Studies", "ZBrush"]
+tools: ["ZBrush"]
+client: ["Vult", "UIW3D"]
+role: "3D Character Artist"
+featured: false
+order: 1001
+size: "medium"
+---
+
+import Heading from '@/components/ui/heading.astro';
+import sketch01 from '@/assets/sketchbook/cg_sketchbook_001.jpg';
+import sketch02 from '@/assets/sketchbook/cg_sketchbook_002.jpg';
+import sketch03 from '@/assets/sketchbook/cg_sketchbook_003.jpg';
+import sketch04 from '@/assets/sketchbook/cg_sketchbook_004.jpg';
+import sketch05 from '@/assets/sketchbook/cg_sketchbook_005.jpg';
+import sketch06 from '@/assets/sketchbook/cg_sketchbook_006.jpg';
+import sketch07 from '@/assets/sketchbook/cg_sketchbook_007.jpg';
+import sketch08 from '@/assets/sketchbook/cg_sketchbook_008.jpg';
+import sketch09 from '@/assets/sketchbook/cg_sketchbook_009.jpg';
+import sketch10 from '@/assets/sketchbook/cg_sketchbook_010.jpg';
+import sketch11Gif from '@/assets/sketchbook/cg_sketchbook_011.gif';
+import sketch13 from '@/assets/sketchbook/cg_sketchbook_013.jpg';
+import sketch14 from '@/assets/sketchbook/cg_sketchbook_thumbnail_014.png';
+import sketch15 from '@/assets/sketchbook/cg_sketchbook_thumbnail_015.png';
+import sketch16 from '@/assets/sketchbook/cg_sketchbook_thumbnail_016.png';
+import sketch17 from '@/assets/sketchbook/cg_sketchbook_thumbnail_017.png';
+import sketch18 from '@/assets/sketchbook/cg_sketchbook_thumbnail_018.png';
+import sketch19 from '@/assets/sketchbook/cg_sketchbook_thumbnail_019.png';
+
+export const sketches = [
+  { img: sketch01, alt: 'Sketchbook study 01' },
+  { img: sketch02, alt: 'Sketchbook study 02' },
+  { img: sketch03, alt: 'Sketchbook study 03', wide: true },
+  { img: sketch04, alt: 'Sketchbook study 04' },
+  { img: sketch05, alt: 'Sketchbook study 05', wide: true },
+  { img: sketch06, alt: 'Sketchbook study 06' },
+  { img: sketch07, alt: 'Sketchbook study 07', wide: true },
+  { img: sketch08, alt: 'Sketchbook study 08' },
+  { img: sketch09, alt: 'Sketchbook study 09' },
+  { img: sketch10, alt: 'Sketchbook study 10' },
+  { img: sketch11Gif, alt: 'Sketchbook study 11 (turnaround)' },
+  { img: sketch13, alt: 'Sketchbook study 13', wide: true },
+  { img: sketch14, alt: 'Adventure Time Finn poses' },
+  { img: sketch15, alt: 'Hourglass character sculpt' },
+  { img: sketch16, alt: 'Robot skull head sculpt' },
+  { img: sketch17, alt: 'Bowser bust sculpt' },
+  { img: sketch18, alt: 'Gumball character sculpt' },
+  { img: sketch19, alt: 'Creature study sculpt' },
+];
+
+{/*
+  Bento grid sized from each image's real aspect ratio (no preset buckets,
+  no cropping). Row/gap/column units are all expressed in cqw (% of the grid's
+  own container width), not px, so the exact aspect ratio holds true at every
+  viewport instead of only the one width it was tuned against.
+*/}
+export const GAP_CQW = 1.8;
+export const ROW_CQW = 0.9;
+export const COL_CQW = (100 - GAP_CQW) / 2;
+export const rowSpan = (img, cols = 1) => {
+  const width = cols === 2 ? 100 : COL_CQW;
+  const height = (img.height / img.width) * width;
+  return Math.max(1, Math.ceil((height + GAP_CQW) / (ROW_CQW + GAP_CQW)));
+};
+
+<Heading level={2} size="4xl">Sketchbook</Heading>
+
+A place for smaller and random art that doesn't belong to a larger project. Quick studies, demos, tests, and whatever else I happen to have laying around. Enjoy!
+
+<div class="my-8 [container-type:inline-size]">
+  <div class="grid grid-cols-1 sm:grid-cols-2 [grid-auto-flow:dense]" style={`gap: ${GAP_CQW}cqw; grid-auto-rows: ${ROW_CQW}cqw;`}>
+    {sketches.map(({ img, alt, wide }) => (
+      <div class={`rounded-md overflow-hidden bg-card ${wide ? 'sm:col-span-2' : ''}`} style={`grid-row: span ${rowSpan(img, wide ? 2 : 1)}`}>
+        <img src={img.src} alt={alt} class="w-full h-full object-contain !my-0" />
+      </div>
+    ))}
+  </div>
+</div>
