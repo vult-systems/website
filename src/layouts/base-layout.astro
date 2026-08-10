@@ -251,13 +251,22 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		to { opacity: 0; }
 	}
 
-	/* Global image fade-in — uses animation not transition so it doesn't conflict with hover transitions */
-	img:not([data-no-lightbox]):not(#lightbox-image):not(.img-ready):not(.img-loaded) {
+	/* Global image fade-in — uses animation not transition so it doesn't conflict with hover transitions.
+	   data-no-lightbox only opts an image out of the click-to-zoom lightbox
+	   (see image-lightbox.astro) — it has nothing to do with fade-in, but
+	   used to be excluded here too, which meant nearly every prominent image
+	   sitewide (grid thumbnails, hero photos, carousel images all carry
+	   data-no-lightbox) skipped the fade and just popped in the instant it
+	   decoded. When several finish loading in the same instant — the normal
+	   case for a grid of thumbnails — that reads as a synchronized flash
+	   instead of a smooth reveal. #lightbox-image (the open lightbox's own
+	   image) is still excluded since it has its own scale/opacity transition. */
+	img:not(#lightbox-image):not(.img-ready):not(.img-loaded) {
 		opacity: 0;
 	}
 
-	img.img-loaded:not([data-no-lightbox]):not(#lightbox-image) {
-		animation: img-fade-in 0.25s ease-out both;
+	img.img-loaded:not(#lightbox-image) {
+		animation: img-fade-in 0.25s ease-out var(--img-fade-delay, 0ms) both;
 	}
 
 	@keyframes img-fade-in {
@@ -277,12 +286,23 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 <script>
 	const initImageFadeGlobal = () => {
 		const imgs = document.querySelectorAll<HTMLImageElement>(
-			'img:not([data-no-lightbox]):not(#lightbox-image)'
+			'img:not(#lightbox-image)'
 		);
+		// A page swap's grid images (thumbnails etc.) all start loading at once
+		// and, on a fast connection, finish within a few ms of each other —
+		// without staggering, that's a whole grid's worth of images fading
+		// from 0 to full opacity in the same instant, which reads as a single
+		// flash rather than a smooth reveal. Delaying each by its DOM order
+		// (capped) turns that into a brief ripple instead. Only images that
+		// actually animate (the 'load' path below) need it — already-complete
+		// ones get 'img-ready' with no animation, so no delay to stagger.
+		let loadIndex = 0;
 		imgs.forEach((img) => {
 			if (img.complete && img.naturalWidth > 0) {
 				img.classList.add('img-ready');
 			} else {
+				img.style.setProperty('--img-fade-delay', `${Math.min(loadIndex * 30, 300)}ms`);
+				loadIndex++;
 				img.addEventListener('load', () => img.classList.add('img-loaded'), { once: true });
 				img.addEventListener('error', () => img.classList.add('img-loaded'), { once: true });
 			}
