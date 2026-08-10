@@ -758,7 +758,15 @@ const rowCategories = categories
     document.querySelectorAll<HTMLElement>('#lp-slide .pt-generator').forEach(fitPresentGenerator);
   });
 
-  document.querySelectorAll<HTMLElement>('.pt-generator').forEach(wireGenerator);
+  function initGenerators() {
+    document.querySelectorAll<HTMLElement>('.pt-generator').forEach(wireGenerator);
+  }
+  // Run immediately (catches initial page load before astro:page-load fires)
+  initGenerators();
+  // Run again on ViewTransitions navigation — Astro only evaluates this
+  // script's top-level code once per session, so without this the Generate
+  // button on a freshly swapped-in page never gets its click listener.
+  document.addEventListener('astro:page-load', initGenerators);
 
   // Present mode clones lecture-body content into slides via cloneNode,
   // which copies attributes/markup — including data-wired — but never live
@@ -768,6 +776,11 @@ const rowCategories = categories
   // reading-page instance happened to roll at page load (dead Generate
   // button, and this block's own fitPresentGenerator never got a chance to
   // run since generate() never fired for the clone).
+  // Observes document.documentElement (not document.body) since Astro's
+  // ViewTransitions router replaces document.body wholesale on every
+  // navigation — an observer on the old body reference would end up
+  // watching a detached node after the first swap. documentElement persists
+  // across navigations, so this one observer keeps working indefinitely.
   new MutationObserver((records) => {
     for (const r of records) {
       for (const n of r.addedNodes) {
@@ -779,5 +792,5 @@ const rowCategories = categories
         });
       }
     }
-  }).observe(document.body, { childList: true, subtree: true });
+  }).observe(document.documentElement, { childList: true, subtree: true });
 </script>
