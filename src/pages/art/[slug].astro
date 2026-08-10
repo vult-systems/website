@@ -10,6 +10,7 @@ import Text from '@/components/ui/text.astro';
 import Badge from '@/components/ui/badge.astro';
 import Link from '@/components/ui/link.astro';
 import { getArtPageSEO } from '@/config/seo';
+import { SITE } from '@/config/site';
 import mayaLogo from '@/assets/logos/software-autodesk-maya-logo-01.png';
 import zbrushLogo from '@/assets/logos/software-maxon-zbrush-logo-01.png';
 import substanceLogo from '@/assets/logos/software-substance-painter-logo-01.webp';
@@ -115,6 +116,20 @@ const seo = getArtPageSEO(art.data.title);
 
 const formatDate = (date: Date) =>
   new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  headline: art.data.title,
+  description: art.data.description,
+  image: heroImageSrc ? new URL(heroImageSrc, Astro.site).toString() : undefined,
+  datePublished: art.data.pubDate.toISOString(),
+  author: {
+    '@type': 'Person',
+    name: SITE.author.name,
+  },
+  keywords: art.data.tags?.join(', '),
+};
 ---
 
 <BaseLayout
@@ -124,6 +139,7 @@ const formatDate = (date: Date) =>
   type="article"
   keywords={art.data.tags?.join(', ')}
 >
+  <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
   <Header />
   <PageMain class="text-foreground">
     <div class="relative z-10 w-full py-8 sm:py-12">
@@ -137,7 +153,12 @@ const formatDate = (date: Date) =>
 
               <!-- Title & Description -->
               <div>
-                <Heading level={1} size="xl" class="mb-2 leading-tight">
+                <!-- level=2, not 1: the mobile header below renders the same
+                     title as the page's real h1. Both exist in the DOM at
+                     once (only one is visually shown per breakpoint via
+                     hidden/lg:hidden), so only one can be h1 without
+                     producing two on every page. -->
+                <Heading level={2} size="xl" class="mb-2 leading-tight">
                   {art.data.title}
                 </Heading>
                 {art.data.description && (
