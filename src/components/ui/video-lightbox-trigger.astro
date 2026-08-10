@@ -1,0 +1,44 @@
+---
+// Muted, looping autoplay video preview with the site's spotlight-card glow
+// (same effect as content images — see globals.css). Click opens the full
+// video in the sitewide lightbox via image-lightbox.astro's
+// `.video-lightbox-trigger[data-video]` click delegation, and the
+// [slug].astro IntersectionObserver plays/pauses it based on scroll
+// visibility (relies on the `data-autoplay` attribute below).
+//
+// For a single video meant to be watched inline with native controls
+// (Sanity Log posts), use PortableTextVideo.astro instead — this component
+// is specifically the autoplaying "preview that opens bigger" pattern.
+interface Props {
+  src: string;
+  poster?: string;
+  aspectRatio?: string; // CSS aspect-ratio value, e.g. '16/9', '1/1', '4/3'
+  class?: string;
+}
+
+const { src, poster, aspectRatio = '16/9', class: className = '' } = Astro.props;
+---
+
+<div class={`spotlight-card group relative my-8 ${className}`}>
+  <div
+    class="video-lightbox-trigger spotlight-inner relative rounded-md overflow-hidden cursor-pointer bg-black transition-all duration-300 group-hover:scale-[1.02]"
+    style={`aspect-ratio: ${aspectRatio}`}
+    data-video={src}
+  >
+    <video
+      src={src}
+      poster={poster}
+      class="w-full h-full object-cover block pointer-events-none"
+      loop
+      muted
+      playsinline
+      preload="none"
+      data-autoplay
+    ></video>
+    <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
+      <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    </div>
+  </div>
+</div>

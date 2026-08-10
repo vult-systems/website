@@ -16,13 +16,18 @@ size: "medium"
 
 import { Image } from 'astro:assets';
 import Heading from '@/components/ui/heading.astro';
+import VideoLightboxTrigger from '@/components/ui/video-lightbox-trigger.astro';
 import conceptArt from '@/assets/monomyth/aurech/monomyth_aurech_conceptart.png';
 import teeth01 from '@/assets/monomyth/aurech/mm_aurech_mod_teeth_v04_0001.png';
 import teeth02 from '@/assets/monomyth/aurech/mm_aurech_mod_teeth_v04_0002.png';
 import clayFull from '@/assets/monomyth/aurech/mm_aurech_mod_clay_full_v02.mp4';
+import clayFullPoster from '@/assets/monomyth/aurech/mm_aurech_mod_clay_full_v02-poster.jpg';
 import wiresFull from '@/assets/monomyth/aurech/mm_aurech_mod_wires_full_v02.mp4';
+import wiresFullPoster from '@/assets/monomyth/aurech/mm_aurech_mod_wires_full_v02-poster.jpg';
 import hairClay from '@/assets/monomyth/aurech/mm_aurech_mod_hair_v02_clay_compressed.mp4';
+import hairClayPoster from '@/assets/monomyth/aurech/mm_aurech_mod_hair_v02_clay_compressed-poster.jpg';
 import hairWires from '@/assets/monomyth/aurech/mm_aurech_mod_hair_v02_wires_compressed.mp4';
+import hairWiresPoster from '@/assets/monomyth/aurech/mm_aurech_mod_hair_v02_wires_compressed-poster.jpg';
 
 <Heading level={2} size="4xl">Project Overview</Heading>
 
@@ -30,73 +35,13 @@ Aurech is the protagonist of an upcoming character vignette for *Monomyth*, an o
 
 The turntables below showcase the clay and wireframe passes, the hair model developed with grooming in mind, and the additional detail work completed for the teeth.
 
-<div class="video-lightbox-trigger group relative aspect-video overflow-hidden cursor-pointer rounded-md my-8" data-video={hairClay}>
-  <video
-    src={hairClay}
-    class="w-full h-full object-cover block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
-    loop
-    muted
-    playsinline
-    preload="none"
-    data-autoplay
-  ></video>
-  <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
-    <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  </div>
-</div>
+<VideoLightboxTrigger src={hairClay} poster={hairClayPoster.src} />
 
-<div class="video-lightbox-trigger group relative aspect-video overflow-hidden cursor-pointer rounded-md my-8" data-video={hairWires}>
-  <video
-    src={hairWires}
-    class="w-full h-full object-cover block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
-    loop
-    muted
-    playsinline
-    preload="none"
-    data-autoplay
-  ></video>
-  <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
-    <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  </div>
-</div>
+<VideoLightboxTrigger src={hairWires} poster={hairWiresPoster.src} />
 
-<div class="video-lightbox-trigger group relative aspect-video overflow-hidden cursor-pointer rounded-md my-8" data-video={clayFull}>
-  <video
-    src={clayFull}
-    class="w-full h-full object-cover block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
-    loop
-    muted
-    playsinline
-    preload="none"
-    data-autoplay
-  ></video>
-  <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
-    <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  </div>
-</div>
+<VideoLightboxTrigger src={clayFull} poster={clayFullPoster.src} />
 
-<div class="video-lightbox-trigger group relative aspect-video overflow-hidden cursor-pointer rounded-md my-8" data-video={wiresFull}>
-  <video
-    src={wiresFull}
-    class="w-full h-full object-cover block pointer-events-none rounded-md transition-transform duration-300 group-hover:scale-[1.02]"
-    loop
-    muted
-    playsinline
-    preload="none"
-    data-autoplay
-  ></video>
-  <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20">
-    <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  </div>
-</div>
+<VideoLightboxTrigger src={wiresFull} poster={wiresFullPoster.src} />
 
 <Image src={teeth01} alt="Aurech - Teeth Detail 01" class="rounded-md my-8" />
 

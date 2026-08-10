@@ -187,6 +187,7 @@ id={studentId(piece)}
 <div class="video-lightbox-trigger relative bg-foreground/5 overflow-hidden cursor-pointer" data-video={piece.video} style={piece.aspectratio ? `aspect-ratio:${piece.aspectratio}` : undefined}>
 <video
 src={piece.video}
+poster={piece.video.replace(/\.mp4$/, '-poster.jpg')}
 class="w-full h-full object-cover pointer-events-none"
 loop
 muted

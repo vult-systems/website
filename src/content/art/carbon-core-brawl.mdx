@@ -16,6 +16,7 @@ size: "medium"
 
 import { Image } from 'astro:assets';
 import Heading from '@/components/ui/heading.astro';
+import VideoLightboxTrigger from '@/components/ui/video-lightbox-trigger.astro';
 import balorTurnaround from '@/assets/carbon-core-brawl/ccb-balor-render-turnaround.jpg';
 import balorTurnaroundWires from '@/assets/carbon-core-brawl/ccb-balor-render-turnaround-wireframe.jpg';
 import balorTurnaroundBakes from '@/assets/carbon-core-brawl/ccb-balor-render-turnaround-bakes.jpg';
@@ -24,6 +25,7 @@ import balorThumb02 from '@/assets/carbon-core-brawl/ccb-balor-thumb-02.png';
 import balorSelectFront from '@/assets/carbon-core-brawl/ccb-balor-select-screen-front.jpg';
 import balorSelectBack from '@/assets/carbon-core-brawl/ccb-balor-select-screen-back.jpg';
 import balorAnimation from '@/assets/carbon-core-brawl/ccb-balor-animation.mp4';
+import balorAnimationPoster from '@/assets/carbon-core-brawl/ccb-balor-animation-poster.jpg';
 import mizettoFront from '@/assets/carbon-core-brawl/ccb-mizetto-render-front.jpg';
 import mizettoBack from '@/assets/carbon-core-brawl/ccb-mizetto-render-back.jpg';
 import mainMenu from '@/assets/carbon-core-brawl/ccb-main-menu.jpg';
@@ -32,21 +34,7 @@ import mainMenu from '@/assets/carbon-core-brawl/ccb-main-menu.jpg';
 
 These characters were created for Carbon Core: Brawl, a multiplayer demo developed at Qualcomm and showcased at CES. Balor was completed as a fully playable character and integrated into the final experience, while Mizetto was developed during production but ultimately did not make it into the demo due to time and integration constraints.
 
-<div class="video-lightbox-trigger relative overflow-hidden cursor-pointer rounded-md my-8" data-video={balorAnimation}>
-  <video
-    src={balorAnimation}
-    class="w-full h-auto block pointer-events-none rounded-md"
-    loop
-    muted
-    playsinline
-    autoplay
-  ></video>
-  <div class="absolute inset-0 flex items-center justify-center transition-opacity bg-transparent hover:bg-black/20 group">
-    <svg class="w-12 h-12 text-white/80 opacity-0 hover:opacity-100 transition-opacity drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M8 5v14l11-7z" />
-    </svg>
-  </div>
-</div>
+<VideoLightboxTrigger src={balorAnimation} poster={balorAnimationPoster.src} />
 
 ## Balor
 
