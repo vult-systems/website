@@ -19,10 +19,16 @@ import { urlFor } from '@/lib/sanity/image';
 import { bodyToPlainText, slugify, extractMedia } from '@/lib/sanity/toc';
 import PortableText from '@/components/sanity/PortableText.astro';
 
-// Read live from Sanity at request time (edits appear instantly).
+// Read live from Sanity at request time. coursesQuery pulls the full
+// curriculum body (every course -> project -> thread, with images/models)
+// on every request, which made this page noticeably slow to navigate to —
+// so responses are cached at Vercel's edge for 45s (stale-while-revalidate
+// for up to 5min beyond that) instead of hitting Sanity fresh every time.
+// Edits still show up within under a minute, just not instantly.
 export const prerender = false;
 
 const seo = getLearnPageSEO();
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=45, stale-while-revalidate=300');
 
 // -------------------------------------------------------------------
 // Syllabus & Assignment Images
