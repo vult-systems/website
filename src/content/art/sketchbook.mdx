@@ -63,20 +63,39 @@ export const sketches = [
 export const GAP_CQW = 1.8;
 export const ROW_CQW = 0.9;
 export const COL_CQW = (100 - GAP_CQW) / 2;
-export const rowSpan = (img, cols = 1) => {
-  const width = cols === 2 ? 100 : COL_CQW;
-  const height = (img.height / img.width) * width;
+// Row-span count needed for an image rendered at a given % of the grid's
+// own width (cqw units), so this always matches the item's ACTUAL rendered
+// width rather than assuming a fixed column count.
+export const rowSpanForWidth = (img, widthCqw) => {
+  const height = (img.height / img.width) * widthCqw;
   return Math.max(1, Math.ceil((height + GAP_CQW) / (ROW_CQW + GAP_CQW)));
 };
+// Desktop (sm:grid-cols-2): non-wide items sit in one of two columns
+// (COL_CQW wide), wide items span both (100 wide).
+export const rowSpan = (img, cols = 1) => rowSpanForWidth(img, cols === 2 ? 100 : COL_CQW);
 
 <Heading level={2} size="4xl">Sketchbook</Heading>
 
 A place for smaller and random art that doesn't belong to a larger project. Quick studies, demos, tests, and whatever else I happen to have laying around. Enjoy!
 
+<style>{`
+  /* grid-cols-1 below sm means every item (wide or not) actually renders at
+     100% of the grid's width, not the desktop column width rowSpan() below
+     assumes — so row height needs its own mobile-width calculation instead
+     of reusing the desktop one, or short items end up reserved half the
+     height they need and float tiny inside a too-short cell. */
+  .sketchbook-item { grid-row: span var(--row-mobile); }
+  @media (min-width: 640px) {
+    .sketchbook-item { grid-row: span var(--row-desktop); }
+  }
+`}</style>
 <div class="my-8 [container-type:inline-size]">
   <div class="grid grid-cols-1 sm:grid-cols-2 [grid-auto-flow:dense]" style={`gap: ${GAP_CQW}cqw; grid-auto-rows: ${ROW_CQW}cqw;`}>
     {sketches.map(({ img, alt, wide }) => (
-      <div class={`spotlight-card group relative ${wide ? 'sm:col-span-2' : ''}`} style={`grid-row: span ${rowSpan(img, wide ? 2 : 1)}`}>
+      <div
+        class={`sketchbook-item spotlight-card group relative ${wide ? 'sm:col-span-2' : ''}`}
+        style={`--row-mobile: ${rowSpanForWidth(img, 100)}; --row-desktop: ${rowSpan(img, wide ? 2 : 1)};`}
+      >
         <div class="spotlight-inner h-full rounded-md overflow-hidden bg-card transition-all duration-300 group-hover:scale-[1.02]">
           <img src={img.src} alt={alt} class="w-full h-full object-contain !my-0" />
         </div>
