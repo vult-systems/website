@@ -30,7 +30,11 @@ export default defineConfig({
   ...(sanityEnabled ? { adapter: vercel() } : {}),
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: 'hover',
+    // 'hover' never fires on touch devices (no hover before a tap), so
+    // mobile navigation got zero prefetch head start on any link, ever —
+    // 'tap' fires on touchstart/mousedown, just ahead of the actual
+    // click/tap completing, and works on both.
+    defaultStrategy: 'tap',
   },
   integrations: [
     tailwind({

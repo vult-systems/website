@@ -229,29 +229,14 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		}
 	}
 
-	/* Smooth fade for all transitions. The new page's delay matches the old
-	   page's fade-out duration exactly (120ms) so the two never overlap —
-	   an overlapping cross-fade double-exposes the outgoing and incoming
-	   pages' bright content (images, logo, light text) on top of each
-	   other for the overlap window, which reads as a jarring flash rather
-	   than a smooth transition, especially in dark mode. Kept short (240ms
-	   total) since a sequential fade has a "nothing visible" gap that an
-	   overlapping one doesn't — anything longer reads as sluggish rather
-	   than smooth, especially on heavier pages. */
-	::view-transition-old(root) {
-		animation: 120ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
-	}
-
+	/* No page-transition animation: the new page replaces the old one the
+	   instant the swap completes, no fade. A fade (even a short, sequenced
+	   one — see git history) adds a fixed delay before any new content is
+	   visible, which reads as lag, especially on heavier pages. Instant beats
+	   smooth here. */
+	::view-transition-old(root),
 	::view-transition-new(root) {
-		animation: 180ms cubic-bezier(0, 0, 0.2, 1) 120ms both fade-in;
-	}
-
-	@keyframes fade-in {
-		from { opacity: 0; }
-	}
-
-	@keyframes fade-out {
-		to { opacity: 0; }
+		animation: none;
 	}
 
 	/* Global image fade-in — uses animation not transition so it doesn't conflict with hover transitions.
@@ -275,14 +260,6 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 	@keyframes img-fade-in {
 		from { opacity: 0; }
 		to   { opacity: 1; }
-	}
-
-	/* Reduced motion support */
-	@media (prefers-reduced-motion: reduce) {
-		::view-transition-old(root),
-		::view-transition-new(root) {
-			animation: none !important;
-		}
 	}
 </style>
 
