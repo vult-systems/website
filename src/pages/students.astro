@@ -470,6 +470,17 @@ const shuffleStudentWall = () => {
   grid.innerHTML = '';
   grid.appendChild(col0);
   grid.appendChild(col1);
+
+  // Moving a still-loading <img loading="lazy"> via appendChild (as just
+  // happened above, reordering into balanced columns) orphans any
+  // 'load'/'error' listener base-layout's fade-in script already attached
+  // to it — the image still loads fine, but nothing is left to mark it
+  // .img-loaded, so it sits at the sitewide opacity:0 default forever.
+  // Clearing the wired marker lets the fade-in script's MutationObserver
+  // (which fires for these appendChild calls) re-wire each image fresh.
+  grid.querySelectorAll<HTMLImageElement>('img[data-fade-wired]').forEach((img) => {
+    delete img.dataset.fadeWired;
+  });
 };
 shuffleStudentWall();
 
