@@ -264,10 +264,23 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 </style>
 
 <script>
+	// Marks a single image ready-to-fade (or already-ready). Guarded by
+	// data-fade-wired so an image discovered by both the bulk scan and the
+	// MutationObserver below (e.g. right after a navigation, where both can
+	// see the same freshly-swapped-in images) only gets wired once.
+	const wireImage = (img: HTMLImageElement, delayMs?: number) => {
+		if (img.dataset.fadeWired) return;
+		img.dataset.fadeWired = '1';
+		if (img.complete && img.naturalWidth > 0) {
+			img.classList.add('img-ready');
+		} else {
+			if (delayMs !== undefined) img.style.setProperty('--img-fade-delay', `${delayMs}ms`);
+			img.addEventListener('load', () => img.classList.add('img-loaded'), { once: true });
+			img.addEventListener('error', () => img.classList.add('img-loaded'), { once: true });
+		}
+	};
+
 	const initImageFadeGlobal = () => {
-		const imgs = document.querySelectorAll<HTMLImageElement>(
-			'img:not(#lightbox-image)'
-		);
 		// A page swap's grid images (thumbnails etc.) all start loading at once
 		// and, on a fast connection, finish within a few ms of each other —
 		// without staggering, that's a whole grid's worth of images fading
@@ -277,15 +290,9 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		// actually animate (the 'load' path below) need it — already-complete
 		// ones get 'img-ready' with no animation, so no delay to stagger.
 		let loadIndex = 0;
-		imgs.forEach((img) => {
-			if (img.complete && img.naturalWidth > 0) {
-				img.classList.add('img-ready');
-			} else {
-				img.style.setProperty('--img-fade-delay', `${Math.min(loadIndex * 30, 300)}ms`);
-				loadIndex++;
-				img.addEventListener('load', () => img.classList.add('img-loaded'), { once: true });
-				img.addEventListener('error', () => img.classList.add('img-loaded'), { once: true });
-			}
+		document.querySelectorAll<HTMLImageElement>('img:not(#lightbox-image)').forEach((img) => {
+			const needsDelay = !(img.complete && img.naturalWidth > 0);
+			wireImage(img, needsDelay ? Math.min(loadIndex++ * 30, 300) : undefined);
 		});
 	};
 
@@ -293,4 +300,23 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 	initImageFadeGlobal();
 	// Run again on ViewTransitions navigation
 	document.addEventListener('astro:page-load', initImageFadeGlobal);
+
+	// Images inserted dynamically well after the scans above ran — e.g. the
+	// generator block's fetched reference photos, added on a button click
+	// long after astro:page-load already fired — would otherwise sit at the
+	// global `img { opacity: 0 }` default forever, since nothing ever marks
+	// them img-ready/img-loaded. Observes documentElement, not body: Astro's
+	// ViewTransitions router replaces document.body wholesale on navigation,
+	// which would leave an observer on the old body watching a detached
+	// node — documentElement persists across swaps, so this one observer,
+	// set up once here, keeps working for the page's whole life.
+	new MutationObserver((records) => {
+		for (const r of records) {
+			for (const n of r.addedNodes) {
+				if (!(n instanceof HTMLElement)) continue;
+				if (n instanceof HTMLImageElement) wireImage(n);
+				n.querySelectorAll?.('img').forEach((img) => wireImage(img as HTMLImageElement));
+			}
+		}
+	}).observe(document.documentElement, { childList: true, subtree: true });
 </script>
