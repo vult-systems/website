@@ -19,7 +19,7 @@ interface Props {
 const { src, poster, aspectRatio = '16/9', class: className = '' } = Astro.props;
 ---
 
-<div class={`spotlight-card group relative my-8 ${className}`}>
+<div class={`spotlight-card group relative my-8 not-prose ${className}`}>
   <div
     class="video-lightbox-trigger spotlight-inner relative rounded-md overflow-hidden cursor-pointer bg-black transition-all duration-300 group-hover:scale-[1.02]"
     style={`aspect-ratio: ${aspectRatio}`}
