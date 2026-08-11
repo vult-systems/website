@@ -911,6 +911,30 @@ link.dataset.thread === threadSlug,
 });
 };
 
+// Panels start hidden (display:none) so their content can render server-side without
+// flashing every course/project/thread at once. Native `loading="lazy"` images never
+// get a layout box while their ancestor is display:none, so they never fire `load` —
+// leaving them permanently stuck at opacity:0 (see base-layout.astro's fade-in). Force
+// any lazy images in a panel to load as soon as it's revealed.
+const wakeLazyImages = (root: ParentNode) => {
+root.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
+img.loading = 'eager';
+});
+};
+
+// Card thumbnails are re-cloned (see initThreadCards/initProjectCards/course-card
+// binding below) to strip stale click listeners on every re-render. cloneNode(true)
+// copies the `data-fade-wired` marker the fade-in script sets, but not the `load`
+// listener it stands for — so a clone whose image hasn't finished loading yet would
+// never get re-wired and would stay at opacity:0 forever. Clearing the marker lets
+// the base-layout MutationObserver (which fires for every node these replaceChild
+// calls insert) wire it fresh.
+const reviveClonedImages = (root: ParentNode) => {
+root.querySelectorAll<HTMLImageElement>('img[data-fade-wired]').forEach((img) => {
+delete img.dataset.fadeWired;
+});
+};
+
 // --- Course drill-down ---
 const openCourseDetail = (courseSlug: string, updateHash = true) => {
 document.getElementById('project-detail')?.classList.add('hidden');
@@ -925,6 +949,8 @@ detail.classList.remove('hidden');
 document.querySelectorAll<HTMLElement>('.course-detail-content').forEach((el) => {
 el.classList.toggle('hidden', el.id !== `detail-${courseSlug}`);
 });
+const activeCourseEl = document.getElementById(`detail-${courseSlug}`);
+if (activeCourseEl) wakeLazyImages(activeCourseEl);
 document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]').forEach((link) => {
 link.classList.toggle('active', link.dataset.slug === courseSlug);
 });
@@ -1143,6 +1169,7 @@ const activeProject = document.getElementById(`project-${courseSlug}-${projectSl
 if (activeProject) {
 initThreadCards();
 buildProjectChapterNav(activeProject);
+wakeLazyImages(activeProject);
 }
 syncSidebarSubnav(courseSlug, projectSlug);
 if (updateHash) updateUrl(courseSlug, projectSlug);
@@ -1159,7 +1186,10 @@ document.querySelectorAll<HTMLElement>('.thread-detail-content').forEach((el) =>
 el.classList.toggle('hidden', el.id !== `thread-${courseSlug}-${projectSlug}-${threadSlug}`);
 });
 const activeThread = document.getElementById(`thread-${courseSlug}-${projectSlug}-${threadSlug}`) as HTMLElement | null;
-if (activeThread) buildProjectChapterNav(activeThread);
+if (activeThread) {
+buildProjectChapterNav(activeThread);
+wakeLazyImages(activeThread);
+}
 syncSidebarSubnav(courseSlug, projectSlug, threadSlug);
 if (updateHash) updateUrl(courseSlug, projectSlug, threadSlug);
 };
@@ -1167,6 +1197,7 @@ if (updateHash) updateUrl(courseSlug, projectSlug, threadSlug);
 const initThreadCards = () => {
 document.querySelectorAll<HTMLElement>('.thread-card').forEach((card) => {
 const fresh = card.cloneNode(true) as HTMLElement;
+reviveClonedImages(fresh);
 card.parentNode?.replaceChild(fresh, card);
 });
 document.querySelectorAll<HTMLElement>('.thread-card').forEach((card) => {
@@ -1185,6 +1216,7 @@ openProjectDetail(activeCourseSlug, activeProjectSlug);
 const initProjectCards = () => {
 document.querySelectorAll<HTMLElement>('.project-card').forEach((card) => {
 const fresh = card.cloneNode(true) as HTMLElement;
+reviveClonedImages(fresh);
 card.parentNode?.replaceChild(fresh, card);
 });
 document.querySelectorAll<HTMLElement>('.project-card').forEach((card) => {
@@ -1204,6 +1236,7 @@ openCourseDetail(activeLink?.dataset.slug || 'angd-1314');
 // Course cards
 document.querySelectorAll<HTMLElement>('.course-card').forEach((card) => {
 const fresh = card.cloneNode(true) as HTMLElement;
+reviveClonedImages(fresh);
 card.parentNode?.replaceChild(fresh, card);
 });
 document.querySelectorAll<HTMLElement>('.course-card').forEach((card) => {
