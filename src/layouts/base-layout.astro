@@ -168,6 +168,23 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 				} else {
 					event.newDocument.documentElement.classList.remove('dark');
 				}
+
+				// Every page shares the same main stylesheet href, and Astro's
+				// swap already tries to preserve a same-href stylesheet link on
+				// its own — but in practice this site still shows it transiently
+				// missing during the swap (confirmed: unstyled/browser-default
+				// content for ~100-150ms — default blue link color, unconstrained
+				// image sizing — every single navigation). Explicitly matching
+				// via transition:persist takes Astro's primary matching path
+				// (checked before the href-based fallback that isn't holding up
+				// here), so the link element is never removed and re-inserted at
+				// all, closing whatever timing gap the fallback was hitting.
+				const currentSheet = document.querySelector('head link[rel="stylesheet"]');
+				const newSheet = event.newDocument.querySelector('head link[rel="stylesheet"]');
+				if (currentSheet && newSheet && currentSheet.getAttribute('href') === newSheet.getAttribute('href')) {
+					currentSheet.setAttribute('data-astro-transition-persist', 'main-stylesheet');
+					newSheet.setAttribute('data-astro-transition-persist', 'main-stylesheet');
+				}
 			});
 		</script>
 		
