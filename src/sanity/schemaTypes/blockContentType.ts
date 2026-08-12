@@ -1,5 +1,6 @@
 import { defineType, defineArrayMember } from 'sanity';
 import { DropIcon } from '@sanity/icons/Drop';
+import { DuplicatableBlock } from '../components/DuplicatableBlock';
 
 /**
  * Rich text ("Portable Text") used by Log entries, Course projects, and
@@ -86,6 +87,7 @@ export const blockContentType = defineType({
       name: 'figure',
       title: 'Figure',
       options: { hotspot: true },
+      components: { block: DuplicatableBlock },
       fields: [
         { name: 'alt', type: 'string', title: 'Alt text' },
         { name: 'caption', type: 'string', title: 'Caption' },
@@ -142,6 +144,7 @@ export const blockContentType = defineType({
       type: 'object',
       name: 'divider',
       title: 'Divider',
+      components: { block: DuplicatableBlock },
       fields: [
         {
           name: 'variant',
@@ -166,6 +169,7 @@ export const blockContentType = defineType({
       type: 'object',
       name: 'video',
       title: 'Video',
+      components: { block: DuplicatableBlock },
       fields: [
         {
           name: 'file',
@@ -199,6 +203,7 @@ export const blockContentType = defineType({
       type: 'object',
       name: 'model3d',
       title: '3D Model',
+      components: { block: DuplicatableBlock },
       fields: [
         {
           name: 'file',
@@ -420,6 +425,7 @@ export const blockContentType = defineType({
       title: 'Generator',
       description:
         'Embeds a reusable "roll a random constraint" widget. The categories/items live on the referenced Generator document, not here — that gets its own full-page editor instead of nested array-of-objects dialogs.',
+      components: { block: DuplicatableBlock },
       fields: [
         {
           name: 'ref',
