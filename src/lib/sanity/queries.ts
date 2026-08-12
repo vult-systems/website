@@ -98,7 +98,8 @@ export const coursesQuery = `
         "slug": slug.current,
         description,
         thumbnail,
-        ${BODY_PROJECTION}
+        ${BODY_PROJECTION},
+        references[]{ title, url, kind }
       }
     }
   }
@@ -118,7 +119,8 @@ export const pipelineQuery = `
       "slug": slug.current,
       description,
       thumbnail,
-      ${BODY_PROJECTION}
+      ${BODY_PROJECTION},
+      references[]{ title, url, kind }
     }
   }
 `;

@@ -40,6 +40,13 @@ export const courseProjectThreadType = defineType({
     defineField({ name: 'description', type: 'text', rows: 2 }),
     defineField({ name: 'thumbnail', type: 'image', options: { hotspot: true } }),
     defineField({ name: 'body', type: 'blockContent' }),
+    defineField({
+      name: 'references',
+      title: 'References',
+      type: 'array',
+      description: 'Optional. External sources/further reading shown at the bottom of this lecture.',
+      of: [defineArrayMember({ type: 'referenceLink' })],
+    }),
   ],
   preview: { select: { title: 'title', subtitle: 'description' } },
 });

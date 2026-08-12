@@ -4,6 +4,7 @@ import { courseType, courseProjectType, courseProjectThreadType } from './course
 import { pipelineTopicType, pipelineThreadType } from './pipelineTopicType';
 import { learnPageType } from './learnPageType';
 import { generatorType } from './generatorType';
+import { referenceLinkType } from './referenceLinkType';
 
 export const schemaTypes = [
   // Documents
@@ -17,4 +18,5 @@ export const schemaTypes = [
   courseProjectType,
   courseProjectThreadType,
   pipelineThreadType,
+  referenceLinkType,
 ];
