@@ -125,6 +125,16 @@
      alignments from its own styles. */
   .prose figure[data-align='full'] { max-width: none; }
 
+  /* Typography's default prose-lg `img` margin (~1.78em top/bottom) still
+     matches images nested inside a portable-text figure's spotlight-card
+     wrapper — :where(img) isn't scoped to direct children, so it reaches
+     straight through .spotlight-inner. The outer <figure class="my-8"> (see
+     PortableTextFigure.astro) already owns the figure's spacing, so that
+     margin is pure double-spacing here; worse, .spotlight-inner clips
+     overflow, so the top margin reads as a blank gap above the image inside
+     the bordered card instead of just extra whitespace. */
+  .prose figure.spotlight-card img { margin: 0; }
+
   /* Divider under lecture headings, mirroring the Present view (no manual divider needed). */
   .lecture-body h2 {
     padding-bottom: 0.3em;
