@@ -257,6 +257,20 @@
   #lecture-presenter #lp-slide .lp-body > *:nth-child(n + 6) { animation-delay: 0.52s; }
   #lecture-presenter #lp-slide img { opacity: 0; transition: opacity 0.45s ease; }
   #lecture-presenter #lp-slide img.lp-loaded { opacity: 1; }
+  /* "No entrance transition in Present" (PortableTextFigure.astro /
+     blockContentType.ts) — every slide is rebuilt from scratch on
+     render(), so a duplicated image carried over from the previous
+     slide replays this same fade/rise-in on itself even though nothing
+     about it actually changed. Forcing it to its resting state skips
+     that replay so it reads as having stayed put across the slide
+     change instead of re-appearing. */
+  #lecture-presenter #lp-slide [data-no-present-transition],
+  #lecture-presenter #lp-slide [data-no-present-transition] img {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
   /* 3D models pop straight in once loaded rather than fading. */
   @media (prefers-reduced-motion: reduce) {
     #lecture-presenter #lp-slide .lp-head,

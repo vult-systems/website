@@ -132,11 +132,41 @@ export const blockContentType = defineType({
             'Still shows on the page, just skipped when building Present mode slides.',
           initialValue: false,
         },
+        {
+          name: 'noPresentTransition',
+          type: 'boolean',
+          title: 'No entrance transition in Present',
+          description:
+            "Skips the fade/rise-in entrance animation for this image in Present mode. Use it on a duplicated image that's meant to look like it never left when carrying across two consecutive slides — otherwise it replays the same entrance on itself every slide, since Present rebuilds each slide from scratch.",
+          initialValue: false,
+        },
       ],
       preview: {
-        select: { caption: 'caption', alt: 'alt', hideOnPage: 'hideOnPage', hideInPresent: 'hideInPresent' },
-        prepare: ({ caption, alt, hideOnPage, hideInPresent }: { caption?: string; alt?: string; hideOnPage?: boolean; hideInPresent?: boolean }) => {
-          const flags = [hideOnPage && 'hidden on page', hideInPresent && 'hidden in Present'].filter(Boolean);
+        select: {
+          caption: 'caption',
+          alt: 'alt',
+          hideOnPage: 'hideOnPage',
+          hideInPresent: 'hideInPresent',
+          noPresentTransition: 'noPresentTransition',
+        },
+        prepare: ({
+          caption,
+          alt,
+          hideOnPage,
+          hideInPresent,
+          noPresentTransition,
+        }: {
+          caption?: string;
+          alt?: string;
+          hideOnPage?: boolean;
+          hideInPresent?: boolean;
+          noPresentTransition?: boolean;
+        }) => {
+          const flags = [
+            hideOnPage && 'hidden on page',
+            hideInPresent && 'hidden in Present',
+            noPresentTransition && 'no Present transition',
+          ].filter(Boolean);
           return {
             title: caption || alt || 'Figure',
             subtitle: flags.join(' · ') || undefined,

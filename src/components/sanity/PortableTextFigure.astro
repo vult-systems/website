@@ -26,6 +26,7 @@ const align = node?.align ?? 'center';
 // it walks .lecture-body's children to build slide groups.
 const hideOnPage = node?.hideOnPage === true;
 const hideInPresent = node?.hideInPresent === true;
+const noPresentTransition = node?.noPresentTransition === true;
 ---
 
 <figure
@@ -34,6 +35,7 @@ const hideInPresent = node?.hideInPresent === true;
   data-align={align}
   data-hide-on-page={hideOnPage ? 'true' : undefined}
   data-hide-in-present={hideInPresent ? 'true' : undefined}
+  data-no-present-transition={noPresentTransition ? 'true' : undefined}
 >
   <div class="spotlight-inner rounded-lg overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
     <img
