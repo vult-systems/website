@@ -136,6 +136,16 @@
     display: none;
   }
 
+  /* "Hide on page" figures (see PortableTextFigure.astro/blockContentType.ts)
+     stay in the DOM — Present mode reads its slides straight off the
+     rendered .lecture-body, so removing the element would hide it from
+     Present too. Scoped to .lecture-body specifically: Present clones
+     figure nodes into #lp-slide, a container this selector doesn't reach,
+     so the same figure still renders there normally. */
+  .lecture-body figure[data-hide-on-page] {
+    display: none;
+  }
+
   /* Figure alignment is a presenter-only concept: on the page every figure
      renders normally. Only `full` (a size, not a side alignment) is honored
      here for the occasional full-width image; the presenter reads all the

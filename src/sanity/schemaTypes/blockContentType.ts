@@ -110,7 +110,33 @@ export const blockContentType = defineType({
           },
           initialValue: 'center',
         },
+        {
+          name: 'hideOnPage',
+          type: 'boolean',
+          title: 'Hide on page',
+          description:
+            'Still shows in Present mode, just skipped in the normal reading view. Use this on a second copy of an image to carry it across multiple slides without it appearing twice in the article.',
+          initialValue: false,
+        },
+        {
+          name: 'hideInPresent',
+          type: 'boolean',
+          title: 'Hide in Present',
+          description:
+            'Still shows on the page, just skipped when building Present mode slides.',
+          initialValue: false,
+        },
       ],
+      preview: {
+        select: { caption: 'caption', alt: 'alt', hideOnPage: 'hideOnPage', hideInPresent: 'hideInPresent' },
+        prepare: ({ caption, alt, hideOnPage, hideInPresent }: { caption?: string; alt?: string; hideOnPage?: boolean; hideInPresent?: boolean }) => {
+          const flags = [hideOnPage && 'hidden on page', hideInPresent && 'hidden in Present'].filter(Boolean);
+          return {
+            title: caption || alt || 'Figure',
+            subtitle: flags.join(' · ') || undefined,
+          };
+        },
+      },
     }),
     defineArrayMember({
       type: 'object',

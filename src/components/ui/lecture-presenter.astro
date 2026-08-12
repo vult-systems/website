@@ -1034,6 +1034,9 @@
       };
 
       children.forEach((node) => {
+        // "Hide in Present" figures (see PortableTextFigure.astro) show
+        // normally on the page but are left out of every slide entirely.
+        if (node.hasAttribute('data-hide-in-present')) return;
         if (hasManualBreaks) {
           if (node.hasAttribute('data-slide-break')) {
             startGroup(

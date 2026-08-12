@@ -14,9 +14,27 @@ const width = dims ? Number(dims[1]) : undefined;
 const height = dims ? Number(dims[2]) : undefined;
 
 const align = node?.align ?? 'center';
+
+// Present mode (lecture-presenter.astro) builds its slides by reading the
+// already-rendered .lecture-body DOM, not the raw Sanity body — so "hide on
+// page" can't just skip rendering here, or the image would vanish from
+// Present too. Instead it stays in the DOM but display:none in the page's
+// own reading-view scope (see globals.css); Present clones nodes into a
+// different container that scope doesn't reach, so it shows there
+// normally. "Hide in Present" is the mirror case, handled by
+// lecture-presenter.astro skipping any node carrying this attribute when
+// it walks .lecture-body's children to build slide groups.
+const hideOnPage = node?.hideOnPage === true;
+const hideInPresent = node?.hideInPresent === true;
 ---
 
-<figure id={node?._key ? `pt-${node._key}` : undefined} class="my-8 spotlight-card group relative" data-align={align}>
+<figure
+  id={node?._key ? `pt-${node._key}` : undefined}
+  class="my-8 spotlight-card group relative"
+  data-align={align}
+  data-hide-on-page={hideOnPage ? 'true' : undefined}
+  data-hide-in-present={hideInPresent ? 'true' : undefined}
+>
   <div class="spotlight-inner rounded-lg overflow-hidden transition-all duration-300 group-hover:scale-[1.02]">
     <img
       src={src}
