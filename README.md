@@ -23,7 +23,7 @@ Personal portfolio site for 3D art, studio work, teaching, and technical writing
 | `/` | Landing page — auto-scrolling art carousel + hero |
 | `/art` | Art portfolio grid |
 | `/art/[slug]` | Individual art piece detail |
-| `/learn` | Curriculum, course projects, and Pipeline topics (from Sanity, SSR). Each course and thread has a shareable deep link, e.g. `/learn#source-control/git`. `/courses` redirects here |
+| `/learn` | Curriculum, course projects, and Pipeline topics (from Sanity, SSR). Every course/project/thread and Pipeline topic/thread has a real, shareable URL, e.g. `/learn/angd-1314/alien-bust/reference` or `/learn/source-control/git` (path-based rest route: `src/pages/learn/[...slug].astro`). `/courses` redirects here |
 | `/students` | Student work showcase |
 | `/resources` | Free tools and downloads |
 | `/log` | Development log / blog (from Sanity, SSR) |

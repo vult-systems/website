@@ -7,7 +7,7 @@ Read this before making changes so you match existing conventions.
 
 - **Front end:** Astro components + vanilla TypeScript. **No framework runtime is shipped to visitors** (no React/Vue on the public site). Sanity Studio is React but runs separately.
 - **CMS:** Sanity. Courses, Pipeline topics, and Log entries live in Sanity; Art pieces are local MDX (`src/content/art/*.mdx`).
-- **Rendering:** Most pages prerender. `/learn`, `/log`, and `/log/[slug]` are `export const prerender = false` (SSR) and read live from Sanity with `useCdn: false`, so published edits appear instantly (no rebuild).
+- **Rendering:** Most pages prerender. `/learn` (`src/pages/learn/[...slug].astro`, an Astro rest-param route), `/log`, and `/log/[slug]` are `export const prerender = false` (SSR) and read live from Sanity with `useCdn: false`, so published edits appear instantly (no rebuild). `/learn` resolves `Astro.params.slug` server-side (against the same Sanity data) purely for per-page SEO tags and Prev/Next computation — the whole curriculum still renders into one document client-side-toggled by `display:none`/JS, same as before; the route conversion only changed how the URL itself is produced (real paths, not a `#hash` the server never saw). A totally unrecognized top-level slug 404s; a stale-but-valid-course/unknown-project falls back one level.
 - **Config is the single source of truth:** `src/config/site.ts` (metadata/SEO), `src/config/seo.ts` (per-page SEO), `src/config/design.ts` (styling tokens). Change once, propagates everywhere.
 
 ## Sanity conventions (important)
@@ -19,6 +19,7 @@ Read this before making changes so you match existing conventions.
 - **Env:** `.env` (gitignored) holds `PUBLIC_SANITY_PROJECT_ID` (`atnkz0s5`), `PUBLIC_SANITY_DATASET` (`production`), matching `SANITY_STUDIO_*`, and a `SANITY_WRITE_TOKEN` (Editor). Project id/dataset are duplicated under both `PUBLIC_*` (site) and `SANITY_STUDIO_*` (CLI) names.
 - **Slugs:** `courseType` slugs are generated from `code` via a custom `slugify` that strips punctuation (course codes contain the `·` middle dot). Keep slugs URL-safe.
 - **Schema changes require `npm run studio:deploy`** to reach the hosted Studio (`carlosgarcia-works.sanity.studio`). Code changes deploy via Vercel on push.
+- **`referenceLink`** (`src/sanity/schemaTypes/referenceLinkType.ts`): reusable object (`title`, `url`, optional `kind` incl. "Image Credit") for a `references[]` array on both `courseProjectThread` and `pipelineThread`. Rendered on `/learn` as a collapsed `<details>/<summary>` disclosure below the lecture body (outside `.lecture-block`, so Present mode's slide-scraping ignores it) and above the Prev/Next nav.
 
 ## The 3D model block (`model3d`)
 
@@ -34,6 +35,18 @@ A Portable Text block for interactive 3D models, used e.g. for anatomy teaching.
 - **Loading:** Blocks inside hidden `/learn` lessons won't load with `loading="lazy"` (never enter viewport). The block uses `loading="eager"` for this reason. If a `<model-viewer>` is stuck on its poster, first suspect a JS console error preventing custom-element registration, or lazy-loading in a `display:none` container.
 - **Slot attribute:** Astro DOES preserve `slot="hotspot-N"` on native elements (verified) — model-viewer registers hotspots via a MutationObserver reading `node.slot` + `node.dataset.position`.
 - **Use uncompressed GLB.** Draco/meshopt need extra decoders (often fetched from a CDN) and will fail under the CSP.
+
+## Image lightbox (`src/components/ui/image-lightbox.astro`)
+
+Single shared lightbox, rendered once in `base-layout.astro`, that auto-binds click-to-zoom on every `<img>` site-wide except `header`/`nav`/`footer` images and anything with `data-no-lightbox`. Left/Right arrow keys step through the other lightbox-eligible images on the current page while it's open (wraps at either end, no-ops in video mode). The gallery list (`{src, alt}` entries) is captured fresh at click time, never cached.
+
+Pages with their own bespoke trigger markup (a wrapper div carrying a caption that isn't just the `<img>`'s own `alt`) can't use the generic per-`<img>` click path — build a `{src, alt}[]` list and call `window.lightboxGallery.open(entries, index)` instead of touching the `#lightbox` DOM directly. `students.astro`'s `.learn-lightbox-trigger` is the existing example (its `<img>` carries `data-no-lightbox` so the generic path doesn't double-bind it). If a page reports "click works but keyboard nav doesn't," check for a page-local duplicate lightbox implementation (`getElementById('lightbox')` outside this file) before assuming the shared component is broken — a `cloneNode`-to-strip-listeners pattern (used on `students.astro` and `learn.astro` card grids) can silently orphan the generic binding while a page's own separate handler keeps working.
+
+## Sketchbook bento grid (`src/content/art/sketchbook.mdx`)
+
+Static MDX content-collection page (not Sanity) with a hand-tuned masonry grid: each card's height is computed from **the image's own real aspect ratio** at its column width (`rowSpanForWidth`), not a preset bucket — the design intent is no cropping, ever. Two gotchas learned the hard way here:
+- If a source image has blank canvas baked in (e.g. a ZBrush render where the sculpt sits low in frame), that's real pixel data the grid faithfully reproduces as extra cell height — reads as the hover-glow border being "detached" from the artwork. Fix by cropping the source to its real content bounding box (`sharp`), not by patching the grid CSS.
+- `wide: true` (spans both grid columns) can only be placed once CSS Grid's `dense` auto-flow has both columns simultaneously free — a `wide` item added after an *uneven* row leaves the finished column sitting empty until the wide item's row starts, reading as a broken gap. This is a moving target (de-widening one item to fix its gap can just break parity for the next `wide` item further down) — don't add `wide: true` to newly-appended entries without verifying via a bounding-box gap scan; the 4 original wide entries happen to sit after already-balanced rows and are safe to leave as-is. A "make this one card smaller" request should render at a reduced width *within* its normal single-column cell (matching that reduced width for both the row-span calc and the visual box) rather than reaching for a narrower column-span, for the same reason.
 
 ## Security / CSP
 
