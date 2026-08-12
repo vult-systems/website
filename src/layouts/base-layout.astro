@@ -146,9 +146,7 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		
 		<!-- Analytics Integration -->
 		<Analytics />
-		<VercelAnalytics />
-		<SpeedInsights />
-		
+
 		<script is:inline>
 			// On page load or when changing themes, best to add inline in `head` to avoid FOUC
 			if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -193,6 +191,19 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 	<body class="min-h-screen bg-background text-foreground font-light flex flex-col">
 		<slot />
 		<ImageLightbox />
+		<!-- VercelAnalytics/SpeedInsights render <vercel-analytics>/<vercel-speed-insights>
+		     custom elements. Custom elements aren't valid head content per the HTML5
+		     parsing algorithm — the parser implicitly closes </head> the instant it sees
+		     one and reprocesses that element (and everything textually after it in head,
+		     including the auto-injected stylesheet <link> and Astro's ViewTransitions
+		     setup) as body content instead. That silently broke the stylesheet link's
+		     presence in document.head on every single page load, which was the actual
+		     reason Astro's swap couldn't find/persist it across navigation (the
+		     transition:persist matching below queries 'head link[...]', which never
+		     matched while these lived in head). Keeping them in body avoids the whole
+		     class of bug. -->
+		<VercelAnalytics />
+		<SpeedInsights />
 	</body>
 </html>
 
