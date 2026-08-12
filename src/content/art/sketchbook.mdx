@@ -27,7 +27,6 @@ import sketch10 from '@/assets/sketchbook/cg_sketchbook_010.jpg';
 import sketch11Gif from '@/assets/sketchbook/cg_sketchbook_011.gif';
 import sketch13 from '@/assets/sketchbook/cg_sketchbook_013.jpg';
 import sketch14 from '@/assets/sketchbook/cg_sketchbook_thumbnail_014.png';
-import sketch15 from '@/assets/sketchbook/cg_sketchbook_thumbnail_015.png';
 import sketch16 from '@/assets/sketchbook/cg_sketchbook_thumbnail_016.png';
 import sketch17 from '@/assets/sketchbook/cg_sketchbook_thumbnail_017.png';
 import sketch18 from '@/assets/sketchbook/cg_sketchbook_thumbnail_018.png';
@@ -65,7 +64,6 @@ export const sketches = [
   { img: sketch11Gif, alt: 'Sketchbook study 11 (turnaround)' },
   { img: sketch13, alt: 'Sketchbook study 13', wide: true },
   { img: sketch14, alt: 'Adventure Time Finn poses' },
-  { img: sketch15, alt: 'Hourglass character sculpt', small: true },
   { img: sketch16, alt: 'Robot skull head sculpt' },
   { img: sketch17, alt: 'Bowser bust sculpt' },
   { img: sketch18, alt: 'Gumball character sculpt' },
@@ -106,18 +104,6 @@ export const rowSpanForWidth = (img, widthCqw) => {
 // Desktop (sm:grid-cols-2): non-wide items sit in one of two columns
 // (COL_CQW wide), wide items span both (100 wide).
 export const rowSpan = (img, cols = 1) => rowSpanForWidth(img, cols === 2 ? 100 : COL_CQW);
-// "small" items stay a completely normal single-column grid item (same
-// col-span, same dense-packing behavior as everything else) -- they just
-// render at a reduced width/height *within* that same reserved cell,
-// computed from the SAME reduced width used for both dimensions, so the
-// card's own aspect ratio still exactly matches the image's real ratio and
-// there's no dead space inside the border. The only visible cost is a
-// strip of ordinary page background beside/below it in its own cell,
-// which is fine -- unlike giving it a genuinely narrower column-span, nothing
-// downstream in the grid depends on that space being reclaimed, so this
-// can never produce the dense-packing gaps a partial-track "wide"-style
-// item can (see git history for two rounds of exactly that bug).
-export const SMALL_SCALE = 0.6;
 
 <Heading level={2} size="4xl">Sketchbook</Heading>
 
@@ -133,28 +119,18 @@ A place for smaller and random art that doesn't belong to a larger project. Quic
   @media (min-width: 640px) {
     .sketchbook-item { grid-row: span var(--row-desktop); }
   }
-  /* "small" items render at a reduced width within their normal grid cell
-     (see SMALL_SCALE above) instead of stretching to fill it -- the row
-     height above is computed from that same reduced width, so the card's
-     own box still matches its image's real aspect ratio exactly. */
-  .small-item { width: var(--item-width); }
 `}</style>
 <div class="my-8 [container-type:inline-size]">
   <div class="grid grid-cols-1 sm:grid-cols-2 [grid-auto-flow:dense]" style={`gap: ${GAP_CQW}cqw; grid-auto-rows: ${ROW_CQW}cqw;`}>
-    {sketches.map(({ img, alt, wide, small }) => {
-      const scale = small ? SMALL_SCALE : 1;
-      const desktopWidthCqw = (wide ? 100 : COL_CQW) * scale;
-      const mobileWidthCqw = 100 * scale;
-      return (
-        <div
-          class={`sketchbook-item spotlight-card group relative ${wide ? 'sm:col-span-2' : ''} ${small ? 'small-item' : ''}`}
-          style={`--row-mobile: ${rowSpanForWidth(img, mobileWidthCqw)}; --row-desktop: ${rowSpanForWidth(img, desktopWidthCqw)}; --item-width: ${scale * 100}%;`}
-        >
-          <div class="spotlight-inner h-full rounded-md overflow-hidden bg-card transition-all duration-300 group-hover:scale-[1.02]">
-            <img src={img.src} alt={alt} class="w-full h-full object-contain !my-0" />
-          </div>
+    {sketches.map(({ img, alt, wide }) => (
+      <div
+        class={`sketchbook-item spotlight-card group relative ${wide ? 'sm:col-span-2' : ''}`}
+        style={`--row-mobile: ${rowSpanForWidth(img, 100)}; --row-desktop: ${rowSpan(img, wide ? 2 : 1)};`}
+      >
+        <div class="spotlight-inner h-full rounded-md overflow-hidden bg-card transition-all duration-300 group-hover:scale-[1.02]">
+          <img src={img.src} alt={alt} class="w-full h-full object-contain !my-0" />
         </div>
-      );
-    })}
+      </div>
+    ))}
   </div>
 </div>
