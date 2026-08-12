@@ -208,6 +208,22 @@ export const blockContentType = defineType({
         'Only matters on a slide using the "Two columns" layout in Present — everything before this point fills the first column, everything after starts the second. Invisible everywhere else (the page, and slides using any other layout), so it’s safe to leave in place if you change a slide’s layout later.',
       fields: [
         {
+          name: 'verticalAlign',
+          type: 'string',
+          title: 'Vertical alignment',
+          description:
+            'How the two columns line up when one is shorter than the other — top-aligns both by default. Center is typically what you want for a short pull-quote next to a longer paragraph column.',
+          options: {
+            list: [
+              { title: 'Top', value: 'top' },
+              { title: 'Center', value: 'center' },
+              { title: 'Bottom', value: 'bottom' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'top',
+        },
+        {
           name: 'label',
           type: 'string',
           title: 'Editor note (optional)',
@@ -215,9 +231,10 @@ export const blockContentType = defineType({
         },
       ],
       preview: {
-        select: { label: 'label' },
-        prepare: ({ label }: { label?: string }) => ({
+        select: { label: 'label', verticalAlign: 'verticalAlign' },
+        prepare: ({ label, verticalAlign }: { label?: string; verticalAlign?: string }) => ({
           title: label ? `Column break — ${label}` : 'Column break',
+          subtitle: verticalAlign && verticalAlign !== 'top' ? `align: ${verticalAlign}` : undefined,
         }),
       },
     }),

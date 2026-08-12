@@ -726,8 +726,11 @@
     column-count: initial;
     display: flex;
     gap: clamp(1.75rem, 3cqw, 3rem);
-    align-items: flex-start;
+    align-items: flex-start; /* fallback if data-col-align is somehow missing */
   }
+  #lecture-presenter #lp-slide .lp-two-col-split[data-col-align='top'] { align-items: flex-start; }
+  #lecture-presenter #lp-slide .lp-two-col-split[data-col-align='center'] { align-items: center; }
+  #lecture-presenter #lp-slide .lp-two-col-split[data-col-align='bottom'] { align-items: flex-end; }
   #lecture-presenter #lp-slide .lp-two-col-split .lp-col {
     flex: 1 1 0;
     min-width: 0;
@@ -1065,11 +1068,15 @@
       if (g.layout === 'two-col') {
         const breakIdx = g.nodes.findIndex((n) => n.hasAttribute('data-column-break'));
         if (breakIdx !== -1) {
+          const marker = g.nodes[breakIdx];
+          const align = marker.dataset.columnAlign === 'center' || marker.dataset.columnAlign === 'bottom'
+            ? marker.dataset.columnAlign
+            : 'top';
           const left = g.nodes.slice(0, breakIdx);
           const right = g.nodes.slice(breakIdx + 1);
           return (
             `<div class="lp-deck lp-content-slide">${head}` +
-              `<div class="lp-body lp-two-col lp-two-col-split">` +
+              `<div class="lp-body lp-two-col lp-two-col-split" data-col-align="${align}">` +
                 `<div class="lp-col">${cloneHtml(left)}</div>` +
                 `<div class="lp-col">${cloneHtml(right)}</div>` +
               `</div>` +

@@ -4,7 +4,10 @@
 // See globals.css (.lecture-column-break) for the page-hidden rule and
 // lecture-presenter.astro's buildSlides, which splits the slide's nodes
 // into two independent columns at this exact marker rather than relying
-// on CSS multi-column layout to guess where to break.
+// on CSS multi-column layout to guess where to break. data-column-align
+// carries the chosen vertical alignment through to that split.
+const { node } = Astro.props;
+const verticalAlign = node?.verticalAlign === 'center' || node?.verticalAlign === 'bottom' ? node.verticalAlign : 'top';
 ---
 
-<div class="lecture-column-break" data-column-break aria-hidden="true"></div>
+<div class="lecture-column-break" data-column-break data-column-align={verticalAlign} aria-hidden="true"></div>
