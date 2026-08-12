@@ -614,6 +614,27 @@
   }
   #lecture-presenter #lp-slide figure[data-align='bottom'] figcaption { display: none; }
 
+  /* A Note placed last in a slide's content anchors to the slide's
+     bottom edge instead of sitting wherever the preceding content
+     happens to end — same flex-column-plus-margin-top:auto mechanism as
+     the bottom-anchored figure above, just pushing a compact note down
+     rather than stretching an image to fill the remaining space. Scoped
+     to :last-child so a note anywhere else in the middle of a slide's
+     content is untouched and stays inline. */
+  #lecture-presenter #lp-slide .lp-deck:has(> .lp-body > .lecture-note:last-child) {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  #lecture-presenter #lp-slide .lp-deck:has(> .lp-body > .lecture-note:last-child) .lp-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+  }
+  #lecture-presenter #lp-slide .lp-body > .lecture-note:last-child {
+    margin-top: auto;
+  }
+
   /* Layout presets */
   #lecture-presenter #lp-slide .lp-cols {
     display: grid;
