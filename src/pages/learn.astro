@@ -12,7 +12,6 @@ import LecturePresenter from '@/components/ui/lecture-presenter.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getLearnPageSEO } from '@/config/seo';
-import alienBustThumb from '@/assets/courses/organic-modeling/alien-bust/cg-alienbust-thumb-02.png';
 import { sanityClient } from '@/lib/sanity/client';
 import { coursesQuery, pipelineQuery, learnPageQuery } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/image';
@@ -243,7 +242,6 @@ const searchIndexJson = JSON.stringify(searchEntries).replace(/</g, '\\u003c');
 title={seo.title}
 description={seo.description}
 keywords={seo.keywords}
-image={alienBustThumb.src}
 >
 <Header />
 <PageMain class="learn-body text-foreground">

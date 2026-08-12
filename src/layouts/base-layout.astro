@@ -36,10 +36,10 @@ const {
 	author = SITE.author.name
 } = Astro.props;
 
-// Use optimized logo as favicon; use Vult logo as default OG image (Discord/social needs a raster image, not SVG)
+// Use optimized logo as favicon; default OG image for link previews.
 const optimizedLogo = await getImage({ src: logoSvg, format: 'svg' });
 const faviconSvg = optimizedLogo.src;
-const ogImage = image || '/CarlosGarcia_Logo_og.png';
+const ogImage = image || '/og-image.png';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const siteUrl = Astro.site?.toString() || SITE.url;

@@ -9,7 +9,6 @@ import Text from '@/components/ui/text.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getResourcesPageSEO } from '@/config/seo';
-import zbrushMenusThumb from '@/assets/learn/resources/thumbs/learn-thumbnail-landingpage.png';
 import mayaLogoImg from '@/assets/logos/software-autodesk-maya-logo-01.png';
 import pythonLogoImg from '@/assets/logos/programming-python-logo.png';
 import substancePainterLogoImg from '@/assets/logos/software-substance-painter-logo-01.webp';
@@ -220,7 +219,6 @@ for (const group of resources) {
 title={seo.title}
 description={seo.description}
 keywords={seo.keywords}
-image={zbrushMenusThumb.src}
 >
 <Header />
 <PageMain class="text-foreground">
