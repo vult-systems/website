@@ -291,6 +291,15 @@
     margin-block-start: -1em;
     padding-block-start: 0;
   }
+
+  /* Same reasoning as the blockquote merge above, but a "Note" callout
+     has a full border on every edge rather than just a left rule, so
+     seamlessly joining two into one box isn't worth the complexity here
+     — tightening the gap is enough for a multi-paragraph note to still
+     read as one group instead of two unrelated callouts. */
+  .prose :where(.lecture-note) + :where(.lecture-note) {
+    margin-block-start: 0.5rem;
+  }
 }
 
 /* ---------------------------------------------------------------------------
