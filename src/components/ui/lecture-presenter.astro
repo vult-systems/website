@@ -709,29 +709,36 @@
     align-items: flex-end;
   }
 
+  /* Auto-balanced fallback for a "Two columns" slide with no explicit
+     "Column break" marker in it — CSS multi-column layout picks the split
+     point itself. */
   #lecture-presenter #lp-slide .lp-two-col { column-count: 2; column-gap: clamp(1.75rem, 3cqw, 3rem); }
   #lecture-presenter #lp-slide .lp-two-col :is(h2, h3) { column-span: all; }
   #lecture-presenter #lp-slide .lp-body-center { text-align: center; }
 
-  /* "Column break" (PortableTextColumnBreak.astro) marks where a
-     two-column slide's content should move to the second column, instead
-     of leaving it to the browser's automatic column-balancing. Hidden by
-     default (a slide using any other layout still carries these markers
-     in its body if the author left them in) — only inside .lp-two-col
-     does it become a zero-height break point: break-before requires the
-     element to actually generate a box, so this can't just be
-     display:none the way the plain page-hidden rule in globals.css is. */
+  /* Explicit split (a "Column break" marker present — see buildSlides'
+     two-col branch, which slices the group's nodes into two independent
+     lists at the marker instead of relying on CSS column-count at all).
+     Flex columns can't overflow into each other the way CSS multi-column
+     can, so the split lands exactly at the marker regardless of the
+     slide frame's actual height. */
+  #lecture-presenter #lp-slide .lp-two-col-split {
+    column-count: initial;
+    display: flex;
+    gap: clamp(1.75rem, 3cqw, 3rem);
+    align-items: flex-start;
+  }
+  #lecture-presenter #lp-slide .lp-two-col-split .lp-col {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* Any leftover "Column break" marker (e.g. one left in a slide that
+     isn't using the "Two columns" layout, or a second one the author
+     added by mistake — buildSlides only splits on the first) stays
+     completely invisible rather than rendering as a stray empty div. */
   #lecture-presenter #lp-slide [data-column-break] {
     display: none;
-  }
-  #lecture-presenter #lp-slide .lp-two-col [data-column-break] {
-    display: block;
-    height: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    overflow: hidden;
-    break-before: column;
   }
 
   /* Small screens / heavy browser zoom-in: drop the fixed 16:9 frame and fall
@@ -791,6 +798,7 @@
     /* Two-column and side-by-side collapse to one column */
     #lecture-presenter #lp-slide .lp-cols { grid-template-columns: 1fr; }
     #lecture-presenter #lp-slide .lp-two-col { column-count: 1; }
+    #lecture-presenter #lp-slide .lp-two-col-split { flex-direction: column; }
     /* Bleed side image stacks under the text with a fixed ratio */
     #lecture-presenter #lp-slide:has(.lp-cols.bleed) { padding: 1.5rem 1.25rem 2rem; overflow: visible; }
     #lecture-presenter #lp-slide .lp-deck:has(.lp-cols.bleed) { display: block; height: auto; min-height: 0; }
@@ -1043,8 +1051,31 @@
         );
       }
 
-      // Two-column body.
+      // Two-column body. An explicit "Column break" marker splits the
+      // content into two independent flex columns at that exact point —
+      // CSS column-count's own break-before:column (the previous approach)
+      // only guarantees a boundary AT the marker, it doesn't stop EARLIER
+      // content from overflowing into column 2 on its own first if column
+      // 1 doesn't have enough vertical room in the actual slide frame
+      // height, which quietly moved the split point around depending on
+      // viewport/window size. Two flex columns can't overflow into each
+      // other, so the split is exactly where the marker is regardless of
+      // frame size. Falls back to CSS auto-balancing (column-count: 2 on
+      // .lp-two-col, see the stylesheet) when there's no marker to split on.
       if (g.layout === 'two-col') {
+        const breakIdx = g.nodes.findIndex((n) => n.hasAttribute('data-column-break'));
+        if (breakIdx !== -1) {
+          const left = g.nodes.slice(0, breakIdx);
+          const right = g.nodes.slice(breakIdx + 1);
+          return (
+            `<div class="lp-deck lp-content-slide">${head}` +
+              `<div class="lp-body lp-two-col lp-two-col-split">` +
+                `<div class="lp-col">${cloneHtml(left)}</div>` +
+                `<div class="lp-col">${cloneHtml(right)}</div>` +
+              `</div>` +
+            `</div>`
+          );
+        }
         return `<div class="lp-deck lp-content-slide">${head}<div class="lp-body lp-two-col">${cloneHtml(g.nodes)}</div></div>`;
       }
 
