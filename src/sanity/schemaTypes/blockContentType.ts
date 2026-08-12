@@ -1,5 +1,6 @@
 import { defineType, defineArrayMember } from 'sanity';
 import { DropIcon } from '@sanity/icons/Drop';
+import { PortableTextInputWithDuplicate } from '../components/PortableTextDuplicateActions';
 
 /**
  * Rich text ("Portable Text") used by Log entries, Course projects, and
@@ -11,6 +12,11 @@ export const blockContentType = defineType({
   title: 'Body',
   name: 'blockContent',
   type: 'array',
+  // Cast: defineType's array overload can't disambiguate a mixed
+  // block/object array from a primitives array by its `of` list alone, so
+  // it infers the wrong InputProps type for this slot — the component
+  // itself is still fully typed against the real PortableTextInputProps.
+  components: { input: PortableTextInputWithDuplicate as any },
   of: [
     defineArrayMember({
       type: 'block',
