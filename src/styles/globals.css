@@ -15,11 +15,19 @@
     
     --accent: 28 100% 52%;                /* #FF7C0A */
     --accent-hover: 28 100% 45%;           /* #FF7C0A darker */
-    
+
+    /* Preset text colors (Sanity `textColor` annotation, see
+       .lecture-clr-* below) — dark enough to hold contrast on the
+       near-white light-mode background. */
+    --clr-red: 2 75% 48%;
+    --clr-blue: 210 75% 48%;
+    --clr-gold: 45 80% 42%;
+    --clr-green: 150 55% 38%;
+
     /* Component backgrounds */
     --card-bg: 0 0% 94%;                  /* light gray card */
     --card-bg-hover: 0 0% 90%;            /* slightly darker on hover */
-    
+
     /* Other semantic tokens */
     --radius: 0.375rem;                   /* 6px - smaller, tighter radius */
   }
@@ -37,7 +45,16 @@
     /* Muted accent for dark mode (less "hot" than light mode's #FF7C0A) */
     --accent: 28 85% 58%;
     --accent-hover: 28 90% 66%;
-    
+
+    /* Same hues as light mode, lifted to the accent's brightness band
+       (~55-65% lightness) — the light-mode values read as dull/muddy
+       against this near-black background otherwise, since they were
+       tuned for contrast on white instead. */
+    --clr-red: 2 78% 62%;
+    --clr-blue: 210 78% 64%;
+    --clr-gold: 45 85% 58%;
+    --clr-green: 150 55% 55%;
+
     /* Component backgrounds */
     --card-bg: 0 0% 3%;                  /* match bg; borders define cards */
     --card-bg-hover: 0 0% 7%;            /* subtle lift on hover */
@@ -170,19 +187,21 @@
   /* Preset text colors (Sanity `textColor` annotation) — apply on the page
      and in Present. Red/blue/gold take their hue straight from the brand
      mark (src/assets/brand/logo.svg: #E22B25 / #2282DF / #F2C923 — hsl(2
-     77% 52%) / hsl(210 75% 50%) / hsl(48 89% 54%)), darkened and
-     desaturated to a shared ~60% saturation / ~38-42% lightness band —
-     the raw brand colors are tuned to pop as flat logo shapes, not to sit
-     legibly inside a paragraph of body text. Green isn't in the logo, so
-     it's picked to land in that same band rather than derived from it.
+     77% 52%) / hsl(210 75% 50%) / hsl(48 89% 54%)); green isn't in the
+     logo, so it's picked to land in the same band rather than derived
+     from it. Values live in --clr-* (see :root/.dark above) rather than
+     fixed here, since a single flat lightness reads dull against one of
+     the two backgrounds — light mode needs it dark enough to hold
+     contrast on near-white, dark mode needs it lifted into the accent's
+     own brightness band or it looks muddy against near-black.
      Muted and accent are intentionally left alone: muted is a deliberate
      de-emphasis option rather than a "color" to tone-match, and accent is
      the site's own separate brand color, not one of the mark's three. */
   .lecture-clr-accent { color: hsl(var(--accent)); }
-  .lecture-clr-red { color: hsl(2 60% 40%); }
-  .lecture-clr-blue { color: hsl(210 60% 42%); }
-  .lecture-clr-gold { color: hsl(48 62% 36%); }
-  .lecture-clr-green { color: hsl(150 45% 36%); }
+  .lecture-clr-red { color: hsl(var(--clr-red)); }
+  .lecture-clr-blue { color: hsl(var(--clr-blue)); }
+  .lecture-clr-gold { color: hsl(var(--clr-gold)); }
+  .lecture-clr-green { color: hsl(var(--clr-green)); }
   .lecture-clr-muted { color: hsl(var(--foreground-secondary)); }
   /* Bold/italic/code inside a colored run keeps the color instead of resetting it. */
   [class*='lecture-clr-'] :is(strong, em, code) { color: inherit; }
