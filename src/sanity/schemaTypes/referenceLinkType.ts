@@ -1,6 +1,6 @@
 import { defineType, defineField } from 'sanity';
 
-const REFERENCE_KINDS = ['Article', 'Video', 'Book', 'Documentation', 'Tool', 'Other'];
+const REFERENCE_KINDS = ['Article', 'Video', 'Book', 'Documentation', 'Tool', 'Image Credit', 'Other'];
 
 /** A single external source/further-reading link shown at the bottom of a lecture. */
 export const referenceLinkType = defineType({
