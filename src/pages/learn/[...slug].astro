@@ -27,7 +27,6 @@ import PortableText from '@/components/sanity/PortableText.astro';
 // before this was tuned down.
 export const prerender = false;
 
-const seo = getLearnPageSEO();
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=60');
 
 // -------------------------------------------------------------------
@@ -156,6 +155,114 @@ const courseId = (code: string) => slugify(code);
 // Editable per-topic in Sanity (the topic's "Code / Label" field); this is the fallback default.
 const PIPELINE_CODE = 'ANGD Core';
 
+// -------------------------------------------------------------------
+// Path resolution (server-side, for per-page SEO + Prev/Next)
+// -------------------------------------------------------------------
+// The whole curriculum still renders into one document below (every
+// course/project/thread hidden until revealed by client JS) — this
+// resolution step doesn't change that. It only figures out which entity
+// the request's path points to, so we can give it real per-page
+// <title>/description/OG tags and compute its Prev/Next neighbors.
+// Mirrors the exact fallback disambiguation the client's restoreFromPath()
+// does at runtime (course/project/thread, or topic/thread), so a
+// stale-but-partially-valid URL degrades the same way in both places.
+const slugParam = Astro.params.slug ?? '';
+const [seg1, seg2, seg3] = slugParam.split('/').filter(Boolean);
+
+type Resolved =
+	| { kind: 'root' }
+	| { kind: 'course'; course: Course }
+	| { kind: 'project'; course: Course; project: CourseProject }
+	| { kind: 'thread'; course: Course; project: CourseProject; thread: CourseProjectThread }
+	| { kind: 'topic'; topic: PipelineTopic }
+	| { kind: 'topic-thread'; topic: PipelineTopic; thread: PipelineThread };
+
+let resolved: Resolved = { kind: 'root' };
+
+if (seg1) {
+	const matchedCourse = allCourses.find((c) => courseId(c.code) === seg1);
+	const matchedTopic = matchedCourse ? undefined : pipeline.find((t) => t.slug === seg1);
+
+	if (matchedCourse) {
+		const project = seg2 ? matchedCourse.projects?.find((p) => p.slug === seg2) : undefined;
+		if (project) {
+			const thread = seg3 ? project.threads?.find((t) => t.slug === seg3) : undefined;
+			resolved = thread
+				? { kind: 'thread', course: matchedCourse, project, thread }
+				: { kind: 'project', course: matchedCourse, project };
+		} else {
+			resolved = { kind: 'course', course: matchedCourse };
+		}
+	} else if (matchedTopic) {
+		const thread = seg2 ? matchedTopic.threads?.find((t) => t.slug === seg2) : undefined;
+		resolved = thread
+			? { kind: 'topic-thread', topic: matchedTopic, thread }
+			: { kind: 'topic', topic: matchedTopic };
+	} else {
+		return new Response('Not found', { status: 404 });
+	}
+}
+
+const thumbForSeo = (src: any): string | undefined => {
+	try { return src?.asset ? urlFor(src).width(1200).auto('format').url() : undefined; } catch { return undefined; }
+};
+
+let pageCrumb: string | undefined;
+let pageDescription: string | undefined;
+let pageImage: string | undefined;
+let pageType: 'website' | 'article' = 'website';
+
+switch (resolved.kind) {
+	case 'thread':
+		pageCrumb = `${resolved.thread.title} · ${resolved.course.code}`;
+		pageDescription = resolved.thread.description;
+		pageImage = thumbForSeo(resolved.thread.thumbnail) ?? thumbForSeo(resolved.project.thumbnail);
+		pageType = 'article';
+		break;
+	case 'project':
+		pageCrumb = `${resolved.project.title} · ${resolved.course.code}`;
+		pageDescription = resolved.project.description;
+		pageImage = thumbForSeo(resolved.project.thumbnail);
+		break;
+	case 'course':
+		pageCrumb = `${resolved.course.code} — ${resolved.course.title}`;
+		pageDescription = resolved.course.description;
+		break;
+	case 'topic-thread':
+		pageCrumb = `${resolved.thread.title} · ${resolved.topic.title}`;
+		pageDescription = resolved.thread.description;
+		pageImage = thumbForSeo(resolved.thread.thumbnail);
+		pageType = 'article';
+		break;
+	case 'topic':
+		pageCrumb = resolved.topic.title;
+		pageDescription = resolved.topic.description;
+		break;
+}
+
+const seo = getLearnPageSEO(pageCrumb);
+const pageMetaDescription = pageDescription || seo.description;
+
+// -------------------------------------------------------------------
+// Prev/Next lecture chains
+// -------------------------------------------------------------------
+// Flattened once per course (rolling across project boundaries, in the
+// exact same order already used for rendering below) and once per
+// pipeline topic. Threadless projects (project.body only, no threads)
+// are naturally absent since only `threads` are flattened.
+interface FlatCourseThread { project: CourseProject; thread: CourseProjectThread }
+const courseThreadFlat = new Map<string, FlatCourseThread[]>();
+for (const course of allCourses) {
+	courseThreadFlat.set(
+		courseId(course.code),
+		(course.projects ?? []).flatMap((project) => (project.threads ?? []).map((thread) => ({ project, thread })))
+	);
+}
+const topicThreadFlat = new Map<string, PipelineThread[]>();
+for (const topic of pipeline) {
+	topicThreadFlat.set(topic.slug, topic.threads ?? []);
+}
+
 // Build the search haystack for a course/topic including full lecture body text,
 // so a search like "block-in" finds the lecture that mentions it — not just titles.
 const courseSearchData = (course: Course) =>
@@ -182,12 +289,12 @@ const topicThreadSearchData = (topic: PipelineTopic, thread: CourseProjectThread
 
 // Granular search index for the results view: one entry per lecture / glossary
 // term, keeping the original-case text so we can show a highlighted snippet.
-type SearchEntry = { kind: string; title: string; crumb: string; hash: string; text: string; thumb?: string };
+type SearchEntry = { kind: string; title: string; crumb: string; href: string; text: string; thumb?: string };
 const searchEntries: SearchEntry[] = [];
 const thumbUrl = (src: any): string | undefined => {
 	try { return src?.asset ? urlFor(src).width(160).height(100).fit('crop').auto('format').url() : undefined; } catch { return undefined; }
 };
-const pushMedia = (body: any, crumb: string, hash: string) => {
+const pushMedia = (body: any, crumb: string, href: string) => {
 	for (const m of extractMedia(body)) {
 		const alt = String(m.alt ?? '').trim();
 		const caption = String(m.caption ?? '').trim();
@@ -197,20 +304,20 @@ const pushMedia = (body: any, crumb: string, hash: string) => {
 		// Video and 3D model blocks carry their own poster image; a plain
 		// figure/image block's asset is the searchable image itself.
 		const kind = isModel ? '3D Model' : isVideo ? 'Video' : 'Image';
-		// Append the block's own key so the result deep-links straight to it
-		// (see scrollToPanelMedia) instead of just the project/thread it's in.
-		const entryHash = m._key ? `${hash}/${m._key}` : hash;
-		searchEntries.push({ kind, title: label.length > 90 ? `${label.slice(0, 90)}\u2026` : label, crumb, hash: entryHash, text: `${alt} ${caption}`.trim(), thumb: thumbUrl(isVideo || isModel ? m.poster : m) });
+		// Append the block's own key as a hash suffix so the result deep-links
+		// straight to it (see scrollToPanelMedia) instead of just the panel it's in.
+		const entryHref = m._key ? `${href}#${m._key}` : href;
+		searchEntries.push({ kind, title: label.length > 90 ? `${label.slice(0, 90)}…` : label, crumb, href: entryHref, text: `${alt} ${caption}`.trim(), thumb: thumbUrl(isVideo || isModel ? m.poster : m) });
 	}
 };
 for (const course of allCourses) {
 	const cid = courseId(course.code);
 	for (const project of course.projects ?? []) {
-		searchEntries.push({ kind: 'Project', title: project.title, crumb: course.code, hash: `${cid}/${project.slug}`, text: `${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)}`.trim(), thumb: thumbUrl(project.thumbnail) });
-		pushMedia(project.body, `${course.code} · ${project.title}`, `${cid}/${project.slug}`);
+		searchEntries.push({ kind: 'Project', title: project.title, crumb: course.code, href: `/learn/${cid}/${project.slug}`, text: `${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)}`.trim(), thumb: thumbUrl(project.thumbnail) });
+		pushMedia(project.body, `${course.code} · ${project.title}`, `/learn/${cid}/${project.slug}`);
 		for (const thread of project.threads ?? []) {
-			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: `${course.code} · ${project.title}`, hash: `${cid}/${project.slug}/${thread.slug}`, text: `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim(), thumb: thumbUrl(thread.thumbnail) });
-			pushMedia(thread.body, `${course.code} · ${project.title} · ${thread.title}`, `${cid}/${project.slug}/${thread.slug}`);
+			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: `${course.code} · ${project.title}`, href: `/learn/${cid}/${project.slug}/${thread.slug}`, text: `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim(), thumb: thumbUrl(thread.thumbnail) });
+			pushMedia(thread.body, `${course.code} · ${project.title} · ${thread.title}`, `/learn/${cid}/${project.slug}/${thread.slug}`);
 		}
 	}
 }
@@ -222,17 +329,17 @@ for (const topic of pipeline) {
 			const term = String(cells[0] ?? '').trim();
 			const def = String(cells[1] ?? '').trim();
 			if (!term || term.toLowerCase() === 'name') continue;
-			searchEntries.push({ kind: 'Glossary', title: term, crumb: topic.title, hash: `${topic.slug}/${slugify(term)}`, text: `${term} — ${def}` });
+			searchEntries.push({ kind: 'Glossary', title: term, crumb: topic.title, href: `/learn/${topic.slug}#${slugify(term)}`, text: `${term} — ${def}` });
 		}
 	} else if ((topic.threads?.length ?? 0) > 0) {
 		for (const thread of topic.threads ?? []) {
-			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: topic.title, hash: `${topic.slug}/${thread.slug}`, text: `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim(), thumb: thumbUrl(thread.thumbnail) });
-			pushMedia(thread.body, `${topic.title} · ${thread.title}`, `${topic.slug}/${thread.slug}`);
+			searchEntries.push({ kind: 'Lecture', title: thread.title, crumb: topic.title, href: `/learn/${topic.slug}/${thread.slug}`, text: `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.trim(), thumb: thumbUrl(thread.thumbnail) });
+			pushMedia(thread.body, `${topic.title} · ${thread.title}`, `/learn/${topic.slug}/${thread.slug}`);
 		}
 	} else {
 		const topicText = bodyToPlainText(topic.body);
-		if (topicText) searchEntries.push({ kind: 'Topic', title: topic.title, crumb: 'Supplemental', hash: topic.slug, text: topicText });
-		pushMedia(topic.body, topic.title, topic.slug);
+		if (topicText) searchEntries.push({ kind: 'Topic', title: topic.title, crumb: 'Supplemental', href: `/learn/${topic.slug}`, text: topicText });
+		pushMedia(topic.body, topic.title, `/learn/${topic.slug}`);
 	}
 }
 const searchIndexJson = JSON.stringify(searchEntries).replace(/</g, '\\u003c');
@@ -241,7 +348,9 @@ const searchIndexJson = JSON.stringify(searchEntries).replace(/</g, '\\u003c');
 
 <BaseLayout
 title={seo.title}
-description={seo.description}
+description={pageMetaDescription}
+image={pageImage}
+type={pageType}
 keywords={seo.keywords}
 >
 <Header />
@@ -312,7 +421,7 @@ loading="eager"
 {allCourses.map((course) => (
 <div class="course-nav-group">
 <a
-href={`#${courseId(course.code)}`}
+href={`/learn/${courseId(course.code)}`}
 class="learn-nav-link block leading-snug group"
 data-slug={courseId(course.code)}
 data-course-nav="true"
@@ -326,7 +435,7 @@ data-course-search={courseSearchData(course)}
 {(course.projects ?? []).map((project) => (
 <div class="project-nav-group">
 <a
-href={`#${courseId(course.code)}/${project.slug}`}
+href={`/learn/${courseId(course.code)}/${project.slug}`}
 class="subnav-link learn-nav-link block leading-snug group"
 data-course={courseId(course.code)}
 data-project={project.slug}
@@ -337,7 +446,7 @@ data-project={project.slug}
 <div class="project-subnav hidden mt-2 space-y-1.5 border-l border-foreground-secondary/10 pl-3" data-course={courseId(course.code)} data-project={project.slug}>
 {(project.threads ?? []).map((thread) => (
 <a
-href={`#${courseId(course.code)}/${project.slug}/${thread.slug}`}
+href={`/learn/${courseId(course.code)}/${project.slug}/${thread.slug}`}
 class="subnav-thread-link learn-nav-link block leading-snug group"
 data-course={courseId(course.code)}
 data-project={project.slug}
@@ -365,7 +474,7 @@ data-thread={thread.slug}
 {pipeline.map((topic) => (
 <div class="course-nav-group">
 <a
-href={`#${topic.slug}`}
+href={`/learn/${topic.slug}`}
 class="learn-nav-link block leading-snug group"
 data-slug={topic.slug}
 data-course-nav="true"
@@ -378,7 +487,7 @@ data-course-search={topicSearchData(topic)}
 <div class="course-subnav hidden mt-3 space-y-2 border-l border-foreground-secondary/10 pl-3" data-course-subnav={topic.slug}>
 {(topic.threads ?? []).map((thread) => (
 <a
-href={`#${topic.slug}/${thread.slug}`}
+href={`/learn/${topic.slug}/${thread.slug}`}
 class="subnav-link learn-nav-link block leading-snug group"
 data-course={topic.slug}
 data-project={thread.slug}
@@ -653,7 +762,12 @@ data-project={thread.slug}
 			)}
 		</div>
 	)))}
-	{pipeline.flatMap((topic) => (topic.threads ?? []).map((thread) => (
+	{pipeline.flatMap((topic) => (topic.threads ?? []).map((thread) => {
+		const flat = topicThreadFlat.get(topic.slug) ?? [];
+		const idx = flat.findIndex((t) => t === thread);
+		const prevThread = idx > 0 ? flat[idx - 1] : null;
+		const nextThread = idx >= 0 && idx < flat.length - 1 ? flat[idx + 1] : null;
+		return (
 		<div id={`project-${topic.slug}-${thread.slug}`} class="project-detail-content hidden max-w-3xl mx-auto">
 			<Heading level={2} size="2xl" class="mb-3">{thread.title}</Heading>
 			<div class="mb-6"><Badge variant="accent" size="sm">{topic.title}</Badge></div>
@@ -671,8 +785,47 @@ data-project={thread.slug}
 					<span class="text-sm text-foreground-muted">Content coming soon</span>
 				</div>
 			)}
+			{(prevThread || nextThread) && (
+				<nav class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4" aria-label="Lecture navigation">
+					{prevThread && (
+						<a
+							href={`/learn/${topic.slug}/${prevThread.slug}`}
+							class="prevnext-link group flex items-center gap-3 rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4"
+							data-kind="topic-thread"
+							data-course={topic.slug}
+							data-thread={prevThread.slug}
+						>
+							<svg class="w-4 h-4 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
+							</svg>
+							<div class="min-w-0">
+								<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Previous</p>
+								<p class="text-sm font-medium text-foreground truncate" style="font-family: 'Besley', serif !important;">{prevThread.title}</p>
+							</div>
+						</a>
+					)}
+					{nextThread && (
+						<a
+							href={`/learn/${topic.slug}/${nextThread.slug}`}
+							class="prevnext-link group flex items-center justify-end gap-3 rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4 text-right sm:col-start-2"
+							data-kind="topic-thread"
+							data-course={topic.slug}
+							data-thread={nextThread.slug}
+						>
+							<div class="min-w-0">
+								<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Next</p>
+								<p class="text-sm font-medium text-foreground truncate" style="font-family: 'Besley', serif !important;">{nextThread.title}</p>
+							</div>
+							<svg class="w-4 h-4 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+							</svg>
+						</a>
+					)}
+				</nav>
+			)}
 		</div>
-	)))}
+		);
+	}))}
 </div>
 
 <!-- Thread detail (3rd level: course > project > thread) -->
@@ -683,7 +836,12 @@ data-project={thread.slug}
 		</svg>
 		Back to Project
 	</button>
-	{allCourses.flatMap((course) => (course.projects || []).flatMap((project) => (project.threads ?? []).map((thread) => (
+	{allCourses.flatMap((course) => (course.projects || []).flatMap((project) => (project.threads ?? []).map((thread) => {
+		const flat = courseThreadFlat.get(courseId(course.code)) ?? [];
+		const idx = flat.findIndex((f) => f.thread === thread);
+		const prevEntry = idx > 0 ? flat[idx - 1] : null;
+		const nextEntry = idx >= 0 && idx < flat.length - 1 ? flat[idx + 1] : null;
+		return (
 		<div id={`thread-${courseId(course.code)}-${project.slug}-${thread.slug}`} class="thread-detail-content hidden max-w-3xl mx-auto">
 			<Heading level={2} size="2xl" class="mb-3">{thread.title}</Heading>
 			<div class="mb-6 flex items-center gap-2">
@@ -704,8 +862,49 @@ data-project={thread.slug}
 					<span class="text-sm text-foreground-muted">Content coming soon</span>
 				</div>
 			)}
+			{(prevEntry || nextEntry) && (
+				<nav class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4" aria-label="Lecture navigation">
+					{prevEntry && (
+						<a
+							href={`/learn/${courseId(course.code)}/${prevEntry.project.slug}/${prevEntry.thread.slug}`}
+							class="prevnext-link group flex items-center gap-3 rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4"
+							data-kind="thread"
+							data-course={courseId(course.code)}
+							data-project={prevEntry.project.slug}
+							data-thread={prevEntry.thread.slug}
+						>
+							<svg class="w-4 h-4 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
+							</svg>
+							<div class="min-w-0">
+								<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Previous</p>
+								<p class="text-sm font-medium text-foreground truncate" style="font-family: 'Besley', serif !important;">{prevEntry.thread.title}</p>
+							</div>
+						</a>
+					)}
+					{nextEntry && (
+						<a
+							href={`/learn/${courseId(course.code)}/${nextEntry.project.slug}/${nextEntry.thread.slug}`}
+							class="prevnext-link group flex items-center justify-end gap-3 rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4 text-right sm:col-start-2"
+							data-kind="thread"
+							data-course={courseId(course.code)}
+							data-project={nextEntry.project.slug}
+							data-thread={nextEntry.thread.slug}
+						>
+							<div class="min-w-0">
+								<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Next</p>
+								<p class="text-sm font-medium text-foreground truncate" style="font-family: 'Besley', serif !important;">{nextEntry.thread.title}</p>
+							</div>
+							<svg class="w-4 h-4 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+							</svg>
+						</a>
+					)}
+				</nav>
+			)}
 		</div>
-	))))}
+		);
+	})))}
 </div>
 
 </div>
@@ -789,44 +988,80 @@ Sections
 
 <script>
 let coursesPopstateBound = false;
+let prevNextBound = false;
 const initCourses = () => {
 let applyCourseSearchFilters: (() => void) | null = null;
 
 // --- Shareable deep links (URL <-> open detail) ---
-// Course:  /learn#<courseSlug>
-// Project: /learn#<courseSlug>/<projectSlug>
-// Thread:  /learn#<courseSlug>/<projectSlug>/<threadSlug>
+// Course:  /learn/<courseSlug>
+// Project: /learn/<courseSlug>/<projectSlug>
+// Thread:  /learn/<courseSlug>/<projectSlug>/<threadSlug>
+// A trailing #<key> addresses a sub-element within whichever panel that
+// path resolves to (a Portable Text block, or a glossary term).
 const updateUrl = (courseSlug: string, projectSlug: string | null, threadSlug: string | null = null) => {
-let hash = `#${courseSlug}`;
-if (projectSlug) hash += `/${projectSlug}`;
-if (projectSlug && threadSlug) hash += `/${threadSlug}`;
-if (location.hash !== hash) history.pushState(null, '', hash);
+let path = `/learn/${courseSlug}`;
+if (projectSlug) path += `/${projectSlug}`;
+if (projectSlug && threadSlug) path += `/${threadSlug}`;
+// A real panel change always drops any hash suffix left over from
+// whatever was previously open (a stale media-key/glossary anchor).
+if (location.pathname !== path || location.hash) history.pushState(null, '', path);
 };
-const restoreFromHash = (): boolean => {
-const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
+const restoreFromPath = (): boolean => {
+const raw = decodeURIComponent(location.pathname.replace(/^\/learn\/?/, ''));
 if (!raw) return false;
-// A trailing segment (from a media search result — see pushMedia in the
-// frontmatter) points at one figure/video/model3d block, identified by
-// its Portable Text _key, within either a thread or a project's own
-// body — whichever the media actually lives in.
-const [courseSlug, projectSlug, threadSlug, threadMediaKey] = raw.split('/');
+const [courseSlug, projectSlug, threadSlug] = raw.split('/');
 if (!courseSlug || !document.getElementById(`detail-${courseSlug}`)) return false;
 openCourseDetail(courseSlug, false);
+let matchedProject = false;
+let matchedThread = false;
 if (projectSlug) {
 if (threadSlug && document.getElementById(`thread-${courseSlug}-${projectSlug}-${threadSlug}`)) {
 openProjectDetail(courseSlug, projectSlug, false);
 openThreadDetail(courseSlug, projectSlug, threadSlug, false);
-if (threadMediaKey) scrollToPanelMedia(`thread-${courseSlug}-${projectSlug}-${threadSlug}`, threadMediaKey);
+matchedProject = true;
+matchedThread = true;
 } else if (document.getElementById(`project-${courseSlug}-${projectSlug}`)) {
 openProjectDetail(courseSlug, projectSlug, false);
-// No real thread matched, so a 3rd segment here is a media key
-// scoped to the project's own body instead.
-if (threadSlug) scrollToPanelMedia(`project-${courseSlug}-${projectSlug}`, threadSlug);
+matchedProject = true;
 } else {
 scrollToGlossaryTerm(courseSlug, projectSlug);
 }
 }
+// A hash suffix (if any) points at one figure/video/model3d block — see
+// pushMedia in the frontmatter — or a glossary term, within the panel
+// that was just opened above.
+const mediaKey = decodeURIComponent(location.hash.replace(/^#/, ''));
+if (mediaKey) {
+if (matchedThread) scrollToPanelMedia(`thread-${courseSlug}-${projectSlug}-${threadSlug}`, mediaKey);
+else if (matchedProject) scrollToPanelMedia(`project-${courseSlug}-${projectSlug}`, mediaKey);
+else if (!projectSlug) scrollToGlossaryTerm(courseSlug, mediaKey);
+}
 return true;
+};
+
+// One-time migration for old-format bookmarked/shared links (#course/project/thread).
+// Only relevant on a bare /learn load — a path-format link never had a hash to begin
+// with, since the server didn't understand hash fragments before this change.
+const migrateOldHash = () => {
+if (location.pathname.replace(/\/$/, '') !== '/learn' || !location.hash) return;
+const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
+if (!raw) return;
+const [courseSlug, projectSlug, threadSlug, mediaKey] = raw.split('/');
+if (!courseSlug || !document.getElementById(`detail-${courseSlug}`)) return;
+let path = `/learn/${courseSlug}`;
+let hash = '';
+if (projectSlug) {
+if (threadSlug && document.getElementById(`thread-${courseSlug}-${projectSlug}-${threadSlug}`)) {
+path += `/${projectSlug}/${threadSlug}`;
+if (mediaKey) hash = `#${mediaKey}`;
+} else if (document.getElementById(`project-${courseSlug}-${projectSlug}`)) {
+path += `/${projectSlug}`;
+if (threadSlug) hash = `#${threadSlug}`;
+} else {
+hash = `#${projectSlug}`;
+}
+}
+history.replaceState(null, '', path + hash);
 };
 
 // Scroll to an in-page anchor (e.g. a glossary term) inside an open topic panel.
@@ -864,13 +1099,13 @@ const panel = anchor.closest<HTMLElement>('.course-detail-content');
 const term = anchor.dataset.term;
 if (!panel || !term) return;
 const topicSlug = panel.id.replace(/^detail-/, '');
-const hash = `#${topicSlug}/${term}`;
-anchor.setAttribute('href', hash);
+const href = `/learn/${topicSlug}#${term}`;
+anchor.setAttribute('href', href);
 anchor.dataset.bound = 'true';
 anchor.addEventListener('click', (e) => {
 e.preventDefault();
-history.pushState(null, '', hash);
-const url = `${location.origin}${location.pathname}${hash}`;
+history.pushState(null, '', href);
+const url = `${location.origin}${href}`;
 navigator.clipboard?.writeText(url).catch(() => {});
 anchor.classList.add('glossary-anchor-copied');
 window.setTimeout(() => anchor.classList.remove('glossary-anchor-copied'), 1400);
@@ -972,22 +1207,22 @@ const initCourseSearch = () => {
 
 	// --- Full-text results with highlighted snippets ---
 	const searchIndexEl = document.getElementById('learn-search-index');
-	let searchEntries: Array<{ kind: string; title: string; crumb: string; hash: string; text: string; thumb?: string }> = [];
+	let searchEntries: Array<{ kind: string; title: string; crumb: string; href: string; text: string; thumb?: string }> = [];
 	try { searchEntries = JSON.parse(searchIndexEl?.textContent || '[]'); } catch { searchEntries = []; }
 	const resultsPanel = document.getElementById('search-results');
 	const escHtml = (s: string) =>
 		s.replace(/[&<>"']/g, (c) => (({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as Record<string, string>)[c]));
 	const buildSnippet = (text: string, q: string) => {
 		const i = text.toLowerCase().indexOf(q);
-		if (i < 0) return escHtml(text.slice(0, 150)) + (text.length > 150 ? '\u2026' : '');
+		if (i < 0) return escHtml(text.slice(0, 150)) + (text.length > 150 ? '…' : '');
 		const start = Math.max(0, i - 60);
 		const end = Math.min(text.length, i + q.length + 90);
 		return (
-			(start > 0 ? '\u2026' : '') +
+			(start > 0 ? '…' : '') +
 			escHtml(text.slice(start, i)) +
 			'<mark>' + escHtml(text.slice(i, i + q.length)) + '</mark>' +
 			escHtml(text.slice(i + q.length, end)) +
-			(end < text.length ? '\u2026' : '')
+			(end < text.length ? '…' : '')
 		);
 	};
 	const renderResults = (q: string) => {
@@ -1001,14 +1236,14 @@ const initCourseSearch = () => {
 			.filter((x): x is { e: (typeof searchEntries)[number]; inTitle: boolean } => x !== null);
 		hits.sort((a, b) => Number(b.inTitle) - Number(a.inTitle));
 		if (!hits.length) {
-			resultsPanel.innerHTML = `<p class="mt-6 text-sm text-foreground-muted" style="font-family:'Besley',serif">No results for \u201c${escHtml(q)}\u201d.</p>`;
+			resultsPanel.innerHTML = `<p class="mt-6 text-sm text-foreground-muted" style="font-family:'Besley',serif">No results for “${escHtml(q)}”.</p>`;
 			return;
 		}
 		resultsPanel.innerHTML =
 			`<p class="mb-4 text-xs uppercase tracking-widest text-foreground-muted" style="font-family:'Besley',serif">${hits.length} result${hits.length === 1 ? '' : 's'}</p>` +
 			`<div class="space-y-2">` +
 			hits.slice(0, 50).map(({ e }) =>
-				`<a href="#${escHtml(e.hash)}" class="search-result flex items-start gap-3 rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4" data-hash="${escHtml(e.hash)}">` +
+				`<a href="${escHtml(e.href)}" class="search-result flex items-start gap-3 rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4" data-href="${escHtml(e.href)}">` +
 					(e.thumb ? `<img src="${escHtml(e.thumb)}" alt="" class="w-20 h-14 rounded object-cover shrink-0 border border-border" decoding="async" />` : '') +
 					`<div class="min-w-0 flex-1">` +
 						`<div class="flex items-center gap-2 mb-1"><span class="text-[0.65rem] uppercase tracking-wider text-accent" style="font-family:'Besley',serif">${escHtml(e.kind)}</span><span class="text-xs text-foreground-muted truncate">${escHtml(e.crumb)}</span></div>` +
@@ -1067,8 +1302,8 @@ const initCourseSearch = () => {
 		searchInput.value = '';
 		sessionStorage.setItem('course-search', '');
 		applyCourseSearchFilters?.();
-		history.pushState(null, '', `#${link.dataset.hash}`);
-		restoreFromHash();
+		history.pushState(null, '', link.dataset.href!);
+		restoreFromPath();
 	});
 
 	applyCourseSearchFilters();
@@ -1268,16 +1503,36 @@ openThreadDetail(link.dataset.course!, link.dataset.project!, link.dataset.threa
 });
 });
 
+// Bottom-of-lecture Prev/Next pagination. Bound once at module scope (not per
+// initCourses() call) since the links themselves are static server-rendered
+// content, not rebuilt/re-cloned on every drill-down like the cards above.
+if (!prevNextBound) {
+prevNextBound = true;
+document.addEventListener('click', (e) => {
+const link = (e.target as HTMLElement).closest<HTMLElement>('.prevnext-link');
+if (!link) return;
+e.preventDefault();
+const { kind, course, project, thread } = link.dataset;
+if (kind === 'thread' && course && project && thread) {
+openThreadDetail(course, project, thread);
+} else if (kind === 'topic-thread' && course && thread) {
+openProjectDetail(course, thread);
+}
+window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+}
+
+migrateOldHash();
 initCourseSearch();
 initGlossaryAnchors();
-if (!restoreFromHash()) {
+if (!restoreFromPath()) {
 openCourseDetail('angd-1314', false);
 }
 
 if (!coursesPopstateBound) {
 coursesPopstateBound = true;
 window.addEventListener('popstate', () => {
-if (!restoreFromHash()) openCourseDetail('angd-1314', false);
+if (!restoreFromPath()) openCourseDetail('angd-1314', false);
 });
 }
 };

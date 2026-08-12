@@ -85,9 +85,13 @@ export function getCodePageSEO(): PageSEO {
 /**
  * Generate SEO metadata for the Learn (Education) page
  */
-export function getLearnPageSEO(): PageSEO {
+export function getLearnPageSEO(crumb?: string): PageSEO {
+  const pageTitle = crumb
+    ? `${crumb} | Learn | ${SITE.author.name}`
+    : `Learn | ${SITE.author.name}`;
+
   return {
-    title: `Learn | ${SITE.author.name}`,
+    title: pageTitle,
     description: `Curriculum and course content by ${SITE.author.name}. Organic modeling, anatomy, environment, and character art courses taught for 3D Animation and Game Design.`,
     keywords: 'Courses, Curriculum, Teaching, Maya, ZBrush, Character Modeling, Environment Art, 3D Workflows, Game Design, Animation'
   };
