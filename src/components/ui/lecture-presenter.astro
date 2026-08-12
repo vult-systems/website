@@ -713,6 +713,27 @@
   #lecture-presenter #lp-slide .lp-two-col :is(h2, h3) { column-span: all; }
   #lecture-presenter #lp-slide .lp-body-center { text-align: center; }
 
+  /* "Column break" (PortableTextColumnBreak.astro) marks where a
+     two-column slide's content should move to the second column, instead
+     of leaving it to the browser's automatic column-balancing. Hidden by
+     default (a slide using any other layout still carries these markers
+     in its body if the author left them in) — only inside .lp-two-col
+     does it become a zero-height break point: break-before requires the
+     element to actually generate a box, so this can't just be
+     display:none the way the plain page-hidden rule in globals.css is. */
+  #lecture-presenter #lp-slide [data-column-break] {
+    display: none;
+  }
+  #lecture-presenter #lp-slide .lp-two-col [data-column-break] {
+    display: block;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    break-before: column;
+  }
+
   /* Small screens / heavy browser zoom-in: drop the fixed 16:9 frame and fall
      back to a simple scrollable stacked view so nothing collapses or overlaps. */
   @media (max-width: 720px), (max-height: 520px) {

@@ -136,6 +136,14 @@
     display: none;
   }
 
+  /* Presentation-only column boundary (Present mode's "Two columns" slide
+     layout): never visible in the reading view. Present-mode styling for
+     the actual break-before:column behavior lives in lecture-presenter.astro,
+     scoped to .lp-two-col specifically. */
+  .lecture-column-break {
+    display: none;
+  }
+
   /* "Hide on page" figures (see PortableTextFigure.astro/blockContentType.ts)
      stay in the DOM — Present mode reads its slides straight off the
      rendered .lecture-body, so removing the element would hide it from

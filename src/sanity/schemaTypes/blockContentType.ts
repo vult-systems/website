@@ -1,5 +1,6 @@
 import { defineType, defineArrayMember } from 'sanity';
 import { DropIcon } from '@sanity/icons/Drop';
+import { SplitVerticalIcon } from '@sanity/icons/SplitVertical';
 import { PortableTextInputWithDuplicate } from '../components/PortableTextDuplicateActions';
 
 /**
@@ -196,6 +197,28 @@ export const blockContentType = defineType({
       preview: {
         select: { variant: 'variant' },
         prepare: ({ variant }) => ({ title: `Divider (${variant || 'line'})` }),
+      },
+    }),
+    defineArrayMember({
+      type: 'object',
+      name: 'columnBreak',
+      title: 'Column break',
+      icon: SplitVerticalIcon,
+      description:
+        'Only matters on a slide using the "Two columns" layout in Present — everything before this point fills the first column, everything after starts the second. Invisible everywhere else (the page, and slides using any other layout), so it’s safe to leave in place if you change a slide’s layout later.',
+      fields: [
+        {
+          name: 'label',
+          type: 'string',
+          title: 'Editor note (optional)',
+          description: 'Only shown in the editor to help you find this break.',
+        },
+      ],
+      preview: {
+        select: { label: 'label' },
+        prepare: ({ label }: { label?: string }) => ({
+          title: label ? `Column break — ${label}` : 'Column break',
+        }),
       },
     }),
     defineArrayMember({
