@@ -212,15 +212,20 @@
      the two backgrounds — light mode needs it dark enough to hold
      contrast on near-white, dark mode needs it lifted into the accent's
      own brightness band or it looks muddy against near-black.
-     Muted and accent are intentionally left alone: muted is a deliberate
-     de-emphasis option rather than a "color" to tone-match, and accent is
-     the site's own separate brand color, not one of the mark's three. */
+     Accent is intentionally left alone — it's the site's own separate
+     brand color, not one of the mark's three. Muted was meant to be a
+     deliberate de-emphasis option, but pointed at --foreground-secondary,
+     which is also .prose's own base text color (see below) — so "Muted"
+     text rendered pixel-identical to unstyled text, not just similar to
+     it. --foreground-muted is the actually-distinct, dedicated token for
+     this (medium gray in both themes, vs. foreground-secondary's
+     near-max-contrast body-text gray). */
   .lecture-clr-accent { color: hsl(var(--accent)); }
   .lecture-clr-red { color: hsl(var(--clr-red)); }
   .lecture-clr-blue { color: hsl(var(--clr-blue)); }
   .lecture-clr-gold { color: hsl(var(--clr-gold)); }
   .lecture-clr-green { color: hsl(var(--clr-green)); }
-  .lecture-clr-muted { color: hsl(var(--foreground-secondary)); }
+  .lecture-clr-muted { color: hsl(var(--foreground-muted)); }
   /* Bold/italic/code inside a colored run keeps the color instead of resetting it. */
   [class*='lecture-clr-'] :is(strong, em, code) { color: inherit; }
 
