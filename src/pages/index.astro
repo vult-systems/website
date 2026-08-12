@@ -30,6 +30,17 @@ const featuredArt = artPieces
     category: piece.data.category
   }));
 
+// The carousel opens centered on its second card (see featured-carousel.astro),
+// with a sliver of the first and third showing to either side -- reordered
+// here, independent of the order above (which the /art page also reads and
+// must stay untouched), so it opens on Aurech centered, Sketchbook peeking in
+// on the left, and Grimghast/Halo peeking in on the right.
+const carouselLead = ['sketchbook', 'aurech', 'halo-infinite-character'];
+const carouselArt = [
+  ...carouselLead.map((slug) => featuredArt.find((piece) => piece.slug === slug)).filter((piece) => piece != null),
+  ...featuredArt.filter((piece) => !carouselLead.includes(piece.slug)),
+];
+
 const seo = getHomePageSEO();
 ---
 
@@ -41,7 +52,7 @@ const seo = getHomePageSEO();
 <Header />
 	<main class="min-h-screen w-full text-foreground">
 		<!-- Featured Carousel -->
-		<FeaturedCarousel artPieces={featuredArt} title="" description="" linkText="" />
+		<FeaturedCarousel artPieces={carouselArt} title="" description="" linkText="" />
 
 		<!-- Hero Section -->
 		<AnimatedHero />

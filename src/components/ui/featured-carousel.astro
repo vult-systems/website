@@ -344,9 +344,9 @@ const carouselPieces = artPieces;
       currentRafId = rafId;
     };
 
-    // Start centered on the second card (343i / Grimghast) using layout offsets
-    // (not the live transform) so re-inits are idempotent and don't jump. A sliver
-    // of Aurech shows on the left and Foundation Explorer on the right.
+    // Start centered on the second card using layout offsets (not the live
+    // transform) so re-inits are idempotent and don't jump. Which piece that
+    // is comes from the order artPieces is passed in (see index.astro).
     const centerItems = track.querySelectorAll<HTMLElement>('.carousel-item');
     if (centerItems.length > 1) {
       const padLeft = parseFloat(getComputedStyle(container).paddingLeft) || 0;
