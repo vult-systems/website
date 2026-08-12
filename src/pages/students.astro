@@ -202,7 +202,7 @@ data-autoplay
 </div>
 ) : piece.image ? (
 <div class="learn-lightbox-trigger relative bg-foreground/5 overflow-hidden cursor-pointer" data-label={`${piece.student} — ${piece.title}`}>
-<img src={piece.image} alt={`${piece.student} — ${piece.title}`} class="w-full h-auto object-cover" loading="lazy" />
+<img src={piece.image} alt={`${piece.student} — ${piece.title}`} class="w-full h-auto object-cover" loading="lazy" data-no-lightbox />
 </div>
 ) : (
 <div class="aspect-[4/3] bg-foreground/5 flex flex-col items-center justify-center">
@@ -411,22 +411,25 @@ trigger.parentNode?.replaceChild(fresh, trigger);
 });
 document.querySelectorAll<HTMLElement>('.learn-lightbox-trigger').forEach((trigger) => {
 trigger.addEventListener('click', () => {
-const lightbox = document.getElementById('lightbox');
-const lightboxImage = document.getElementById('lightbox-image') as HTMLImageElement;
-const imageWrapper = document.getElementById('image-wrapper');
-if (!lightbox || !lightboxImage || !imageWrapper) return;
-const label = trigger.dataset.label || 'Preview';
-const imgEl = trigger.querySelector<HTMLImageElement>('img');
-if (!imgEl?.src) return;
-lightboxImage.src = imgEl.src;
-lightboxImage.alt = label;
-lightbox.classList.remove('invisible', 'opacity-0');
-lightbox.classList.add('visible', 'opacity-100');
-requestAnimationFrame(() => {
-imageWrapper.classList.remove('opacity-0', 'scale-90');
-imageWrapper.classList.add('opacity-100', 'scale-100');
-});
-document.body.style.overflow = 'hidden';
+// Routed through the shared lightbox's gallery hook (image-lightbox.astro)
+// instead of opening the #lightbox DOM directly, so arrow keys can step
+// through the other student pieces the same way they do everywhere else
+// on the site -- these triggers wrap a student/title caption rather than
+// just the image's own alt text, which is why this page builds its own
+// entry list instead of relying on the generic per-<img> click path.
+// Filtered (and index found) against the SAME array so a trigger without
+// a valid image src -- shouldn't happen given the template guard, but
+// cheap to guard against here too -- can't shift entries out of sync
+// with the index.
+const triggers = Array.from(document.querySelectorAll<HTMLElement>('.learn-lightbox-trigger'))
+	.filter((t) => !!t.querySelector<HTMLImageElement>('img')?.src);
+const entries = triggers.map((t) => ({
+	src: t.querySelector<HTMLImageElement>('img')!.src,
+	alt: t.dataset.label || 'Preview',
+}));
+const index = triggers.indexOf(trigger);
+if (index === -1) return;
+window.lightboxGallery?.open(entries, index);
 });
 });
 

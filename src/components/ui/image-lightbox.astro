@@ -81,6 +81,51 @@
   let isVideoMode = false;
   let lastFocusedElement: HTMLElement | null = null;
 
+  // Arrow-key gallery navigation. The entry list is captured fresh at the
+  // moment something is clicked (not cached across page loads), scoped to
+  // whatever page the click happened on. Entries are plain {src, alt} pairs
+  // rather than element references, so a page with its own bespoke trigger
+  // markup (e.g. students.astro's .learn-lightbox-trigger, which wraps a
+  // caption that isn't just the image's own alt text) can build its own
+  // list and hand it to openGallery() below instead of being forced through
+  // the generic <img> click path.
+  interface GalleryEntry { src: string; alt: string }
+  let galleryEntries: GalleryEntry[] = [];
+  let galleryIndex = -1;
+
+  const collectGalleryImages = (): HTMLImageElement[] =>
+    Array.from(
+      document.querySelectorAll<HTMLImageElement>(
+        'img:not(header img):not(nav img):not(footer img):not([data-no-lightbox])'
+      )
+    );
+
+  const resolveImageSrc = (img: HTMLImageElement) => img.dataset.full || img.currentSrc || img.src;
+
+  const openGallery = (entries: GalleryEntry[], index: number) => {
+    if (entries.length === 0) return;
+    galleryEntries = entries;
+    galleryIndex = ((index % entries.length) + entries.length) % entries.length;
+    const entry = galleryEntries[galleryIndex];
+    openLightbox(entry.src, entry.alt);
+  };
+
+  const stepGallery = (delta: number) => {
+    if (galleryEntries.length <= 1) return;
+    galleryIndex = ((galleryIndex + delta) % galleryEntries.length + galleryEntries.length) % galleryEntries.length;
+    const entry = galleryEntries[galleryIndex];
+    openLightbox(entry.src, entry.alt);
+  };
+
+  // Small hook for pages with bespoke lightbox-trigger markup to plug into
+  // the same open/gallery/focus/zoom-reset machinery as the generic path.
+  declare global {
+    interface Window {
+      lightboxGallery?: { open: (entries: GalleryEntry[], index: number) => void };
+    }
+  }
+  window.lightboxGallery = { open: openGallery };
+
   // Focusable controls currently visible inside the lightbox (zoom controls
   // are hidden in video mode, so this is recomputed rather than cached).
   const getFocusable = (): HTMLElement[] => {
@@ -130,7 +175,13 @@
     const zc = document.getElementById('zoom-controls');
     if (!lb || !img || !iw) return;
 
-    lastFocusedElement = document.activeElement as HTMLElement;
+    // Navigating to the next/previous image re-calls this while the
+    // lightbox is already open — activeElement at that point is something
+    // inside the lightbox itself (focus is trapped there), not the page
+    // trigger, so only capture it on a genuine fresh open.
+    if (lb.classList.contains('invisible')) {
+      lastFocusedElement = document.activeElement as HTMLElement;
+    }
     isVideoMode = false;
     img.src = src;
     img.alt = alt;
@@ -231,9 +282,10 @@
       imageElement.style.cursor = 'pointer';
       imageElement.classList.add('hover:scale-[1.02]', 'transition-transform', 'duration-300');
       imageElement.addEventListener('click', () => {
+        const imgs = collectGalleryImages();
         // Prefer a full-resolution source so zooming stays crisp.
-        const fullSrc = imageElement.dataset.full || imageElement.currentSrc || imageElement.src;
-        openLightbox(fullSrc, imageElement.alt);
+        const entries = imgs.map((el) => ({ src: resolveImageSrc(el), alt: el.alt }));
+        openGallery(entries, imgs.indexOf(imageElement));
       });
     });
   };
@@ -341,6 +393,18 @@
     if (e.key === 'Escape' && lb && !lb.classList.contains('invisible')) {
       closeLightbox();
     }
+  });
+
+  // Arrow keys step through the other lightbox-eligible images on the page
+  // (wraps around at either end). Image-only -- a video has no "next" to
+  // step to, so leave native video keyboard controls alone in that mode.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const lb = document.getElementById('lightbox');
+    if (!lb || lb.classList.contains('invisible') || isVideoMode) return;
+    if (galleryEntries.length <= 1) return;
+    e.preventDefault();
+    stepGallery(e.key === 'ArrowRight' ? 1 : -1);
   });
 
   // Trap Tab focus within the lightbox's visible controls while it's open
