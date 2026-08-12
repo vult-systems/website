@@ -173,9 +173,31 @@
     margin-block: 1rem;
   }
   #lecture-presenter #lp-slide .lp-body blockquote p { font-size: inherit; line-height: inherit; margin-block: 0.3em; }
-  /* Restore list markers (Tailwind Preflight strips them) */
-  #lecture-presenter #lp-slide .lp-body ul { list-style: disc outside; padding-left: 1.5em; margin-block: 0.6em; }
-  #lecture-presenter #lp-slide .lp-body ol { list-style: decimal outside; padding-left: 1.5em; margin-block: 0.6em; }
+  /* "Note" callout (PortableTextNote.astro) sets its own text size via a
+     Tailwind text-sm class (a single class, specificity 0-0-1-0) — but
+     the #lecture-presenter #lp-slide p rule above is two IDs plus a type
+     selector, so it was winning and scaling note text up to full body
+     size (~23px instead of the intended ~14px), which also read as
+     oversized next to the note's fixed 16px icon. Sized down from (not
+     equal to) the body clamp rather than reusing the page's fixed
+     text-sm, so it still scales with the slide the way everything else
+     in Present does. */
+  #lecture-presenter #lp-slide .lecture-note p {
+    font-size: clamp(0.85rem, 1.3vw, 1.15rem);
+    line-height: 1.5;
+  }
+  #lecture-presenter #lp-slide .lecture-note svg {
+    width: clamp(1rem, 1.3vw, 1.15rem);
+    height: clamp(1rem, 1.3vw, 1.15rem);
+  }
+  /* Restore list markers (Tailwind Preflight strips them). padding-left
+     is a fixed clamp() rather than an em value on purpose — ul/ol never
+     get the p/li font-size scaling above (only li does), so 1.5em was
+     resolving against the browser-default 16px regardless of how large
+     the list text actually rendered (up to ~23px), computing a flat 24px
+     indent that read as barely-there next to Present's larger type. */
+  #lecture-presenter #lp-slide .lp-body ul { list-style: disc outside; padding-left: clamp(1.25rem, 2.2vw, 2rem); margin-block: 0.6em; }
+  #lecture-presenter #lp-slide .lp-body ol { list-style: decimal outside; padding-left: clamp(1.25rem, 2.2vw, 2rem); margin-block: 0.6em; }
   #lecture-presenter #lp-slide .lp-body li { display: list-item; margin-block: 0.4em; }
   #lecture-presenter #lp-slide .lp-body :is(ul, ol) :is(ul, ol) { margin-block: 0.2em; }
   #lecture-presenter #lp-slide .lp-body ol ol { list-style-type: disc; }
