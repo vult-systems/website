@@ -1,4 +1,5 @@
 import { defineType, defineArrayMember } from 'sanity';
+import type { PreviewValue } from 'sanity';
 import { DropIcon } from '@sanity/icons/Drop';
 import { SplitVerticalIcon } from '@sanity/icons/SplitVertical';
 import { PortableTextInputWithDuplicate } from '../components/PortableTextDuplicateActions';
@@ -458,7 +459,10 @@ export const blockContentType = defineType({
         select: { title: 'caption', alt: 'alt', media: 'poster' },
         prepare: ({ title, alt, media }: { title?: string; alt?: string; media?: unknown }) => ({
           title: title || alt || '3D Model',
-          media,
+          // Studio's own preview renderer accepts a raw Sanity image value here
+          // and resolves it at runtime; PreviewValue['media'] just doesn't
+          // advertise that shape in its public type.
+          media: media as PreviewValue['media'],
         }),
       },
     }),

@@ -19,6 +19,7 @@ const rawCategories = (data?.categories ?? []) as Array<{
   _key?: string;
   label: string;
   kind: 'image' | 'word' | 'shape';
+  imageAspect?: 'standard' | 'wide';
   items: Array<Record<string, unknown>>;
 }>;
 
