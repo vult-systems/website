@@ -1,6 +1,9 @@
 import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
 import { createClient } from '@sanity/client';
+// Shared with the /learn page and the Presentation resolver so the sitemap
+// URLs, the rendered hrefs and the Studio's preview targets cannot drift.
+import { slugify } from './src/lib/sanity/slug.ts';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
@@ -25,8 +28,6 @@ const sanityEnabled = Boolean(PUBLIC_SANITY_PROJECT_ID);
 // can't discover those URLs by crawling the file tree — they're enumerated
 // here instead. A Sanity hiccup at build time must not fail the whole site
 // build, so this degrades to an empty list rather than throwing.
-const slugify = (text) =>
-  text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 let learnCustomPages = [];
 if (sanityEnabled) {
   try {

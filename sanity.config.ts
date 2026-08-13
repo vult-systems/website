@@ -1,10 +1,12 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
+import { presentationTool } from 'sanity/presentation';
 import { visionTool } from '@sanity/vision';
 import { table } from '@sanity/table';
 import { codeInput } from '@sanity/code-input';
 import { schemaTypes } from './src/sanity/schemaTypes';
 import { studioTheme } from './src/sanity/theme';
+import { resolve } from './src/sanity/presentation/resolve';
 
 // Pin "Learn Page" as a single settings document (not a create-many list).
 const LEARN_PAGE_ID = 'learnPage';
@@ -32,12 +34,31 @@ const dataset =
   process.env.SANITY_STUDIO_DATASET ||
   'production';
 
+// Where Presentation points its preview iframe. Scoped to /learn: that is the
+// only route wired for visual editing in this pilot, and the only route whose
+// security headers allow the Studio to frame it.
+const previewUrl = process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:4321/learn';
+
 export default defineConfig({
   name: 'default',
   title: 'carlosgarcia.works',
   projectId,
   dataset,
   theme: studioTheme,
-  plugins: [structureTool({ structure }), visionTool({ defaultApiVersion: '2024-10-01' }), table(), codeInput()],
+  plugins: [
+    structureTool({ structure }),
+    presentationTool({
+      resolve,
+      previewUrl: {
+        initial: previewUrl,
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+        },
+      },
+    }),
+    visionTool({ defaultApiVersion: '2024-10-01' }),
+    table(),
+    codeInput(),
+  ],
   schema: { types: schemaTypes },
 });

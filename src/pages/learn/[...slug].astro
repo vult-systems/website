@@ -12,11 +12,21 @@ import LecturePresenter from '@/components/ui/lecture-presenter.astro';
 import { Image } from 'astro:assets';
 import heroBg from '@/assets/mindflayer/MindFlayer_BG.png';
 import { getLearnPageSEO } from '@/config/seo';
-import { sanityClient } from '@/lib/sanity/client';
 import { coursesQuery, pipelineQuery, learnPageQuery } from '@/lib/sanity/queries';
 import { urlFor } from '@/lib/sanity/image';
-import { bodyToPlainText, slugify, extractMedia } from '@/lib/sanity/toc';
+import { bodyToPlainText, extractMedia } from '@/lib/sanity/toc';
+import { slugify } from '@/lib/sanity/slug';
+import { loadQuery } from '@/lib/sanity/load-query';
+import { getDraftModeProps, isDraftMode } from '@/lib/sanity/draft-mode';
+import { stegaClean } from '@sanity/client/stega';
+import {
+	assertSlugShape,
+	assertCleanDeep,
+	assertNoInvisible,
+	cleanStructuralFields,
+} from '@/lib/sanity/stega-guard';
 import PortableText from '@/components/sanity/PortableText.astro';
+import VisualEditing from '@/components/sanity/VisualEditing.astro';
 
 // Read live from Sanity at request time. coursesQuery pulls the full
 // curriculum body (every course -> project -> thread, with images/models)
@@ -139,11 +149,25 @@ const YEAR_ORDER: Record<string, number> = {
 	'Junior': 3,
 	'Senior': 4,
 };
-const [coursesData, pipelineData, learnPage] = await Promise.all([
-	sanityClient.fetch(coursesQuery),
-	sanityClient.fetch(pipelineQuery),
-	sanityClient.fetch(learnPageQuery),
+// Draft mode is driven by the perspective cookie that /api/draft-mode/enable
+// sets after Presentation validates its signed secret. Without that cookie
+// this fetches exactly what it always did: published content, no token, no
+// stega, and the overlay below never renders.
+const isDraft = isDraftMode(Astro.cookies);
+const draftProps = getDraftModeProps(Astro.cookies);
+
+const [coursesRes, pipelineRes, learnPageRes] = await Promise.all([
+	loadQuery<any>({ query: coursesQuery, ...draftProps }),
+	loadQuery<any>({ query: pipelineQuery, ...draftProps }),
+	loadQuery<any>({ query: learnPageQuery, ...draftProps }),
 ]);
+
+// Strip stega from `code` and `slug` before anything builds a URL or DOM id
+// out of them. See cleanStructuralFields for why those two fields and not
+// the rest. No-op when not in draft mode.
+const coursesData = cleanStructuralFields(coursesRes.data, stegaClean);
+const pipelineData = cleanStructuralFields(pipelineRes.data, stegaClean);
+const learnPage = learnPageRes.data;
 // Editable page chrome (with fallbacks if the Learn Page doc is empty).
 const pageTitle = learnPage?.pageTitle || 'Education';
 const pageIntro = learnPage?.intro ||
@@ -158,7 +182,9 @@ const allCourses = ((coursesData ?? []) as Course[]).sort(
 );
 const pipeline = (pipelineData ?? []) as PipelineTopic[];
 // Strips punctuation (e.g. the "·" in course codes) so anchor ids stay URL-safe.
-const courseId = (code: string) => slugify(code);
+// The assert is the tripwire for stega reaching a URL segment or DOM id: it
+// can only fire if something upstream stopped cleaning `code`.
+const courseId = (code: string) => assertSlugShape('courseId(course.code)', slugify(code));
 // Pipeline topics are taught as core class content; show this as their "course code".
 // Editable per-topic in Sanity (the topic's "Code / Label" field); this is the fallback default.
 const PIPELINE_CODE = 'ANGD Core';
@@ -248,8 +274,19 @@ switch (resolved.kind) {
 		break;
 }
 
+// SEO strings go into <title>, <meta> and OG tags. Stega in <head> is both
+// useless (nothing there is clickable) and actively harmful: it leaks into
+// search-engine snippets and social previews. Clean before they reach the
+// layout, and assert, since a corrupt <title> is invisible in a browser tab.
+pageCrumb = pageCrumb === undefined ? undefined : assertNoInvisible('seo.pageCrumb', stegaClean(pageCrumb));
+pageDescription =
+	pageDescription === undefined ? undefined : assertNoInvisible('seo.pageDescription', stegaClean(pageDescription));
+pageImage = pageImage === undefined ? undefined : assertNoInvisible('seo.pageImage', stegaClean(pageImage));
+
 const seo = getLearnPageSEO(pageCrumb);
 const pageMetaDescription = pageDescription || seo.description;
+assertNoInvisible('seo.title', seo.title);
+assertNoInvisible('seo.description', pageMetaDescription);
 
 // -------------------------------------------------------------------
 // Prev/Next lecture chains
@@ -273,27 +310,47 @@ for (const topic of pipeline) {
 
 // Build the search haystack for a course/topic including full lecture body text,
 // so a search like "block-in" finds the lecture that mentions it — not just titles.
+//
+// Every one of these ends up in a data-*-search HTML attribute and is matched
+// with .includes() by the client script. Stega inside them would sit between
+// the letters of otherwise-matching words and silently kill those matches, so
+// each is cleaned and then asserted. searchText() is the single choke point.
+const searchText = (label: string, raw: string) =>
+	assertNoInvisible(label, stegaClean(raw).toLowerCase());
+
 const courseSearchData = (course: Course) =>
-	`${course.code} ${course.title} ${course.description ?? ''} ${course.outcomes ?? ''} ${(course.projects || [])
-		.map((project) =>
-			`${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)} ${(project.threads ?? [])
-				.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
-				.join(' ')}`
-		)
-		.join(' ')}`.toLowerCase();
+	searchText(
+		`courseSearchData(${course.code})`,
+		`${course.code} ${course.title} ${course.description ?? ''} ${course.outcomes ?? ''} ${(course.projects || [])
+			.map((project) =>
+				`${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)} ${(project.threads ?? [])
+					.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
+					.join(' ')}`
+			)
+			.join(' ')}`
+	);
 
 const projectSearchData = (course: Course, project: CourseProject) =>
-	`${course.code} ${course.title} ${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)} ${(project.threads ?? [])
-		.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
-		.join(' ')}`.toLowerCase();
+	searchText(
+		`projectSearchData(${course.code}/${project.slug})`,
+		`${course.code} ${course.title} ${project.title} ${project.description ?? ''} ${bodyToPlainText(project.body)} ${(project.threads ?? [])
+			.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
+			.join(' ')}`
+	);
 
 const topicSearchData = (topic: PipelineTopic) =>
-	`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.description ?? ''} ${bodyToPlainText(topic.body)} ${(topic.threads ?? [])
-		.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
-		.join(' ')}`.toLowerCase();
+	searchText(
+		`topicSearchData(${topic.slug})`,
+		`${topic.code ?? PIPELINE_CODE} ${topic.title} ${topic.description ?? ''} ${bodyToPlainText(topic.body)} ${(topic.threads ?? [])
+			.map((thread) => `${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`)
+			.join(' ')}`
+	);
 
 const topicThreadSearchData = (topic: PipelineTopic, thread: CourseProjectThread) =>
-	`${topic.title} ${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`.toLowerCase();
+	searchText(
+		`topicThreadSearchData(${topic.slug}/${thread.slug})`,
+		`${topic.title} ${thread.title} ${thread.description ?? ''} ${bodyToPlainText(thread.body)}`
+	);
 
 // Granular search index for the results view: one entry per lecture / glossary
 // term, keeping the original-case text so we can show a highlighted snippet.
@@ -350,7 +407,13 @@ for (const topic of pipeline) {
 		pushMedia(topic.body, topic.title, `/learn/${topic.slug}`);
 	}
 }
-const searchIndexJson = JSON.stringify(searchEntries).replace(/</g, '\\u003c');
+// This array is serialized into a <script type="application/json"> block and
+// matched with .includes() at runtime. It is the single worst place for stega
+// to land: it would bloat the payload and break search with no visible symptom.
+// Clean the whole structure, then assert every string leaf really is clean.
+const cleanedSearchEntries = stegaClean(searchEntries) as SearchEntry[];
+assertCleanDeep('searchIndex', cleanedSearchEntries);
+const searchIndexJson = JSON.stringify(cleanedSearchEntries).replace(/</g, '\\u003c');
 ---
 
 
@@ -989,6 +1052,9 @@ Sections
 </PageMain>
 <Footer />
 <LecturePresenter />
+{/* Draft mode only. Astro emits this component's bundled script solely when
+    the component renders, so published /learn responses never reference it. */}
+{isDraft && <VisualEditing />}
 </BaseLayout>
 
 <style>

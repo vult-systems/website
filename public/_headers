@@ -20,3 +20,23 @@
 # HTML pages - no cache for dynamic content
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
+
+# /learn is the Sanity Presentation preview target. The Studio loads it in an
+# iframe, so it needs a frame-ancestors allowlist rather than the site-wide
+# 'self'. Local Studio only for now: the hosted studio origin is deliberately
+# NOT listed, so production stays unframeable.
+#
+# NOTE: this file is Netlify/Cloudflare Pages syntax and is INERT on Vercel,
+# which reads vercel.json instead. Verified against production:
+#   curl -sSIL https://www.carlosgarcia.works/learn
+#   -> X-Frame-Options: SAMEORIGIN, and no Content-Security-Policy at all.
+# The real change is the matching rule in vercel.json. This is kept in sync so
+# the two files don't contradict each other if the host ever changes.
+/learn
+  Content-Security-Policy: frame-ancestors 'self' http://localhost:3333
+
+/learn/*
+  Content-Security-Policy: frame-ancestors 'self' http://localhost:3333
+
+/api/draft-mode/*
+  Content-Security-Policy: frame-ancestors 'self' http://localhost:3333

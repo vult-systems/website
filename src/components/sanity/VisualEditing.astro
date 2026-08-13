@@ -1,0 +1,158 @@
+---
+/**
+ * Sanity visual-editing overlay. DRAFT MODE ONLY.
+ *
+ * Rendered exclusively behind `{isDraft && <VisualEditing />}` in
+ * src/pages/learn/[...slug].astro. Astro only emits a component's bundled
+ * script when the component actually renders, so a published /learn response
+ * contains no reference to this chunk at all. That is the hard requirement:
+ * the public site ships no framework runtime.
+ *
+ * This uses the framework-agnostic `enable-visual-editing` entry point rather
+ * than the React <VisualEditing /> component the official guide shows. Same
+ * capabilities (the options type carries history, refresh, onPerspectiveChange
+ * and onSuspiciousStega), but it lets us avoid adding @astrojs/react to the
+ * project purely for a preview feature.
+ */
+---
+
+<a id="sanity-exit-draft" href="/api/draft-mode/disable" hidden>Exit draft mode</a>
+
+{/*
+  is:inline is deliberate. A normal <style> block gets hoisted into the page's
+  bundled stylesheet at build time based on the module graph, not on whether
+  the component rendered, so the overlay's CSS shipped to published /learn
+  even though the component never ran. Verified: `sanity-exit-draft` was
+  present in dist _astro/_slug_.*.css before this change. is:inline emits the
+  tag in place, so it exists only when this component actually renders.
+*/}
+<style is:inline>
+  #sanity-exit-draft {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1000000;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    background: #101112;
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    text-decoration: none;
+  }
+</style>
+
+<script>
+  import { enableVisualEditing } from '@sanity/visual-editing/enable-visual-editing';
+  import type { HistoryAdapter, HistoryAdapterNavigate } from '@sanity/visual-editing';
+  import { perspectiveCookieName } from '@sanity/preview-url-secret/constants';
+  import type { ClientPerspective } from '@sanity/client';
+
+  // The exit link is only useful when you reached draft mode directly in a
+  // tab. Inside Presentation's iframe the Studio already owns that control,
+  // so leave it hidden there.
+  if (window.self === window.top) {
+    document.getElementById('sanity-exit-draft')?.removeAttribute('hidden');
+  }
+
+  const currentUrl = () =>
+    `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+  // --- Perspective cookie -------------------------------------------------
+  // The Studio can switch between drafts / published / a release. When it
+  // does, the server needs to fetch with the same perspective, so we mirror
+  // the choice into the cookie loadQuery() reads and reload.
+  const serialize = (perspective: ClientPerspective) =>
+    typeof perspective === 'string' ? perspective : JSON.stringify(perspective);
+
+  const readCookie = (name: string): string | undefined => {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : undefined;
+  };
+
+  const writePerspectiveCookie = (perspective: ClientPerspective): boolean => {
+    const next = serialize(perspective);
+    if (readCookie(perspectiveCookieName) === next) return false;
+    // Must match the attributes enable.ts used, or we create a second cookie
+    // instead of updating the first. See the CHIPS note in that file.
+    const partitioned = window.self !== window.top ? '; Partitioned' : '';
+    document.cookie = `${perspectiveCookieName}=${encodeURIComponent(next)}; path=/; SameSite=None; Secure${partitioned}`;
+    return true;
+  };
+
+  // --- History adapter ----------------------------------------------------
+  // /learn does a lot of its navigation client-side via history.pushState
+  // (course -> project -> thread drill-down). Without patching those, the
+  // Studio's URL bar and document targeting would desync the moment an editor
+  // clicked into a lecture.
+  let navigate: HistoryAdapterNavigate | undefined;
+  let lastUrl = '';
+
+  const sync = () => {
+    const url = currentUrl();
+    if (url === lastUrl) return;
+    lastUrl = url;
+    navigate?.({ type: 'push', title: document.title, url });
+  };
+
+  const origPush = window.history.pushState;
+  const origReplace = window.history.replaceState;
+  window.history.pushState = function (...args) {
+    origPush.apply(window.history, args);
+    sync();
+  };
+  window.history.replaceState = function (...args) {
+    origReplace.apply(window.history, args);
+    sync();
+  };
+  window.addEventListener('popstate', sync);
+  window.addEventListener('hashchange', sync);
+
+  const history: HistoryAdapter = {
+    subscribe: (cb) => {
+      navigate = cb;
+      lastUrl = currentUrl();
+      cb({ type: 'push', title: document.title, url: lastUrl });
+      return () => {
+        navigate = undefined;
+      };
+    },
+    update: (update) => {
+      switch (update.type) {
+        case 'push':
+          if (window.location.href !== update.url) window.location.assign(update.url);
+          return;
+        case 'replace':
+          if (window.location.href !== update.url) window.location.replace(update.url);
+          return;
+        case 'pop':
+          window.history.back();
+          return;
+      }
+    },
+  };
+
+  enableVisualEditing({
+    history,
+    onPerspectiveChange: (perspective) => {
+      if (writePerspectiveCookie(perspective)) window.location.reload();
+    },
+    refresh: () =>
+      new Promise<void>((resolve) => {
+        window.location.reload();
+        resolve();
+      }),
+    // Belt and braces alongside the server-side stega-guard: this reports
+    // stega that reached somewhere it always breaks things (href, src, id,
+    // <head>, script contents). Dev only, since it costs a DOM scan.
+    ...(import.meta.env.DEV
+      ? {
+          onSuspiciousStega: (reports) => {
+            for (const report of reports) {
+              console.error('[sanity] suspicious stega:', report);
+            }
+          },
+        }
+      : {}),
+  });
+</script>

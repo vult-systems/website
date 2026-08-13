@@ -1,15 +1,10 @@
 /** Helpers for building a table of contents from Portable Text. */
 
-/** Slugify heading text into a stable anchor id. */
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-}
+// Slugify now lives in ./slug so the sitemap builder and the Presentation
+// resolver can share it without pulling in the Portable Text helpers below.
+// Re-exported here because existing call sites import it from this module.
+export { slugify } from './slug';
+import { slugify } from './slug';
 
 /** Flatten a Portable Text block's spans into plain text (handles annotated/nested spans). */
 export function portableTextToPlain(block: any): string {
