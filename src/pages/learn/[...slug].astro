@@ -1258,6 +1258,7 @@ el.classList.toggle('hidden', el.id !== `detail-${courseSlug}`);
 });
 const activeCourseEl = document.getElementById(`detail-${courseSlug}`);
 if (activeCourseEl) wakeLazyImages(activeCourseEl);
+document.dispatchEvent(new CustomEvent('learn:panel-revealed'));
 document.querySelectorAll<HTMLElement>('.learn-nav-link[data-course-nav="true"]').forEach((link) => {
 link.classList.toggle('active', link.dataset.slug === courseSlug);
 });
@@ -1477,6 +1478,7 @@ if (activeProject) {
 initThreadCards();
 buildProjectChapterNav(activeProject);
 wakeLazyImages(activeProject);
+document.dispatchEvent(new CustomEvent('learn:panel-revealed'));
 }
 syncSidebarSubnav(courseSlug, projectSlug);
 if (updateHash) updateUrl(courseSlug, projectSlug);
@@ -1496,6 +1498,7 @@ const activeThread = document.getElementById(`thread-${courseSlug}-${projectSlug
 if (activeThread) {
 buildProjectChapterNav(activeThread);
 wakeLazyImages(activeThread);
+document.dispatchEvent(new CustomEvent('learn:panel-revealed'));
 }
 syncSidebarSubnav(courseSlug, projectSlug, threadSlug);
 if (updateHash) updateUrl(courseSlug, projectSlug, threadSlug);

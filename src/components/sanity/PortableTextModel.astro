@@ -604,7 +604,17 @@ const overridesJson = JSON.stringify(overrides);
   // behind an IntersectionObserver so it only loads once a model block is
   // actually about to be seen, instead of on every page load that happens
   // to contain one.
+  //
+  // Two independent triggers call this, so it needs to be idempotent: the
+  // IntersectionObserver below (for models that scroll into view within an
+  // already-visible panel) and the 'learn:panel-revealed' listener (for
+  // /learn's display:none panel swap, where a model can already be on
+  // screen the instant its panel is revealed — see that listener for why
+  // the observer alone can't catch that case).
+  let modelViewerInitStarted = false;
   function initModelViewer() {
+    if (modelViewerInitStarted) return;
+    modelViewerInitStarted = true;
     import('@google/model-viewer').then(() => {
 
     // Orientation cube: snap the camera to a preset view.
@@ -956,6 +966,16 @@ const overridesJson = JSON.stringify(overrides);
   // delay) and "model is offscreen, in a collapsed section, etc." (stays
   // dormant, unlike a plain getBoundingClientRect check which can't tell
   // "already visible" apart from "hidden" — both report a zero-ish rect).
+  //
+  // That guarantee only holds if the frame already has real layout at
+  // observe() time, though. On /learn, every course/project/thread panel
+  // renders server-side but stays display:none until JS reveals the active
+  // one — so at page-script eval time every .model-viewer-frame reports an
+  // empty rect and never counts as intersecting, even ones about to be
+  // shown front-and-center with no scroll needed. [...slug].astro dispatches
+  // 'learn:panel-revealed' right after it un-hides a panel (same spot it
+  // already wakes lazy-loaded <img>s for the same reason) so those models
+  // get their own trigger instead of waiting on a scroll that may never come.
   const frames = document.querySelectorAll<HTMLElement>('.model-viewer-frame');
   if (frames.length) {
     const io = new IntersectionObserver((entries, observer) => {
@@ -966,4 +986,5 @@ const overridesJson = JSON.stringify(overrides);
     }, { rootMargin: '400px 0px' });
     frames.forEach((f) => io.observe(f));
   }
+  document.addEventListener('learn:panel-revealed', () => initModelViewer());
 </script>
