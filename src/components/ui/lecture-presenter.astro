@@ -280,6 +280,43 @@
   #lecture-presenter #lp-slide figure { margin-block: 1rem; text-align: center; }
   #lecture-presenter #lp-slide strong { font-weight: 700; }
 
+  /* Short frames (phone landscape): every clamp() above pairs a cqw/cqh-driven
+     preferred value with a REM floor tuned for normal desktop/laptop window
+     sizes. #lp-frame is pinned to an exact 16:9 box, so cqw and cqh inside it
+     are always proportional to each other by a fixed 16/9 constant — on a
+     large frame the preferred value always clears the floor, so it never
+     engages. On phone landscape, real available height after browser chrome
+     is small enough (measured 205-242px tall) that the preferred value falls
+     far under the floor, so every rule renders at its desktop-tuned minimum
+     regardless of how little room the frame actually has, and the floors
+     stack into an overflow the frame's own scroll affordance doesn't make
+     obvious on a touch device (confirmed empirically: slide content running
+     2-3x the frame's own height). 320px leaves headroom above every measured
+     phone-landscape frame while staying far below any realistic desktop/
+     tablet windowed frame, so this only ever engages on real phone
+     landscape. Only the floor moves; the preferred/ceiling terms are
+     untouched so the scaling curve stays continuous. */
+  @container (max-height: 320px) {
+    #lecture-presenter #lp-slide {
+      --lp-px: clamp(1rem, 6cqw, 6.5rem);
+      --lp-py: clamp(0.6rem, 5.5cqh, 3.5rem);
+    }
+    #lecture-presenter #lp-slide .lp-head {
+      margin-bottom: clamp(0.4rem, 2.5cqh, 2rem);
+      padding-bottom: clamp(0.25rem, 1.2cqh, 1rem);
+    }
+    #lecture-presenter #lp-slide .lp-title-main { font-size: clamp(1.15rem, 4.8cqw, 4.5rem); }
+    #lecture-presenter #lp-slide .lp-title-sub { font-size: clamp(0.7rem, 2.1cqw, 1.7rem); }
+    #lecture-presenter #lp-slide h2 { font-size: clamp(0.85rem, 3cqw, 2.3rem); }
+    #lecture-presenter #lp-slide h3 { font-size: clamp(0.75rem, 2.4cqw, 1.75rem); }
+    #lecture-presenter #lp-slide p,
+    #lecture-presenter #lp-slide li { font-size: clamp(0.7rem, 1.7cqw, 1.45rem); }
+    #lecture-presenter #lp-slide .lp-body blockquote { font-size: clamp(0.8rem, 2.4cqw, 2rem); }
+    #lecture-presenter #lp-slide .lecture-note p { font-size: clamp(0.6rem, 1.3cqw, 1.15rem); }
+    #lecture-presenter #lp-slide .lp-body ul,
+    #lecture-presenter #lp-slide .lp-body ol { padding-left: clamp(0.85rem, 2.2cqw, 2rem); }
+  }
+
   /* The wireframe toggle and camera cube are positioned relative to
      model-viewer itself (top: 10px), which in a full/bleed layout can sit
      flush with the top of the slide — right where #lp-context (top: 12px)
@@ -665,8 +702,23 @@
   #lecture-presenter #lp-slide:has(.lp-cols.bleed) { padding: 0; overflow: hidden; }
   #lecture-presenter #lp-slide .lp-deck:has(.lp-cols.bleed) { height: 100%; min-height: 0; display: flex; }
   #lecture-presenter #lp-slide .lp-cols.bleed { flex: 1; min-height: 0; gap: 0; align-items: stretch; }
-  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media { min-height: 0; }
+  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media { height: 100%; min-height: 0; }
   #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media figure { margin: 0; width: 100%; height: 100%; }
+  /* PortableTextFigure.astro wraps every image/video in a .spotlight-card >
+     .spotlight-inner hover-glow pair (see globals.css) — an extra layer
+     between figure and img that has no height of its own here, so it just
+     shrinks to whatever height its content (the img) comes out to. That
+     makes the percentage chain circular: the img's height: 100% below
+     resolves against .spotlight-inner's height, but .spotlight-inner's
+     height is itself only ever the img's rendered size — so the img fell
+     back to auto, i.e. sized by its own aspect-ratio (from its Sanity
+     width/height attributes) instead of filling the column, overflowing
+     the frame by however much taller that ratio came out (measured: a
+     consistent ~15-20px overflow on every phone-landscape size tested,
+     regardless of which image). Giving .spotlight-inner an explicit
+     height breaks the circularity so the img's height: 100% has a real,
+     already-letterboxed box to resolve against. */
+  #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media .spotlight-inner { height: 100%; }
   #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media img,
   #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media video {
     width: 100%;
