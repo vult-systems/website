@@ -943,6 +943,31 @@ const overridesJson = JSON.stringify(overrides);
       wireCube(mv);
       if (mv.loaded) onModelLoad(mv);
       else mv.addEventListener('load', () => onModelLoad(mv), { once: true });
+
+      // Present mode: model-viewer's own poster-to-model swap is a hard
+      // display:none/block toggle with no transition (see its LoadingMixin —
+      // $hidePoster() flips a class, no opacity involved), so the model pops
+      // in the instant it's ready instead of fading like everything else on
+      // a slide. Fade the whole frame in on 'load' instead, registered after
+      // onModelLoad above so the camera's already snapped to its corrected
+      // radius (see that function's own comment) before anything becomes
+      // visible. Scoped to Present — the reading page shows models inline
+      // while scrolling, where the same hard cut isn't nearly as noticeable.
+      const frame = mv.closest('.model-viewer-frame') as HTMLElement | null;
+      if (frame && mv.closest('#lecture-presenter')) {
+        const reveal = () => frame.classList.add('lp-mv-revealed');
+        if (mv.loaded) reveal();
+        else {
+          // 'error' and the timeout are the same belt-and-suspenders
+          // lecture-presenter.astro's revealImage() uses for <img> — a model
+          // that fails to load, or whatever edge case never fires 'load',
+          // shouldn't leave the frame invisible for the rest of the
+          // presentation.
+          mv.addEventListener('load', reveal, { once: true });
+          mv.addEventListener('error', reveal, { once: true });
+          window.setTimeout(reveal, 4000);
+        }
+      }
     }
 
     document.querySelectorAll('model-viewer').forEach((mv) => wireModel(mv as any));
@@ -976,6 +1001,13 @@ const overridesJson = JSON.stringify(overrides);
   // 'learn:panel-revealed' right after it un-hides a panel (same spot it
   // already wakes lazy-loaded <img>s for the same reason) so those models
   // get their own trigger instead of waiting on a scroll that may never come.
+  //
+  // /learn renders a whole course's panels into one page load, so a model
+  // anywhere in the course (a different project/thread than the one being
+  // viewed) puts this script on the page — meaning every panel reveal fires
+  // the event, not just ones that actually contain a model. Re-check
+  // visibility here (same offsetParent-based check image-lightbox.astro
+  // uses) so the import only fires when the revealed panel actually has one.
   const frames = document.querySelectorAll<HTMLElement>('.model-viewer-frame');
   if (frames.length) {
     const io = new IntersectionObserver((entries, observer) => {
@@ -986,5 +1018,7 @@ const overridesJson = JSON.stringify(overrides);
     }, { rootMargin: '400px 0px' });
     frames.forEach((f) => io.observe(f));
   }
-  document.addEventListener('learn:panel-revealed', () => initModelViewer());
+  document.addEventListener('learn:panel-revealed', () => {
+    if (Array.from(frames).some((f) => f.offsetParent !== null)) initModelViewer();
+  });
 </script>

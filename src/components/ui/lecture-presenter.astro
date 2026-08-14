@@ -41,8 +41,23 @@
       </div>
     </div>
 
+    <!-- Phone-in-portrait fallback: shown instead of #lp-stage/#lp-controls
+         via the (orientation: portrait) media query below. A 16:9 frame
+         squeezed into a portrait phone's width comes out too short to read;
+         asking for landscape keeps the real slide frame everywhere else
+         instead of maintaining a second, degraded layout. -->
+    <div id="lp-rotate-prompt" class="hidden flex-1 flex-col items-center justify-center gap-4 px-8 text-center text-foreground-secondary">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <rect x="6" y="2" width="12" height="20" rx="2" />
+        <path d="M10 19h4" />
+        <path d="M20 8v3a3 3 0 0 1-3 3h-1" stroke-dasharray="2.5 2.5" />
+        <path d="m14 12 2 2 2-2" />
+      </svg>
+      <p class="text-sm" style="font-family: 'Besley', serif !important;">Rotate your device to landscape to view this presentation.</p>
+    </div>
+
     <!-- Controls -->
-    <div class="flex items-center gap-4 px-6 py-3 border-t border-foreground-secondary/10">
+    <div id="lp-controls" class="flex items-center gap-4 px-6 py-3 border-t border-foreground-secondary/10">
       <button id="lp-prev" class="rounded-md border border-foreground/20 bg-background/90 w-9 h-9 flex items-center justify-center text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" aria-label="Previous slide">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
       </button>
@@ -279,6 +294,13 @@
   #lecture-presenter #lp-slide .lp-body > *:nth-child(n + 6) { animation-delay: 0.52s; }
   #lecture-presenter #lp-slide img { opacity: 0; transition: opacity 0.45s ease; }
   #lecture-presenter #lp-slide img.lp-loaded { opacity: 1; }
+  /* 3D models: model-viewer's own poster-to-model swap has no transition of
+     its own (a plain display:none/block toggle), so it pops in the instant
+     it's ready. Fade the whole frame in instead, same idea as the image
+     fade above — PortableTextModel.astro's wireModel() adds lp-mv-revealed
+     once the model has actually loaded. */
+  #lecture-presenter #lp-slide .model-viewer-frame { opacity: 0; transition: opacity 0.45s ease; }
+  #lecture-presenter #lp-slide .model-viewer-frame.lp-mv-revealed { opacity: 1; }
   /* "No entrance transition in Present" (PortableTextFigure.astro /
      blockContentType.ts) — every slide is rebuilt from scratch on
      render(), so a duplicated image carried over from the previous
@@ -293,11 +315,11 @@
     transform: none !important;
     transition: none !important;
   }
-  /* 3D models pop straight in once loaded rather than fading. */
   @media (prefers-reduced-motion: reduce) {
     #lecture-presenter #lp-slide .lp-head,
     #lecture-presenter #lp-slide .lp-body > * { animation: none; }
     #lecture-presenter #lp-slide img { opacity: 1; transition: none; }
+    #lecture-presenter #lp-slide .model-viewer-frame { opacity: 1; transition: none; }
   }
 
   /* The spotlight hover glow (globals.css .spotlight-card/.spotlight-inner)
@@ -766,94 +788,18 @@
     display: none;
   }
 
-  /* Small screens / heavy browser zoom-in: drop the fixed 16:9 frame and fall
-     back to a simple scrollable stacked view so nothing collapses or overlaps. */
-  @media (max-width: 720px), (max-height: 520px) {
-    #lecture-presenter #lp-stage { display: block; padding: 0; overflow-y: auto; }
-    #lecture-presenter #lp-frame {
-      aspect-ratio: auto;
-      width: 100%;
-      height: auto;
-      min-height: 100%;
-      border: 0;
-      border-radius: 0;
-      overflow: visible;
-    }
-    #lecture-presenter #lp-slide {
-      position: static;
-      inset: auto;
-      display: block;
-      overflow: visible;
-      min-height: 100%;
-      padding: 1.5rem 1.25rem 2rem;
-    }
-    #lecture-presenter #lp-zone-prev,
-    #lecture-presenter #lp-zone-next { display: none; }
-    #lecture-presenter #lp-context {
-      position: static;
-      max-width: none;
-      text-align: left;
-      margin-bottom: 0.75rem;
-    }
-    /* Un-flex the deck/body so the bottom image gets a real box instead of collapsing */
-    #lecture-presenter #lp-slide .lp-deck,
-    #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']),
-    #lecture-presenter #lp-slide .lp-title-slide {
-      display: block;
-      min-height: 0;
-    }
-    /* Cover / title-only slide stays centered so it doesn't look blank */
-    #lecture-presenter #lp-slide .lp-title-slide:not(:has(.lp-body)) {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      min-height: calc(100dvh - 8.5rem);
-    }
-    #lecture-presenter #lp-slide .lp-deck:has(figure[data-align='bottom']) .lp-body { display: block; }
-    #lecture-presenter #lp-slide figure[data-align='bottom'] {
-      flex: none;
-      display: block;
-      aspect-ratio: 16 / 10;
-      width: 100%;
-      margin: 1rem 0 0;
-    }
-    #lecture-presenter #lp-slide figure[data-align='bottom'] img { height: 100%; }
-    /* Two-column and side-by-side collapse to one column */
-    #lecture-presenter #lp-slide .lp-cols { grid-template-columns: 1fr; }
-    #lecture-presenter #lp-slide .lp-two-col { column-count: 1; }
-    #lecture-presenter #lp-slide .lp-two-col-split { flex-direction: column; }
-    /* Bleed side image stacks under the text with a fixed ratio */
-    #lecture-presenter #lp-slide:has(.lp-cols.bleed) { padding: 1.5rem 1.25rem 2rem; overflow: visible; }
-    #lecture-presenter #lp-slide .lp-deck:has(.lp-cols.bleed) { display: block; height: auto; min-height: 0; }
-    #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-text {
-      display: block;
-      overflow: visible;
-      padding: 1.25rem 0 0;
-    }
-    #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media { aspect-ratio: 16 / 10; min-height: 0; }
-    #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media img,
-    #lecture-presenter #lp-slide .lp-cols.bleed .lp-col-media video { height: 100%; }
-    /* Background image keeps covering the slide with text over it */
-    #lecture-presenter #lp-slide:has(.lp-bg-slide) { padding: 0; overflow: visible; }
-    #lecture-presenter #lp-slide .lp-bg-slide {
-      display: flex;
-      height: auto;
-      min-height: calc(100dvh - 7rem);
-      padding: 1.5rem 1.25rem;
-    }
-    #lecture-presenter #lp-slide .lp-bg-media { position: absolute; }
-    #lecture-presenter #lp-slide .lp-bg-content { max-height: none; overflow: visible; }
-    /* Compact, fixed type */
-    #lecture-presenter #lp-slide .lp-title-main { font-size: clamp(1.5rem, 6vw, 2.1rem); }
-    #lecture-presenter #lp-slide .lp-title-sub { font-size: 1.05rem; }
-    #lecture-presenter #lp-slide h2 { font-size: 1.5rem; }
-    #lecture-presenter #lp-slide h3 { font-size: 1.25rem; }
-    #lecture-presenter #lp-slide p,
-    #lecture-presenter #lp-slide li { font-size: 1rem; }
-    #lecture-presenter #lp-slide img,
-    #lecture-presenter #lp-slide video { max-height: none; }
+  /* Phone-width portrait touch devices: a 16:9 frame squeezed into that
+     width comes out too short to read. Ask for landscape instead of
+     maintaining a second, degraded slide layout — every other combination
+     (including tablets in portrait, which have enough width for a
+     legible letterboxed frame) keeps the normal 16:9 frame above, which
+     already self-scales its type via clamp()/cqw/cqh. (hover: none) and
+     (pointer: coarse) scope this to touch devices, not a resized desktop
+     window. */
+  @media (orientation: portrait) and (hover: none) and (pointer: coarse) and (max-width: 700px) {
+    #lecture-presenter #lp-stage,
+    #lecture-presenter #lp-controls { display: none; }
+    #lecture-presenter #lp-rotate-prompt { display: flex; }
   }
 </style>
 
