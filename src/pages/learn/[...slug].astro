@@ -411,6 +411,7 @@ class="learn-nav-link block leading-snug group"
 data-slug={courseId(course.code)}
 data-course-nav="true"
 data-course-search={courseSearchData(course)}
+data-astro-reload
 >
 <span class="font-serif block text-base font-medium text-accent">{course.code}</span>
 <span class="font-serif block text-base text-foreground-secondary group-hover:text-accent transition-colors">{course.title}</span>
@@ -424,6 +425,7 @@ href={`/learn/${courseId(course.code)}/${project.slug}`}
 class="subnav-link learn-nav-link block leading-snug group"
 data-course={courseId(course.code)}
 data-project={project.slug}
+data-astro-reload
 >
 <span class="font-serif learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors">{project.title}</span>
 </a>
@@ -436,6 +438,7 @@ class="subnav-thread-link learn-nav-link block leading-snug group"
 data-course={courseId(course.code)}
 data-project={project.slug}
 data-thread={thread.slug}
+data-astro-reload
 >
 <span class="font-serif learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors">{thread.title}</span>
 </a>
@@ -464,6 +467,7 @@ class="learn-nav-link block leading-snug group"
 data-slug={topic.slug}
 data-course-nav="true"
 data-course-search={topicSearchData(topic)}
+data-astro-reload
 >
 <span class="font-serif block text-base font-medium text-accent">{topic.code ?? PIPELINE_CODE}</span>
 <span class="font-serif block text-base text-foreground-secondary group-hover:text-accent transition-colors">{topic.title}</span>
@@ -476,6 +480,7 @@ href={`/learn/${topic.slug}/${thread.slug}`}
 class="subnav-link learn-nav-link block leading-snug group"
 data-course={topic.slug}
 data-project={thread.slug}
+data-astro-reload
 >
 <span class="font-serif learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors">{thread.title}</span>
 </a>
@@ -819,6 +824,7 @@ data-project={thread.slug}
 							data-kind="topic-thread"
 							data-course={topic.slug}
 							data-thread={prevThread.slug}
+							data-astro-reload
 						>
 							<svg class="w-4 h-4 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
@@ -836,6 +842,7 @@ data-project={thread.slug}
 							data-kind="topic-thread"
 							data-course={topic.slug}
 							data-thread={nextThread.slug}
+							data-astro-reload
 						>
 							<div class="min-w-0">
 								<p class="font-serif text-xs uppercase tracking-widest text-foreground-muted mb-1">Next</p>
@@ -924,6 +931,7 @@ data-project={thread.slug}
 							data-course={courseId(course.code)}
 							data-project={prevEntry.project.slug}
 							data-thread={prevEntry.thread.slug}
+							data-astro-reload
 						>
 							<svg class="w-4 h-4 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
@@ -942,6 +950,7 @@ data-project={thread.slug}
 							data-course={courseId(course.code)}
 							data-project={nextEntry.project.slug}
 							data-thread={nextEntry.thread.slug}
+							data-astro-reload
 						>
 							<div class="min-w-0">
 								<p class="font-serif text-xs uppercase tracking-widest text-foreground-muted mb-1">Next</p>
