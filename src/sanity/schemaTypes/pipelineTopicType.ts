@@ -14,7 +14,14 @@ export const pipelineThreadType = defineType({
     defineField({
       name: 'slug',
       type: 'slug',
-      options: { source: 'title', maxLength: 96 },
+      // `source: 'title'` resolves against the top-level document (the
+      // pipeline topic), not this array item — every thread in the same
+      // topic would generate the same slug. Read the sibling title off
+      // the slug field's own parent object instead.
+      options: {
+        source: (_doc, context) => (context.parent as { title?: string })?.title ?? '',
+        maxLength: 96,
+      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({ name: 'description', type: 'text', rows: 2 }),

@@ -34,7 +34,15 @@ export const courseProjectThreadType = defineType({
     defineField({
       name: 'slug',
       type: 'slug',
-      options: { source: 'title', maxLength: 96, slugify },
+      // `source: 'title'` resolves against the top-level document (the
+      // course), not this array item — every thread in the same course
+      // would generate the same slug. Read the sibling title off the
+      // slug field's own parent object instead.
+      options: {
+        source: (_doc, context) => (context.parent as { title?: string })?.title ?? '',
+        maxLength: 96,
+        slugify,
+      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({ name: 'description', type: 'text', rows: 2 }),
@@ -78,7 +86,15 @@ export const courseProjectType = defineType({
     defineField({
       name: 'slug',
       type: 'slug',
-      options: { source: 'title', maxLength: 96, slugify },
+      // `source: 'title'` resolves against the top-level document (the
+      // course), not this array item — every project in the same course
+      // would generate the same slug. Read the sibling title off the
+      // slug field's own parent object instead.
+      options: {
+        source: (_doc, context) => (context.parent as { title?: string })?.title ?? '',
+        maxLength: 96,
+        slugify,
+      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({ name: 'description', type: 'text', rows: 2 }),
