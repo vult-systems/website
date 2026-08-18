@@ -176,10 +176,6 @@
     border-bottom: 1px solid hsl(var(--foreground-secondary) / 0.18);
   }
 
-  /* Learn page body copy uses the reading sans, distinct from the Besley
-     headings/nav around it (see .reading-copy below for the same split). */
-  .learn-body p { font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; }
-
   /* Body copy (Text component) uses a dedicated reading sans everywhere — page
      headers, landing page, and cards — deliberately distinct from the Besley
      serif used for headings/nav/chrome, so the two read as a paired typeface
