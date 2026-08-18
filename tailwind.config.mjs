@@ -31,7 +31,7 @@ module.exports = {
   			// tokens in src/config/design.ts have a real Tailwind class behind
   			// them instead of falling back to Tailwind's generic defaults.
   			serif: ['Besley', 'ui-serif', 'Georgia', 'serif'],
-  			sans: ['Source Sans 3', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  			sans: ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
   			mono: ['IBM Plex Mono', 'Courier New', 'monospace'],
   		},  		colors: {
   			// Semantic color system

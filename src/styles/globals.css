@@ -178,7 +178,7 @@
 
   /* Learn page body copy uses the reading sans, distinct from the Besley
      headings/nav around it (see .reading-copy below for the same split). */
-  .learn-body p { font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif; }
+  .learn-body p { font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif; }
 
   /* Body copy (Text component) uses a dedicated reading sans everywhere — page
      headers, landing page, and cards — deliberately distinct from the Besley
@@ -187,7 +187,7 @@
      Mirrors the `.prose` approach to beat the global `body *` monospace rule. */
   .reading-copy,
   .reading-copy * {
-    font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
     letter-spacing: 0;
   }
   /* Inline code/technical bits inside body copy stay monospace. */
@@ -237,7 +237,7 @@
   .search-result img { opacity: 1 !important; animation: none !important; }
 
   .prose {
-    --reading-font: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+    --reading-font: 'Figtree', ui-sans-serif, system-ui, sans-serif;
     --reading-size: 1.1875rem;     /* 19px */
     --reading-line-height: 1.7;    /* comfortable body leading (WCAG >= 1.5) */
     --reading-tracking: 0em;
