@@ -176,15 +176,18 @@
     border-bottom: 1px solid hsl(var(--foreground-secondary) / 0.18);
   }
 
-  /* Learn page body copy uses the reading serif to match its headings/nav. */
-  .learn-body p { font-family: 'Besley', ui-serif, Georgia, serif; }
+  /* Learn page body copy uses the reading sans, distinct from the Besley
+     headings/nav around it (see .reading-copy below for the same split). */
+  .learn-body p { font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif; }
 
-  /* Body copy (Text component) uses the reading serif everywhere — page headers,
-     landing page, and cards — so it matches the headings and article prose.
+  /* Body copy (Text component) uses a dedicated reading sans everywhere — page
+     headers, landing page, and cards — deliberately distinct from the Besley
+     serif used for headings/nav/chrome, so the two read as a paired typeface
+     combo instead of one font everywhere.
      Mirrors the `.prose` approach to beat the global `body *` monospace rule. */
   .reading-copy,
   .reading-copy * {
-    font-family: 'Besley', ui-serif, Georgia, serif;
+    font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
     letter-spacing: 0;
   }
   /* Inline code/technical bits inside body copy stay monospace. */
@@ -234,7 +237,7 @@
   .search-result img { opacity: 1 !important; animation: none !important; }
 
   .prose {
-    --reading-font: 'Besley', ui-serif, Georgia, serif;
+    --reading-font: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
     --reading-size: 1.1875rem;     /* 19px */
     --reading-line-height: 1.7;    /* comfortable body leading (WCAG >= 1.5) */
     --reading-tracking: 0em;
@@ -257,8 +260,14 @@
     font-family: var(--font-ibm-plex);
   }
 
-  /* Headings brighter for contrast; balanced line breaks */
+  /* Headings brighter for contrast; balanced line breaks. Font-family pinned
+     back to the Besley serif (rather than inheriting --reading-font) so
+     article sub-headings still match every other heading on the site, even
+     though surrounding paragraph text is the reading sans. Same specificity
+     trick as the code/pre override above: .prose * and this selector are
+     equal specificity, so source order decides, and this comes after. */
   .prose :where(h1, h2, h3, h4) {
+    font-family: 'Besley', ui-serif, Georgia, serif;
     color: hsl(var(--foreground));
     text-wrap: balance;
   }

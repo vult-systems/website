@@ -37,19 +37,18 @@ const {
 
 const classes = cn(
   components.link.base,
+  'font-serif',
   components.link.variants[variant],
   components.link.underline[underline],
   'text-xl',
   className
 );
 
-const externalAttrs = external 
+const externalAttrs = external
   ? { target: '_blank', rel: 'noopener noreferrer' }
   : {};
-
-const style = 'font-family: "Besley", serif !important;';
 ---
 
-<a href={href} class={classes} style={style} {...externalAttrs}>
+<a href={href} class={classes} {...externalAttrs}>
   <slot />
 </a>

@@ -42,17 +42,16 @@ const Tag = href ? 'a' : 'button';
 
 const classes = cn(
   components.button.base,
+  'font-serif',
   components.button.variants[variant],
   components.button.sizes[size],
   disabled && components.button.states.disabled,
   className
 );
 
-const style = 'font-family: "Besley", serif !important;';
-
-const attrs = href 
-  ? { href, class: classes, style }
-  : { type, disabled, class: classes, style };
+const attrs = href
+  ? { href, class: classes }
+  : { type, disabled, class: classes };
 ---
 
 <Tag {...attrs}>

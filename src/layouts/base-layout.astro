@@ -9,6 +9,8 @@ import '@fontsource/ibm-plex-mono/700.css';
 import '@fontsource/ibm-plex-mono/400-italic.css';
 import besleyNormalUrl from '@fontsource-variable/besley/files/besley-latin-wght-normal.woff2';
 import besleyItalicUrl from '@fontsource-variable/besley/files/besley-latin-wght-italic.woff2';
+import sourceSans3NormalUrl from '@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2';
+import sourceSans3ItalicUrl from '@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-italic.woff2';
 import ibmMono400Url from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2';
 import { getImage } from 'astro:assets';
 import logoSvg from '@/assets/brand/logo.svg';
@@ -92,13 +94,17 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		<!-- Security: real headers are set in public/_headers; only the meta-valid one is kept here -->
 		<meta name="referrer" content="strict-origin-when-cross-origin" />
 		
-		<!-- Performance: self-hosted fonts preloaded so text paints in Besley/IBM Plex Mono without a swap -->
+		<!-- Performance: self-hosted fonts preloaded so text paints in Besley/Source Sans 3/IBM Plex Mono without a swap -->
 		<link rel="preload" as="font" type="font/woff2" href={besleyNormalUrl} crossorigin />
 		<link rel="preload" as="font" type="font/woff2" href={besleyItalicUrl} crossorigin />
+		<link rel="preload" as="font" type="font/woff2" href={sourceSans3NormalUrl} crossorigin />
+		<link rel="preload" as="font" type="font/woff2" href={sourceSans3ItalicUrl} crossorigin />
 		<link rel="preload" as="font" type="font/woff2" href={ibmMono400Url} crossorigin />
 		<style is:global set:html={`
 			@font-face{font-family:'Besley';font-style:normal;font-weight:400 900;font-display:swap;src:url(${besleyNormalUrl}) format('woff2');}
 			@font-face{font-family:'Besley';font-style:italic;font-weight:400 900;font-display:swap;src:url(${besleyItalicUrl}) format('woff2');}
+			@font-face{font-family:'Source Sans 3';font-style:normal;font-weight:200 900;font-display:swap;src:url(${sourceSans3NormalUrl}) format('woff2');}
+			@font-face{font-family:'Source Sans 3';font-style:italic;font-weight:200 900;font-display:swap;src:url(${sourceSans3ItalicUrl}) format('woff2');}
 		`}></style>
 		<link rel="dns-prefetch" href="https://images.unsplash.com" />
 		

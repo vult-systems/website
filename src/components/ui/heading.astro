@@ -57,10 +57,11 @@ const classes = cn(
   components.heading.sizes[visualSize],
   alignClasses[align],
   'text-foreground',
+  'font-serif',
   className
 );
 ---
 
-<Tag class={classes} style="font-family: 'Besley', serif !important;">
+<Tag class={classes}>
   <slot />
 </Tag>

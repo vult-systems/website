@@ -16,14 +16,13 @@ const bodyRows = rows.slice(1);
         {headerRow && (
           <thead>
             <tr class="border-b border-border">
-              <th class="w-10 px-2 py-2.5 font-normal text-foreground-muted" style="font-family: 'Besley', serif;" />
+              <th class="font-serif w-10 px-2 py-2.5 font-normal text-foreground-muted" />
               {(headerRow.cells ?? []).map((cell, i) => (
                 <th
                   class:list={[
-                    'px-4 py-2.5 font-medium text-foreground align-top break-words',
+                    'font-serif px-4 py-2.5 font-medium text-foreground align-top break-words',
                     i === 0 && 'w-40 sm:w-48',
                   ]}
-                  style="font-family: 'Besley', serif;"
                 >
                   {cell}
                 </th>

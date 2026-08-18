@@ -173,7 +173,7 @@ const articleJsonLd = {
               <!-- Role -->
               {art.data.role && (
                 <div>
-                  <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-2 block" style="font-family: 'Besley', serif !important;">
+                  <Text size="xs" variant="secondary" class="font-serif uppercase tracking-widest mb-2 block">
                     Role
                   </Text>
                   <Text size="sm" variant="secondary">{art.data.role}</Text>
@@ -183,7 +183,7 @@ const articleJsonLd = {
               <!-- Company / Client -->
               {art.data.client && (
                 <div>
-                  <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-3 block" style="font-family: 'Besley', serif !important;">
+                  <Text size="xs" variant="secondary" class="font-serif uppercase tracking-widest mb-3 block">
                     Studio
                   </Text>
                   <div class="flex flex-col gap-4">
@@ -212,7 +212,7 @@ const articleJsonLd = {
               <!-- Project -->
               {art.data.project && (
                 <div>
-                  <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-3 block" style="font-family: 'Besley', serif !important;">
+                  <Text size="xs" variant="secondary" class="font-serif uppercase tracking-widest mb-3 block">
                     Project
                   </Text>
                   {projectLogos[art.data.project] ? (
@@ -239,7 +239,7 @@ const articleJsonLd = {
               <!-- Tools -->
               {art.data.tools && art.data.tools.length > 0 && (
                 <div>
-                  <Text size="xs" variant="secondary" class="uppercase tracking-widest mb-3 block" style="font-family: 'Besley', serif !important;">
+                  <Text size="xs" variant="secondary" class="font-serif uppercase tracking-widest mb-3 block">
                     Tools
                   </Text>
                   <div class="flex flex-col gap-2">

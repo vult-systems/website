@@ -364,7 +364,7 @@ loading="eager"
 	<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 		<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
 	</svg>
-	<p class="text-sm text-foreground-secondary" style="font-family: 'Besley', serif !important;">
+	<p class="font-serif text-sm text-foreground-secondary">
 		Currently undergoing active updates. New content and changes are being made as you read this!
 	</p>
 </div>
@@ -385,8 +385,7 @@ loading="eager"
 			id="course-search"
 			type="search"
 			placeholder="Search courses..."
-			class="w-full bg-transparent text-sm text-foreground placeholder:text-foreground-muted outline-none"
-			style="font-family: 'Besley', serif !important;"
+			class="font-serif w-full bg-transparent text-sm text-foreground placeholder:text-foreground-muted outline-none"
 			autocomplete="off"
 		/>
 	</div>
@@ -400,7 +399,7 @@ loading="eager"
 <div class="lg:sticky lg:top-32">
 
 <div id="sidebar-classes">
-<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+<Text size="xs" variant="secondary" class="font-serif uppercase tracking-widest mb-4 block">
 {coursesLabel}
 </Text>
 <nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
@@ -413,8 +412,8 @@ data-slug={courseId(course.code)}
 data-course-nav="true"
 data-course-search={courseSearchData(course)}
 >
-<span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{course.code}</span>
-<span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{course.title}</span>
+<span class="font-serif block text-base font-medium text-accent">{course.code}</span>
+<span class="font-serif block text-base text-foreground-secondary group-hover:text-accent transition-colors">{course.title}</span>
 </a>
 {(course.projects?.length ?? 0) > 0 && (
 <div class="course-subnav hidden mt-3 space-y-2 border-l border-foreground-secondary/10 pl-3" data-course-subnav={courseId(course.code)}>
@@ -426,7 +425,7 @@ class="subnav-link learn-nav-link block leading-snug group"
 data-course={courseId(course.code)}
 data-project={project.slug}
 >
-<span class="learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{project.title}</span>
+<span class="font-serif learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors">{project.title}</span>
 </a>
 {(project.threads?.length ?? 0) > 0 && (
 <div class="project-subnav hidden mt-2 space-y-1.5 border-l border-foreground-secondary/10 pl-3" data-course={courseId(course.code)} data-project={project.slug}>
@@ -438,7 +437,7 @@ data-course={courseId(course.code)}
 data-project={project.slug}
 data-thread={thread.slug}
 >
-<span class="learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{thread.title}</span>
+<span class="font-serif learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors">{thread.title}</span>
 </a>
 ))}
 </div>
@@ -453,7 +452,7 @@ data-thread={thread.slug}
 </div>
 
 <div id="sidebar-pipeline" class="mt-8">
-<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+<Text size="xs" variant="secondary" class="font-serif uppercase tracking-widest mb-4 block">
 {pipelineLabel}
 </Text>
 <nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
@@ -466,8 +465,8 @@ data-slug={topic.slug}
 data-course-nav="true"
 data-course-search={topicSearchData(topic)}
 >
-<span class="block text-base font-medium text-accent" style="font-family: 'Besley', serif !important;">{topic.code ?? PIPELINE_CODE}</span>
-<span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{topic.title}</span>
+<span class="font-serif block text-base font-medium text-accent">{topic.code ?? PIPELINE_CODE}</span>
+<span class="font-serif block text-base text-foreground-secondary group-hover:text-accent transition-colors">{topic.title}</span>
 </a>
 {(topic.threads?.length ?? 0) > 0 && (
 <div class="course-subnav hidden mt-3 space-y-2 border-l border-foreground-secondary/10 pl-3" data-course-subnav={topic.slug}>
@@ -478,7 +477,7 @@ class="subnav-link learn-nav-link block leading-snug group"
 data-course={topic.slug}
 data-project={thread.slug}
 >
-<span class="learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{thread.title}</span>
+<span class="font-serif learn-nav-title block text-sm text-foreground-secondary group-hover:text-accent transition-colors">{thread.title}</span>
 </a>
 ))}
 </div>
@@ -509,10 +508,10 @@ data-project={thread.slug}
 			<div class="flex items-start justify-between gap-4">
 				<div class="min-w-0">
 					<div class="flex items-center gap-2 mb-2">
-						<span class="text-xs font-medium text-accent" style="font-family: 'Besley', serif !important;">{course.code}</span>
+						<span class="font-serif text-xs font-medium text-accent">{course.code}</span>
 						<span class="text-xs text-foreground-muted">{course.year}</span>
 					</div>
-					<p class="text-base font-medium text-foreground mb-1" style="font-family: 'Besley', serif !important;">{course.title}</p>
+					<p class="font-serif text-base font-medium text-foreground mb-1">{course.title}</p>
 					<p class="text-sm text-foreground-secondary line-clamp-2">{course.description}</p>
 				</div>
 				<svg class="w-5 h-5 text-foreground-muted group-hover:text-accent transition-colors shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -546,20 +545,20 @@ data-project={thread.slug}
 				</Text>
 				{course.outcomes && (
 					<div class="mt-5">
-						<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Outcomes</p>
+						<p class="font-serif text-xs uppercase tracking-widest text-foreground-muted mb-1">Outcomes</p>
 						<Text size="base" variant="secondary" class="whitespace-pre-line">{course.outcomes}</Text>
 					</div>
 				)}
 				{(course.required || course.audience) && (
 					<div class="mt-4 flex flex-col gap-2">
 						{course.required && (
-							<p class="text-base" style="font-family: 'Besley', serif !important;">
+							<p class="font-serif text-base">
 								<span class="text-foreground-muted">Required: </span>
 								<span class="text-foreground-secondary">{course.required}</span>
 							</p>
 						)}
 						{course.audience && (
-							<p class="text-base" style="font-family: 'Besley', serif !important;">
+							<p class="font-serif text-base">
 								<span class="text-foreground-muted">Audience: </span>
 								<span class="text-foreground-secondary">{course.audience}</span>
 							</p>
@@ -571,8 +570,7 @@ data-project={thread.slug}
 						href={course.syllabusUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						class="group mt-4 inline-flex items-center gap-2 text-base text-accent hover:text-accent/80 transition-colors"
-						style="font-family: 'Besley', serif !important;"
+						class="font-serif group mt-4 inline-flex items-center gap-2 text-base text-accent hover:text-accent/80 transition-colors"
 					>
 						<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
@@ -605,16 +603,16 @@ data-project={thread.slug}
 							</div>
 							<!-- Text -->
 								<div class="flex-1 min-w-0 p-4 lg:p-6 flex flex-col justify-center border-l border-border">
-									<p class="text-base text-foreground-muted mb-3 truncate" style="font-family: 'Besley', serif !important;">{course.code} - {course.title}</p>
-									<p class="text-fluid-4xl font-normal text-foreground mb-4 leading-tight" style="font-family: 'Besley', serif !important;">{project.title}</p>
-								<span class="inline-block text-base text-accent transition-colors duration-200" style="font-family: 'Besley', serif !important;">View Content</span>
+									<p class="font-serif text-base text-foreground-muted mb-3 truncate">{course.code} - {course.title}</p>
+									<p class="font-serif text-fluid-4xl font-normal text-foreground mb-4 leading-tight">{project.title}</p>
+								<span class="font-serif inline-block text-base text-accent transition-colors duration-200">View Content</span>
 							</div>
 						</div>
 						</div>
 					</button>
 				))}
 			</div>
-			<p class="projects-search-empty hidden mt-5 text-sm text-foreground-muted" style="font-family: 'Besley', serif !important;">
+			<p class="font-serif projects-search-empty hidden mt-5 text-sm text-foreground-muted">
 				No project content matches this search.
 			</p>
 		</div>
@@ -664,9 +662,9 @@ data-project={thread.slug}
 							</div>
 							<!-- Text -->
 								<div class="flex-1 min-w-0 p-4 lg:p-6 flex flex-col justify-center border-l border-border">
-									<p class="text-base text-foreground-muted mb-3 truncate" style="font-family: 'Besley', serif !important;">{topic.code ?? PIPELINE_CODE} - {topic.title}</p>
-									<p class="text-fluid-4xl font-normal text-foreground mb-4 leading-tight" style="font-family: 'Besley', serif !important;">{thread.title}</p>
-								<span class="inline-block text-base text-accent transition-colors duration-200" style="font-family: 'Besley', serif !important;">View Content</span>
+									<p class="font-serif text-base text-foreground-muted mb-3 truncate">{topic.code ?? PIPELINE_CODE} - {topic.title}</p>
+									<p class="font-serif text-fluid-4xl font-normal text-foreground mb-4 leading-tight">{thread.title}</p>
+								<span class="font-serif inline-block text-base text-accent transition-colors duration-200">View Content</span>
 							</div>
 						</div>
 						</div>
@@ -689,13 +687,13 @@ data-project={thread.slug}
 				<span class="text-sm text-foreground-muted">Content coming soon</span>
 			</div>
 			)}
-			<p class="projects-search-empty hidden mt-5 text-sm text-foreground-muted" style="font-family: 'Besley', serif !important;">
+			<p class="font-serif projects-search-empty hidden mt-5 text-sm text-foreground-muted">
 				No content matches this search.
 			</p>
 		</div>
 	))}
 
-	<p id="classes-search-empty" class="hidden mt-6 text-sm text-foreground-muted" style="font-family: 'Besley', serif !important;">
+	<p id="classes-search-empty" class="font-serif hidden mt-6 text-sm text-foreground-muted">
 		No courses match your search.
 	</p>
 
@@ -703,7 +701,7 @@ data-project={thread.slug}
 
 <!-- Project detail -->
 <div id="project-detail" class="hidden">
-	<button id="project-back" class="flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors mb-8" style="font-family: 'Besley', serif !important;">
+	<button id="project-back" class="font-serif flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors mb-8">
 		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
 		</svg>
@@ -738,9 +736,9 @@ data-project={thread.slug}
 								</div>
 								<!-- Text -->
 								<div class="flex-1 min-w-0 p-4 lg:p-6 flex flex-col justify-center border-l border-border">
-									<p class="text-base text-foreground-muted mb-3 truncate" style="font-family: 'Besley', serif !important;">{project.title}</p>
-									<p class="text-fluid-4xl font-normal text-foreground mb-4 leading-tight" style="font-family: 'Besley', serif !important;">{thread.title}</p>
-									<span class="inline-block text-base text-accent transition-colors duration-200" style="font-family: 'Besley', serif !important;">View Content</span>
+									<p class="font-serif text-base text-foreground-muted mb-3 truncate">{project.title}</p>
+									<p class="font-serif text-fluid-4xl font-normal text-foreground mb-4 leading-tight">{thread.title}</p>
+									<span class="font-serif inline-block text-base text-accent transition-colors duration-200">View Content</span>
 								</div>
 							</div>
 							</div>
@@ -788,7 +786,7 @@ data-project={thread.slug}
 			{(thread.references?.length ?? 0) > 0 && (
 				<details class="references-details mt-10 rounded-lg border border-border bg-card">
 					<summary class="flex items-center justify-between gap-3 cursor-pointer select-none px-5 py-4">
-						<span class="text-xs uppercase tracking-widest text-foreground-muted" style="font-family: 'Besley', serif !important;">
+						<span class="font-serif text-xs uppercase tracking-widest text-foreground-muted">
 							References <span class="text-foreground-muted/70">({thread.references?.length})</span>
 						</span>
 						<svg class="references-chevron w-4 h-4 shrink-0 text-foreground-muted transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -802,7 +800,7 @@ data-project={thread.slug}
 									<svg class="w-3.5 h-3.5 shrink-0 mt-0.5 text-foreground-muted group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
 									</svg>
-									<span style="font-family: 'Besley', serif !important;">
+									<span class="font-serif">
 										{ref.title}
 										{ref.kind && <span class="text-foreground-muted"> &middot; {ref.kind}</span>}
 									</span>
@@ -826,8 +824,8 @@ data-project={thread.slug}
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
 							</svg>
 							<div class="min-w-0">
-								<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Previous</p>
-								<p class="text-sm font-medium text-foreground truncate" style="font-family: 'Besley', serif !important;">{prevThread.title}</p>
+								<p class="font-serif text-xs uppercase tracking-widest text-foreground-muted mb-1">Previous</p>
+								<p class="font-serif text-sm font-medium text-foreground truncate">{prevThread.title}</p>
 							</div>
 						</a>
 					)}
@@ -840,8 +838,8 @@ data-project={thread.slug}
 							data-thread={nextThread.slug}
 						>
 							<div class="min-w-0">
-								<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Next</p>
-								<p class="text-sm font-medium text-foreground truncate" style="font-family: 'Besley', serif !important;">{nextThread.title}</p>
+								<p class="font-serif text-xs uppercase tracking-widest text-foreground-muted mb-1">Next</p>
+								<p class="font-serif text-sm font-medium text-foreground truncate">{nextThread.title}</p>
 							</div>
 							<svg class="w-4 h-4 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
@@ -857,7 +855,7 @@ data-project={thread.slug}
 
 <!-- Thread detail (3rd level: course > project > thread) -->
 <div id="thread-detail" class="hidden">
-	<button id="thread-back" class="flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors mb-8" style="font-family: 'Besley', serif !important;">
+	<button id="thread-back" class="font-serif flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors mb-8">
 		<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
 		</svg>
@@ -892,7 +890,7 @@ data-project={thread.slug}
 			{(thread.references?.length ?? 0) > 0 && (
 				<details class="references-details mt-10 rounded-lg border border-border bg-card">
 					<summary class="flex items-center justify-between gap-3 cursor-pointer select-none px-5 py-4">
-						<span class="text-xs uppercase tracking-widest text-foreground-muted" style="font-family: 'Besley', serif !important;">
+						<span class="font-serif text-xs uppercase tracking-widest text-foreground-muted">
 							References <span class="text-foreground-muted/70">({thread.references?.length})</span>
 						</span>
 						<svg class="references-chevron w-4 h-4 shrink-0 text-foreground-muted transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -906,7 +904,7 @@ data-project={thread.slug}
 									<svg class="w-3.5 h-3.5 shrink-0 mt-0.5 text-foreground-muted group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
 									</svg>
-									<span style="font-family: 'Besley', serif !important;">
+									<span class="font-serif">
 										{ref.title}
 										{ref.kind && <span class="text-foreground-muted"> &middot; {ref.kind}</span>}
 									</span>
@@ -931,8 +929,8 @@ data-project={thread.slug}
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
 							</svg>
 							<div class="min-w-0">
-								<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Previous</p>
-								<p class="text-sm font-medium text-foreground truncate" style="font-family: 'Besley', serif !important;">{prevEntry.thread.title}</p>
+								<p class="font-serif text-xs uppercase tracking-widest text-foreground-muted mb-1">Previous</p>
+								<p class="font-serif text-sm font-medium text-foreground truncate">{prevEntry.thread.title}</p>
 							</div>
 						</a>
 					)}
@@ -946,8 +944,8 @@ data-project={thread.slug}
 							data-thread={nextEntry.thread.slug}
 						>
 							<div class="min-w-0">
-								<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Next</p>
-								<p class="text-sm font-medium text-foreground truncate" style="font-family: 'Besley', serif !important;">{nextEntry.thread.title}</p>
+								<p class="font-serif text-xs uppercase tracking-widest text-foreground-muted mb-1">Next</p>
+								<p class="font-serif text-sm font-medium text-foreground truncate">{nextEntry.thread.title}</p>
 							</div>
 							<svg class="w-4 h-4 text-foreground-muted group-hover:text-accent transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
@@ -967,7 +965,7 @@ data-project={thread.slug}
 <aside id="chapters-aside" class="w-72 shrink-0">
 <div class="sticky top-32">
 <div id="sidebar-project-chapters" class="hidden">
-<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+<Text size="xs" variant="secondary" class="font-serif uppercase tracking-widest mb-4 block">
 Sections
 </Text>
 <nav id="sidebar-project-chapters-nav" class="space-y-2 border-l-2 border-foreground-secondary/10 pl-4"></nav>
@@ -1302,18 +1300,18 @@ const initCourseSearch = () => {
 			.filter((x): x is { e: (typeof searchEntries)[number]; inTitle: boolean } => x !== null);
 		hits.sort((a, b) => Number(b.inTitle) - Number(a.inTitle));
 		if (!hits.length) {
-			resultsPanel.innerHTML = `<p class="mt-6 text-sm text-foreground-muted" style="font-family:'Besley',serif">No results for “${escHtml(q)}”.</p>`;
+			resultsPanel.innerHTML = `<p class="font-serif mt-6 text-sm text-foreground-muted">No results for “${escHtml(q)}”.</p>`;
 			return;
 		}
 		resultsPanel.innerHTML =
-			`<p class="mb-4 text-xs uppercase tracking-widest text-foreground-muted" style="font-family:'Besley',serif">${hits.length} result${hits.length === 1 ? '' : 's'}</p>` +
+			`<p class="font-serif mb-4 text-xs uppercase tracking-widest text-foreground-muted">${hits.length} result${hits.length === 1 ? '' : 's'}</p>` +
 			`<div class="space-y-2">` +
 			hits.slice(0, 50).map(({ e }) =>
 				`<a href="${escHtml(e.href)}" class="search-result flex items-start gap-3 rounded-lg border border-border bg-card hover:border-accent/50 hover:bg-foreground/[0.03] transition-all p-4" data-href="${escHtml(e.href)}">` +
 					(e.thumb ? `<img src="${escHtml(e.thumb)}" alt="" class="w-20 h-14 rounded object-cover shrink-0 border border-border" decoding="async" />` : '') +
 					`<div class="min-w-0 flex-1">` +
-						`<div class="flex items-center gap-2 mb-1"><span class="text-[0.65rem] uppercase tracking-wider text-accent" style="font-family:'Besley',serif">${escHtml(e.kind)}</span><span class="text-xs text-foreground-muted truncate">${escHtml(e.crumb)}</span></div>` +
-						`<p class="text-base font-medium text-foreground mb-1" style="font-family:'Besley',serif">${escHtml(e.title)}</p>` +
+						`<div class="flex items-center gap-2 mb-1"><span class="font-serif text-[0.65rem] uppercase tracking-wider text-accent">${escHtml(e.kind)}</span><span class="text-xs text-foreground-muted truncate">${escHtml(e.crumb)}</span></div>` +
+						`<p class="font-serif text-base font-medium text-foreground mb-1">${escHtml(e.title)}</p>` +
 						`<p class="text-sm text-foreground-secondary leading-snug">${buildSnippet(e.text, q)}</p>` +
 					`</div>` +
 				`</a>`
@@ -1417,8 +1415,7 @@ link.dataset.key = key;
 link.className = 'learn-nav-link block leading-snug group';
 
 const title = document.createElement('span');
-title.className = 'learn-nav-title block text-base text-foreground-secondary group-hover:text-accent transition-colors';
-title.style.fontFamily = "'Besley', serif";
+title.className = 'learn-nav-title font-serif block text-base text-foreground-secondary group-hover:text-accent transition-colors';
 if (level >= 3) title.style.paddingLeft = `${(level - 2) * 0.9}rem`;
 title.textContent = label;
 link.appendChild(title);

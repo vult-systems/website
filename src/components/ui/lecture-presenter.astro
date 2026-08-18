@@ -12,8 +12,8 @@
   <div class="absolute inset-0 flex flex-col">
     <!-- Top bar -->
     <div class="flex items-center justify-between gap-4 px-6 py-3 border-b border-foreground-secondary/10">
-      <span id="lp-title" class="truncate text-sm text-foreground-secondary" style="font-family: 'Besley', serif !important;"></span>
-      <button id="lp-exit" class="rounded-md border border-foreground/20 bg-background/90 px-3 h-9 text-xs text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" style="font-family: 'Besley', serif !important;">Exit&nbsp;(Esc)</button>
+      <span id="lp-title" class="font-serif truncate text-sm text-foreground-secondary"></span>
+      <button id="lp-exit" class="font-serif rounded-md border border-foreground/20 bg-background/90 px-3 h-9 text-xs text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors">Exit&nbsp;(Esc)</button>
     </div>
 
     <!-- Slide stage -->
@@ -25,7 +25,7 @@
              z-10 keeps both above .model-viewer-frame's own z-index: 5 (see its
              comment) — without it, a model that bleeds to the slide edge sits
              in front of this chrome instead of under it. -->
-        <div id="lp-context" class="pointer-events-none absolute top-3 right-4 z-10 max-w-[72%] truncate text-[0.65rem] sm:text-xs uppercase tracking-[0.15em]" style="font-family: 'Besley', serif !important;">
+        <div id="lp-context" class="font-serif pointer-events-none absolute top-3 right-4 z-10 max-w-[72%] truncate text-[0.65rem] sm:text-xs uppercase tracking-[0.15em]">
           <span id="lp-ctx-course" class="text-foreground-secondary/45"></span><span id="lp-ctx-sep" class="text-foreground-secondary/30"> &middot; </span><span id="lp-ctx-project" class="text-accent/80"></span>
         </div>
         <div class="pointer-events-none absolute bottom-3 left-4 z-10 opacity-60">
@@ -53,7 +53,7 @@
         <path d="M20 8v3a3 3 0 0 1-3 3h-1" stroke-dasharray="2.5 2.5" />
         <path d="m14 12 2 2 2-2" />
       </svg>
-      <p class="text-sm" style="font-family: 'Besley', serif !important;">Rotate your device to landscape to view this presentation.</p>
+      <p class="font-serif text-sm">Rotate your device to landscape to view this presentation.</p>
     </div>
 
     <!-- Controls -->
@@ -64,7 +64,7 @@
       <div class="flex-1 h-1 rounded bg-foreground/10 overflow-hidden">
         <div id="lp-progress" class="h-full bg-accent transition-[width] duration-200" style="width: 0%"></div>
       </div>
-      <span id="lp-counter" class="text-xs tabular-nums text-foreground-secondary" style="font-family: 'Besley', serif !important;">1 / 1</span>
+      <span id="lp-counter" class="font-serif text-xs tabular-nums text-foreground-secondary">1 / 1</span>
       <button id="lp-next" class="rounded-md border border-foreground/20 bg-background/90 w-9 h-9 flex items-center justify-center text-foreground/70 hover:text-white hover:bg-accent hover:border-accent transition-colors" aria-label="Next slide">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
       </button>
@@ -121,7 +121,15 @@
   }
   #lecture-presenter #lp-slide,
   #lecture-presenter #lp-slide * {
-    font-family: 'Besley', ui-serif, Georgia, serif; /* beat the global monospace default */
+    font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif; /* beat the global monospace default */
+  }
+  /* Slide titles/section headings stay the Besley serif, matching every
+     other heading on the site — only the reading-copy body text (paragraphs,
+     lists, quotes) uses the sans above. */
+  #lecture-presenter #lp-slide .lp-title-main,
+  #lecture-presenter #lp-slide .lp-title-sub,
+  #lecture-presenter #lp-slide :is(h2, h3) {
+    font-family: 'Besley', ui-serif, Georgia, serif;
   }
   #lecture-presenter #lp-slide .lp-deck {
     width: 100%;

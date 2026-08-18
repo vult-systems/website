@@ -258,8 +258,7 @@ This page contains a collection of downloadable tools and resources that I use t
 			id="resource-search"
 			type="search"
 			placeholder="Search resources..."
-			class="w-full bg-transparent text-sm text-foreground placeholder:text-foreground-muted outline-none"
-			style="font-family: 'Besley', serif !important;"
+			class="font-serif w-full bg-transparent text-sm text-foreground placeholder:text-foreground-muted outline-none"
 			autocomplete="off"
 		/>
 	</div>
@@ -271,7 +270,7 @@ This page contains a collection of downloadable tools and resources that I use t
 <!-- Sidebar -->
 <aside class="hidden lg:block w-72 shrink-0">
 <div class="sticky top-32">
-<Text size="xs" variant="secondary" class="uppercase tracking-widest mb-4 block" style="font-family: 'Besley', serif !important;">
+<Text size="xs" variant="secondary" class="font-serif uppercase tracking-widest mb-4 block">
 Categories
 </Text>
 <nav class="space-y-4 border-l-2 border-foreground-secondary/10 pl-4">
@@ -281,7 +280,7 @@ href={`#${resourceId(group.category)}`}
 class="learn-nav-link block leading-snug group"
 data-slug={resourceId(group.category)}
 >
-<span class="block text-base text-foreground-secondary group-hover:text-accent transition-colors" style="font-family: 'Besley', serif !important;">{group.category}</span>
+<span class="font-serif block text-base text-foreground-secondary group-hover:text-accent transition-colors">{group.category}</span>
 </a>
 ))}
 </nav>
@@ -343,7 +342,7 @@ data-slug={resourceId(group.category)}
 							)}
 						</div>
 						{item.download && (
-							<a href={item.download} download class="inline-flex items-center gap-1.5 text-xs text-foreground-secondary hover:text-accent transition-colors self-start" style="font-family: 'Besley', serif !important;">
+							<a href={item.download} download class="font-serif inline-flex items-center gap-1.5 text-xs text-foreground-secondary hover:text-accent transition-colors self-start">
 								<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
 								</svg>
@@ -399,7 +398,7 @@ data-slug={resourceId(group.category)}
 			)}
 		</div>
 		{item.download && (
-			<a href={item.download} download class="inline-flex items-center gap-1.5 text-xs text-foreground-secondary hover:text-accent transition-colors self-start" style="font-family: 'Besley', serif !important;">
+			<a href={item.download} download class="font-serif inline-flex items-center gap-1.5 text-xs text-foreground-secondary hover:text-accent transition-colors self-start">
 				<svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
 				</svg>
@@ -415,7 +414,7 @@ data-slug={resourceId(group.category)}
 </article>
 ))}
 
-<p id="tools-search-empty" class="hidden mt-6 text-sm text-foreground-muted" style="font-family: 'Besley', serif !important;">
+<p id="tools-search-empty" class="font-serif hidden mt-6 text-sm text-foreground-muted">
 	No tools or resources match your search.
 </p>
 </div>
@@ -433,13 +432,13 @@ data-slug={resourceId(group.category)}
 			<img id="resource-modal-img" src="" alt="" class="w-full h-auto object-contain max-h-64" />
 		</div>
 		<div class="p-6 overflow-y-auto max-h-[70vh]">
-			<p id="resource-modal-name" class="text-xl font-medium text-foreground mb-2" style="font-family: 'Besley', serif"></p>
+			<p id="resource-modal-name" class="font-serif text-xl font-medium text-foreground mb-2"></p>
 			<p id="resource-modal-desc" class="text-sm text-foreground-secondary mb-5"></p>
 			<div id="resource-modal-how-to" class="hidden mb-5">
-				<p class="text-xs uppercase tracking-widest text-foreground-muted mb-2" style="font-family: 'Besley', serif">How to Use</p>
+				<p class="font-serif text-xs uppercase tracking-widest text-foreground-muted mb-2">How to Use</p>
 				<ol id="resource-modal-how-to-list" class="space-y-1.5 text-sm text-foreground-secondary list-none"></ol>
 			</div>
-			<a id="resource-modal-download" href="#" download class="hidden inline-flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors" style="font-family: 'Besley', serif">
+			<a id="resource-modal-download" href="#" download class="font-serif hidden inline-flex items-center gap-2 text-sm text-foreground-secondary hover:text-accent transition-colors">
 				<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
 				Download
 			</a>
