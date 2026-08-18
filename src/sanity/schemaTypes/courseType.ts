@@ -47,8 +47,21 @@ export const courseProjectThreadType = defineType({
       description: 'Optional. External sources/further reading shown at the bottom of this lecture.',
       of: [defineArrayMember({ type: 'referenceLink' })],
     }),
+    defineField({
+      name: 'hidden',
+      title: 'Hidden',
+      type: 'boolean',
+      description: 'Hide this from the live site without deleting it. Useful for staging content before it’s ready or pulling something mid-semester.',
+      initialValue: false,
+    }),
   ],
-  preview: { select: { title: 'title', subtitle: 'description' } },
+  preview: {
+    select: { title: 'title', subtitle: 'description', hidden: 'hidden' },
+    prepare: ({ title, subtitle, hidden }) => ({
+      title,
+      subtitle: hidden ? ['Hidden', subtitle].filter(Boolean).join(' · ') : subtitle,
+    }),
+  },
 });
 
 /** A project/assignment thread inside a course. */
@@ -79,8 +92,21 @@ export const courseProjectType = defineType({
         'Optional. Sub-sections within this project (e.g. Reference, Intro to ZBrush, Block Ins). If any threads exist, they are shown as cards and take priority over the "body" above.',
       of: [defineArrayMember({ type: 'courseProjectThread' })],
     }),
+    defineField({
+      name: 'hidden',
+      title: 'Hidden',
+      type: 'boolean',
+      description: 'Hide this from the live site without deleting it. Useful for staging content before it’s ready or pulling something mid-semester.',
+      initialValue: false,
+    }),
   ],
-  preview: { select: { title: 'title', subtitle: 'description' } },
+  preview: {
+    select: { title: 'title', subtitle: 'description', hidden: 'hidden' },
+    prepare: ({ title, subtitle, hidden }) => ({
+      title,
+      subtitle: hidden ? ['Hidden', subtitle].filter(Boolean).join(' · ') : subtitle,
+    }),
+  },
 });
 
 /** Course document — migrated from the `curriculum` array in courses.astro */

@@ -87,13 +87,13 @@ export const coursesQuery = `
     audience,
     syllabus,
     assignments[]{ title, image },
-    projects[]{
+    projects[hidden != true]{
       title,
       "slug": slug.current,
       description,
       thumbnail,
       ${BODY_PROJECTION},
-      threads[]{
+      threads[hidden != true]{
         title,
         "slug": slug.current,
         description,
@@ -114,7 +114,7 @@ export const pipelineQuery = `
     code,
     description,
     ${BODY_PROJECTION},
-    threads[]{
+    threads[hidden != true]{
       title,
       "slug": slug.current,
       description,

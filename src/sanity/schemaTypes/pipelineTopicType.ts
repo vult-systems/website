@@ -27,8 +27,21 @@ export const pipelineThreadType = defineType({
       description: 'Optional. External sources/further reading shown at the bottom of this lecture.',
       of: [defineArrayMember({ type: 'referenceLink' })],
     }),
+    defineField({
+      name: 'hidden',
+      title: 'Hidden',
+      type: 'boolean',
+      description: 'Hide this from the live site without deleting it. Useful for staging content before it’s ready or pulling something mid-semester.',
+      initialValue: false,
+    }),
   ],
-  preview: { select: { title: 'title', subtitle: 'description' } },
+  preview: {
+    select: { title: 'title', subtitle: 'description', hidden: 'hidden' },
+    prepare: ({ title, subtitle, hidden }) => ({
+      title,
+      subtitle: hidden ? ['Hidden', subtitle].filter(Boolean).join(' · ') : subtitle,
+    }),
+  },
 });
 
 /** Pipeline topic (e.g. "Source Control") grouping several threads. */
