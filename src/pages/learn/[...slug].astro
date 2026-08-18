@@ -29,28 +29,6 @@ export const prerender = false;
 
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=60');
 
-// -------------------------------------------------------------------
-// Syllabus & Assignment Images
-// -------------------------------------------------------------------
-// To add a syllabus thumbnail for a course:
-//   1. Drop a screenshot/image into src/assets/learn/syllabi/
-//      e.g. angd-1312-syllabus.png
-//   2. Import it here:
-//      import syllabus1312 from '@/assets/learn/syllabi/angd-1312-syllabus.png';
-//   3. Add it to the matching course below:
-//      { code: 'ANGD 1312', title: '...', syllabus: syllabus1312 }
-//
-// To add assignment thumbnails for a course:
-//   1. Drop images into src/assets/learn/assignments/
-//      e.g. angd-1312-assign-01.png
-//   2. Import them here:
-//      import assign1312_01 from '@/assets/learn/assignments/angd-1312-assign-01.png';
-//   3. Add them to the matching course:
-//      { code: 'ANGD 1312', title: '...', assignments: [
-//          { image: assign1312_01, title: 'Assignment 1' },
-//      ]}
-// -------------------------------------------------------------------
-
 interface CourseAssignment {
 	image: ImageMetadata;
 	title: string;
@@ -90,7 +68,7 @@ interface Course {
 	outcomes?: string;
 	required?: string;
 	audience?: string;
-	syllabus?: any;
+	syllabusUrl?: string;
 	assignments?: CourseAssignment[];
 	projects?: CourseProject[];
 }
@@ -587,6 +565,20 @@ data-project={thread.slug}
 							</p>
 						)}
 					</div>
+				)}
+				{course.syllabusUrl && (
+					<a
+						href={course.syllabusUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="group mt-4 inline-flex items-center gap-2 text-base text-accent hover:text-accent/80 transition-colors"
+						style="font-family: 'Besley', serif !important;"
+					>
+						<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16" />
+						</svg>
+						Download Syllabus (PDF)
+					</a>
 				)}
 			</div>
 

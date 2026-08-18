@@ -142,7 +142,12 @@ export const courseType = defineType({
     defineField({ name: 'outcomes', type: 'text', rows: 3 }),
     defineField({ name: 'required', type: 'string' }),
     defineField({ name: 'audience', type: 'string' }),
-    defineField({ name: 'syllabus', type: 'image', options: { hotspot: true } }),
+    defineField({
+      name: 'syllabus',
+      title: 'Syllabus (PDF)',
+      type: 'file',
+      options: { accept: '.pdf,application/pdf' },
+    }),
     defineField({
       name: 'assignments',
       type: 'array',
@@ -174,5 +179,5 @@ export const courseType = defineType({
       ],
     },
   ],
-  preview: { select: { title: 'title', subtitle: 'code', media: 'syllabus' } },
+  preview: { select: { title: 'title', subtitle: 'code' } },
 });

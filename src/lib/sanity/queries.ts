@@ -85,7 +85,7 @@ export const coursesQuery = `
     outcomes,
     required,
     audience,
-    syllabus,
+    "syllabusUrl": syllabus.asset->url,
     assignments[]{ title, image },
     projects[hidden != true]{
       title,
