@@ -214,20 +214,23 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 </html>
 
 <style is:global>
-	/* Font System - IBM Plex Mono for body text */
+	/* Font System - two typefaces sitewide: Besley (headings/chrome) and
+	   Figtree (reading copy/default UI text). IBM Plex Mono is kept only
+	   for actual code (see `code, pre, kbd, samp` below) — never a general
+	   site typeface. */
 	:root {
 		--font-ibm-plex: 'IBM Plex Mono', 'Courier New', monospace;
 	}
-	
-	/* Apply IBM Plex Mono globally; components override with Besley where needed */
+
+	/* Figtree is the sitewide default for anything not explicitly Besley
+	   (headings/nav/chrome via font-serif, or the raw-tag rule below). */
 	html, body, body * {
-		font-family: var(--font-ibm-plex);
+		font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
 		letter-spacing: 0.02em;
 	}
 
 	/* Readable content (paragraphs, list items, headings, quotes) uses the Besley
 	   reading serif so raw markup matches the Text/Heading components and prose.
-	   UI chrome (nav, buttons, badges) and code stay monospace via `body *`.
 	   Placed after `body *` so it wins at equal specificity; letter-spacing is
 	   left untouched so `tracking-*` utilities on labels still apply. */
 	p, li, blockquote, figcaption, dt, dd,
