@@ -541,13 +541,13 @@ data-project={thread.slug}
 				<Heading level={2} size="2xl" class="mb-3">
 					{course.title}
 				</Heading>
-				<Text size="base" variant="secondary">
+				<Text size="base" variant="secondary" class="whitespace-pre-line">
 					{course.description}
 				</Text>
 				{course.outcomes && (
 					<div class="mt-5">
 						<p class="text-xs uppercase tracking-widest text-foreground-muted mb-1" style="font-family: 'Besley', serif !important;">Outcomes</p>
-						<Text size="base" variant="secondary">{course.outcomes}</Text>
+						<Text size="base" variant="secondary" class="whitespace-pre-line">{course.outcomes}</Text>
 					</div>
 				)}
 				{(course.required || course.audience) && (
@@ -635,7 +635,7 @@ data-project={thread.slug}
 				<Heading level={2} size="2xl" class="mb-3">
 					{topic.title}
 				</Heading>
-				<Text size="base" variant="secondary">
+				<Text size="base" variant="secondary" class="whitespace-pre-line">
 					{topic.description}
 				</Text>
 			</div>
@@ -713,7 +713,7 @@ data-project={thread.slug}
 		<div id={`project-${courseId(course.code)}-${project.slug}`} class:list={["project-detail-content", "hidden", (project.threads?.length ?? 0) === 0 && "max-w-3xl mx-auto"]}>
 			<Heading level={2} size="2xl" class="mb-3">{project.title}</Heading>
 			<div class="mb-6"><Badge variant="accent" size="sm">{course.code}</Badge></div>
-			<Text size="lg" variant="secondary" class="mb-8">{project.description}</Text>
+			<Text size="lg" variant="secondary" class="mb-8 whitespace-pre-line">{project.description}</Text>
 			{(project.threads?.length ?? 0) > 0 ? (
 				<!-- Thread cards (course > project > thread drill-down) -->
 				<div class="grid grid-cols-1 gap-4">
@@ -771,7 +771,7 @@ data-project={thread.slug}
 		<div id={`project-${topic.slug}-${thread.slug}`} class="project-detail-content hidden max-w-3xl mx-auto">
 			<Heading level={2} size="2xl" class="mb-3">{thread.title}</Heading>
 			<div class="mb-6"><Badge variant="accent" size="sm">{topic.title}</Badge></div>
-			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
+			<Text size="lg" variant="secondary" class="mb-8 whitespace-pre-line">{thread.description}</Text>
 			{thread.body ? (
 				<div class="lecture-block" data-lecture-title={thread.title} data-lecture-subtitle={thread.description} data-lecture-context={topic.code ? `${topic.code} ${topic.title}` : topic.title} data-lecture-context-accent={thread.title}>
 					<LectureActions />
@@ -875,7 +875,7 @@ data-project={thread.slug}
 				<Badge variant="accent" size="sm">{course.code}</Badge>
 				<Badge variant="outline" size="sm">{project.title}</Badge>
 			</div>
-			<Text size="lg" variant="secondary" class="mb-8">{thread.description}</Text>
+			<Text size="lg" variant="secondary" class="mb-8 whitespace-pre-line">{thread.description}</Text>
 			{thread.body ? (
 				<div class="lecture-block" data-lecture-title={thread.title} data-lecture-subtitle={thread.description} data-lecture-context={`${course.code} ${course.title}`} data-lecture-context-accent={project.title}>
 					<LectureActions />
