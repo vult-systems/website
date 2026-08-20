@@ -6,7 +6,7 @@ import { layout } from '@/config/design';
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="w-full bg-background/90 backdrop-blur-lg sticky top-0 left-0 right-0 z-50" transition:persist>
+<header class="w-full bg-background/90 backdrop-blur-lg sticky top-0 left-0 right-0 z-50" transition:persist transition:animate="none">
     <div class={layout.container}>
         <div class="flex h-16 items-end justify-between pb-4 border-b-2 border-foreground-secondary/10">
         <a href="/" class="flex items-end gap-x-3 hover:scale-105 transition-transform duration-200">
