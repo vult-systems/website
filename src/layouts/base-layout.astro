@@ -266,25 +266,28 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 		}
 	}
 
-	/* Short sequenced fade — NOT purely cosmetic. Astro's swap keeps the
-	   shared stylesheet <link> in place across navigation in theory, but in
-	   practice this site reproducibly renders fully unstyled for ~100-150ms
-	   right after the swap (confirmed repeatedly on production: zero
-	   stylesheets in document.head, links in the browser's default blue,
-	   images sized off their raw intrinsic dimensions instead of their CSS
-	   classes — a real gap, not a rendering artifact). That was always
-	   happening; a previous, longer fade here always covered it, which is
-	   exactly why removing the transition (for snappier nav) made it
-	   visible. Old fades to the background color fast, new is held back
-	   long enough to clear the gap before revealing itself, then fades in
-	   quickly — short enough to still feel fast, long enough to never show
-	   unstyled content. */
+	/* This used to hold a much longer delay (180ms) to paper over a real
+	   unstyled-content flash — the actual cause (VercelAnalytics/SpeedInsights
+	   breaking <head> parsing, see the comment on those above, near <body>) is
+	   now fixed at the source, so this only needs a small buffer, not a
+	   cover-up. Verified via Playwright against a production build: 0 unstyled
+	   samples across 25 navigations at these shorter durations. Old fades out
+	   fast; new waits just long enough to avoid a same-frame swap, then fades
+	   in quickly. */
+	/* The browser's UA stylesheet also puts a ~250ms default animation-duration
+	   on ::view-transition-group(root) itself (for size/position morphing) —
+	   irrelevant here since root never changes size, but it still holds the
+	   transition open that long unless overridden. */
+	::view-transition-group(root) {
+		animation-duration: 0s;
+	}
+
 	::view-transition-old(root) {
-		animation: 100ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
+		animation: 80ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
 	}
 
 	::view-transition-new(root) {
-		animation: 120ms cubic-bezier(0, 0, 0.2, 1) 180ms both fade-in;
+		animation: 100ms cubic-bezier(0, 0, 0.2, 1) 40ms both fade-in;
 	}
 
 	@keyframes fade-in {

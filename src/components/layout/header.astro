@@ -72,7 +72,7 @@ const currentPath = Astro.url.pathname;
                 <span class="hamburger-line block w-5 h-[2px] bg-foreground transition-all duration-300"></span>
             </button>
             
-            <div transition:persist="theme-toggle">
+            <div transition:persist="theme-toggle" transition:animate="none">
                 <ThemeToggle />
             </div>
         </div>
