@@ -172,23 +172,6 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 				} else {
 					event.newDocument.documentElement.classList.remove('dark');
 				}
-
-				// Every page shares the same main stylesheet href, and Astro's
-				// swap already tries to preserve a same-href stylesheet link on
-				// its own — but in practice this site still shows it transiently
-				// missing during the swap (confirmed: unstyled/browser-default
-				// content for ~100-150ms — default blue link color, unconstrained
-				// image sizing — every single navigation). Explicitly matching
-				// via transition:persist takes Astro's primary matching path
-				// (checked before the href-based fallback that isn't holding up
-				// here), so the link element is never removed and re-inserted at
-				// all, closing whatever timing gap the fallback was hitting.
-				const currentSheet = document.querySelector('head link[rel="stylesheet"]');
-				const newSheet = event.newDocument.querySelector('head link[rel="stylesheet"]');
-				if (currentSheet && newSheet && currentSheet.getAttribute('href') === newSheet.getAttribute('href')) {
-					currentSheet.setAttribute('data-astro-transition-persist', 'main-stylesheet');
-					newSheet.setAttribute('data-astro-transition-persist', 'main-stylesheet');
-				}
 			});
 		</script>
 		
@@ -243,51 +226,26 @@ const siteUrl = Astro.site?.toString() || SITE.url;
 	}
 
 
-	/* Custom view transition animations */
-	@keyframes slideUp {
-		from {
-			opacity: 0;
-			transform: translateY(30px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	@keyframes slideDown {
-		from {
-			opacity: 1;
-			transform: translateY(0);
-		}
-		to {
-			opacity: 0;
-			transform: translateY(-30px);
-		}
-	}
-
-	/* This used to hold a much longer delay (180ms) to paper over a real
-	   unstyled-content flash — the actual cause (VercelAnalytics/SpeedInsights
-	   breaking <head> parsing, see the comment on those above, near <body>) is
-	   now fixed at the source, so this only needs a small buffer, not a
-	   cover-up. Verified via Playwright against a production build: 0 unstyled
-	   samples across 25 navigations at these shorter durations. Old fades out
-	   fast; new waits just long enough to avoid a same-frame swap, then fades
-	   in quickly. */
-	/* The browser's UA stylesheet also puts a ~250ms default animation-duration
-	   on ::view-transition-group(root) itself (for size/position morphing) —
-	   irrelevant here since root never changes size, but it still holds the
-	   transition open that long unless overridden. */
-	::view-transition-group(root) {
-		animation-duration: 0s;
+	/* Root page-transition fade. The old snapshot fades out quickly; the new
+	   one waits briefly before fading in — short enough to feel immediate,
+	   long enough that a same-frame swap never reads as a hard cut. These
+	   durations matched the site's actual behavior for months before being
+	   cut further and regressing (see git history on this block) — restored
+	   here rather than re-guessing at tighter numbers. mix-blend-mode is
+	   pinned to normal because the browser's default view-transition
+	   cross-fade uses plus-lighter, which can wash out bright/saturated
+	   content mid-transition on this dark-first theme. */
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		mix-blend-mode: normal;
 	}
 
 	::view-transition-old(root) {
-		animation: 80ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
+		animation: 100ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
 	}
 
 	::view-transition-new(root) {
-		animation: 100ms cubic-bezier(0, 0, 0.2, 1) 40ms both fade-in;
+		animation: 120ms cubic-bezier(0, 0, 0.2, 1) 180ms both fade-in;
 	}
 
 	@keyframes fade-in {
